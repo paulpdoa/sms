@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
-import DateTime from '../components/DateTime';
-
+import DateTime from "../components/DateTime";
 const SchoolAdmin = () => {
     return (
         <main className="p-2">

@@ -18,6 +18,7 @@ const Sidebar = () => {
     const viewHeight = window.outerHeight;
 
     const currentRole = localStorage.getItem('role');
+    const currentUser = localStorage.getItem('username');
     
     // 1. 
     // 2. 
@@ -30,7 +31,7 @@ const Sidebar = () => {
                 {
                     name: 'Dashboard',
                     icon: <AiFillDashboard />,
-                    link: '/'
+                    link: '/master/dashboard'
                 },
                 {
                     name: 'Master Data',
@@ -84,6 +85,14 @@ const Sidebar = () => {
                             name: 'Users',
                             link: '/master/users'
                         },
+                        {
+                            name: 'Strands',
+                            link: '/master/strands'
+                        },
+                        {
+                            name: 'Textbooks',
+                            link: '/master/text-books'
+                        },
                     ]
                 },
                 {
@@ -93,6 +102,10 @@ const Sidebar = () => {
                         { 
                             name: 'Teachers',
                             link: '/teachers'
+                        },
+                        { 
+                            name: 'Strands',
+                            link: '/strands'
                         }
                     ]
                 },
@@ -146,60 +159,6 @@ const Sidebar = () => {
                     icon: <AiFillDashboard />,
                     link: '/'
                 },
-                    // {
-                    //     name: 'Master Data',
-                    //     icon: <RiAccountPinBoxFill />,
-                    //     subMenus: [
-                    //         { 
-                    //             name: 'Religion',
-                    //             link: '/master/religion'
-                    //         },
-                    //         { 
-                    //             name:'Nationality',
-                    //             link: '/master/nationality'
-                    //         },
-                    //         { 
-                    //             name: 'Gender',
-                    //             link: '/master/gender'
-                    //         },
-                    //         { 
-                    //             name: 'Departments',
-                    //             link: '/master/departments'
-                    //         },
-                    //         { 
-                    //             name: 'Sections',
-                    //             link: '/master/sections'
-                    //         },
-                    //         {
-                    //             name: 'Students',
-                    //             link: '/master/students'
-                    //         },
-                    //         {
-                    //             name: 'Teachers',
-                    //             link: '/master/teachers'
-                    //         },
-                    //         {
-                    //             name: 'Grade Level',
-                    //             link: '/master/grade-levels'
-                    //         },
-                    //         {
-                    //             name: 'Admission Requirements',
-                    //             link: '/master/requirements'
-                    //         },
-                    //         {
-                    //             name: 'User Roles',
-                    //             link: '/master/user-roles'
-                    //         },
-                    //         {
-                    //             name: 'School Year',
-                    //             link: '/master/school-year'
-                    //         },
-                    //         {
-                    //             name: 'Users',
-                    //             link: '/master/users'
-                    //         },
-                    //     ]
-                    // },
                 {
                     name: 'School Admin',
                     icon: <FaCashRegister />,
@@ -255,7 +214,7 @@ const Sidebar = () => {
     ])
 
     return (    
-        <nav style={{ height: viewHeight }} className="w-full col-span-2 bg-sky-950 h-screen">
+        <nav className="w-full col-span-2 bg-sky-950 h-full">
            <div>
                 <div className="bg-green-600 p-3">
                     <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
@@ -264,8 +223,8 @@ const Sidebar = () => {
                 <div className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg">
                     <FaRegUserCircle className="text-5xl" />
                     <div className="text-gray-100 flex flex-col">
-                        <h2 className="text-lg">Paul Andres</h2>
-                        <span className="text-xs">Super Admin</span>
+                        <h2 className="text-lg">{currentUser}</h2>
+                        <span className="text-xs">{currentRole}</span>
                     </div>
                 </div>
 
@@ -275,12 +234,12 @@ const Sidebar = () => {
                         <div key={id}>
                             <li className="px-7 py-3 my-3 flex flex-col gap-2 hover cursor-pointer group">
                                 { menu.link !== undefined ?
-                                <Link to={menu.link} className="flex items-center gap-2">
+                                <Link to={menu.link} className="flex items-center gap-2 p-1 hover:bg-sky-900">
                                     <span className="text-green-500 ">{menu.icon}</span> 
                                     <span className="text-gray-100">{menu.name}</span> 
                                     { menu.subMenus !== undefined && <MdOutlineKeyboardArrowUp  className="rotate-180 group-hover:rotate-0"/> }
                                 </Link> :
-                                <button className="flex items-center gap-2">
+                                <button className="flex items-center gap-2 hover:bg-sky-900 p-1">
                                     <span className="text-green-500 ">{menu.icon}</span> 
                                     <span className="text-gray-100">{menu.name}</span> 
                                     { menu.subMenus !== undefined && <MdOutlineKeyboardArrowUp  className="rotate-180 group-hover:rotate-0"/> }
@@ -289,7 +248,7 @@ const Sidebar = () => {
                                 { menu.subMenus !== undefined && 
                                 <ul className="group-hover:flex flex-col gap-3 hidden">
                                     { menu.subMenus?.map((subMenu,id) => (
-                                        <Link key={id} className="hover:bg-sky-900 p-2" to={subMenu.link}><li className="text-sm px-5">{subMenu.name}</li></Link>
+                                        <Link key={id} className="hover:bg-sky-900 p-1" to={subMenu.link}><li className="text-sm px-5">{subMenu.name}</li></Link>
                                     )) }
                                 </ul>   
                                 }

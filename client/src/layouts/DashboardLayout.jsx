@@ -4,12 +4,10 @@ import Navbar from "../components/Navbar";
 
 const DashboardLayout = () =>{
 
-    const viewHeight = window.outerHeight;
-
     return (
-        <main style={{height:viewHeight}} className="grid grid-cols-10 bg-gray-100">
+        <main className="grid grid-cols-10 bg-gray-100 h-screen">
             <Sidebar />
-            <div className="col-span-8 h-auto">
+            <div className="col-span-8 h-full bg-gray-100">
                 <Navbar />
                 <Outlet />
             </div>

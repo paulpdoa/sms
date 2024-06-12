@@ -30,6 +30,8 @@ import UserRoles from "./pages/SuperAdmin/UserRoles";
 import SchoolYear from "./pages/SuperAdmin/SchoolYear";
 import NewTeacher from "./pages/Teacher/NewTeacher";
 import SchoolAdmin from './layouts/SchoolAdmin';
+import Strands from "./pages/SuperAdmin/Strands";
+import Textbook from "./pages/SuperAdmin/Textbook";
 
 function App() {
 
@@ -66,11 +68,14 @@ function App() {
             <Route path='school-year' element={<SchoolYear />} />
             <Route path='teachers' element={<Teachers />} />
             <Route path='users' element={<Users />} />
+            <Route path='strands' element={<Strands />} />
+            <Route path='text-books' element={<Textbook />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />
-          <Route path='/school-admin' element={<SchoolAdmin />}>
-            <Route path='teachers' element={<Teachers />} />
+          <Route path='strands' element={<Strands />} />
+
+          <Route path='/school-admin' element={role === 'School Admin' && <SchoolAdmin />}>
             <Route path='new-teacher' element={<NewTeacher />} />
           </Route>
 

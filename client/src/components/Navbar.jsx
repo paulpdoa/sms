@@ -15,6 +15,7 @@ const Navbar = () => {
         localStorage.removeItem('userToken');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
+        localStorage.removeItem('id');
         toast.success(message, {
             position: "top-center",
             autoClose: 1000,

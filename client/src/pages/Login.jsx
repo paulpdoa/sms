@@ -4,11 +4,16 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { useFetch } from '../hooks/useFetch';
 
 const Login = () => {
 
+    const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
+
     const [username,setUsername] = useState('');
     const [password,setPassword] = useState('');
+    const [schoolYear,setSchoolYear] = useState('');
+
     const navigate = useNavigate();
 
     const loginUser = async (e) => {
@@ -19,6 +24,8 @@ const Login = () => {
             localStorage.setItem('userToken',data.data.token);
             localStorage.setItem('role',data.data.role);
             localStorage.setItem('username',data.data.data.username);
+            localStorage.setItem('id',data.data.data._id);
+            localStorage.setItem('session',schoolYear);
 
             toast.success(data.data.mssg, {
                 position: "top-center",
@@ -71,6 +78,16 @@ const Login = () => {
                 <div className="flex flex-col gap-2 my-2">
                     <span className="text-gray-700">Password</span>
                     <input onChange={(e) => setPassword(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md" type="password" />
+                </div>
+
+                <div className="flex flex-col gap-2 my-2">
+                    <span className="text-gray-700">Session</span>
+                    <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
+                        <option hidden>Select session</option>
+                        { schoolYears?.map(sy => (
+                            <option value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
+                        )) }
+                    </select>
                 </div>
 
                 <button className="bg-green-500 w-full p-1 rounded-md text-gray-200 cursor-pointer my-3">Login</button>
