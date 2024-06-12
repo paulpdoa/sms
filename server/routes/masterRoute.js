@@ -40,10 +40,26 @@ edit_grade_level,
 edit_requirement,
 edit_role,
 edit_school_year,
-edit_user} = require('../controller/masterController');
+edit_user,
+user_login} = require('../controller/masterController');
+
+const requireAuth = require('../middleware/requireAuth');
+
+route.post('/user-login',user_login);
+
+// Role
+route.get('/user-roles', get_roles);
+route.post('/user-roles', add_roles);
+route.delete('/user-role/:id', delete_role);
+route.get('/user-role/:id', get_role_detail);
+route.patch('/user-role/:id',edit_role);
+
+
+// require auth for all workout routes
+// route.use(requireAuth)
 
 // Religion
-route.get('/religions', get_religions);
+route.get('/religions',get_religions);
 route.post('/religions', add_religion);
 route.delete('/religion/:id', delete_religion);
 route.get('/religion/:id', get_religion_detail);
@@ -91,12 +107,7 @@ route.delete('/requirement/:id', delete_requirement);
 route.get('/requirement/:id', get_requirement_detail);
 route.patch('/requirement/:id',edit_requirement);
 
-// Role
-route.get('/user-roles', get_roles);
-route.post('/user-roles', add_roles);
-route.delete('/user-role/:id', delete_role);
-route.get('/user-role/:id', get_role_detail);
-route.patch('/user-role/:id',edit_role);
+
 
 // School Year
 route.get('/school-years', get_school_years);

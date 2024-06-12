@@ -17,130 +17,244 @@ const Sidebar = () => {
 
     const viewHeight = window.outerHeight;
 
+    const currentRole = localStorage.getItem('role');
+    
+    // 1. 
+    // 2. 
+    // 3. 
+
     const [menus,setMenus] = useState([
         {
-            name: 'Dashboard',
-            icon: <AiFillDashboard />,
-            link: '/'
-        },
-        {
-            name: 'Master Data',
-            icon: <RiAccountPinBoxFill />,
-            subMenus: [
-                { 
-                    name: 'Religion',
-                    link: '/master/religion'
-                },
-                { 
-                    name:'Nationality',
-                    link: '/master/nationality'
-                },
-                { 
-                    name: 'Gender',
-                    link: '/master/gender'
-                },
-                { 
-                    name: 'Departments',
-                    link: '/master/departments'
-                },
-                { 
-                    name: 'Sections',
-                    link: '/master/sections'
+            role: 'Super Admin',
+            menus: [
+                {
+                    name: 'Dashboard',
+                    icon: <AiFillDashboard />,
+                    link: '/'
                 },
                 {
-                    name: 'Students',
-                    link: '/master/students'
+                    name: 'Master Data',
+                    icon: <RiAccountPinBoxFill />,
+                    subMenus: [
+                        { 
+                            name: 'Religion',
+                            link: '/master/religion'
+                        },
+                        { 
+                            name:'Nationality',
+                            link: '/master/nationality'
+                        },
+                        { 
+                            name: 'Gender',
+                            link: '/master/gender'
+                        },
+                        { 
+                            name: 'Departments',
+                            link: '/master/departments'
+                        },
+                        { 
+                            name: 'Sections',
+                            link: '/master/sections'
+                        },
+                        {
+                            name: 'Students',
+                            link: '/master/students'
+                        },
+                        {
+                            name: 'Teachers',
+                            link: '/master/teachers'
+                        },
+                        {
+                            name: 'Grade Level',
+                            link: '/master/grade-levels'
+                        },
+                        {
+                            name: 'Admission Requirements',
+                            link: '/master/requirements'
+                        },
+                        {
+                            name: 'User Roles',
+                            link: '/master/user-roles'
+                        },
+                        {
+                            name: 'School Year',
+                            link: '/master/school-year'
+                        },
+                        {
+                            name: 'Users',
+                            link: '/master/users'
+                        },
+                    ]
                 },
                 {
-                    name: 'Teachers',
-                    link: '/master/teachers'
+                    name: 'School Admin',
+                    icon: <FaCashRegister />,
+                    subMenus: [
+                        { 
+                            name: 'Teachers',
+                            link: '/teachers'
+                        }
+                    ]
                 },
                 {
-                    name: 'Grade Level',
-                    link: '/master/grade-levels'
+                    name: 'Registrar',
+                    icon: <FaCashRegister />,
+                    subMenus: [
+                        { 
+                            name: 'Students',
+                            link: '/students'
+                        },
+                        { 
+                            name:'Registration' 
+                        },
+                        { 
+                            name: 'Admission' 
+                        },
+                        { 
+                            name: 'Sectioning' 
+                        }
+                    ]
                 },
                 {
-                    name: 'Admission Requirements',
-                    link: '/master/requirements'
+                    name: 'Parents',
+                    icon: <RiParentFill />,
+                    link: '/parents'
                 },
                 {
-                    name: 'User Roles',
-                    link: '/master/user-roles'
+                    name: 'Library',
+                    icon: <IoLibrary />,
+                    link: '/library'
                 },
                 {
-                    name: 'School Year',
-                    link: '/master/school-year'
+                    name: 'Account',
+                    icon: <RiAccountPinBoxFill />,
+                    link: '/account'
                 },
+                
                 {
-                    name: 'Users',
-                    link: '/master/users'
-                },
-            ]
-        },
-        {
-            name: 'School Admin',
-            icon: <FaCashRegister />,
-            subMenus: [
-                { 
-                    name: 'Teachers',
-                    link: '/teachers'
+                    name: 'Settings',
+                    icon: <IoSettings />,
+                    link: '/settings'
                 }
             ]
         },
         {
-            name: 'Registrar',
-            icon: <FaCashRegister />,
-            subMenus: [
-                { 
-                    name: 'Students',
-                    link: '/students'
+            role: 'School Admin',
+            menus: [
+                {
+                    name: 'Dashboard',
+                    icon: <AiFillDashboard />,
+                    link: '/'
                 },
-                { 
-                    name:'Registration' 
+                    // {
+                    //     name: 'Master Data',
+                    //     icon: <RiAccountPinBoxFill />,
+                    //     subMenus: [
+                    //         { 
+                    //             name: 'Religion',
+                    //             link: '/master/religion'
+                    //         },
+                    //         { 
+                    //             name:'Nationality',
+                    //             link: '/master/nationality'
+                    //         },
+                    //         { 
+                    //             name: 'Gender',
+                    //             link: '/master/gender'
+                    //         },
+                    //         { 
+                    //             name: 'Departments',
+                    //             link: '/master/departments'
+                    //         },
+                    //         { 
+                    //             name: 'Sections',
+                    //             link: '/master/sections'
+                    //         },
+                    //         {
+                    //             name: 'Students',
+                    //             link: '/master/students'
+                    //         },
+                    //         {
+                    //             name: 'Teachers',
+                    //             link: '/master/teachers'
+                    //         },
+                    //         {
+                    //             name: 'Grade Level',
+                    //             link: '/master/grade-levels'
+                    //         },
+                    //         {
+                    //             name: 'Admission Requirements',
+                    //             link: '/master/requirements'
+                    //         },
+                    //         {
+                    //             name: 'User Roles',
+                    //             link: '/master/user-roles'
+                    //         },
+                    //         {
+                    //             name: 'School Year',
+                    //             link: '/master/school-year'
+                    //         },
+                    //         {
+                    //             name: 'Users',
+                    //             link: '/master/users'
+                    //         },
+                    //     ]
+                    // },
+                {
+                    name: 'School Admin',
+                    icon: <FaCashRegister />,
+                    subMenus: [
+                        { 
+                            name: 'Teachers',
+                            link: '/teachers'
+                        }
+                    ]
                 },
-                { 
-                    name: 'Admission' 
+                {
+                    name: 'Registrar',
+                    icon: <FaCashRegister />,
+                    subMenus: [
+                        { 
+                            name: 'Students',
+                            link: '/students'
+                        },
+                        { 
+                            name:'Registration' 
+                        },
+                        { 
+                            name: 'Admission' 
+                        },
+                        { 
+                            name: 'Sectioning' 
+                        }
+                    ]
                 },
-                { 
-                    name: 'Sectioning' 
+                {
+                    name: 'Parents',
+                    icon: <RiParentFill />,
+                    link: '/parents'
+                },
+                {
+                    name: 'Library',
+                    icon: <IoLibrary />,
+                    link: '/library'
+                },
+                {
+                    name: 'Account',
+                    icon: <RiAccountPinBoxFill />,
+                    link: '/account'
+                },
+                
+                {
+                    name: 'Settings',
+                    icon: <IoSettings />,
+                    link: '/settings'
                 }
             ]
-        },
-        // {
-        //     name: 'Students',
-        //     icon: <PiStudentFill />,
-        //     link: '/students'
-        // },
-        // {
-        //     name: 'Teachers',
-        //     icon: <PiChalkboardTeacherFill />,
-        //     link: '/teachers'
-        // },
-        {
-            name: 'Parents',
-            icon: <RiParentFill />,
-            link: '/parents'
-        },
-        {
-            name: 'Library',
-            icon: <IoLibrary />,
-            link: '/library'
-        },
-        {
-            name: 'Account',
-            icon: <RiAccountPinBoxFill />,
-            link: '/account'
-        },
-        
-        {
-            name: 'Settings',
-            icon: <IoSettings />,
-            link: '/settings'
-        }
+        }      
     ])
 
-
-    return (
+    return (    
         <nav style={{ height: viewHeight }} className="w-full col-span-2 bg-sky-950 h-screen">
            <div>
                 <div className="bg-green-600 p-3">
@@ -157,7 +271,7 @@ const Sidebar = () => {
 
 
                 <ul className="max-h-full text-gray-100">
-                    { menus?.map((menu,id) => (
+                    { menus?.filter(menu => menu.role === currentRole)[0]?.menus?.map((menu,id) => (
                         <div key={id}>
                             <li className="px-7 py-3 my-3 flex flex-col gap-2 hover cursor-pointer group">
                                 { menu.link !== undefined ?

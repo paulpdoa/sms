@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const requiredString = {
     type: String,
@@ -8,7 +9,7 @@ const requiredString = {
 
 const userSchema = new mongoose.Schema({
     firstName: requiredString,
-    middleName: requiredString,
+    middleName: requiredString, 
     lastName: requiredString,
     username: {
         type: String,
@@ -29,13 +30,18 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();
+
+    if(!validator.isStrongPassword(this.password)) {
+        throw Error('Password not strong enough')
+    }
+
     this.password = await bcrypt.hash(this.password,salt);
     next();
 });
 
 // create static login method for user
-userSchema.statics.login = async function(email,password) {
-    const user = await this.findOne({ email });
+userSchema.statics.login = async function(username,password) {
+    const user = await this.findOne({ username });
     if(user) {
         const auth = await bcrypt.compare(password,user.password);
         if(auth) {

@@ -1,3 +1,4 @@
+
 const Religion = require('../model/Religion');
 const Nationality = require('../model/Nationality');
 const Gender = require('../model/Gender');
@@ -8,6 +9,14 @@ const Requirement = require('../model/Requirement');
 const Role = require('../model/Roles');
 const SchoolYear = require('../model/SchoolYear');
 const User = require('../model/Users');
+const jwt = require('jsonwebtoken');
+
+const maxAge = 3 * 24 * 24 * 60;
+const createToken = (token) => {
+    return jwt.sign({ token }, process.env.SECRET, {
+        expiresIn: maxAge
+    })
+}
 
 // For Religion
 module.exports.get_religions = async (req,res) => {
@@ -604,12 +613,14 @@ module.exports.add_user = async (req,res) => {
     try {
         if(password === confirmPassword) {
             const newUser = await User.create({ firstName,middleName,role,lastName,username,password,isActive });
-            res.status(200).json({ mssg: `${firstName} has been added to the record` });
+            const token = createToken(newUser._id);
+            res.status(200).json({ mssg: `${firstName} has been added to the record`, token });
         } else {
             res.status(400).json({ mssg:'Password does not match, please check before submitting' });
         }
     } catch(err) {
-        console.log(err);
+        console.log(err.message);
+        res.status(400).json({ mssg: err.message });
     }
 }
 
@@ -651,5 +662,21 @@ module.exports.edit_user = async (req,res) => {
         
     } catch(err) {
         console.log(err);
+    }
+}
+
+module.exports.user_login = async (req,res) => {
+
+    const { username,password } = req.body;
+
+    try {
+        const login = await User.login(username,password);
+        const token = createToken(login._id);
+        const roleDetail = await Role.find({ _id: login.role });
+
+        res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail[0].userRole,redirect:'/' });
+    } catch(err) {
+        console.log(err.message);
+        res.status(400).json({ mssg: err.message });
     }
 }

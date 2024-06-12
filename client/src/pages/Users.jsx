@@ -70,6 +70,7 @@ const Users = () => {
         e.preventDefault();
         try {
             const newUser = await axios.post(`${baseUrl()}/user`,{ firstName,middleName,lastName,username,role,password,confirmPassword });
+            localStorage.setItem('user',newUser.data.token);
             toast.success(newUser.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

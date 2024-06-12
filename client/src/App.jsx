@@ -3,7 +3,7 @@ import {
   createRoutesFromElements,
   RouterProvider,
   Route,
-  Link,
+  Navigate,
 } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
@@ -33,12 +33,15 @@ import SchoolAdmin from './layouts/SchoolAdmin';
 
 function App() {
 
+  const userToken = localStorage.getItem('userToken');
+  const role = localStorage.getItem('role');
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route>
-        <Route path='/login' element={<Login />} />
+        <Route path='/login' element={userToken ? <Navigate to='/' /> : <Login />} />
 
-        <Route element={<DashboardLayout />}>
+        <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
           <Route path='/' element={<Dashboard />} />
 
           <Route path='/students' element={<Students />} />
@@ -49,7 +52,8 @@ function App() {
           </Route>
 
           {/* For Super admin */}
-          <Route path='/master' element={<MasterLayout />}>
+          <Route path='/master' element={role === 'Super Admin' && <MasterLayout />}>
+            <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
             <Route path='nationality' element={<Nationality />} />
             <Route path='gender' element={<Gender />} />

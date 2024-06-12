@@ -1,4 +1,14 @@
 const Teacher = require('../model/Teacher');
+const Role = require('../model/Roles');
+const User = require('../model/Users');
+const jwt = require('jsonwebtoken');
+
+const maxAge = 3 * 24 * 24 * 60;
+const createToken = (token) => {
+    return jwt.sign({ token }, process.env.SECRET, {
+        expiresIn: maxAge
+    })
+}
 
 module.exports.get_teachers = async (req,res) => {
     try {
@@ -36,13 +46,18 @@ module.exports.add_teacher = async (req,res) => {
         password,
         confirmPassword
      } = req.body;
-     console.log(req.body)
+
+
+     const role = 'Teacher';
+     const activeStatus = true;
+
     try {
         if(password === confirmPassword) {
+            const findRoleId = await Role.find({ userRole: role });
+            const addTeacherToUser = await User.create({ firstName,middleName,lastName,username,password,role: findRoleId[0]._id, isActive: activeStatus});
             const addTeacher = await Teacher.create({firstName,
                 middleName,
                 lastName,
-                suffix,
                 dateOfBirth,
                 age,
                 sex,
@@ -64,6 +79,7 @@ module.exports.add_teacher = async (req,res) => {
                 section,
                 username,
                 password });
+                const token = createToken(addTeacher._id);
             res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
         }
     } catch(err) {

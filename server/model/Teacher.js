@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const requiredString = {
     type: String,
@@ -59,7 +61,18 @@ const teacherSchema = new mongoose.Schema({
     username: requiredString,
     password: requiredString
 
-}, { timestamps: true })
+}, { timestamps: true });
+
+teacherSchema.pre('save', async function(next) {
+    const salt = await bcrypt.genSalt();
+
+    if(!validator.isStrongPassword(this.password)) {
+        throw Error('Password not strong enough')
+    }
+
+    this.password = await bcrypt.hash(this.password,salt);
+    next();
+});
 
 const TeacherModel = mongoose.model('teacher',teacherSchema);
 module.exports = TeacherModel;

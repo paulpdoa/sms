@@ -54,7 +54,6 @@ const NewTeacher = () => {
             firstName,
             middleName,
             lastName,
-           
             dateOfBirth,
             age: getAge,
             sex,
@@ -81,7 +80,6 @@ const NewTeacher = () => {
     
         try {
             const data = await axios.post(`${baseUrl()}/teachers`,teacherInformation);
-            // navigate(data.data.redirect);
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
