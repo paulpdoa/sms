@@ -1,4 +1,3 @@
-
 const Religion = require('../model/Religion');
 const Nationality = require('../model/Nationality');
 const Gender = require('../model/Gender');
@@ -9,6 +8,7 @@ const Requirement = require('../model/Requirement');
 const Role = require('../model/Roles');
 const SchoolYear = require('../model/SchoolYear');
 const User = require('../model/Users');
+const PaymentTerm = require('../model/PaymentTerm');
 const jwt = require('jsonwebtoken');
 
 const maxAge = 3 * 24 * 24 * 60;
@@ -21,7 +21,7 @@ const createToken = (token) => {
 // For Religion
 module.exports.get_religions = async (req,res) => {
     try {
-        const religions = await Religion.find();
+        const religions = await Religion.find().populate('inputter');
         res.status(200).json(religions);
     } catch(err) {
         console.log(err);
@@ -30,10 +30,10 @@ module.exports.get_religions = async (req,res) => {
 
 module.exports.add_religion = async (req,res) => {
 
-    const { religion } = req.body
+    const { religion,currentUserId: inputter } = req.body
 
     try {
-        const newReligion = await Religion.create({ religion });
+        const newReligion = await Religion.create({ religion,inputter });
         res.status(200).json({ mssg: `${religion} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -65,12 +65,12 @@ module.exports.get_religion_detail = async (req,res) => {
 module.exports.edit_religion = async (req,res) => {
     const { id } = req.params;
 
-    const { newReligion: religion } = req.body;
+    const { newReligion: religion,currentUserId: inputter } = req.body;
 
     try {   
         const currReligion = await Religion.findById(id);
         if(currReligion.religion !== religion) {
-            const newReligion = await Religion.findByIdAndUpdate({ _id: id }, { religion });
+            const newReligion = await Religion.findByIdAndUpdate({ _id: id }, { religion,inputter });
             res.status(200).json({ mssg: `${newReligion.religion} has been changed to ${religion} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${religion}, still the same with old value` })
@@ -85,7 +85,7 @@ module.exports.edit_religion = async (req,res) => {
 
 module.exports.get_nationalities = async (req,res) => {
     try {
-        const nationalities = await Nationality.find();
+        const nationalities = await Nationality.find().populate('inputter');
         res.status(200).json(nationalities);
     } catch(err) {
         console.log(err);
@@ -94,10 +94,10 @@ module.exports.get_nationalities = async (req,res) => {
 
 module.exports.add_nationality = async (req,res) => {
 
-    const { nationality } = req.body
+    const { nationality,currentUserId: inputter } = req.body
 
     try {
-        const newNationality = await Nationality.create({ nationality });
+        const newNationality = await Nationality.create({ nationality,inputter });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -128,12 +128,12 @@ module.exports.get_nationality_detail = async (req,res) => {
 
 module.exports.edit_nationality = async (req,res) => {
     const { id } = req.params;
-    const { newNationality: nationality } = req.body;
+    const { newNationality: nationality,currentUserId: inputter } = req.body;
 
     try {
         const currNationality = await Nationality.findById(id);
         if(currNationality.nationality !== nationality) {
-            const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality });
+            const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,inputter });
             res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${nationality}, still the same with old value` })
@@ -149,7 +149,7 @@ module.exports.edit_nationality = async (req,res) => {
 
 module.exports.get_genders = async (req,res) => {
     try {
-        const genders = await Gender.find();
+        const genders = await Gender.find().populate('inputter');
         res.status(200).json(genders);
     } catch(err) {
         console.log(err);
@@ -158,10 +158,10 @@ module.exports.get_genders = async (req,res) => {
 
 module.exports.add_gender = async (req,res) => {
 
-    const { gender } = req.body
+    const { gender,inputter } = req.body
 
     try {
-        const newGender = await Gender.create({ gender });
+        const newGender = await Gender.create({ gender,inputter });
         res.status(200).json({ mssg: `${gender} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -193,12 +193,12 @@ module.exports.get_gender_detail = async (req,res) => {
 module.exports.edit_gender = async (req,res) => {
     const { id } = req.params;
 
-    const { newGender: gender } = req.body;
-
+    const { newGender: gender,currentUserId:inputter } = req.body;
+  
     try {   
         const currGender = await Gender.findById(id);
         if(currGender.gender !== gender) {
-            const newGender = await Gender.findByIdAndUpdate({ _id: id }, { gender });
+            const newGender = await Gender.findByIdAndUpdate({ _id: id }, { gender,inputter });
             res.status(200).json({ mssg: `${newGender.gender} has been changed to ${gender} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${gender}, still the same with old value` })
@@ -213,7 +213,7 @@ module.exports.edit_gender = async (req,res) => {
 
 module.exports.get_departments = async (req,res) => {
     try {
-        const departments = await Department.find();
+        const departments = await Department.find().populate('inputter session');
         res.status(200).json(departments);
     } catch(err) {
         console.log(err);
@@ -222,10 +222,10 @@ module.exports.get_departments = async (req,res) => {
 
 module.exports.add_departments = async (req,res) => {
 
-    const { department } = req.body
+    const { department,session,currentUserId } = req.body
 
     try {
-        const newDepartment = await Department.create({ department });
+        const newDepartment = await Department.create({ department,session,inputter: currentUserId });
         res.status(200).json({ mssg: `${newDepartment.department} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -257,12 +257,12 @@ module.exports.get_department_detail = async (req,res) => {
 module.exports.edit_department = async (req,res) => {
     const { id } = req.params;
 
-    const { newDepartment: department } = req.body;
+    const { newDepartment: department, session, currentUserId: inputter } = req.body;
 
     try {   
         const currDepartment = await Department.findById(id);
         if(currDepartment.department !== department) {
-            const newDepartment = await Department.findByIdAndUpdate({ _id: id }, { department });
+            const newDepartment = await Department.findByIdAndUpdate({ _id: id }, { department,session,inputter });
             res.status(200).json({ mssg: `${newDepartment.department} has been changed to ${department} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${department}, still the same with old value` })
@@ -277,7 +277,7 @@ module.exports.edit_department = async (req,res) => {
 
 module.exports.get_sections = async (req,res) => {
     try {
-        const sections = await Section.find().populate('gradeLevel department adviser');
+        const sections = await Section.find({ status: true }).populate('gradeLevel department adviser');
         res.status(200).json(sections);
     } catch(err) {
         console.log(err);
@@ -287,20 +287,23 @@ module.exports.get_sections = async (req,res) => {
 module.exports.add_sections = async (req,res) => {
 
     const { section,gradeLevel,department } = req.body;
+    const status = true;
 
     try {
-        const newSection = await Section.create({ section,gradeLevel,department });
+        const newSection = await Section.addSection(section,gradeLevel,department,status);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: err.message });
     }
 }
 
 module.exports.delete_section = async (req,res) => {
     const { id } = req.params;
+    const status = false;
 
     try {
-        const sectionFind = await Section.findByIdAndDelete(id);
+        const sectionFind = await Section.findByIdAndUpdate({ _id: id },{ status });
         res.status(200).json({ mssg: `${sectionFind.section} section record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -322,7 +325,7 @@ module.exports.edit_section = async (req,res) => {
     const { id } = req.params;
 
     const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser,newDepartment: department  } = req.body;
-    console.log(req.body)
+   
     try {   
         const currSection = await Section.findById(id);
         // if(currSection.section !== section) {
@@ -341,7 +344,7 @@ module.exports.edit_section = async (req,res) => {
 
 module.exports.get_grade_levels = async (req,res) => {
     try {
-        const gradeLevels = await GradeLevel.find();
+        const gradeLevels = await GradeLevel.find().populate('inputter');
         res.status(200).json(gradeLevels);
     } catch(err) {
         console.log(err);
@@ -350,10 +353,10 @@ module.exports.get_grade_levels = async (req,res) => {
 
 module.exports.add_grade_levels = async (req,res) => {
 
-    const { gradeLevel } = req.body
+    const { gradeLevel,inputter } = req.body
 
     try {
-        const newGradeLevel = await GradeLevel.create({ gradeLevel });
+        const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter });
         res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -385,12 +388,12 @@ module.exports.get_grade_level_detail = async (req,res) => {
 module.exports.edit_grade_level = async (req,res) => {
     const { id } = req.params;
 
-    const { newGradeLevel: gradeLevel } = req.body;
+    const { newGradeLevel: gradeLevel,inputter } = req.body;
 
     try {   
         const currGradeLevel = await GradeLevel.findById(id);
         if(currGradeLevel.gradeLevel !== GradeLevel) {
-            const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel });
+            const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel,inputter });
             res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been changed to ${gradeLevel} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${gradeLevel}, still the same with old value` })
@@ -405,7 +408,7 @@ module.exports.edit_grade_level = async (req,res) => {
 
 module.exports.get_requirements = async (req,res) => {
     try {
-        const requirements = await Requirement.find();
+        const requirements = await Requirement.find().populate('inputter');
         res.status(200).json(requirements);
     } catch(err) {
         console.log(err);
@@ -414,10 +417,10 @@ module.exports.get_requirements = async (req,res) => {
 
 module.exports.add_requirements = async (req,res) => {
 
-    const { requirement,isRequired } = req.body
+    const { requirement,isRequired,currentUserId } = req.body
 
     try {
-        const newRequirement = await Requirement.create({ requirement,isRequired });
+        const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId });
         res.status(200).json({ mssg: `${newRequirement.requirement} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -449,12 +452,12 @@ module.exports.get_requirement_detail = async (req,res) => {
 module.exports.edit_requirement = async (req,res) => {
     const { id } = req.params;
 
-    const { newRequirement: requirement,newIsRequired: isRequired } = req.body;
+    const { newRequirement: requirement,newIsRequired: isRequired,currentUserId: inputter } = req.body;
 
     try {   
         const currRequirement = await Requirement.findById(id);
         // if(currRequirement.requirement !== requirement && currRequirement.isRequired !== isRequired) {
-            const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired });
+            const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter });
             res.status(200).json({ mssg: `${newRequirement.requirement} has been changed to ${requirement} successfully!` });
         // } else {
         //     res.status(400).json({ mssg: `Cannot update ${requirement}, still the same with old value` })
@@ -469,7 +472,7 @@ module.exports.edit_requirement = async (req,res) => {
 
 module.exports.get_roles = async (req,res) => {
     try {
-        const roles = await Role.find();
+        const roles = await Role.find({ status: true }).populate('inputter');
         res.status(200).json(roles);
     } catch(err) {
         console.log(err);
@@ -478,10 +481,11 @@ module.exports.get_roles = async (req,res) => {
 
 module.exports.add_roles = async (req,res) => {
 
-    const { userRole } = req.body;
+    const { userRole,currentUserId: inputter } = req.body;
+    const status = true
 
     try {
-        const newRole = await Role.create({ userRole });
+        const newRole = await Role.addRole(userRole,inputter,status);
         res.status(200).json({ mssg: `${newRole.userRole} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -490,9 +494,10 @@ module.exports.add_roles = async (req,res) => {
 
 module.exports.delete_role = async (req,res) => {
     const { id } = req.params;
+    const status = false;
 
     try {
-        const roleFind = await Role.findByIdAndDelete(id);
+        const roleFind = await Role.findByIdAndUpdate({ _id:id },{ status });
         res.status(200).json({ mssg: `${roleFind.userRole} user role record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -513,12 +518,13 @@ module.exports.get_role_detail = async (req,res) => {
 module.exports.edit_role = async (req,res) => {
     const { id } = req.params;
 
-    const { newUserRole: role } = req.body;
+    const { newUserRole: role,currentUserId: inputter } = req.body;
+    console.log(req.body);
 
     try {   
         const currRole = await Role.findById(id);
         if(currRole.role !== role) {
-            const newRole = await Role.findByIdAndUpdate({ _id: id }, { userRole:role });
+            const newRole = await Role.findByIdAndUpdate({ _id: id }, { userRole:role,inputter });
             res.status(200).json({ mssg: `${newRole.userRole} has been changed to ${role} successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${role}, still the same with old value` })
@@ -543,9 +549,10 @@ module.exports.get_school_years = async (req,res) => {
 module.exports.add_school_year = async (req,res) => {
 
     const { syTheme,yearEnd,yearStart } = req.body;
-    console.log(req.body)
+    const isYearDone = false;
+
     try {
-        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart });
+        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart,isYearDone });
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -556,8 +563,8 @@ module.exports.delete_school_year = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const schoolYearFind = await SchoolYear.findByIdAndDelete(id);
-        res.status(200).json({ mssg: `${schoolYearFind.startYear} to ${schoolYearFind.endYear} record has been deleted` });
+        const schoolYearFind = await SchoolYear.findByIdAndUpdate({ _id: id },{ isYearDone: true });
+        res.status(200).json({ mssg: `${schoolYearFind.startYear.split('-')[0]} to ${schoolYearFind.endYear.split('-')[0]} year has ended` });
     } catch(err) {
         console.log(err)
     }
@@ -577,13 +584,13 @@ module.exports.get_school_year_detail = async (req,res) => {
 module.exports.edit_school_year = async (req,res) => {
     const { id } = req.params;
 
-    const { newSchoolTheme: schoolTheme, newEndYear:endYear, newStartYear:startYear } = req.body;
+    const { newSchoolTheme: schoolTheme, newEndYear:endYear, newStartYear:startYear,isYearDone } = req.body;
 
     try {   
         const currSchoolYear = await SchoolYear.findById(id);
         // if(currSchoolYear.syTheme !== syTheme) {
-            const newSchoolYear = await SchoolYear.findByIdAndUpdate({ _id: id }, { schoolTheme,startYear,endYear });
-            res.status(200).json({ mssg: `${newSchoolYear.startYear} to ${newSchoolYear.endYear} has been edited successfully!` });
+            const newSchoolYear = await SchoolYear.findByIdAndUpdate({ _id: id }, { schoolTheme,startYear,endYear,isYearDone });
+            res.status(200).json({ mssg: `${newSchoolYear.startYear.split('-')[0]} to ${newSchoolYear.endYear.split('-')[0]} has been edited successfully!` });
         // } else {
         //     res.status(400).json({ mssg: `Cannot update ${syTheme}, still the same with old value` })
         // }
@@ -628,7 +635,7 @@ module.exports.delete_user = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const userFind = await User.findByIdAndDelete(id);
+        const userFind = await User.findByIdAndUpdate({ _id: id },{ isActive: false });
         res.status(200).json({ mssg: `${userFind.firstName}'s user record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -667,10 +674,10 @@ module.exports.edit_user = async (req,res) => {
 
 module.exports.user_login = async (req,res) => {
 
-    const { username,password } = req.body;
+    const { username,password,session } = req.body;
 
     try {
-        const login = await User.login(username,password);
+        const login = await User.login(username,password,session);
         const token = createToken(login._id);
         const roleDetail = await Role.find({ _id: login.role });
 
@@ -681,3 +688,63 @@ module.exports.user_login = async (req,res) => {
     }
 }
 
+// Payment Terms
+
+module.exports.get_payment_terms = async (req,res) => {
+    try {
+        const paymentTerms = await PaymentTerm.find().populate('inputter');
+        res.status(200).json(paymentTerms);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.add_payment_term = async (req,res) => {
+
+    const { payEvery,installmentBy,inputter,term } = req.body;
+
+    try {
+
+        const newPaymentTerm = await PaymentTerm.create({ term,payEvery,installmentBy,inputter });
+        console.log(newPaymentTerm);
+        res.status(200).json({ mssg: `${term} has been added in payment terms record` });
+
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.delete_payment_term = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const paymentTermFind = await PaymentTerm.findByIdAndDelete(id);
+        res.status(200).json({ mssg: `${paymentTermFind.term} record has been deleted in the record` });
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.get_payment_term_details = async (req,res) => {
+    const { id } = req.params;
+    
+    try {
+        const paymentTermFind = await PaymentTerm.findById(id);
+        res.status(200).json(paymentTermFind);
+    } catch(err) {
+        console.log(err);
+    }
+}   
+
+module.exports.edit_payment_term = async (req,res) => {
+    const { id } = req.params;
+
+    const { newPayEvery,newInstallmentBy,currentUserId,newTerm } = req.body;
+
+    try {
+        const newPaymentTerm = await PaymentTerm.findByIdAndUpdate({ _id:id },{ payEvery: newPayEvery,installmentBy:newInstallmentBy,inputter:currentUserId,term:newTerm });
+        res.status(200).json({ mssg: `${newPaymentTerm.term} has been updated successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}

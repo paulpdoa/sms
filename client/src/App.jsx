@@ -32,6 +32,10 @@ import NewTeacher from "./pages/Teacher/NewTeacher";
 import SchoolAdmin from './layouts/SchoolAdmin';
 import Strands from "./pages/SuperAdmin/Strands";
 import Textbook from "./pages/SuperAdmin/Textbook";
+import PaymentTerm from "./pages/SuperAdmin/PaymentTerm";
+import PaymentPenalty from "./pages/SuperAdmin/PaymentPenalty";
+import PaymentSchedule from "./pages/SuperAdmin/PaymentSchedule";
+import Admission from './pages/Registrar/Admission';
 
 function App() {
 
@@ -47,10 +51,11 @@ function App() {
           <Route path='/' element={<Dashboard />} />
 
           <Route path='/students' element={<Students />} />
-
+          <Route path='/admission' element={<Admission />} />
           <Route path='/registrar' element={<Registrar />}>
             <Route path='new-student' element={<NewStudent />} />
             <Route path='edit-student/:id' element={<EditStudent />} />
+            
           </Route>
 
           {/* For Super admin */}
@@ -70,6 +75,10 @@ function App() {
             <Route path='users' element={<Users />} />
             <Route path='strands' element={<Strands />} />
             <Route path='text-books' element={<Textbook />} />
+            <Route path='payment-terms' element={<PaymentTerm />} />
+            <Route path='payment-penalty' element={<PaymentPenalty />} />
+            <Route path='payment-schedule' element={<PaymentSchedule />} />
+            <Route path='admission' element={<Admission />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />

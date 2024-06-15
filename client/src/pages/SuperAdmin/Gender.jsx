@@ -13,7 +13,9 @@ const columns = [
         accessorKey: 'gender',
         header: 'Gender',
     },
-    
+    {
+        header: 'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -35,9 +37,11 @@ const Gender = () => {
         setNewGender(record.gender)
     }
 
+    const currentUserId = localStorage.getItem('id');
+
     const updateNewGender = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender });
+            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -96,7 +100,7 @@ const Gender = () => {
     const addGender = async (e) => {
         e.preventDefault();
         try {
-            const newGender = await axios.post(`${baseUrl()}/genders`,{ gender });
+            const newGender = await axios.post(`${baseUrl()}/genders`,{ gender,inputter: currentUserId });
             toast.success(newGender.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -151,13 +155,23 @@ const Gender = () => {
                             { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     { updateGender && (genderId === record._id) ?
+                                       <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newGender} onChange={(e) => setNewGender(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </td>
+                                       </>
                                         :
+                                       <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             { record.gender }
-                                        </th>
+                                        </th>     
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th>  
+                                       </>
                                     }
                                     <td className="px-6 py-4 flex gap-2 items-center">
                                         { updateGender && (genderId === record._id) ? 

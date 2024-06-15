@@ -1,6 +1,5 @@
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
@@ -13,7 +12,9 @@ const columns = [
         accessorKey: 'department',
         header: 'Department',
     },
-    
+    {
+        header: 'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -29,15 +30,18 @@ const Department = () => {
     const [departmentId,setDepartmentId] = useState('');
     const [newDepartment,setNewDepartment] = useState('');
 
+    const currentUserId = localStorage.getItem('id');
+    const session = localStorage.getItem('session');
+
     const enableEditDepartment = (record) => {
         setUpdateDepartment(!updateDepartment);
         setDepartmentId(record._id);
-        setNewDepartment(record.department)
+        setNewDepartment(record.department);
     }
 
     const updateNewDepartment = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment });
+            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -95,7 +99,7 @@ const Department = () => {
     const addDepartment = async (e) => {
         e.preventDefault();
         try {
-            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department });
+            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session });
             toast.success(newDepartment.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -118,7 +122,6 @@ const Department = () => {
     return (
         <main className="p-2">
             <DateTime />
-
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Department</h1>
                 <Searchbar />
@@ -151,13 +154,23 @@ const Department = () => {
                             { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     { updateDepartment && (departmentId === record._id) ?
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newDepartment} onChange={(e) => setNewDepartment(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter.username }
+                                        </td>
+                                        </>
                                         :
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             { record.department }
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th>
+                                        </>
                                     }
 
                                     <td className="px-6 py-4 flex gap-2 items-center">

@@ -22,6 +22,9 @@ const columns = [
         header: 'School Theme',
     },
     {
+        header: 'Status'
+    },
+    {
         accessorKey: 'action',
         header: 'Action'
     }
@@ -39,6 +42,7 @@ const SchoolYear = () => {
     const [newStartYear,setNewStartYear] = useState('');
     const [newEndYear,setNewEndYear] = useState('');
     const [newSchoolTheme,setNewSchoolTheme] = useState('');
+    const [isYearDone,setIsYearDone] = useState();
 
     const enableEditSchoolYear = (record) => {
         setUpdateSchoolYear(!updateSchoolYear);
@@ -46,11 +50,12 @@ const SchoolYear = () => {
         setNewStartYear(record.startYear)
         setNewEndYear(record.endYear);
         setNewSchoolTheme(record.schoolTheme);
+        setIsYearDone(record.isYearDone);
     }
 
     const updateNewStartYear = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear,newEndYear,newSchoolTheme });
+            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear,newEndYear,newSchoolTheme,isYearDone });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -85,7 +90,7 @@ const SchoolYear = () => {
 
     const deleteSchoolYear = async (id) => {
         try {
-            const removeSchoolYear = await axios.delete(`${baseUrl()}/school-year/${id}`);
+            const removeSchoolYear = await axios.put(`${baseUrl()}/school-year/${id}`);
             toast.success(removeSchoolYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -182,6 +187,13 @@ const SchoolYear = () => {
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newSchoolTheme} onChange={(e) => setNewSchoolTheme(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setIsYearDone(e.target.value)}>
+                                                <option hidden>{record.isYearDone ? 'Done' : 'Ongoing'}</option>
+                                                <option value={true}>Done</option>
+                                                <option value={false}>Ongoing</option>
+                                            </select>                                        
+                                        </th>
                                         </>
                                         :
                                         <>
@@ -193,6 +205,9 @@ const SchoolYear = () => {
                                         </th>
                                         <td scope="row" className="px-6 py-4 font-medium">
                                             { record.schoolTheme }
+                                        </td>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.isYearDone ? 'Done' : 'Ongoing' }
                                         </td>
                                         </>
                                     }

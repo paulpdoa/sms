@@ -41,7 +41,12 @@ edit_requirement,
 edit_role,
 edit_school_year,
 edit_user,
-user_login} = require('../controller/masterController');
+user_login,
+get_payment_terms,
+add_payment_term,
+delete_payment_term,
+get_payment_term_details,
+edit_payment_term} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 
@@ -50,7 +55,7 @@ route.post('/user-login',user_login);
 // Role
 route.get('/user-roles', get_roles);
 route.post('/user-roles', add_roles);
-route.delete('/user-role/:id', delete_role);
+route.put('/user-role/:id', delete_role);
 route.get('/user-role/:id', get_role_detail);
 route.patch('/user-role/:id',edit_role);
 
@@ -89,7 +94,7 @@ route.patch('/department/:id',edit_department);
 // Section
 route.get('/sections', get_sections);
 route.post('/sections', add_sections);
-route.delete('/section/:id', delete_section);
+route.put('/section/:id', delete_section);
 route.get('/section/:id', get_section_detail);
 route.patch('/section/:id',edit_section);
 
@@ -107,20 +112,25 @@ route.delete('/requirement/:id', delete_requirement);
 route.get('/requirement/:id', get_requirement_detail);
 route.patch('/requirement/:id',edit_requirement);
 
-
-
 // School Year
 route.get('/school-years', get_school_years);
 route.post('/school-year', add_school_year);
-route.delete('/school-year/:id', delete_school_year);
+route.put('/school-year/:id', delete_school_year);
 route.get('/school-year/:id', get_school_year_detail);
 route.patch('/school-year/:id',edit_school_year);
 
 // User
 route.get('/users', get_users);
 route.post('/user', add_user);
-route.delete('/user/:id', delete_user);
+route.put('/user/:id', delete_user);
 route.get('/user/:id', get_user_detail);
 route.patch('/user/:id',edit_user);
+
+// Payment Term
+route.get('/payment-terms', get_payment_terms);
+route.post('/payment-term', add_payment_term);
+route.delete('/payment-term/:id', delete_payment_term);
+route.get('/payment-term/:id', get_payment_term_details);
+route.patch('/payment-term/:id',edit_payment_term);
 
 module.exports = route;

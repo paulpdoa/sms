@@ -1,0 +1,96 @@
+Tables that should not change its ID:
+DEPT
+GRADELEVEL
+USERROLE
+TEACHER
+SY
+REQUIREMENTS
+DISCOUNT
+NATIONALITY
+
+MONTHSLATE computation: [(today - paymentschedule) / 30.43 days to make months difference] - [{(today - paymentschedule) / 30.43} as integer to remove the decimal part]
+so : 9.1 - 9 = 0.1
+
+if result > 0 then +1day
+in short, if there is even a day late, it is considered 1 month late
+lapses is in 30.43 days measure
+
+
+does strand have different TF amount? itis currently set to Yes in frmAssessment
+A null field content is treated as: null to table level and zero to cds or program level
+
+Modules that should be set when setting a new SY:
+
+1. cdsPenalty
+
+Table data that should not be changed:
+Nationaltiy - NationalityID 1 Filipino
+gradelvlID
+Discount ID: (7,8,9,10) for TF
+Strand - StrandID
+
+Fee - Feecode and Feedesc
+Feecat data id and data
+fEECODE - Feecode data and feecode column
+
+FEES Table
+Textbooks with total amount are inserted to Fees by gradelvl automatically on popup 'Textbooks'. There must already be books per gradelvl being defined prior to inserting it to Fees table. In adding the Textbooks, just click 'Add' then the system insert it if no record is found, else, the amount will just be updated per gradelvl. clicking 'Edit' button on Textbook doesnt have any routine
+
+Assessment affects the ff tables:
+studentpayment
+studpayrec
+Fee (for 'applied')
+studbooks
+studTFSched
+
+ADMISSION----
+Admission puts Requirements in the student indiviually bY:
+Submitted Requirements popup.
+It updates ALL students automaically when it adds new Requirements 
+Admission Fee is inserted to StudentPayment (if there is check in theAdmReq)  and Studpayrec from Admission and not from Assessment (it is exluded there... 'ADM')
+
+cdsADmission is filtered by 'status<>Old' //only new record is displayed
+cdsAdmAcademic is filtered by 'idsy=curSY' //filtered by current SY
+student status is case sensitive ('Old')
+
+Setting stronglyRequired Requirement to True/False does not change the 'Admitted' status of a student
+
+ADMISSION rEQUIREMENTS:
+checking 'Submitted' from AdmReq for a student will add  student's 'admission reservation fee' row to studentpayment and studpayrec
+Unchecking 'Submitted' will delete reservation fee row from Studentpayment and studpayrec 
+
+
+REGISTRATION-------
+To be automatically registered, Old Students should have the checked clearance, report card, no arrears and should alrady have Payment Terms selected.
+Likewise with the new or returning student, except that only Report card is required and have Payment terms selected
+
+Deleteing a Payment Term (e.g. TF Annualy) will unregister a student
+
+Editing a Payment Term entry (e.g. TF Annualy) into different item (e.g. GIA 1st) will unregister a student
+Deletion and creation of Payment Schedule happened in Assessment
+
+A null field content is treated as: ''(for text), 0 (for numbers), and null(in database level query), and simply 'Clear' on Date or field.AsDateTime = 0 and null(in database level query)
+
+StudentDiscount for govt and school asstistance are populated per Student in frmRegAssistance,
+
+ASSESSMENT-----
+StudentDiscount for govt and school asstistance are summed up, and then inserted into StudentPayment as "TGovtasst" and "TSchoolasst"
+Books must all be prepared in Fees table and Books table prior to executign student Assessment, otherwise, it will not be reflected in the STUDENT'S ASSESSMENT
+
+
+Enrollment ----
+Enrollment Fee is inserted as entry (blank amount) in the Assessment. It is being updated (with amount, etc) from Enrollment window (deleted this feature)
+
+STUDPAYREC--------
+IDBAL - identifier in case there are payments that has balances. Each row in StudPayRec starts with idfeecat followed by ordinal character 'A', followed by '1' followed by 'F'. 'F' here means 'Fully paid', so, first row for a tuition fee record is:
+2A1 (first record for tuition fee item)
+2A2 (additonal record in case there is balance in first record)
+2A3 (additonal record in case there is balance in second record)..and so on
+2A4F (additonal record in case there is balance in 3rd record, but then, here is fully paid) 
+IDBAL also maintains the sorting logically if there are new records added for that feecategory or paymentsched 
+
+place discountvars value to studpayrec
+place the initial fees to studpayrec
+
+on new SY:--------
+students table should update to 'old' the status

@@ -14,7 +14,9 @@ const columns = [
         accessorKey: 'religion',
         header: 'Religion',
     },
-    
+    {
+        header:'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -38,9 +40,11 @@ const Religion = () => {
         setNewReligion(record.religion)
     }
 
+    const currentUserId = localStorage.getItem('id');
+
     const updateNewReligion = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/religion/${id}`,{ newReligion });
+            const newData = await axios.patch(`${baseUrl()}/religion/${id}`,{ newReligion,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -98,7 +102,7 @@ const Religion = () => {
     const addReligion = async (e) => {
         e.preventDefault();
         try {
-            const newReligion = await axios.post(`${baseUrl()}/religions`,{ religion });
+            const newReligion = await axios.post(`${baseUrl()}/religions`,{ religion,currentUserId });
             toast.success(newReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -157,13 +161,23 @@ const Religion = () => {
                             { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     { updateReligion && (religionId === record._id) ?
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newReligion} onChange={(e) => setNewReligion(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th> 
+                                        </> 
                                         :
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             { record.religion }
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th>  
+                                        </>
                                     }
 
                                     <td className="px-6 py-4 flex gap-2 items-center">

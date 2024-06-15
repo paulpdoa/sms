@@ -97,7 +97,7 @@ const Section = () => {
 
     const deleteSection = async (id) => {
         try {
-            const removeSection = await axios.delete(`${baseUrl()}/section/${id}`);
+            const removeSection = await axios.put(`${baseUrl()}/section/${id}`);
             toast.success(removeSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -137,7 +137,16 @@ const Section = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
-            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
         }
     }
 
@@ -155,12 +164,13 @@ const Section = () => {
 
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="section">Section</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSection(e.target.value)} />
+                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSection(e.target.value)} required />
                     </div>
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="grade level">Grade Level</label>
                         <select className="outline-none p-1 rounded-md border border-gray-300"
                             onChange={(e) => setGradeLevel(e.target.value)}
+                            required
                             >
                             <option hidden>Grade Level</option>
                             { gradeLevels?.map(gradeLevel => (
@@ -176,6 +186,7 @@ const Section = () => {
                         <label className="text-sm" htmlFor="department">Department</label>
                         <select className="outline-none p-1 rounded-md border border-gray-300"
                             onChange={(e) => setDepartment(e.target.value)}
+                            required
                             >
                             <option hidden>Department</option>
                             { departments?.map(department => (
@@ -243,7 +254,7 @@ const Section = () => {
                                             { record.adviser === undefined ? 'Not Assigned' : `${record.adviser?.firstName} ${record.adviser?.middleName} ${record.adviser?.lastName}` }
                                         </td>
                                         <td className="px-6 py-4 gap-2">
-                                            { record.department?.department }
+                                            { record.department ? record.department?.department : 'Not Assigned' }
                                         </td>
                                         </>
                                     }

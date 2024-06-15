@@ -10,6 +10,10 @@ const religionSchema = new mongoose.Schema({
         type:String,
         required:true,
         unique:true
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 }, { timestamps: true })
 

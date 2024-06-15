@@ -6,12 +6,12 @@ export const useFetch = (url) => {
    const [records,setRecords] = useState([]);
    const [isLoading,setIsLoading] = useState(false);
 
-   const user = localStorage.getItem('user');
+   const userToken = localStorage.getItem('userToken');
 
    const header = {
-      'Authorization':`Bearer ${user?.token}` 
+      'Authorization':`Bearer ${userToken}` 
    }
-
+   
    useEffect(() => {
       const abortCont = new AbortController();
       const signal = abortCont.signal;
@@ -19,7 +19,7 @@ export const useFetch = (url) => {
       const fetchData = async () => {
          setIsLoading(true);
          try {
-            const data = await axios.get(url,header,{ signal });
+            const data = await axios.get(url,{ header });
             setIsLoading(false);
             setRecords(data?.data);
          } catch(err) {
@@ -29,8 +29,7 @@ export const useFetch = (url) => {
       fetchData();
       
       return () => abortCont.abort();
-   },[url])
+   },[url,userToken])
   
    return { records, isLoading } 
-   
 }

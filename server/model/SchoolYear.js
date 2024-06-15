@@ -11,8 +11,12 @@ const schoolYearSchema = new mongoose.Schema({
         unique: true
     },
     startYear: requiredString,
-    endYear: requiredString
-}, { timestamps: true })
+    endYear: requiredString,
+    isYearDone: {
+        type: Boolean,
+        required: true
+    }
+}, { timestamps: true });
 
 const SchoolYearModel = mongoose.model('schoolYear',schoolYearSchema);
 module.exports = SchoolYearModel;

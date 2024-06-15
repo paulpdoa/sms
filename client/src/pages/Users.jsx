@@ -46,7 +46,7 @@ const Users = () => {
 
     const deleteUser = async (id) => {
         try {
-            const removeUser = await axios.delete(`${baseUrl()}/user/${id}`);
+            const removeUser = await axios.put(`${baseUrl()}/user/${id}`);
             toast.success(removeUser.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

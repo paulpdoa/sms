@@ -13,7 +13,9 @@ const columns = [
         accessorKey: 'department',
         header: 'Department',
     },
-    
+    {
+        header: 'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -29,6 +31,8 @@ const GradeLevel = () => {
     const [gradeLevelId,setGradeLevelId] = useState('');
     const [newGradeLevel,setNewGradeLevel] = useState('');
 
+    const currentUserId = localStorage.getItem('id');
+
     const enableEditGradeLevel = (record) => {
         setUpdateGradeLevel(!updateGradeLevel);
         setGradeLevelId(record._id);
@@ -37,7 +41,7 @@ const GradeLevel = () => {
 
     const updateNewGradeLevel = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel });
+            const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel,inputter: currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -95,7 +99,7 @@ const GradeLevel = () => {
     const addGradeLevel = async (e) => {
         e.preventDefault();
         try {
-            const newGradeLevel = await axios.post(`${baseUrl()}/grade-levels`,{ gradeLevel });
+            const newGradeLevel = await axios.post(`${baseUrl()}/grade-levels`,{ gradeLevel,inputter: currentUserId });
             toast.success(newGradeLevel.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -151,13 +155,23 @@ const GradeLevel = () => {
                         { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     { updateGradeLevel && (gradeLevelId === record._id) ?
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newGradeLevel} onChange={(e) => setNewGradeLevel(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </td>
+                                        </>
                                         :
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             { isNaN(record.gradeLevel) ? record.gradeLevel : `Grade ${record.gradeLevel}` }
                                         </th>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </td>
+                                        </>
                                     }
 
                                     <td className="px-6 py-4 flex gap-2 items-center">

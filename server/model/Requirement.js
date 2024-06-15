@@ -14,6 +14,10 @@ const requirementSchema = new mongoose.Schema({
     isRequired: {
         type: Boolean,
         required: true
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user'
     }
 }, { timestamps: true })
 

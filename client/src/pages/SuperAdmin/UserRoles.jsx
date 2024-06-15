@@ -13,7 +13,9 @@ const columns = [
         accessorKey: 'userRoles',
         header: 'User Roles',
     },
-    
+    {
+        header: 'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -29,15 +31,17 @@ const UserRoles = () => {
     const [userRoleId,setUserRoleId] = useState('');
     const [newUserRole,setNewUserRole] = useState('');
 
+    const currentUserId = localStorage.getItem('id');
+
     const enableEditUserRole = (record) => {
         setUpdateUserRole(!updateUserRole);
         setUserRoleId(record._id);
-        setNewUserRole(record.userRole)
+        setNewUserRole(record.userRole);
     }
 
     const updateNewUserRole = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole });
+            const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -63,7 +67,6 @@ const UserRoles = () => {
                 progress: undefined,
                 theme: "light"
             });
-
             setTimeout(() => {
                 window.location.reload();
             },2000)
@@ -73,7 +76,7 @@ const UserRoles = () => {
 
     const deleteUserRoles = async (id) => {
         try {
-            const removeUserRoles = await axios.delete(`${baseUrl()}/user-role/${id}`);
+            const removeUserRoles = await axios.put(`${baseUrl()}/user-role/${id}`);
             toast.success(removeUserRoles.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -84,7 +87,6 @@ const UserRoles = () => {
                 progress: undefined,
                 theme: "light"
             });
-
             setTimeout(() => {
                 window.location.reload();
             },2000)
@@ -96,7 +98,7 @@ const UserRoles = () => {
     const addUserRoles = async (e) => {
         e.preventDefault();
         try {
-            const newUserRoles = await axios.post(`${baseUrl()}/user-roles`,{ userRole });
+            const newUserRoles = await axios.post(`${baseUrl()}/user-roles`,{ userRole,currentUserId });
             toast.success(newUserRoles.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -112,14 +114,22 @@ const UserRoles = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
-            console.log(err);
+            toast.success(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
         }
     }
 
     return (
         <main className="p-2">
             <DateTime />
-
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">User Roles</h1>
                 <Searchbar />
@@ -152,13 +162,23 @@ const UserRoles = () => {
                             { records?.map(record => (
                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                 { updateUserRole && (userRoleId === record._id) ?
+                                    <>
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <input type="text" value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                     </th>
+                                    <td scope="row" className="px-6 py-4 font-medium">
+                                        { record.inputter.username }
+                                    </td>
+                                    </>
                                     :
+                                    <>
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         { record.userRole }
                                     </th>
+                                    <th scope="row" className="px-6 py-4 font-medium">
+                                        { record.inputter.username }
+                                    </th>
+                                    </>
                                 }
 
                                 <td className="px-6 py-4 flex gap-2 items-center">

@@ -20,7 +20,8 @@ const Login = () => {
 
         e.preventDefault();
         try {
-            const data = await axios.post(`${baseUrl()}/user-login`,{ username,password });
+            const data = await axios.post(`${baseUrl()}/user-login`,{ username,password,session: schoolYear });
+            
             localStorage.setItem('userToken',data.data.token);
             localStorage.setItem('role',data.data.role);
             localStorage.setItem('username',data.data.data.username);

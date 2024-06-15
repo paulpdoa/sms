@@ -40,14 +40,19 @@ userSchema.pre('save', async function(next) {
 });
 
 // create static login method for user
-userSchema.statics.login = async function(username,password) {
+userSchema.statics.login = async function(username,password,session) {
     const user = await this.findOne({ username });
+
+    if(!session) {
+        throw Error('Session must not be empty');
+    }
+
     if(user) {
         const auth = await bcrypt.compare(password,user.password);
         if(auth) {
             return user;
         }
-        throw Error('Incorrect password');
+        throw Error('Password is incorrect');
     } 
     throw Error('This username doesn\'t exist');
 }

@@ -93,6 +93,22 @@ const Sidebar = () => {
                             name: 'Textbooks',
                             link: '/master/text-books'
                         },
+                        {
+                            name: 'Payment Terms',
+                            link: '/master/payment-terms'
+                        },
+                        {
+                            name: 'Payment Schedule',
+                            link: '/master/payment-schedule'
+                        },
+                        {
+                            name: 'Late Payment Penalty',
+                            link: '/master/payment-penalty'
+                        },
+                        {
+                            name: 'Admission',
+                            link: '/master/admission'
+                        }
                     ]
                 },
                 {
@@ -121,7 +137,8 @@ const Sidebar = () => {
                             name:'Registration' 
                         },
                         { 
-                            name: 'Admission' 
+                            name: 'Admission',
+                            link:'/admission'
                         },
                         { 
                             name: 'Sectioning' 

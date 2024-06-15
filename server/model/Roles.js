@@ -10,8 +10,27 @@ const roleSchema = new mongoose.Schema({
         type:String,
         required:true,
         unique:true
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user' 
+    },
+    status: {
+        type: Boolean
     }
 }, { timestamps: true })
+
+roleSchema.statics.addRole = async function(userRole,inputter,status) {
+
+    const exist = await this.findOne({ userRole });
+    if(exist && exist.status){
+        throw Error('This role is already existing');
+    } 
+
+    const newRole = await this.create({ userRole,inputter,status })
+    return newRole
+
+}
 
 const RoleModel = mongoose.model('role',roleSchema);
 module.exports = RoleModel;

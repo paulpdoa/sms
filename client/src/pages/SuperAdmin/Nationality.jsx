@@ -13,7 +13,9 @@ const columns = [
         accessorKey: 'nationality',
         header: 'Nationality',
     },
-    
+    {
+        header: 'Inputter'
+    },
     {
         accessorKey: 'action',
         header: 'Action'
@@ -32,12 +34,14 @@ const Nationality = () => {
     const enableEditNationality = (record ) => {
         setUpdateNationality(!updateNationality);
         setNationalityId(record._id);
-        setNewNationality(record.nationality)
+        setNewNationality(record.nationality);
     }
+
+    const currentUserId = localStorage.getItem('id');
 
     const updateNewNationality = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -63,7 +67,6 @@ const Nationality = () => {
                 progress: undefined,
                 theme: "light"
             });
-
             setTimeout(() => {
                 window.location.reload();
             },2000)
@@ -96,7 +99,7 @@ const Nationality = () => {
     const addNationality = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality });
+            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,currentUserId });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -152,13 +155,23 @@ const Nationality = () => {
                             { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     { updateNationality && (nationalityId === record._id) ?
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newNationality} onChange={(e) => setNewNationality(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th>  
+                                        </>
                                         :
+                                        <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             { record.nationality }
                                         </th>
+                                        <th scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </th>  
+                                        </>
                                     }
                                     <td className="px-6 py-4 flex gap-2 items-center">
                                         { updateNationality && (nationalityId === record._id) ? 

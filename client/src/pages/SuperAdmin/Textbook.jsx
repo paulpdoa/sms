@@ -283,10 +283,10 @@ const Textbook = () => {
                                             { record.bookTitle } 
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-400">
-                                            { record.gradeLevel.gradeLevel } 
+                                            { record.gradeLevel?.gradeLevel ? record.gradeLevel?.gradeLevel : 'Not Assigned' } 
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-400">
-                                            { record.strand.strand } 
+                                            { record.strand?.strand ? record.strand?.strand : 'Not Assigned' } 
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-400">
                                             { record.bookAmount } 

@@ -93,10 +93,10 @@ const Students = () => {
                                     { record.dateOfBirth }
                                 </td>
                                 <td className="px-6 py-4">
-                                    { record.sex.gender }
+                                    { record.sex?.gender ? record.sex?.gender : 'Not Assigned' }
                                 </td>
                                 <td className="px-6 py-4">
-                                    { record.nationality.nationality }
+                                    { record.nationality?.nationality ? record.nationality.nationality : 'Not Assigned' }
                                 </td>
                                 <td className="px-6 py-4 flex gap-2 items-center">
                                     <Link to={`/registrar/edit-student/${record._id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>

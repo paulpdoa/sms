@@ -18,6 +18,9 @@ const columns = [
         header: 'Required',
     },
     {
+        header: 'Inputter'
+    },
+    {
         accessorKey: 'action',
         header: 'Action'
     }
@@ -34,6 +37,8 @@ const Requirements = () => {
     const [newRequirement,setNewRequirement] = useState('');
     const [newIsRequired,setNewIsRequired] = useState(false);
 
+    const currentUserId = localStorage.getItem('id');
+
     const enableEditRequirement = (record) => {
         setUpdateRequirement(!updateRequirement);
         setRequirementId(record._id);
@@ -43,7 +48,7 @@ const Requirements = () => {
 
     const updateNewRequirement = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/requirement/${id}`,{ newRequirement,newIsRequired });
+            const newData = await axios.patch(`${baseUrl()}/requirement/${id}`,{ newRequirement,newIsRequired,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -101,7 +106,7 @@ const Requirements = () => {
     const addRequirement = async (e) => {
         e.preventDefault();
         try {
-            const newRequirement = await axios.post(`${baseUrl()}/requirements`,{ requirement,isRequired });
+            const newRequirement = await axios.post(`${baseUrl()}/requirements`,{ requirement,isRequired,currentUserId });
             toast.success(newRequirement.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -177,6 +182,9 @@ const Requirements = () => {
                                                 <option value={false}>No</option>
                                             </select>
                                         </th>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
+                                        </td>
                                         </>
                                         :
                                         <>
@@ -185,6 +193,9 @@ const Requirements = () => {
                                         </th>
                                         <td scope="row" className="px-6 py-4 font-medium">
                                             { record.isRequired ? 'Yes' : 'No' }
+                                        </td>
+                                        <td scope="row" className="px-6 py-4 font-medium">
+                                            { record.inputter?.username }
                                         </td>
                                         </>
                                     }

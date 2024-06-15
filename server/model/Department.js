@@ -10,6 +10,14 @@ const departmentSchema = new mongoose.Schema({
         type:String,
         required:true,
         unique:true
+    },
+    inputter: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user'
+    },
+    session: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'schoolYear'
     }
 }, { timestamps: true })
 

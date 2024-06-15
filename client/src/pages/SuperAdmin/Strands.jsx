@@ -1,12 +1,10 @@
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import AddReligionBtn from "../../components/AddReligionBtn";
 import { useState } from 'react';
 
 const columns = [
