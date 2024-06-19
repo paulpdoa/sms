@@ -46,11 +46,6 @@ const studentSchema = new mongoose.Schema({
     },
     contactNumber: requiredString,
     address: requiredString,
-    submittedRequirements: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'requirement',
-        unique: true
-    }],
     status: requiredString,
     isAdmitted: {
         type: Boolean,

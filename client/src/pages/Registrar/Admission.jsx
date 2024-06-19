@@ -33,7 +33,7 @@ const columns = [
 
 const Admission = () => {
 
-    const { records, isLoading } = useFetch(`${baseUrl()}/students`);
+    const { records:students, isLoading } = useFetch(`${baseUrl()}/students`);
 
     const admissionPages = ['Student Information','Parents','Sibling','Academic','Submitted Requirements'];
     const [currentPage,setCurrentPage] = useState('Student Information');
@@ -180,9 +180,9 @@ const Admission = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updatePaymentTerm && (paymentTermId === record._id) ?
+                            { students?.map(student => (
+                                <tr key={student._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                                    { updatePaymentTerm && (paymentTermId === student._id) ?
                                         <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <input type="text" value={newTerm} onChange={(e) => setNewTerm(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
@@ -194,28 +194,28 @@ const Admission = () => {
                                             <input type="text" value={newInstallmentBy} onChange={(e) => setNewInstallmentBy(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
+                                            { student.inputter?.username }
                                         </td>
                                         </>  
                                         :
                                         <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.firstName } { record.middleName } { record.lastName }
+                                            { student.firstName } { student.middleName } { student.lastName }
                                         </th>
                                         <td className="px-6 py-4">
-                                            { record?.isAdmitted ? 'Yes' : 'No' }
+                                            { student?.isAdmitted ? 'Yes' : 'No' }
                                         </td>
                                         <td className="px-6 py-4">
-                                            { record?.dateAdmitted ? record.dateAdmitted : 'Not admitted' }
+                                            { student?.dateAdmitted ? student.dateAdmitted : 'Not admitted' }
                                         </td>
                                         <td className="px-6 py-4">
-                                            { record.nationality?.nationality ? record.nationality.nationality : 'Not Assigned' }
+                                            { student.nationality?.nationality ? student.nationality.nationality : 'Not Assigned' }
                                         </td>
                                         </>
                                     }
 
                                     <td className="px-6 py-4 flex gap-2 items-center">
-                                        <button onClick={() => enableViewStudentRecord(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
+                                        <button onClick={() => enableViewStudentRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
                                     </td>
                                 </tr>
                             )) }
