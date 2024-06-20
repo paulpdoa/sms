@@ -36,6 +36,9 @@ import PaymentTerm from "./pages/SuperAdmin/PaymentTerm";
 import PaymentPenalty from "./pages/SuperAdmin/PaymentPenalty";
 import PaymentSchedule from "./pages/SuperAdmin/PaymentSchedule";
 import Admission from './pages/Registrar/Admission';
+import FeeCategory from "./pages/SuperAdmin/FeeCategory";
+import FeeCode from "./pages/SuperAdmin/FeeCode";
+import NewParent from "./pages/Registrar/NewParent";
 
 function App() {
 
@@ -54,8 +57,8 @@ function App() {
           <Route path='/admission' element={<Admission />} />
           <Route path='/registrar' element={<Registrar />}>
             <Route path='new-student' element={<NewStudent />} />
-            <Route path='edit-student/:id' element={<EditStudent />} />
-            
+            <Route path='edit-student/:id' element={<EditStudent />} />  
+            <Route path='new-parent' element={<NewParent />} />
           </Route>
 
           {/* For Super admin */}
@@ -79,10 +82,13 @@ function App() {
             <Route path='payment-penalty' element={<PaymentPenalty />} />
             <Route path='payment-schedule' element={<PaymentSchedule />} />
             <Route path='admission' element={<Admission />} />
+            <Route path='fee-category' element={<FeeCategory />} />
+            <Route path='fee-code' element={<FeeCode />} />
+            <Route path='parents' element={<Parents />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />
-          <Route path='strands' element={<Strands />} />
+          <Route path='/strands' element={<Strands />} />
 
           <Route path='/school-admin' element={role === 'School Admin' && <SchoolAdmin />}>
             <Route path='new-teacher' element={<NewTeacher />} />

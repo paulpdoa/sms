@@ -66,6 +66,10 @@ const Sidebar = () => {
                             link: '/master/teachers'
                         },
                         {
+                            name:'Parents',
+                            link: '/master/parents'
+                        },
+                        {
                             name: 'Grade Level',
                             link: '/master/grade-levels'
                         },
@@ -108,6 +112,14 @@ const Sidebar = () => {
                         {
                             name: 'Admission',
                             link: '/master/admission'
+                        },
+                        {
+                            name: 'Fee Category',
+                            link: '/master/fee-category'
+                        },
+                        {
+                            name: 'Fee Code',
+                            link: '/master/fee-code'
                         }
                     ]
                 },

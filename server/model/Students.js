@@ -14,6 +14,10 @@ const studentSchema = new mongoose.Schema({
         type: String
     },
     section: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'section'
+    },
+    lrn: {
         type: String
     },
     firstName:requiredString,
@@ -51,7 +55,9 @@ const studentSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
-    dateAdmitted: requiredString
+    dateAdmitted: {
+        type: String
+    }
 
 }, { timestamps: true })
 

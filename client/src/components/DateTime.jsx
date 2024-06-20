@@ -1,3 +1,4 @@
+import { useEffect,useState } from 'react';
 
 const DateTime = () => {
 
@@ -13,12 +14,27 @@ const DateTime = () => {
     const hour = today.getHours();
     const minute = today.getMinutes();
     const time = hour > 11 ? 'pm' : 'am'
+
+
+    // Code that automatically moves time
+    const [currentTime,setCurrentTime] = useState(minute);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(minute);
+            // console.log(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
+        },1000)
+
+        return () => clearInterval(timer);
+    },[])
+    
+
     
 
     return (
         <>
         <div className="p-2">
-            <h1 className="text-gray-700">{day}, {date} {month} {year} | {hour > 12 ?  hour - 12 : hour}:{minute < 10 ? `0${minute}` : minute}{time}</h1>
+            <h1 className="text-gray-700">{day}, {date} {month} {year} | {hour > 12 ?  hour - 12 : hour}:{currentTime < 10 ? `0${currentTime}` : currentTime} {time}</h1>
         </div>
         <hr className="h-[2px] bg-gray-300 my-2" />
         </>

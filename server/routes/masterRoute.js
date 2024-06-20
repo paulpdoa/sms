@@ -46,7 +46,19 @@ get_payment_terms,
 add_payment_term,
 delete_payment_term,
 get_payment_term_details,
-edit_payment_term} = require('../controller/masterController');
+edit_payment_term,
+get_fee_categories,
+add_fee_category,
+delete_fee_category,
+edit_fee_category,
+get_fee_category_detail,
+get_fee_codes,
+add_fee_code,
+delete_fee_code,
+edit_fee_code,
+get_parents,
+get_parent_detail,
+add_parent} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 
@@ -132,5 +144,23 @@ route.post('/payment-term', add_payment_term);
 route.delete('/payment-term/:id', delete_payment_term);
 route.get('/payment-term/:id', get_payment_term_details);
 route.patch('/payment-term/:id',edit_payment_term);
+
+// Fee Category
+route.get('/fee-categories', get_fee_categories);
+route.post('/fee-category',add_fee_category);
+route.delete('/fee-category/:id',delete_fee_category);
+route.patch('/fee-category/:id',edit_fee_category);
+route.get('/fee-category/:id',get_fee_category_detail);
+
+// Fee Code
+route.get('/fee-codes',get_fee_codes);
+route.post('/fee-code',add_fee_code);
+route.delete('/fee-code/:id',delete_fee_code);
+route.patch('/fee-code/:id',edit_fee_code);
+
+// Parent
+route.get('/parents',get_parents);
+route.get('/parent/:id',get_parent_detail);
+route.post('/parent',add_parent);
 
 module.exports = route;

@@ -28,6 +28,7 @@ const NewStudent = () => {
     const [email,setEmail] = useState('');
     const [contactNumber,setContactNumber] = useState('');
     const [address,setAddress] = useState('');
+    const [status,setStatus] = useState('');
 
     const getAge = Math.floor((new Date() - new Date(dateOfBirth).getTime()) / 3.15576e+10)
 
@@ -47,7 +48,8 @@ const NewStudent = () => {
             placeOfBirth,
             email,
             contactNumber,
-            address
+            address,
+            status
         }
     
         try {
@@ -186,6 +188,12 @@ const NewStudent = () => {
                                 onChange={(e) => setContactNumber(e.target.value)}
                                 />
                             </div>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="status">Status</label>
+                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" 
+                            onChange={(e) => setStatus(e.target.value)}
+                            />
                         </div>             
                     </div>
                 </div>

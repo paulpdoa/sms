@@ -11,6 +11,10 @@ const gradeLevelSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'department'
+    },
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'

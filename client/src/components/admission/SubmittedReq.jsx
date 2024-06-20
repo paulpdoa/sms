@@ -63,7 +63,7 @@ const SubmittedReq = ({ id }) => {
         <div className="mt-3">
             {requirements?.map((record) => (
                 <div key={record._id} className="flex items-center justify-between gap-5 rounded-md border-b-2 border-gray-300 p-2">
-                    <span className="text-sm text-green-500">{record.requirement}</span>
+                    <span className="text-sm text-gray-600 font-semibold">{record.requirement}</span>
                     {admission?.some(ad => ad.requirementId === record._id) ? (
                         <span className="text-xs text-blue-500">Submitted</span>
                     ) : (

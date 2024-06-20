@@ -11,10 +11,11 @@ module.exports.get_students = async (req,res) => {
 }
 
 module.exports.add_student = async (req,res) => {
-    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address } = req.body;
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,status } = req.body;
+    const isAdmitted = false
    
     try {
-        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address });
+        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,status,email,contactNumber,address,isAdmitted });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
@@ -36,7 +37,7 @@ module.exports.get_student_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const studentFind = await Student.findById(id);
+        const studentFind = await Student.findById(id).populate('sex religion nationality section');
         res.status(200).json(studentFind);
     } catch(err) {
         console.log(err);

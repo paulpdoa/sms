@@ -9,6 +9,11 @@ const Role = require('../model/Roles');
 const SchoolYear = require('../model/SchoolYear');
 const User = require('../model/Users');
 const PaymentTerm = require('../model/PaymentTerm');
+const FeeCategory = require('../model/FeeCategory');
+const FeeCode = require('../model/FeeCode');
+const Parent = require('../model/Parent');
+const Student = require('../model/Students');
+
 const jwt = require('jsonwebtoken');
 
 const maxAge = 3 * 24 * 24 * 60;
@@ -344,7 +349,7 @@ module.exports.edit_section = async (req,res) => {
 
 module.exports.get_grade_levels = async (req,res) => {
     try {
-        const gradeLevels = await GradeLevel.find().populate('inputter');
+        const gradeLevels = await GradeLevel.find().populate('inputter department');
         res.status(200).json(gradeLevels);
     } catch(err) {
         console.log(err);
@@ -353,10 +358,10 @@ module.exports.get_grade_levels = async (req,res) => {
 
 module.exports.add_grade_levels = async (req,res) => {
 
-    const { gradeLevel,inputter } = req.body
+    const { gradeLevel,inputter,department } = req.body
 
     try {
-        const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter });
+        const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter,department });
         res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -388,13 +393,13 @@ module.exports.get_grade_level_detail = async (req,res) => {
 module.exports.edit_grade_level = async (req,res) => {
     const { id } = req.params;
 
-    const { newGradeLevel: gradeLevel,inputter } = req.body;
+    const { newGradeLevel: gradeLevel,inputter,department } = req.body;
 
     try {   
         const currGradeLevel = await GradeLevel.findById(id);
         if(currGradeLevel.gradeLevel !== GradeLevel) {
-            const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel,inputter });
-            res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been changed to ${gradeLevel} successfully!` });
+            const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel,inputter,department });
+            res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been updated successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${gradeLevel}, still the same with old value` })
         }
@@ -744,6 +749,189 @@ module.exports.edit_payment_term = async (req,res) => {
     try {
         const newPaymentTerm = await PaymentTerm.findByIdAndUpdate({ _id:id },{ payEvery: newPayEvery,installmentBy:newInstallmentBy,inputter:currentUserId,term:newTerm });
         res.status(200).json({ mssg: `${newPaymentTerm.term} has been updated successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// Fee Category
+
+module.exports.get_fee_categories = async (req,res) => {
+
+    try {
+        const feeCategs = await FeeCategory.find().populate('inputter');
+        res.status(200).json(feeCategs);
+    } catch(err) {
+        console.log(err)
+    }
+
+}
+
+module.exports.get_fee_category_detail = async (req,res) => {
+
+    const { id } = req.params;
+
+    try {
+        const feeCategs = await FeeCategory.find({ _id:id }).populate('inputter');
+        res.status(200).json(feeCategs);
+    } catch(err) {
+        console.log(err)
+    }
+
+}
+
+module.exports.add_fee_category = async (req,res) => {
+
+    const { category,code,inputter } = req.body;
+
+    try {
+        const feeCateg = await FeeCategory.create({ category,code,inputter });
+        res.status(200).json({ mssg:`${category} has been added to the record` });
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
+module.exports.delete_fee_category = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const feeCategFind = await FeeCategory.findByIdAndDelete(id);
+        res.status(200).json({ mssg: `${feeCategFind.category} record has been deleted in the record` });
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.edit_fee_category = async (req,res) => {
+    const { id } = req.params;
+
+    const { category,code } = req.body;
+    
+
+    try {
+        const newCategory = await FeeCategory.findByIdAndUpdate({ _id:id },{ category,code });
+        res.status(200).json({ mssg: `${newCategory.category} has been updated successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// Fee Code
+
+module.exports.get_fee_codes = async (req,res) => {
+
+    try {
+        const feeCodes = await FeeCode.find().populate('inputter feeCateg');
+        res.status(200).json(feeCodes);
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.add_fee_code = async (req,res) => {
+    const { description,code,inputter,feeCategory } = req.body;
+    console.log(feeCategory)
+
+    try {
+        const newFeeCode = await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory });
+        res.status(200).json({ mssg: `${description} has been added to the record` });
+    } catch(err) {
+        console.log(err);
+    }
+    
+}
+
+module.exports.delete_fee_code = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const feeCode = await FeeCode.findByIdAndDelete(id);
+        res.status(200).json({ mssg: `${feeCode.description} record has been deleted in the record` });
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.edit_fee_code = async (req,res) => {
+    const { id } = req.params;
+
+    const { inputter,description,feeCateg,code} = req.body;
+
+    try {
+        const newCode = await FeeCode.findByIdAndUpdate({ _id:id },{ feeCateg,code: code.toUpperCase(),description,inputter });
+        res.status(200).json({ mssg: `${newCode.description} has been updated successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// Parents
+
+module.exports.get_parents = async (req,res) => {
+    
+    try {   
+        const parents = await Parent.find().populate('studentId');
+        res.status(200).json(parents);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.add_parent = async (req,res) => {
+    const { motherName,
+        fatherName,
+        guardianName,
+        motherOccupation,
+        fatherOccupation,
+        guardianOccupation,
+        motherContact,
+        fatherContact,
+        guardianContact,
+        motherEmail,
+        fatherEmail,
+        guardianEmail,
+        motherOffice,
+        fatherOffice,
+        guardianOffice,
+        studentId } = req.body;
+
+        try {  
+            const student = await Student.findById(studentId);
+            const newParent = await Parent.create({ motherName,
+                fatherName,
+                guardianName,
+                motherOccupation,
+                fatherOccupation,
+                guardianOccupation,
+                motherContact,
+                fatherContact,
+                guardianContact,
+                motherEmail,
+                fatherEmail,
+                guardianEmail,
+                motherOffice,
+                fatherOffice,
+                guardianOffice,
+                studentId 
+            });
+
+            res.status(200).json({ mssg:`Parent for ${student.firstName} ${student.lastName} has been added to the record`});
+        } catch(err) {
+            console.log(err);
+        }
+
+
+
+}
+
+module.exports.get_parent_detail = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const parent = await Parent.findById(id).populate('studentId');
+        res.status(200).json(parent);
     } catch(err) {
         console.log(err);
     }
