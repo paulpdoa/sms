@@ -13,6 +13,7 @@ const FeeCategory = require('../model/FeeCategory');
 const FeeCode = require('../model/FeeCode');
 const Parent = require('../model/Parent');
 const Student = require('../model/Students');
+const Academic = require('../model/Academic');
 
 const jwt = require('jsonwebtoken');
 
@@ -879,6 +880,18 @@ module.exports.get_parents = async (req,res) => {
     }
 }
 
+module.exports.get_student_parent = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const parent = await Parent.find({ studentId: id }).populate('studentId');
+        res.status(200).json(parent[0]);
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
 module.exports.add_parent = async (req,res) => {
     const { motherName,
         fatherName,
@@ -921,9 +934,6 @@ module.exports.add_parent = async (req,res) => {
         } catch(err) {
             console.log(err);
         }
-
-
-
 }
 
 module.exports.get_parent_detail = async (req,res) => {
@@ -935,4 +945,43 @@ module.exports.get_parent_detail = async (req,res) => {
     } catch(err) {
         console.log(err);
     }
+}
+
+module.exports.delete_parent = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const parent = await Parent.findByIdAndDelete(id).populate('studentId');
+        res.status(200).json({ mssg: `Parent of ${parent.studentId.firstName} has been deleted in the record successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// For Academic
+
+module.exports.get_academics = async (req,res) => {
+    try {
+        const academics = await Academic.find().populate('gradeLevelId studentId departmentId strandId sessionId');
+        res.status(200).json(academics);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.add_academic = async (req,res) => {
+
+    const { academicInfo } = req.body;
+    const { strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended } = academicInfo
+
+    // This will also update students info upon posting
+
+    try {
+        const academic = await Academic.create({ strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
+        const student = await Student.findByIdAndUpdate({ _id: studentId }, { gradeLevel: gradeLevelId, sy_id: sessionId });
+        res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+
 }

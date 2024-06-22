@@ -8,16 +8,21 @@ const requiredString = {
 
 const studentSchema = new mongoose.Schema({
     sy_id: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'schoolYear'
     },
     gradeLevel: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gradeLevel'
     },
     section: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'section'
     },
     lrn: {
+        type: String
+    },
+    studentNo: {
         type: String
     },
     firstName:requiredString,
@@ -40,7 +45,7 @@ const studentSchema = new mongoose.Schema({
     age: {
         type: Number
     },
-    sex:{
+    sex: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'gender' 
     },

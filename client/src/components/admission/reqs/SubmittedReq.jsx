@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { baseUrl } from '../../baseUrl';
-import { useFetch } from '../../hooks/useFetch';
+import { baseUrl } from '../../../baseUrl';
+import { useFetch } from '../../../hooks/useFetch';
 
 const SubmittedReq = ({ id }) => {
     const { records: requirements } = useFetch(`${baseUrl()}/requirements`);
@@ -32,13 +32,13 @@ const SubmittedReq = ({ id }) => {
 
             toast.success(data.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -46,29 +46,30 @@ const SubmittedReq = ({ id }) => {
             }, 2000);
         } catch (err) {
             console.error(err);
-            toast.error(err.response.data.mssg, {
+            toast.error(err.response?.data?.mssg || 'An error occurred', {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };
 
     return (
-        <div className="mt-3">
+        <div className="mt-4 p-4 bg-white shadow-md rounded-md">
+            <h2 className="text-lg font-semibold mb-4">Submitted Requirements</h2>
             {requirements?.map((record) => (
-                <div key={record._id} className="flex items-center justify-between gap-5 rounded-md border-b-2 border-gray-300 p-2">
-                    <span className="text-sm text-gray-600 font-semibold">{record.requirement}</span>
+                <div key={record._id} className="flex items-center justify-between gap-4 border-b border-gray-300 py-2">
+                    <span className="text-sm font-semibold">{record.requirement}</span>
                     {admission?.some(ad => ad.requirementId === record._id) ? (
                         <span className="text-xs text-blue-500">Submitted</span>
                     ) : (
                         <input
-                            className="cursor-pointer"
+                            className="cursor-pointer h-4 w-4 text-green-500 focus:ring-0"
                             type="checkbox"
                             checked={selectedRequirements.includes(record._id)}
                             onChange={() => handleRequirementSelection(record._id)}
@@ -77,7 +78,10 @@ const SubmittedReq = ({ id }) => {
                 </div>
             ))}
             
-            <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md" onClick={submitStudentRequirement}>
+            <button 
+                className="bg-green-500 text-white text-sm py-2 px-4 mt-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                onClick={submitStudentRequirement}
+            >
                 Submit
             </button>
             <ToastContainer />

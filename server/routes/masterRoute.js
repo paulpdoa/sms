@@ -58,7 +58,11 @@ delete_fee_code,
 edit_fee_code,
 get_parents,
 get_parent_detail,
-add_parent} = require('../controller/masterController');
+add_parent,
+get_student_parent,
+delete_parent,
+get_academics,
+add_academic} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 
@@ -161,6 +165,12 @@ route.patch('/fee-code/:id',edit_fee_code);
 // Parent
 route.get('/parents',get_parents);
 route.get('/parent/:id',get_parent_detail);
+route.get('/student/parent/:id',get_student_parent);
 route.post('/parent',add_parent);
+route.delete('/parent/:id',delete_parent);
+
+// Academic
+route.get('/academics',get_academics);
+route.post('/academic',add_academic);
 
 module.exports = route;

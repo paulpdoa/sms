@@ -3,7 +3,7 @@ const Admission = require('../model/Admission');
 
 module.exports.get_students = async (req,res) => {
     try {
-        const students = await Student.find().populate('sex religion nationality');
+        const students = await Student.find().populate('sex religion nationality sy_id gradeLevel');
         res.status(200).json(students);
     } catch(err) {
         console.log(err);

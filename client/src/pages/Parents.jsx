@@ -19,6 +19,9 @@ const columns = [
         header: 'Guardian Name',
     },
     {
+        header: 'Student Name'
+    },
+    {
         accessorKey: 'action',
         header: 'Action'
     }
@@ -81,7 +84,9 @@ const Parents = () => {
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     { record.guardianName }
                                 </th>
-                                
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    { record.studentId?.firstName } { record.studentId?.middleName } { record.studentId?.lastName }
+                                </th>   
                                
                                 <td className="px-6 py-4 flex gap-2 items-center">
                                     <Link to={`/registrar/edit-parent/${record._id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
