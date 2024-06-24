@@ -1,34 +1,78 @@
 import { useState } from 'react';
 import { IoMdCloseCircleOutline } from "react-icons/io";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
+import axios from 'axios';
 
 const StudentInfoPopup = ({ id, closeModal }) => {
+
     const [lastName, setLastName] = useState(id?.lastName);
     const [firstName, setFirstName] = useState(id?.firstName);
     const [middleName, setMiddleName] = useState(id?.middleName);
-    const [gender, setGender] = useState(id?.sex?.sex);
+    const [gender, setGender] = useState(id?.sex?._id);
     const [dateOfBirth, setDateOfBirth] = useState(id?.dateOfBirth);
     const [placeOfBirth, setPlaceOfBirth] = useState(id?.placeOfBirth);
     const [address, setAddress] = useState(id?.address);
-    const [nationality, setNationality] = useState(id?.nationality?.nationality);
-    const [religion, setReligion] = useState(id?.religion?.religion);
-    const [mobileNo, setMobileNo] = useState(id?.contactNumber);
+    const [nationality, setNationality] = useState(id?.nationality?._id);
+    const [religion, setReligion] = useState(id?.religion?._id);
+    const [contactNumber, setContactNumber] = useState(id?.contactNumber);
     const [email, setEmail] = useState(id?.email);
     const [status, setStatus] = useState(id?.status);
     const [lrn, setLrn] = useState(id?.lrn);
     const [passedReportCard, setPassedReportCard] = useState(id?.passedReportCard);
     const [settledArrears, setSettledArrears] = useState(id?.settledArrears);
     const [completedClearance, setCompletedClearance] = useState(id?.completedClearance);
+    const [isRegistered,setIsRegistered] = useState(id?.isRegistered);
 
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
+    const { records: religions } = useFetch(`${baseUrl()}/religions`);
+
+    const session = localStorage.getItem('session');
 
     const submitInfo = async (e) => {
         e.preventDefault();
 
         const studentInfo = {
+            firstName,
+            lastName,
+            middleName,
+            gender,
+            dateOfBirth,
+            placeOfBirth,
+            address,
+            nationality,
+            religion,
+            contactNumber,
+            email,
+            status,
+            lrn,
+            passedReportCard,
+            settledArrears,
+            completedClearance,
+            session,
+            isRegistered
+        }
 
+        try {
+            const data = await axios.patch(`${baseUrl()}/student/${id?._id}`,studentInfo);
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch(err) {
+            console.log(err);
         }
     }
 
@@ -70,10 +114,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="gender">Gender</label>
                         <select className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            value={gender}
                             onChange={(e) => setGender(e.target.value)}
                         >
-                            <option hidden>Select gender</option>
+                            <option hidden>{id?.sex?.gender ? id?.sex?.gender : 'Select gender'}</option>
                             { genders?.map(gender => (
                                 <option key={gender._id} value={gender._id}>{gender.gender}</option>
                             )) }
@@ -110,10 +153,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="nationality">Nationality</label>
                         <select className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            value={nationality}
                             onChange={(e) => setNationality(e.target.value)}
                         >
-                            <option hidden>Select nationality</option>
+                            <option hidden>{id?.nationality?.nationality ? id?.nationality?.nationality : 'Select nationality'}</option>
                             { nationalities?.map(nationality => (
                                 <option key={nationality._id} value={nationality._id}>{nationality.nationality}</option>
                             )) }
@@ -121,18 +163,21 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     </div>
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="religion">Religion</label>
-                        <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            type="text"
-                            value={religion}
+                        <select className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             onChange={(e) => setReligion(e.target.value)}
-                        />
+                        >
+                            <option hidden>{id?.religion?.religion ? id?.religion?.religion : 'Select religion'}</option>
+                            { religions?.map(religion => (
+                                <option key={religion._id} value={religion._id}>{religion.religion}</option>
+                            )) }
+                        </select>
                     </div>
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="mobileNo">Mobile Number</label>
                         <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             type="text"
-                            value={mobileNo}
-                            onChange={(e) => setMobileNo(e.target.value)}
+                            value={contactNumber}
+                            onChange={(e) => setContactNumber(e.target.value)}
                         />
                     </div>
                 </div>
@@ -191,6 +236,15 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     </div>
                 </div>
 
+                <div className="flex flex-col items-start">
+                    <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="registered">Registered</label>
+                    <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        type="checkbox"
+                        checked={isRegistered}
+                        onChange={(e) => setIsRegistered(e.target.checked)}
+                    />
+                </div>
+
                 <div className="flex gap-2 items-center justify-end mt-4">
                     <button onClick={submitInfo} className="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-opacity-50">
                         Submit
@@ -201,6 +255,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

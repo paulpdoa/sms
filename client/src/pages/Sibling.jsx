@@ -1,4 +1,3 @@
-import AddTeacherBtn from "../components/AddTeacherBtn";
 import DateTime from "../components/DateTime";
 import Searchbar from "../components/Searchbar";
 import { Link } from 'react-router-dom';
@@ -7,24 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
+import AddSiblingBtn from "../components/AddSiblingBtn";
 
 const columns = [
     {
-        accessorKey: 'fullName',
         header: 'Full Name',
     },
-   
     {
-        accessorKey: 'dateOfBirth',
-        header: 'Date Of Birth'
+        header: 'Sibling Name',
     },
     {
-        accessorKey: 'sex',
-        header: 'Sex'
-    },
-    {
-        accessorKey: 'nationality',
-        header: 'Nationality'
+        header: 'Email'
     },
     {
         accessorKey: 'action',
@@ -32,14 +24,14 @@ const columns = [
     }
 ]
 
-const Teachers = () => {
+const Sibling = () => {
 
-    const { records, isLoading } = useFetch(`${baseUrl()}/teachers`);
+    const { records, isLoading } = useFetch(`${baseUrl()}/siblings`);
 
-    const deleteTeacher = async (id) => {
+    const deleteSibling = async (id) => {
         try {
-            const removeTeacher = await axios.delete(`${baseUrl()}/teacher/${id}`);
-            toast.success(removeTeacher.data.mssg, {
+            const removeSibling = await axios.delete(`${baseUrl()}/sibling/${id}`);
+            toast.success(removeSibling.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
@@ -63,7 +55,7 @@ const Teachers = () => {
             <DateTime />
             <div className="flex justify-between items-center">
                 <Searchbar />
-                <AddTeacherBtn />
+                <AddSiblingBtn />
             </div>
 
             <div className="relative overflow-x-auto mt-5 shadow-md sm:rounded-lg">
@@ -83,19 +75,15 @@ const Teachers = () => {
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     { record.firstName } { record.middleName } { record.lastName }
                                 </th>
-                               
-                                <td className="px-6 py-4">
-                                    { record.dateOfBirth }
-                                </td>
-                                <td className="px-6 py-4">
-                                    { record.sex?.gender ? record.sex?.gender : 'Not Assigned' }
-                                </td>
-                                <td className="px-6 py-4">
-                                    { record.nationality?.nationality ? record.nationality?.nationality : 'Not Assigned'}
-                                </td>
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    { record.studentId?.firstName } { record.studentId?.middleName } { record.studentId?.lastName }
+                                </th>   
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    { record.email }
+                                </th>
                                 <td className="px-6 py-4 flex gap-2 items-center">
-                                    <Link to={`/registrar/edit-teacher/${record._id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
-                                    <button onClick={() => deleteTeacher(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
+                                    <Link to={`/registrar/edit-sibling/${record._id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
+                                    <button onClick={() => deleteSibling(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
                                 </td>
                             </tr>
                         )) }
@@ -107,4 +95,4 @@ const Teachers = () => {
     )
 }
 
-export default Teachers;
+export default Sibling;

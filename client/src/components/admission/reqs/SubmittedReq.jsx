@@ -61,10 +61,11 @@ const SubmittedReq = ({ id }) => {
 
     return (
         <div className="mt-4 p-4 bg-white shadow-md rounded-md">
-            <h2 className="text-lg font-semibold mb-4">Submitted Requirements</h2>
+            <h2 className="text-xl font-bold text-green-600 mb-4">Submitted Requirements</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {requirements?.map((record) => (
                 <div key={record._id} className="flex items-center justify-between gap-4 border-b border-gray-300 py-2">
-                    <span className="text-sm font-semibold">{record.requirement}</span>
+                    <span className="text-sm text-green-600 font-semibold">{record.requirement}</span>
                     {admission?.some(ad => ad.requirementId === record._id) ? (
                         <span className="text-xs text-blue-500">Submitted</span>
                     ) : (
@@ -77,6 +78,7 @@ const SubmittedReq = ({ id }) => {
                     )}
                 </div>
             ))}
+            </div>
             
             <button 
                 className="bg-green-500 text-white text-sm py-2 px-4 mt-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"

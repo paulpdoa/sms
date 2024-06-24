@@ -13,7 +13,7 @@ const FeeCategory = require('../model/FeeCategory');
 const FeeCode = require('../model/FeeCode');
 const Parent = require('../model/Parent');
 const Student = require('../model/Students');
-const Academic = require('../model/Academic');
+const Sibling = require('../model/Sibling');
 
 const jwt = require('jsonwebtoken');
 
@@ -936,6 +936,49 @@ module.exports.add_parent = async (req,res) => {
         }
 }
 
+module.exports.edit_parent = async (req,res) => {
+    const { id } = req.params;
+    const { motherName,
+        fatherName,
+        guardianName,
+        motherOccupation,
+        fatherOccupation,
+        guardianOccupation,
+        motherContact,
+        fatherContact,
+        guardianContact,
+        motherEmail,
+        fatherEmail,
+        guardianEmail,
+        motherOffice,
+        fatherOffice,
+        guardianOffice,
+        studentId } = req.body;
+
+        try {
+            const parent = await Parent.findByIdAndUpdate({_id: id}, { motherName,
+                fatherName,
+                guardianName,
+                motherOccupation,
+                fatherOccupation,
+                guardianOccupation,
+                motherContact,
+                fatherContact,
+                guardianContact,
+                motherEmail,
+                fatherEmail,
+                guardianEmail,
+                motherOffice,
+                fatherOffice,
+                guardianOffice,
+                studentId });
+            res.status(200).json({ mssg: `Parent's record has been updated successfully!` });
+        } catch(err) {
+            console.log(err);
+
+        }
+}
+
 module.exports.get_parent_detail = async (req,res) => {
     const { id } = req.params;
 
@@ -958,30 +1001,76 @@ module.exports.delete_parent = async (req,res) => {
     }
 }
 
-// For Academic
+// For Siblings
 
-module.exports.get_academics = async (req,res) => {
+module.exports.get_siblings = async (req,res) => {
+
     try {
-        const academics = await Academic.find().populate('gradeLevelId studentId departmentId strandId sessionId');
-        res.status(200).json(academics);
+        const siblings = await Sibling.find().populate('studentId');
+        res.status(200).json(siblings);
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
+module.exports.add_sibling = async (req,res) => {
+    const { studentId,firstName,middleName,lastName,email,inputter } = req.body;
+
+    try {
+        const existingStudent = await Student.findById(studentId);
+        const sibling = await Sibling.create({studentId,firstName,middleName,lastName,email,inputter});
+        res.status(200).json({ mssg: `${existingStudent.firstName}'s sibling ${firstName} has been added to the record`,redirect:'/'});
     } catch(err) {
         console.log(err);
     }
 }
 
-module.exports.add_academic = async (req,res) => {
-
-    const { academicInfo } = req.body;
-    const { strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended } = academicInfo
-
-    // This will also update students info upon posting
+module.exports.delete_sibling = async (req,res) => {
+    const { id } = req.params;
 
     try {
-        const academic = await Academic.create({ strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
-        const student = await Student.findByIdAndUpdate({ _id: studentId }, { gradeLevel: gradeLevelId, sy_id: sessionId });
-        res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
+        const sibling = await Sibling.findByIdAndDelete(id);
+        res.status(200).json({ mssg: `${sibling.firstName} has been delete in the record` });
     } catch(err) {
         console.log(err);
     }
+}
 
+module.exports.get_sibling_details = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const sibling = await Sibling.findById(id).populate('studentId');
+        res.status(200).json(sibling)
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_student_sibling = async (req,res) => {
+    const { id } = req.params;
+  
+    try {
+        const studentSibling = await Sibling.findById(id).populate('studentId');
+        res.status(200).json(studentSibling);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.edit_sibling = async (req,res) => {
+    const { id } = req.params;
+    const {firstName,
+        middleName,
+        lastName,
+        email,
+        inputter,studentId} = req.body;
+
+    try {
+        const sibling = await Sibling.findByIdAndUpdate({_id:id},{ firstName,middleName,lastName,email,inputter,studentId });
+        res.status(200).json({ mssg: `${sibling.firstName}'s record has been updated successfully!` });
+    } catch(err) {
+        console.log(err);
+    }
 }

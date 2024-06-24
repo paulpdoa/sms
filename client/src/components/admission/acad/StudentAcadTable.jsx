@@ -1,9 +1,10 @@
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
-import { useState } from 'react';
-import StudentInfoPopup from "./StudentInfoPopup";
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const StudentInfoTable = ({ setViewRecord }) => {
+const StudentAcadTable = ({ setViewRecord }) => {
 
     // This student will display all students that are not admitted yet
 
@@ -13,28 +14,22 @@ const StudentInfoTable = ({ setViewRecord }) => {
             header: 'Full Name',
         },
         {
-            accessorKey: 'studentNo',
-            header: 'Student No.'
+            accessorKey: 'admitted',
+            header: 'Admitted'
         },
         {
-            accessorKey: 'registered',
-            header: 'Registered'
+            accessorKey: 'dateAdmitted',
+            header: 'Date Admitted'
         },
         {
-            accessorKey: 'dateRegistered',
-            header: 'Date Registered'
+            accessorKey: 'gradelevel',
+            header: 'Grade Level'
         },
         {
             header: 'Status'
         },
         {
-            header: 'Grade Level'
-        },
-        {
-            header: 'Strand'
-        },
-        {
-            header: 'Nationality'
+            header: 'Email'
         },
         {
             accessorKey: 'action',
@@ -44,18 +39,35 @@ const StudentInfoTable = ({ setViewRecord }) => {
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
 
-    const [updatePopup,setUpdatePopup] = useState(false);
-    const [studentRec,setStudentRec] = useState([]);
-
-
-    const updateStudentInfo = (student) => {
-        setUpdatePopup(!updatePopup);
-        setStudentRec(student)
-    }
-
-    // Loop student table
-    // Check if their id is existing in student table then get strand
-    
+    const deleteAcadRecord = async (id) => {
+        try {
+            const data = await axios.delete(`${baseUrl()}/academic/${id}`);
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch(err) {
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
+        }
+    } 
 
     return (
         <>
@@ -70,43 +82,38 @@ const StudentInfoTable = ({ setViewRecord }) => {
                 </tr>
             </thead>
             <tbody>
-                { students?.filter(student => student.isAdmitted).map(student => (
+                { students?.filter(student => student.isAdmitted && student.isRegistered).map(student => (
                     <tr key={student._id} className='odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700'>
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             { student.firstName } { student.middleName } { student.lastName }
                         </th>
                         <td className="px-6 py-4">
-                            { student?.studentNo ? student?.studentNo : 'Not assigned' }
+                            { student?.isAdmitted ? 'Yes' : 'No' }
                         </td>
                         <td className="px-6 py-4">
-                            { student?.isRegistered ? 'Yes' : 'No' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.dateRegistered ? student?.dateRegistered.split('T')[0] : 'Not Registered' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.status }
+                            { student?.dateAdmitted?.split('T')[0] ? student?.dateAdmitted?.split('T')[0] : 'Not admitted' }
                         </td>
                         <td className="px-6 py-4">
                             { student?.academicId?.gradeLevelId?.gradeLevel ? student?.academicId?.gradeLevelId?.gradeLevel : 'Not Assigned' }
                         </td>
                         <td className="px-6 py-4">
-                            { student?.academicId?.strandId ? student?.academicId?.strandId?.strand : 'Not assigned' }
+                            { student.status }
                         </td>
                         <td className="px-6 py-4">
-                            { student?.nationality?.nationality ? student?.nationality?.nationality : 'Not assigned' }
+                            { student.email }
                         </td>
                         <td className="px-6 py-4 flex gap-2 items-center">
+                            <button onClick={() => deleteAcadRecord(student?.academicId?._id)} className="font-medium text-red-500 hover:underline">Delete</button>
                             <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-                            <button onClick={() => updateStudentInfo(student)} className="font-medium text-green-500 hover:underline">Update</button>
                         </td>
                     </tr>
                 )) }
             </tbody>
+            
         </table>
-        { updatePopup && <StudentInfoPopup id={studentRec} closeModal={setUpdatePopup}/> }
-        </>
+        <ToastContainer /> 
+        </> 
     )
 }
 
-export default StudentInfoTable;
+export default StudentAcadTable;

@@ -86,7 +86,7 @@ const Login = () => {
                     <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
                         <option hidden>Select session</option>
                         { schoolYears?.map(sy => (
-                            <option value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
+                            <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
                         )) }
                     </select>
                 </div>

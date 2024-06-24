@@ -28,7 +28,7 @@ import GradeLevel from "./pages/SuperAdmin/GradeLevel";
 import Requirements from "./pages/SuperAdmin/Requirements";
 import UserRoles from "./pages/SuperAdmin/UserRoles";
 import SchoolYear from "./pages/SuperAdmin/SchoolYear";
-import NewTeacher from "./pages/Teacher/NewTeacher";
+import NewTeacher from "./pages/Registrar/NewTeacher";
 import SchoolAdmin from './layouts/SchoolAdmin';
 import Strands from "./pages/SuperAdmin/Strands";
 import Textbook from "./pages/SuperAdmin/Textbook";
@@ -39,6 +39,12 @@ import Admission from './pages/Registrar/Admission';
 import FeeCategory from "./pages/SuperAdmin/FeeCategory";
 import FeeCode from "./pages/SuperAdmin/FeeCode";
 import NewParent from "./pages/Registrar/NewParent";
+import Sibling from "./pages/Sibling";
+import NewSibling from "./pages/Registrar/NewSibling";
+import EditSibling from "./pages/Registrar/EditSibling";
+import EditTeacher from "./pages/Registrar/EditTeacher";
+import EditParent from "./pages/Registrar/EditParent";
+import Discount from "./pages/Discount";
 
 function App() {
 
@@ -59,6 +65,10 @@ function App() {
             <Route path='new-student' element={<NewStudent />} />
             <Route path='edit-student/:id' element={<EditStudent />} />  
             <Route path='new-parent' element={<NewParent />} />
+            <Route path='new-sibling' element={<NewSibling />} />
+            <Route path='edit-sibling/:id' element={<EditSibling />} />
+            <Route path='edit-teacher/:id' element={<EditTeacher />} />
+            <Route path='edit-parent/:id' element={<EditParent />} />
           </Route>
 
           {/* For Super admin */}
@@ -85,6 +95,8 @@ function App() {
             <Route path='fee-category' element={<FeeCategory />} />
             <Route path='fee-code' element={<FeeCode />} />
             <Route path='parents' element={<Parents />} />
+            <Route path='siblings' element={<Sibling />} />
+            <Route path='discount' element={<Discount />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />

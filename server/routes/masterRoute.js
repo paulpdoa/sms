@@ -62,7 +62,14 @@ add_parent,
 get_student_parent,
 delete_parent,
 get_academics,
-add_academic} = require('../controller/masterController');
+add_academic,
+get_siblings,
+get_sibling_details,
+add_sibling,
+delete_sibling,
+edit_sibling,
+get_student_sibling,
+edit_parent} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 
@@ -168,9 +175,16 @@ route.get('/parent/:id',get_parent_detail);
 route.get('/student/parent/:id',get_student_parent);
 route.post('/parent',add_parent);
 route.delete('/parent/:id',delete_parent);
+route.patch('/parent/:id',edit_parent);
 
-// Academic
-route.get('/academics',get_academics);
-route.post('/academic',add_academic);
+// Sibling
+route.get('/siblings',get_siblings);
+route.get('/sibling/:id',get_sibling_details);
+route.get('/sibling/student/:id',get_student_sibling);
+route.post('/sibling',add_sibling);
+route.delete('/sibling/:id',delete_sibling);
+route.patch('/sibling/:id',edit_sibling);
+
+
 
 module.exports = route;

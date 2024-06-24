@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DateTime from '../../components/DateTime';
 import Searchbar from '../../components/Searchbar';
-import { useFetch } from '../../hooks/useFetch';
-import { baseUrl } from '../../baseUrl';
 import SubmittedReq from '../../components/admission/reqs/SubmittedReq';
 import StudentParent from '../../components/admission/parent/StudentParent';
 import StudentInfo from '../../components/admission/info/StudentInfo';
 import StudentAcademic from '../../components/admission/acad/StudentAcademic';
 import StudentReqTable from '../../components/admission/reqs/StudentReqTable';
 import StudentInfoTable from '../../components/admission/info/StudentInfoTable';
+import StudentAcadTable from '../../components/admission/acad/StudentAcadTable';
+import StudentParentTable from '../../components/admission/parent/StudentParentTable';
+import StudentSibling from '../../components/admission/sibling/StudentSibling';
+import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
 
 const Admission = () => {
-    const { records: students, isLoading } = useFetch(`${baseUrl()}/students`);
 
-    const admissionPages = ['Information', 'Parents', 'Sibling', 'Academic', 'Requirements'];
-    const [currentPage, setCurrentPage] = useState('Information');
+    const admissionPages = ['Requirements','Information','Parents', 'Sibling', 'Academic'];
+    const [currentPage, setCurrentPage] = useState('Requirements');
     const [currStudRec, setCurrStudRec] = useState(null);
     const [enableView, setEnableView] = useState(false);
 
@@ -69,6 +69,7 @@ const Admission = () => {
                             {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
                             {currentPage === 'Information' && <StudentInfo id={currStudRec._id} />}
                             {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} />}
+                            {currentPage === 'Sibling' && <StudentSibling id={currStudRec} />}
                         </>
                     ) : (
                         <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
@@ -78,6 +79,9 @@ const Admission = () => {
                 <div className="rounded-md overflow-x-auto">
                     {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} />}
                     {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} />}
+                    {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} />}
+                    {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} />}
+                    {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} />}
                 </div>
             </div>
 

@@ -1,9 +1,10 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const StudentAcademic = ({ id }) => {
 
@@ -20,6 +21,16 @@ const StudentAcademic = ({ id }) => {
     const [session,setSession] = useState('');
     const [lastSchool,setLastSchool] = useState('');
 
+    useEffect(() => {
+        if(student) {
+            setGradeLevel(student?.academicId?.gradeLevelId?._id);
+            setDepartment(student?.academicId?.departmentId?._id);
+            setStrand(student?.academicId?.strandId?._id);
+            setSession(student?.academicId?.sessionId?._id);
+            setLastSchool(student?.academicId?.lastSchoolAttended);
+        }
+    },[student]);
+
     const addAcademic = async (e) => {
         e.preventDefault();
 
@@ -32,8 +43,10 @@ const StudentAcademic = ({ id }) => {
             studentId: id
         }
 
+        console.log(academicInfo);
+
         try {
-            const data = await axios.post(`${baseUrl()}/academic`,{ academicInfo });
+            const data = await axios.post(`${baseUrl()}/academic`,academicInfo);
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -42,13 +55,23 @@ const StudentAcademic = ({ id }) => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
         } catch(err) {
-            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+            console.error(err);
         }
     }
 
@@ -56,9 +79,13 @@ const StudentAcademic = ({ id }) => {
         <div className="mt-3 text-sm">
             <form onSubmit={addAcademic} className="flex flex-col gap-2">
                 <div className="flex flex-col gap-2">
+                    <label className="font-semibold" htmlFor="studentNo">Student Number:</label>
+                    <span className="p-2 rounded-md outline-none border border-gray-400 bg-gray-100">{student?.studentNo}</span>
+                </div>
+                <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="grade level">Grade Level</label>
                     <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setGradeLevel(e.target.value)}>
-                        <option hidden>{student?.gradeLevel?.gradeLevel ? student?.gradeLevel?.gradeLevel : 'Not Assigned' }</option>
+                        <option hidden>{student?.academicId?.gradeLevelId?.gradeLevel ? student?.academicId?.gradeLevelId?.gradeLevel : 'Not Assigned'}</option>
                         { gradeLevels?.map(gradeLevel => (
                             <option key={gradeLevel._id} value={gradeLevel._id}>{ gradeLevel.gradeLevel }</option>
                         )) } 
@@ -68,7 +95,7 @@ const StudentAcademic = ({ id }) => {
                 <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="department">Department</label>
                     <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setDepartment(e.target.value)}>
-                        <option hidden>{student?.department?.department ? student?.department?.department : 'Not Assigned' }</option>
+                        <option hidden>{student?.academicId?.departmentId?.department ? student?.academicId?.departmentId?.department : 'Not Assigned' }</option>
                         { departments?.map(department => (
                             <option key={department._id} value={department._id}>{ department.department }</option>
                         )) } 
@@ -78,7 +105,7 @@ const StudentAcademic = ({ id }) => {
                 <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="strand">Strand</label>
                     <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setStrand(e.target.value)}>
-                        <option hidden>{ academic.strandId?.strand ? academic.strandId?.strand : 'Not Assigned' }</option>
+                        <option hidden>{ student?.academicId?.strandId?.strand ? student?.academicId?.strandId?.strand : 'Not Assigned' }</option>
                         { strands?.map(strand => (
                             <option key={strand._id} value={strand._id}>{ strand.strand }</option>
                         )) } 
@@ -88,7 +115,7 @@ const StudentAcademic = ({ id }) => {
                 <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="session">Session</label>
                     <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setSession(e.target.value)}>
-                        <option hidden>{academic.sessionId ? `${academic.sessionId?.startYear.split('-')[0]}-${academic.sessionId?.endYear.split('-')[0]}` : 'Not Assigned' }</option>
+                        <option hidden>{student?.academicId?.sessionId ? `${student?.academicId?.sessionId?.startYear.split('-')[0]}-${student?.academicId?.sessionId?.endYear.split('-')[0]}` : 'Not Assigned' }</option>
                         { schoolYears?.map(schoolYear => (
                             <option key={schoolYear._id} value={schoolYear._id}>{ schoolYear.startYear.split('-')[0] }-{ schoolYear.endYear.split('-')[0] }</option>
                         )) } 
@@ -97,7 +124,7 @@ const StudentAcademic = ({ id }) => {
 
                 <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="school last attended">School Last Attended</label>
-                    <input className="p-2 rounded-md outline-none border border-gray-400" type="text" onChange={(e) => setLastSchool(e.target.value)} />
+                    <input className="p-2 rounded-md outline-none border border-gray-400" type="text" onChange={(e) => setLastSchool(e.target.value)} value={lastSchool ? lastSchool : ''} />
                 </div>
 
                 <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4">Submit</button>

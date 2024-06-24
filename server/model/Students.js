@@ -11,6 +11,10 @@ const studentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },
+    academicId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'academic'
+    },
     gradeLevel: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'gradeLevel'
@@ -20,7 +24,7 @@ const studentSchema = new mongoose.Schema({
         ref: 'section'
     },
     lrn: {
-        type: String
+        type: Number
     },
     studentNo: {
         type: String
@@ -57,14 +61,30 @@ const studentSchema = new mongoose.Schema({
     address: requiredString,
     status: requiredString,
     isAdmitted: {
-        type: Boolean,
-        required: true
+        type: Boolean
     },
     dateAdmitted: {
+        type: Date
+    },
+    isRegistered: {
+        type: Boolean
+    },
+    dateRegistered: {
+        type: Date
+    },
+    passedReportCard: {
+        type: Boolean
+    },
+    settledArrears: {
+        type: Boolean
+    },
+    completedClearance: {
+        type: Boolean
+    },
+    bloodType: {
         type: String
     }
-
-}, { timestamps: true })
+},{ timestamps: true })
 
 const StudentModel = mongoose.model('student',studentSchema);
 module.exports = StudentModel;

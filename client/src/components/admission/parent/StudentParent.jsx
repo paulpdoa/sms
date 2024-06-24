@@ -7,32 +7,10 @@ const StudentParent = ({ id }) => {
 
     if(parent) {
         return (
-            <div className="mt-3">  
-                <div className="flex flex-col text-sm">
-                    <div className="p-2 flex flex-col border-b-2 border-gray-300 rounded-md">
-                        <p className="font-semibold">Mother Name: <span className="font-normal">{parent?.motherName}</span></p>
-                        <p className="font-semibold">Company: <span className="font-normal">{parent?.motherOffice}</span></p>
-                        <p className="font-semibold">Mobile No: <span className="font-normal">{parent?.motherContact}</span></p>
-                        <p className="font-semibold">Occupation: <span className="font-normal">{parent?.motherOccupation}</span></p>
-                        <p className="font-semibold">Email: <span className="font-normal">{parent?.motherEmail}</span></p>
-                    </div>
-    
-                    <div className="p-2 flex flex-col border-b-2 border-gray-300 rounded-md">
-                        <p className="font-semibold">Father Name: <span className="font-normal">{parent?.fatherName}</span></p>
-                        <p className="font-semibold">Company: <span className="font-normal">{parent?.fatherOffice}</span></p>
-                        <p className="font-semibold">Mobile No: <span className="font-normal">{parent?.fatherContact}</span></p>
-                        <p className="font-semibold">Occupation: <span className="font-normal">{parent?.fatherOccupation}</span></p>
-                        <p className="font-semibold">Email: <span className="font-normal">{parent?.fatherEmail}</span></p>
-                    </div>
-    
-                    <div className="p-2 flex flex-col border-b-2 border-gray-300 rounded-md">
-                        <p className="font-semibold">Guardian Name: <span className="font-normal">{parent?.guardianName}</span></p>
-                        <p className="font-semibold">Company: <span className="font-normal">{parent?.guardianOffice}</span></p>
-                        <p className="font-semibold">Mobile No: <span className="font-normal">{parent?.guardianContact}</span></p>
-                        <p className="font-semibold">Occupation: <span className="font-normal">{parent?.guardianOccupation}</span></p>
-                        <p className="font-semibold">Email: <span className="font-normal">{parent?.guardianEmail}</span></p>
-                    </div>
-                </div>
+            <div className="mt-3 p-6 bg-white shadow-md rounded-md overflow-hidden">
+                { renderInformation('Mother',parent.motherName,parent.motherOccupation,parent.motherOffice,parent.motherContact,parent.motherEmail) }
+                { renderInformation('Father',parent.fatherName,parent.fatherOccupation,parent.fatherOffice,parent.fatherContact,parent.fatherEmail) }
+                { renderInformation('Guardian',parent.guardianName,parent.guardianOccupation,parent.guardianOffice,parent.guardianContact,parent.guardianEmail) }
             </div>
         )
     }
@@ -41,5 +19,34 @@ const StudentParent = ({ id }) => {
         <h1 className="mt-3 text-sm text-red-500">No parent records yet</h1>
     )
 }
+
+const renderInformation = (label,name,occupation,office,contact,email) => (
+        <>
+        <h2 className="text-xl text-green-600 font-bold mt-3">{label}'s Information</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+                <label className="font-semibold text-sm text-green-600">Name:</label>
+                <span className="text-sm truncate">{name}</span>
+            </div>
+            <div className="flex flex-col">
+                <label className="font-semibold text-sm text-green-600">Occupation:</label>
+                <span className="text-sm truncate">{occupation}</span>
+            </div>
+            <div className="flex flex-col">
+                <label className="font-semibold text-sm text-green-600">Office:</label>
+                <span className="text-sm truncate">{office}</span>
+            </div>
+            <div className="flex flex-col">
+                <label className="font-semibold text-sm text-green-600">Contact:</label>
+                <span className="text-sm truncate">{contact}</span>
+            </div>
+            <div className="flex flex-col">
+                <label className="font-semibold text-sm text-green-600">Email:</label>
+                <span className="text-sm truncate">{email}</span>
+            </div>
+        </div>
+        </>
+)
+
 
 export default StudentParent;

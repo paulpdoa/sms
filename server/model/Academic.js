@@ -9,7 +9,7 @@ const academicSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'student',
-        unique: true
+        // unique: true
     },
     gradeLevelId: {
         type: mongoose.Schema.Types.ObjectId,
