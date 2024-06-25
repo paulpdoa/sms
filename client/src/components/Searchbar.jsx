@@ -1,16 +1,27 @@
 import { useState } from 'react';
 import { CiSearch } from "react-icons/ci";
 
-const Searchbar = () => {
+const Searchbar = ({ onSearch }) => {
+    const [query, setQuery] = useState('');
 
-    const [item,setItem] = useState('');
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setQuery(value);
+        onSearch(value);
+    };
 
     return (
         <div className="flex items-center gap-2 overflow-hidden border-gray-300 border bg-white rounded-md">
-            <input className="outline-none p-2" type="text" placeholder="Search..." />
+            <input 
+                className="outline-none p-2" 
+                type="text" 
+                placeholder="Search..." 
+                value={query} 
+                onChange={handleInputChange} 
+            />
             <CiSearch className="text-xl mx-2"/>
         </div>
-    )
+    );
 }
 
 export default Searchbar;

@@ -48,7 +48,7 @@ const StudentReqTable = ({ setViewRecord }) => {
                 </tr>
             </thead>
             <tbody>
-                { students?.filter(student => !student.isAdmitted).map(student => (
+                { students?.map(student => (
                     <tr key={student._id} className='odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700'>
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             { student.firstName } { student.middleName } { student.lastName }
@@ -57,7 +57,7 @@ const StudentReqTable = ({ setViewRecord }) => {
                             { student?.isAdmitted ? 'Yes' : 'No' }
                         </td>
                         <td className="px-6 py-4">
-                            { student?.dateAdmitted ? student.dateAdmitted : 'Not admitted' }
+                            { student?.dateAdmitted ? student.dateAdmitted.split('T')[0] : 'Not admitted' }
                         </td>
                         <td className="px-6 py-4">
                             { student.gradeLevel?.gradeLevel ? student.gradeLevel?.gradeLevel : 'Not Assigned' }

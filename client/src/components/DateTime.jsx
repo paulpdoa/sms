@@ -1,44 +1,47 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DateTime = () => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months = ['January','Feburary','March','April','May','June','July','August','September','October','November','December'];
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-    const today = new Date();
-    const day = days[today.getDay()];
-    const month = months[today.getMonth()];
-    const date = today.getDate() < 10 ? `0${today.getDate()}` : today.getDate();
-    const year = today.getFullYear();
-    
-    const hour = today.getHours();
-    const minute = today.getMinutes();
-    const time = hour > 11 ? 'pm' : 'am'
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-    // Code that automatically moves time
-    const [currentTime,setCurrentTime] = useState(minute);
+    return () => clearInterval(timer);
+  }, []);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(minute);
-            // console.log(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
-        },1000)
+  const day = days[currentTime.getDay()];
+  const month = months[currentTime.getMonth()];
+  const date = currentTime.getDate() < 10 ? `0${currentTime.getDate()}` : currentTime.getDate();
+  const year = currentTime.getFullYear();
+  const hour = currentTime.getHours();
+  const minute = currentTime.getMinutes() < 10 ? `0${currentTime.getMinutes()}` : currentTime.getMinutes();
+  const second = currentTime.getSeconds() < 10 ? `0${currentTime.getSeconds()}` : currentTime.getSeconds();
+  const period = hour >= 12 ? 'PM' : 'AM';
 
-        return () => clearInterval(timer);
-    },[])
-    
+  const formattedHour = hour % 12 || 12; // Convert 24-hour time to 12-hour time, with 0 becoming 12
 
-    
-
-    return (
-        <>
-        <div className="p-2">
-            <h1 className="text-gray-700">{day}, {date} {month} {year} | {hour > 12 ?  hour - 12 : hour}:{currentTime < 10 ? `0${currentTime}` : currentTime} {time}</h1>
-        </div>
-        <hr className="h-[2px] bg-gray-300 my-2" />
-        </>
-    )
-}
+  return (
+    <div className="p-4 bg-gray-100 rounded-lg">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-gray-800">
+            {day}, {date} {month} {year} | {formattedHour}:{minute}:{second} {period}
+        </h1>
+        <button onClick={() => navigate(-1)} className="px-3 py-2 bg-blue-600 text-sm text-white rounded hover:bg-blue-700 transition">
+            Go Back
+        </button>
+      </div>
+      <hr className="h-[2px] bg-gray-300 my-4" />
+      
+    </div>
+  );
+};
 
 export default DateTime;

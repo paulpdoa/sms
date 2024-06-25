@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +11,12 @@ const SubmittedReq = ({ id }) => {
     const schoolYear = localStorage.getItem('session');
     
     const [selectedRequirements, setSelectedRequirements] = useState([]);
+
+    useEffect(() => {
+        if (admission) {
+            setSelectedRequirements(admission.map(ad => ad.requirementId));
+        }
+    }, [admission]);
 
     const handleRequirementSelection = (recordId) => {
         if (selectedRequirements.includes(recordId)) {
@@ -63,21 +69,17 @@ const SubmittedReq = ({ id }) => {
         <div className="mt-4 p-4 bg-white shadow-md rounded-md">
             <h2 className="text-xl font-bold text-green-600 mb-4">Submitted Requirements</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {requirements?.map((record) => (
-                <div key={record._id} className="flex items-center justify-between gap-4 border-b border-gray-300 py-2">
-                    <span className="text-sm text-green-600 font-semibold">{record.requirement}</span>
-                    {admission?.some(ad => ad.requirementId === record._id) ? (
-                        <span className="text-xs text-blue-500">Submitted</span>
-                    ) : (
+                {requirements?.map((record) => (
+                    <div key={record._id} className="flex items-center justify-between gap-4 border-b border-gray-300 py-2">
+                        <span className="text-sm text-green-600 font-semibold">{record.requirement}</span>
                         <input
                             className="cursor-pointer h-4 w-4 text-green-500 focus:ring-0"
                             type="checkbox"
                             checked={selectedRequirements.includes(record._id)}
                             onChange={() => handleRequirementSelection(record._id)}
                         />
-                    )}
-                </div>
-            ))}
+                    </div>
+                ))}
             </div>
             
             <button 

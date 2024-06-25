@@ -9,10 +9,30 @@ import { useState } from 'react';
 
 const columns = [
     {
-        accessorKey: 'department',
-        header: 'Department',
+        accessorKey: 'discountType',
+        header: 'Discount Type',
     },
     {
+        accessorKey: 'discountPercent',
+        header: 'Discount Percent'
+    },
+    {
+        accessorKey: 'amount',
+        header: 'Discount Amount'
+    },
+    {
+        accessorKey: 'discountCode',
+        header: 'Discount Code'
+    },
+    {
+        accessorKey: 'gradeLevelId.gradeLevel',
+        header: 'Grade Level'
+    },
+    {
+        accessorKey: 'sessionId.startYear',
+        header: 'Session'
+    },
+    {   
         header: 'Inputter'
     },
     {
@@ -24,24 +44,34 @@ const columns = [
 const Discount = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/discounts`);
+    const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
+    const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
+
     const [department,setDepartment] = useState('');
 
     const [updateDepartment,setUpdateDepartment] = useState(false);
     const [departmentId,setDepartmentId] = useState('');
     const [newDepartment,setNewDepartment] = useState('');
 
+    const [discountType,setDiscountType] = useState('');
+    const [discountPercentage,setDiscountPercentage] = useState(0);
+    const [amount,setAmount] = useState(0);
+    const [discountCode,setDiscountCode] = useState('');
+    const [schoolYear,setSchoolYear] = useState('');
+    const [gradeLevel,setGradeLevel] = useState('');
+
     const currentUserId = localStorage.getItem('id');
     const session = localStorage.getItem('session');
 
-    const enableEditDepartment = (record) => {
+    const enableEditDiscount = (record) => {
         setUpdateDepartment(!updateDepartment);
         setDepartmentId(record._id);
         setNewDepartment(record.department);
     }
 
-    const updateNewDepartment = async (id) => {
+    const updateNewDiscount = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/discount/${id}`,{ newDepartment,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -74,10 +104,10 @@ const Discount = () => {
         }
     }      
 
-    const deleteDepartment = async (id) => {
+    const deleteDiscount = async (id) => {
         try {
-            const removeDepartment = await axios.delete(`${baseUrl()}/discount/${id}`);
-            toast.success(removeDepartment.data.mssg, {
+            const removeDiscount = await axios.delete(`${baseUrl()}/discount/${id}`);
+            toast.success(removeDiscount.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
@@ -96,11 +126,11 @@ const Discount = () => {
         }
     }
 
-    const addDepartment = async (e) => {
+    const addDiscount = async (e) => {
         e.preventDefault();
         try {
-            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session });
-            toast.success(newDepartment.data.mssg, {
+            const newDiscount = await axios.post(`${baseUrl()}/discount`,{ discountType,discountCode,discountPercentage,amount,schoolYear,gradeLevel });
+            toast.success(newDiscount.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
@@ -108,7 +138,7 @@ const Discount = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -131,9 +161,13 @@ const Discount = () => {
                 <form onSubmit={addDiscount} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
                     <h1 className="font-semibold text-xl text-green-500">Add New Discount</h1>
 
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="department">Department</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setDepartment(e.target.value)} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {renderInput('discount type','Discount Type',setDiscountType,'text')}
+                    {renderInput('discount percentage','Discount Percentage',setDiscountPercentage,'number')}
+                    {renderInput('discount amount','Discount Amount',setAmount,'number')}
+                    {renderInput('discount code','Discount Code',setDiscountCode,'text')}
+                    {renderSelect('gradeLevel','Grade Level',setGradeLevel,gradeLevels,'grade level')}
+                    {renderSelect('session','School Year',setSchoolYear,schoolYears,'school year')}
                     </div>
 
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
@@ -182,7 +216,7 @@ const Discount = () => {
                                         :
                                         <>
                                         <button onClick={() => enableEditDepartment(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                        <button onClick={() => deleteDepartment(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
+                                        <button onClick={() => deleteDiscount(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
                                         </>
                                         }
                                         
@@ -199,3 +233,27 @@ const Discount = () => {
 }
 
 export default Discount;
+
+const renderInput = (label,value,onChange,inputType) => (
+    <div className="flex flex-col mt-2">
+        <label className="text-sm" htmlFor={label}>{value}</label>
+        <input className="outline-none p-1 rounded-md border border-gray-300" type={inputType} onChange={(e) => onChange(e.target.value)} />
+    </div>
+)
+
+const renderSelect = (label,value,onChange,options,placeholder) => (
+    <div className="flex flex-col mt-2">
+        <label className="text-sm" htmlFor={label}>{value}</label>
+        <select 
+            className="outline-none p-1 rounded-md border border-gray-300"
+            onChange={(e) => onChange(e.target.value)}
+        >
+            <option hidden>Select {placeholder}</option>
+            { options?.map(option => (
+                <option key={option._id} value={option._id}>
+                    { label === 'session' ? `${option.startYear.split('-')[0]}-${option.endYear.split('-')[0]}` : option[label]}
+                </option>
+            )) }
+        </select>
+    </div>
+)

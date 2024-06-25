@@ -22,7 +22,7 @@ const discountSchema = new mongoose.Schema({
     discountType: requiredString,
     discountPercent: requiredNumber,
     amount: requiredNumber,
-    discountCategory: requiredString,
+    discountCode: requiredString,
 
 }, { timestamps: true })
 

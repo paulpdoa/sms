@@ -77,7 +77,7 @@ const StudentAcademic = ({ id }) => {
 
     return (
         <div className="mt-3 text-sm">
-            <form onSubmit={addAcademic} className="flex flex-col gap-2">
+            <form onSubmit={addAcademic} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                     <label className="font-semibold" htmlFor="studentNo">Student Number:</label>
                     <span className="p-2 rounded-md outline-none border border-gray-400 bg-gray-100">{student?.studentNo}</span>

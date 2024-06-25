@@ -242,6 +242,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                         type="checkbox"
                         checked={isRegistered}
                         onChange={(e) => setIsRegistered(e.target.checked)}
+                        disabled
                     />
                 </div>
 

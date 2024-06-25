@@ -103,6 +103,8 @@ module.exports.get_admission = async (req,res) => {
     }
 }
 
+
+
 module.exports.add_admission = async (req, res) => {
     const { schoolYear, studentId, requirements } = req.body;
     
@@ -115,6 +117,18 @@ module.exports.add_admission = async (req, res) => {
         const existingAdmissions = await Admission.find({ studentId });
         const existingDocIds = existingAdmissions.map(admission => admission.requirementId.toString());
 
+        // Remove existing admissions that are no longer in the submitted requirements
+        const toRemove = existingDocIds.filter(id => !requirements.includes(id));
+        for (let i = 0; i < toRemove.length; i++) {
+            await Admission.findOneAndDelete({ studentId, requirementId: toRemove[i] });
+        }
+
+        // Add new requirements
+        const toAdd = requirements.filter(id => !existingDocIds.includes(id));
+        for (let i = 0; i < toAdd.length; i++) {
+            await Admission.create({ schoolYear, studentId, requirementId: toAdd[i] });
+        }
+
         // Combine existing and new submissions
         const allSubmittedDocs = [...new Set([...existingDocIds, ...requirements])];
 
@@ -124,23 +138,18 @@ module.exports.add_admission = async (req, res) => {
         if (allRequirementsMet) {
             // Admit the student
             await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date() });
-
-            res.status(200).json({ mssg: 'Student has been admitted' });
         } else {
-            // Submit new requirements
-            for (let i = 0; i < requirements.length; i++) {
-                if (!existingDocIds.includes(requirements[i])) {
-                    await Admission.create({ schoolYear, studentId, requirementId: requirements[i] });
-                }
-            }
-
-            res.status(200).json({ mssg: 'Requirements have been submitted' });
+            // Set isAdmitted to false if any requirement is unchecked
+            await Student.findByIdAndUpdate(studentId, { isAdmitted: false });
         }
+
+        res.status(200).json({ mssg: 'Student requirement has been updated' });
     } catch (err) {
         console.log(err);
         res.status(500).json({ mssg: 'Server error' });
     }
 };
+
 
 module.exports.get_admission_student = async (req,res) => {
     const { student } = req.params;
@@ -153,150 +162,14 @@ module.exports.get_admission_student = async (req,res) => {
     }
 }
 
-// Student Information Update
-
-// module.exports.update_student_info = async (req, res) => {
-//     const { id } = req.params;
-//     let studentNo = '';
-//     let currentYear = '';
-//     let studentName = '';
-
-//     const {
-//         firstName,
-//         middleName,
-//         gender,
-//         dateOfBirth,
-//         placeOfBirth,
-//         address,
-//         nationality,
-//         religion,
-//         contactNumber,
-//         email,
-//         status,
-//         lrn,
-//         passedReportCard,
-//         settledArrears,
-//         completedClearance,
-//         session,
-//         isRegistered,
-//     } = req.body;
-
-//     let dateRegistered = '';
-
-
-//     try {
-
-//         const latestStudent = await Student.findOne({ isRegistered: true }).sort({ created_at: -1 });
-
-//         if(isRegistered) {
-//             dateRegistered = new Date();
-    
-//             const isStudentRegistered = await Student.findById(id);
-//             const currentSession = await SchoolYear.findById(session);
-    
-//             if (currentSession) {
-//                 currentYear = currentSession.startYear.split('-')[0];
-//             } else {
-//                 return res.status(400).json({ mssg: 'Session not found' });
-//             }
-
-//             const student = await Student.findByIdAndUpdate(
-//                 id,
-//                 {
-//                     firstName,
-//                     middleName,
-//                     sex:gender,
-//                     dateOfBirth,
-//                     placeOfBirth,
-//                     address,
-//                     nationality,
-//                     religion,
-//                     contactNumber,
-//                     email,
-//                     status,
-//                     lrn,
-//                     passedReportCard,
-//                     settledArrears,
-//                     completedClearance,
-//                     isRegistered
-//                 },
-//                 { new: true }
-//             );
-
-//             // create a check on latest student, if the student number year is different, create a fresh start
-//             // Also create a check if there is already a student number, if it has, don't create student number
-           
-//             if(latestStudent?.studentNo?.slice(0,4) == currentYear) {
-//                 // Must check here if the latest student already has studentNo
-//                 if(student.studentNo === undefined) {
-//                     if(latestStudent) {
-//                         // Create logic to get the studentNo then add 1
-//                         const plusOne = parseInt(latestStudent.studentNo.slice(-4)) + 1;
-//                         const paddedNumber = plusOne.toString().padStart(4, '0');
-            
-//                         // Generate the student number: 2024(Year) 0000(pad 0) 1(occurrence)
-//                         studentNo = `${currentYear}${paddedNumber}`;
-//                     } else {
-//                         // Create the first student number if no record exists yet
-//                         const paddedNumber = '0001';
-//                         studentNo = `${currentYear}${paddedNumber}`;
-//                     }
-//                 } else {
-//                     // If it already has student number, then leave it as is
-//                     studentNo = student.studentNo;
-//                 }
-//             } else {
-//                 const paddedNumber = '0001';
-//                 studentNo = `${currentYear}${paddedNumber}`;
-//             }
-    
-//             student.studentNo = studentNo;
-//             student.dateRegistered = dateRegistered;
-//             studentName = student.firstName
-
-//             await student.save();
-    
-//         } else {
-//             const student = await Student.findByIdAndUpdate(
-//                 id,
-//                 {
-//                     firstName,
-//                     middleName,
-//                     sex:gender,
-//                     dateOfBirth,
-//                     placeOfBirth,
-//                     address,
-//                     nationality,
-//                     religion,
-//                     contactNumber,
-//                     email,
-//                     status,
-//                     lrn,
-//                     passedReportCard,
-//                     settledArrears,
-//                     completedClearance,
-//                     isRegistered
-//                 },
-//                 { new: true }
-//             );
-
-//             studentName = student.firstName
-//         }
-
-//         res.status(200).json({ mssg: `${studentName}'s record has been updated successfully!` });
-       
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ mssg: 'Server error' });
-//     }
-// }
 module.exports.update_student_info = async (req, res) => {
     const { id } = req.params;
     let studentNo = '';
     let currentYear = '';
     let studentName = '';
+    let dateRegistered = '';
 
-    const {
+    let {
         firstName,
         lastName,
         middleName,
@@ -317,7 +190,13 @@ module.exports.update_student_info = async (req, res) => {
         isRegistered,
     } = req.body;
 
-    let dateRegistered = '';
+    if(completedClearance && passedReportCard && settledArrears) {
+        isRegistered = true
+    } else {
+        isRegistered = false;
+    }
+
+    console.log(`Clearance-${completedClearance} /n ReportCard-${passedReportCard} /n Arrears-${settledArrears}`)
 
     try {
         // Fetch the latest registered student sorted by creation date
@@ -478,10 +357,12 @@ module.exports.get_discount_detail = async (req,res) => {
 }
 
 module.exports.add_discount = async (req,res) => {
-    const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory } = req.body;
+    let { schoolYear: sessionId,gradeLevel: gradeLevelId,discountType,discountPercentage: discountPercent,amount,discountCode } = req.body;
+
+    discountPercent = discountPercent / 100 //Divide to 100 to get decimal percentage equivalent
 
     try {
-        const discount = await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory });
+        const discount = await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode });
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
     } catch(err) {
         console.log(err);
