@@ -30,7 +30,7 @@ const initialMenus = [
                     { name: 'Parents', link: '/master/parents' },
                     { name: 'Siblings', link: '/master/siblings' },
                     { name: 'Grade Level', link: '/master/grade-levels' },
-                    { name: 'Admission Requirements', link: '/master/requirements' },
+                    { name: 'Requirements', link: '/master/requirements' },
                     { name: 'User Roles', link: '/master/user-roles' },
                     { name: 'School Year', link: '/master/school-year' },
                     { name: 'Users', link: '/master/users' },
@@ -61,7 +61,8 @@ const initialMenus = [
                     { name: 'Students', link: '/students' },
                     { name: 'Registration' },
                     { name: 'Admission', link: '/admission' },
-                    { name: 'Sectioning' }
+                    { name: 'Sectioning', link:'/sectioning' },
+                    { name: 'Assessment', link: '/assessment' }
                 ]
             },
             {
@@ -108,7 +109,7 @@ const initialMenus = [
                     { name: 'Students', link: '/students' },
                     { name: 'Registration' },
                     { name: 'Admission' },
-                    { name: 'Sectioning' }
+                    { name: 'Sectioning', link: '/sectioning' }
                 ]
             },
             {

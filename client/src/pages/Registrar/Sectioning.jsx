@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import Searchbar from "../../components/Searchbar";
 import axios from 'axios';
 
@@ -13,11 +13,15 @@ const Sectioning = () =>{
     const columns = [
         { accessorKey: 'firstName', header: 'First Name' },
         { accessorKey: 'lastName', header: 'Last Name' },
-        { accessorKey: 'studentNo',header: 'Student No'},
+        { accessorKey: 'studentNo', header: 'Student No' },
         { accessorKey: 'academicId.gradeLevelId.gradeLevel', header: 'Grade Level' },
         { accessorKey: 'academicId.strandId.strand', header: 'Strand' },
         { accessorKey: 'academicId.sectionId.section', header: 'Section' },
-        { accessorKey: 'academicId.sectionId.adviser', header: 'Adviser' }
+        {
+            accessorKey: 'academicId.sectionId.adviser',
+            header: 'Adviser',
+            cell: (adviser) => `${adviser.firstName} ${adviser.lastName}`,
+        },
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
@@ -33,10 +37,14 @@ const Sectioning = () =>{
 
     const [studentRecord,setStudentRecord] = useState(null);
 
-    const populateField = (section) => {
-        const getSection = sections.filter(sect => sect._id === section);
-        setAdviser(`${getSection[0].adviser?.firstName} ${getSection[0].adviser?.lastName}`);
-        setSectionId(section);
+    useEffect(() => {
+        if(studentRecord) {
+            setSectionId(studentRecord?.academicId?.sectionId?._id);
+        }
+    },[studentRecord])
+
+    const handleSectionChange = (e) => {
+        setSectionId(e.target.value);
     }
 
     const submitSectioning = async (e) => {
@@ -47,11 +55,12 @@ const Sectioning = () =>{
             studentId: studentRecord._id,
             sectionId: sectionId,
             inputter: currentUserId,
-            gradeLevelId: studentRecord?.academicId?.gradeLevelId._id,
-            departmentId: studentRecord?.academicId?.departmentId._id,
-            strandId: studentRecord?.academicId?.strandId._id,
+            gradeLevelId: studentRecord?.academicId?.gradeLevelId?._id,
+            strandId: studentRecord?.academicId?.strandId?._id,
             lastSchoolAttended: studentRecord?.academicId?.lastSchoolAttended,
         }
+
+        console.log(sectioningInfo)
 
         try {
             const data = await axios.post(`${baseUrl()}/sectioning`,sectioningInfo);
@@ -91,7 +100,7 @@ const Sectioning = () =>{
                             {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
                             {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
                             {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
-                            {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,populateField)}
+                            {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
                             {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : adviser,'Adviser')}
                         </div>
 
@@ -123,9 +132,9 @@ export default Sectioning;
 const renderStudentInfo = (label,value,placeholder,options,onChange) => (
     <div className="flex flex-col">
         <label className="text-sm mb-1 font-semibold text-green-600" htmlFor={label}>{placeholder}</label>
-        { label === 'section' && !value ? 
-        <select className="text-sm p-2 outline-none rounded-md border border-gray-200" onChange={(e) => onChange(e.target.value)}>
-            <option hidden>Select section</option>
+        { label === 'section' ? 
+        <select className="text-sm p-2 outline-none rounded-md border border-gray-200" onChange={onChange}>
+            <option hidden>{ value ? value : 'Select Section' }</option>
             { options.map(section => (
                 <option key={section._id} value={section._id}>{section.section}</option>
             )) }

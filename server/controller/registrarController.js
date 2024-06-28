@@ -11,13 +11,25 @@ module.exports.get_students = async (req,res) => {
     try {
         // const students = await Student.find().populate('sex religion nationality sy_id gradeLevel academicId');
         const students = await Student.find()
-        .populate({ path: 'academicId',populate: { path: 'studentId' } })
-        .populate({ path: 'academicId', populate: { path: 'strandId' } })
-        .populate({ path: 'academicId', populate: { path: 'departmentId' } })
-        .populate({ path: 'academicId', populate: { path: 'gradeLevelId' } })
-        .populate({ path: 'academicId', populate: { path: 'sessionId' } })
-        .populate({ path: 'academicId', populate: { path: 'sectionId' } })
-        .populate('sex religion nationality sy_id gradeLevel');
+        .populate({
+            path: 'academicId',
+            populate: [
+                { path: 'studentId' },
+                { path: 'strandId' },
+                { path: 'departmentId' },
+                { path: 'gradeLevelId' },
+                { path: 'sessionId' },
+                { 
+                    path: 'sectionId',
+                    populate: { path: 'adviser' }
+                }
+            ]
+        })
+        .populate('sex')
+        .populate('religion')
+        .populate('nationality')
+        .populate('sy_id')
+        .populate('gradeLevel')
         res.status(200).json(students);
     } catch(err) {
         console.log(err);
@@ -64,7 +76,7 @@ module.exports.get_student_detail = async (req, res) => {
                     { path: 'sessionId' },
                     { 
                         path: 'sectionId',
-                        populate: { path: 'adviser', model: 'Teacher'    }
+                        populate: { path: 'adviser' }
                     }
                 ]
             })
@@ -214,8 +226,6 @@ module.exports.update_student_info = async (req, res) => {
         isRegistered = false;
     }
 
-    console.log(`Clearance-${completedClearance} /n ReportCard-${passedReportCard} /n Arrears-${settledArrears}`)
-
     try {
         // Fetch the latest registered student sorted by creation date
         const latestStudent = await Student.findOne({ isRegistered: true }).sort({ _id: -1 });
@@ -324,12 +334,17 @@ module.exports.get_student_academic_detail = async (req,res) => {
 
 module.exports.add_academic = async (req,res) => {
 
-    const { strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended } = req.body;
+    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended } = req.body;
 
     // This will also update students info upon posting
+    console.log(req.body)
+
+    if(strandId === '') {
+        strandId = null;
+    }
 
     try {
-        const academic = await Academic.create({ strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
+        const academic = await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
         const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
         res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
     } catch(err) {
@@ -501,18 +516,18 @@ module.exports.get_sectioning = async (req,res) => {
 } 
 
 module.exports.add_sectioning = async (req,res) => {
-    const { sessionId,studentId,sectionId,inputter,gradeLevelId,departmentId,strandId,lastSchoolAttended } = req.body;
-    console.log(req.body);
+    const { sessionId,studentId,sectionId,inputter,gradeLevelId,strandId,lastSchoolAttended } = req.body;
+    
     try {   
         // insert record in Academic table 
-        const addAcadRec = await Academic.create({ sessionId,studentId,sectionId,inputter,gradeLevelId,departmentId,strandId,lastSchoolAttended });
-
+        const addAcadRec = await Academic.create({ sessionId,studentId,sectionId,inputter,gradeLevelId,strandId,lastSchoolAttended });
+        console.log('addAcadRec',addAcadRec);
         // update student table to update academic record of the student
         const updateStudentRec = await Student.findByIdAndUpdate({_id: studentId},{ academicId: addAcadRec._id });
-
+        console.log('updateStudentRec',updateStudentRec);
         // insert in sectioning table
         const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter });
-
+        console.log('addSectioning',addSectioning);
         res.status(200).json({ mssg: `${updateStudentRec.firstName} has been added new section successfully` });
     } catch(err) {
         console.log(err);

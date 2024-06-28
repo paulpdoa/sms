@@ -45,7 +45,7 @@ import EditSibling from "./pages/Registrar/EditSibling";
 import EditTeacher from "./pages/Registrar/EditTeacher";
 import EditParent from "./pages/Registrar/EditParent";
 import Discount from "./pages/Discount";
-
+import Assessment from './pages/Registrar/Assessment'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Sectioning from "./pages/Registrar/Sectioning";
@@ -107,6 +107,8 @@ function App() {
 
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
+          <Route path='/sectioning' element={<Sectioning />} />
+          <Route path='/assessment' element={<Assessment />} />
 
           <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin')  ? <SchoolAdmin /> : <Navigate to='/' /> }>
             <Route path='new-teacher' element={<NewTeacher />} />

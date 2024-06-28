@@ -283,7 +283,9 @@ module.exports.edit_department = async (req,res) => {
 
 module.exports.get_sections = async (req,res) => {
     try {
-        const sections = await Section.find({ status: true }).populate('gradeLevel department adviser');
+        const sections = await Section.find({ status: true })
+        .populate({ path: 'gradeLevel', populate: { path: 'department' } })
+        .populate('adviser');
         res.status(200).json(sections);
     } catch(err) {
         console.log(err);
@@ -292,11 +294,11 @@ module.exports.get_sections = async (req,res) => {
 
 module.exports.add_sections = async (req,res) => {
 
-    const { section,gradeLevel,department,adviser } = req.body;
+    const { section,gradeLevel,adviser } = req.body;
     const status = true;
 
     try {
-        const newSection = await Section.addSection(section,gradeLevel,adviser,department,status);
+        const newSection = await Section.addSection(section,gradeLevel,adviser,status);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -330,12 +332,12 @@ module.exports.get_section_detail = async (req,res) => {
 module.exports.edit_section = async (req,res) => {
     const { id } = req.params;
 
-    const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser,newDepartment: department  } = req.body;
+    const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser } = req.body;
    
     try {   
         const currSection = await Section.findById(id);
         // if(currSection.section !== section) {
-            const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser,department });
+            const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser });
             res.status(200).json({ mssg: `${newSection.section} has been changed to ${section} successfully!` });
         // } else {
             // res.status(400).json({ mssg: `Cannot update ${section}, still the same with old value` })

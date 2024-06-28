@@ -58,7 +58,7 @@ const teacherSchema = new mongoose.Schema({
     socMedAcct: {
         type: String
     },
-    username: requiredString,
+    username: requiredString,   
     password: requiredString
 
 }, { timestamps: true });

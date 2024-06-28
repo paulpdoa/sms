@@ -55,7 +55,6 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
 
     const actions = (student) => (
         <>
-        {console.log(student)}
         <div className="flex gap-2 items-center">
             <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
             <button onClick={() => deleteAcadRecord(student.academicId._id)} className="font-medium text-red-500 dark:text-red-500 hover:underline">Delete</button>

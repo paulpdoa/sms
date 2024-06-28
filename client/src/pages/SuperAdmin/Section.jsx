@@ -41,14 +41,14 @@ const Section = () => {
     const [section,setSection] = useState('');
     const [gradeLevel,setGradeLevel] = useState('');
     const [adviser,setAdviser] = useState('');
-    const [department,setDepartment] = useState('');
+    // const [department,setDepartment] = useState('');
 
     const [updateSection,setUpdateSection] = useState(false);
     const [sectionId,setSectionId] = useState('');
     const [newSection,setNewSection] = useState('');
     const [newGradeLevel,setNewGradeLevel] = useState('');
     const [newAdviser,setNewAdviser] = useState('');
-    const [newDepartment,setNewDepartment] = useState('');
+    // const [newDepartment,setNewDepartment] = useState('');
 
     const enableEditSection = (record) => {
         setUpdateSection(!updateSection);
@@ -56,13 +56,12 @@ const Section = () => {
         setNewSection(record?.section)
         setNewGradeLevel(record.gradeLevel?._id);
         setNewAdviser(record.adviser?._id);
-        setNewDepartment(record.department?._id);
     }
 
     const updateNewSection = async (id) => {
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/section/${id}`,{ newSection,newGradeLevel,newAdviser,newDepartment });
+            const newData = await axios.patch(`${baseUrl()}/section/${id}`,{ newSection,newGradeLevel,newAdviser });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -121,7 +120,7 @@ const Section = () => {
         e.preventDefault();
        
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`,{ section,gradeLevel,department,adviser });
+            const newSection = await axios.post(`${baseUrl()}/sections`,{ section,gradeLevel,adviser });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -190,7 +189,7 @@ const Section = () => {
                             )) }
                         </select>
                     </div>
-                    <div className="flex flex-col mt-1">
+                    {/* <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="department">Department</label>
                         <select className="outline-none p-1 rounded-md border border-gray-300"
                             onChange={(e) => setDepartment(e.target.value)}
@@ -201,7 +200,7 @@ const Section = () => {
                                 <option key={department._id} value={department._id}>{department.department}</option>
                             )) }
                         </select>
-                    </div>
+                    </div> */}
 
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
@@ -235,19 +234,14 @@ const Section = () => {
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewAdviser(e.target.value)}>
-                                                <option hidden>{record.adviser?.teacher ? record.adviser?.teacher : 'Choose adviser'}</option>
+                                                <option hidden>{record?.adviser ? `${record.adviser?.firstName} ${record.adviser?.middleName} ${record.adviser?.lastName}` : 'Choose adviser'}</option>
                                                 { teachers?.map(teacher => (
                                                     <option key={teacher._id} value={teacher._id}>{ teacher.firstName } { teacher.middleName } { teacher.lastName }</option>
                                                 )) }
                                             </select>
                                         </td>
-                                        <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewDepartment(e.target.value)}>
-                                                <option hidden>{ record.department?.department }</option>
-                                                { departments?.map(department => (
-                                                    <option key={department._id} value={department._id}>{ department.department }</option>
-                                                )) }
-                                            </select>
+                                        <td scope="row" className="px-6 py-4 font-medium text-gray-400 whitespace-nowrap">
+                                            <span>{record?.gradeLevel?.department?.department}</span>
                                         </td>
                                         </>
                                         :
@@ -262,7 +256,7 @@ const Section = () => {
                                             { record.adviser === undefined ? 'Not Assigned' : `${record.adviser?.firstName} ${record.adviser?.middleName} ${record.adviser?.lastName}` }
                                         </td>
                                         <td className="px-6 py-4 gap-2">
-                                            { record.department ? record.department?.department : 'Not Assigned' }
+                                            { record.gradeLevel?.department ? record.gradeLevel?.department?.department : 'Not Assigned' }
                                         </td>
                                         </>
                                     }
