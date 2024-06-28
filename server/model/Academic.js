@@ -8,8 +8,7 @@ const requiredString = {
 const academicSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'student',
-        // unique: true
+        ref:'student'
     },
     gradeLevelId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,7 +26,15 @@ const academicSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
     },
-    lastSchoolAttended: requiredString
+    lastSchoolAttended: requiredString,
+    sectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'section'
+    },
+    paymentTermId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'paymentTerm'
+    }
 }, { timestamps: true })
 
 const AcademicModel = mongoose.model('academic',academicSchema);

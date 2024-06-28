@@ -19,11 +19,18 @@ const discountSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:'gradeLevel'
     },
-    discountType: requiredString,
+    discountType: {
+        type: String,
+        unique:true,
+        required: true
+    },
     discountPercent: requiredNumber,
     amount: requiredNumber,
     discountCode: requiredString,
-
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }
 }, { timestamps: true })
 
 const DiscountModel = mongoose.model('discount',discountSchema);

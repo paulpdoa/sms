@@ -4,6 +4,8 @@ const SchoolYear = require('../model/SchoolYear');
 const Academic = require('../model/Academic');
 const Requirement = require('../model/Requirement');
 const Discount = require('../model/Discount');
+const StudentDiscount = require('../model/StudentDiscount');
+const Sectioning = require('../model/Sectioning');
 
 module.exports.get_students = async (req,res) => {
     try {
@@ -14,6 +16,7 @@ module.exports.get_students = async (req,res) => {
         .populate({ path: 'academicId', populate: { path: 'departmentId' } })
         .populate({ path: 'academicId', populate: { path: 'gradeLevelId' } })
         .populate({ path: 'academicId', populate: { path: 'sessionId' } })
+        .populate({ path: 'academicId', populate: { path: 'sectionId' } })
         .populate('sex religion nationality sy_id gradeLevel');
         res.status(200).json(students);
     } catch(err) {
@@ -46,22 +49,37 @@ module.exports.delete_student = async (req,res) => {
     }
 }
 
-module.exports.get_student_detail = async (req,res) => {
-    const { id } = req.params;
+module.exports.get_student_detail = async (req, res) => {
+    const { id } = req.params;  
 
     try {
         const studentFind = await Student.findById(id)
-        .populate({ path: 'academicId',populate: { path: 'studentId' } })
-        .populate({ path: 'academicId', populate: { path: 'strandId' } })
-        .populate({ path: 'academicId', populate: { path: 'departmentId' } })
-        .populate({ path: 'academicId', populate: { path: 'gradeLevelId' } })
-        .populate({ path: 'academicId', populate: { path: 'sessionId' } })
-        .populate('sex religion nationality sy_id gradeLevel');
+            .populate({
+                path: 'academicId',
+                populate: [
+                    { path: 'studentId' },
+                    { path: 'strandId' },
+                    { path: 'departmentId' },
+                    { path: 'gradeLevelId' },
+                    { path: 'sessionId' },
+                    { 
+                        path: 'sectionId',
+                        populate: { path: 'adviser', model: 'Teacher'    }
+                    }
+                ]
+            })
+            .populate('sex')
+            .populate('religion')
+            .populate('nationality')
+            .populate('sy_id')
+            .populate('gradeLevel')
         res.status(200).json(studentFind);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
+
 
 module.exports.submit_student_requirements = async (req,res) => {
     const { id } = req.params;
@@ -274,7 +292,9 @@ module.exports.update_student_info = async (req, res) => {
 
 module.exports.get_academics = async (req,res) => {
     try {
-        const academics = await Academic.find().populate('gradeLevelId studentId departmentId strandId sessionId');
+        const academics = await Academic.find()
+        .populate({ path: 'sectionId', populate: { path: 'adviser' }})
+        .populate('gradeLevelId studentId departmentId strandId sessionId');
         res.status(200).json(academics);
     } catch(err) {
         console.log(err);
@@ -309,9 +329,7 @@ module.exports.add_academic = async (req,res) => {
     // This will also update students info upon posting
 
     try {
-        
         const academic = await Academic.create({ strandId,departmentId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
-        console.log(academic);
         const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
         res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
     } catch(err) {
@@ -338,7 +356,7 @@ module.exports.delete_academic = async (req,res) => {
 module.exports.get_discounts = async (req,res) => {
 
     try {
-        const discount = await Discount.find().populate('sessionId gradeLevelId');
+        const discount = await Discount.find().populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
@@ -349,7 +367,7 @@ module.exports.get_discount_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const discount = await Discount.findById(id).populate('sessionId gradeLevelId');
+        const discount = await Discount.findById(id).populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
@@ -357,15 +375,17 @@ module.exports.get_discount_detail = async (req,res) => {
 }
 
 module.exports.add_discount = async (req,res) => {
-    let { schoolYear: sessionId,gradeLevel: gradeLevelId,discountType,discountPercentage: discountPercent,amount,discountCode } = req.body;
+    let { schoolYear: sessionId,gradeLevel: gradeLevelId,discountType,discountPercentage: discountPercent,amount,discountCode,inputter } = req.body;
 
     discountPercent = discountPercent / 100 //Divide to 100 to get decimal percentage equivalent
 
     try {
-        const discount = await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode });
+        const discount = await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode,inputter });
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
     } catch(err) {
-        console.log(err);
+        if(err.code === 11000) {
+            res.status(400).json({ mssg: `${discountType} has been already added to the record, please create new discount type` });
+        } 
     }
 }
 
@@ -383,11 +403,117 @@ module.exports.delete_discount = async (req,res) => {
 module.exports.edit_discount = async (req,res) => {
     const { id } = req.params;
 
-    const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory } = req.body;
+    const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter } = req.body;
 
     try {
         const discount = await Discount.findByIdAndUpdate({_id:id},{ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory });
         res.status(200).json({ mssg: `${discount.discountType} has been updated successfully!` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// For Student Discount
+
+module.exports.get_student_discounts = async (req,res) => {
+    
+    try {
+        const studentDiscounts = await StudentDiscount.find().populate('studentId sessionId discountId inputter');
+        res.status(200).json(studentDiscounts);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.delete_student_discount = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const studentDiscount = await StudentDiscount.findByIdAndDelete(id);
+        res.status(200).json({ mssg: 'Student discount has been removed successfully!' });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_student_discount_detail = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const studentDiscount = await StudentDiscount.findById(id).populate('studentId sessionId discountId inputter');
+        res.status(200).json(studentDiscount);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_discounts_of_student = async (req,res) => {
+    const { studentId } = req.params;
+
+    try {
+        const studentDiscount = await StudentDiscount.find({ studentId: studentId }).populate('studentId sessionId discountId inputter');
+        res.status(200).json(studentDiscount);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.add_student_discount = async (req,res) => {
+    const { studentId,sessionId,discountId,inputter } = req.body;
+
+    try {
+
+        const discount = await Discount.findById(discountId);
+        const discountPrice = discount.amount * discount.discountPercent;
+        
+
+        const studentDiscount = await StudentDiscount.create({ studentId,sessionId,discountId,inputter,discount: discountPrice });
+        res.status(200).json({ mssg: 'Discount has been added to the student' });
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
+module.exports.edit_student_discount = async(req,res) => {
+
+    const { id } = req.params;
+    const { studentId,sessionId,discountId,inputter } = req.body;
+
+    try {
+        const studentDiscount = await StudentDiscount.create({ studentId,sessionId,discountId,inputter });
+        res.status(200).json({ mssg: 'Discount has been added to the student' });
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
+// For Sectioning
+
+module.exports.get_sectioning = async (req,res) => {
+    try {
+        const sectionings = await Sectioning.find({  }).populate('sessionId studentId sectionId inputter');
+        res.status(200).json(sectionings);
+    } catch(err) {
+        console.log(err);
+    }
+} 
+
+module.exports.add_sectioning = async (req,res) => {
+    const { sessionId,studentId,sectionId,inputter,gradeLevelId,departmentId,strandId,lastSchoolAttended } = req.body;
+    console.log(req.body);
+    try {   
+        // insert record in Academic table 
+        const addAcadRec = await Academic.create({ sessionId,studentId,sectionId,inputter,gradeLevelId,departmentId,strandId,lastSchoolAttended });
+
+        // update student table to update academic record of the student
+        const updateStudentRec = await Student.findByIdAndUpdate({_id: studentId},{ academicId: addAcadRec._id });
+
+        // insert in sectioning table
+        const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter });
+
+        res.status(200).json({ mssg: `${updateStudentRec.firstName} has been added new section successfully` });
     } catch(err) {
         console.log(err);
     }

@@ -292,15 +292,15 @@ module.exports.get_sections = async (req,res) => {
 
 module.exports.add_sections = async (req,res) => {
 
-    const { section,gradeLevel,department } = req.body;
+    const { section,gradeLevel,department,adviser } = req.body;
     const status = true;
 
     try {
-        const newSection = await Section.addSection(section,gradeLevel,department,status);
+        const newSection = await Section.addSection(section,gradeLevel,adviser,department,status);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: err.message });
+        res.status(400).json({ mssg: `Cannot add ${section} in the record, please try again` });
     }
 }
 

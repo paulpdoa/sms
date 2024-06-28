@@ -29,7 +29,7 @@ const sectionSchema = new mongoose.Schema({
     
 }, { timestamps: true })
 
-sectionSchema.statics.addSection = async function(section,gradeLevel,department,status) {
+sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,department,status) {
     const exist = await this.findOne({ section });
     if(exist && exist.status) {
         throw Error('This section is already existing');
@@ -44,7 +44,7 @@ sectionSchema.statics.addSection = async function(section,gradeLevel,department,
     }
 
     
-    const newSection = await this.create({ section,gradeLevel,department,status });
+    const newSection = await this.create({ section,gradeLevel,adviser,department,status });
     return newSection;
 }
 
