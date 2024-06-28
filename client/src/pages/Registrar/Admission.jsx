@@ -15,15 +15,19 @@ import StudentSibling from '../../components/admission/sibling/StudentSibling';
 import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
 
 const Admission = () => {
-
-    const admissionPages = ['Requirements','Information','Parents', 'Sibling', 'Academic'];
+    const admissionPages = ['Requirements', 'Information', 'Parents', 'Sibling', 'Academic'];
     const [currentPage, setCurrentPage] = useState('Requirements');
     const [currStudRec, setCurrStudRec] = useState(null);
     const [enableView, setEnableView] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
         setEnableView(true);
+    };
+
+    const handleSearch = (query) => {
+        setSearchQuery(query);
     };
 
     const currentUserId = localStorage.getItem('id');
@@ -33,7 +37,7 @@ const Admission = () => {
             <DateTime />
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-green-500 font-bold">Admission</h1>
-                <Searchbar />
+                <Searchbar onSearch={handleSearch} />
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-5">
@@ -62,7 +66,6 @@ const Admission = () => {
                         ))}
                     </div>
 
-                    {/* Render selected page component based on currentPage */}
                     {enableView && currStudRec?._id ? (
                         <>
                             {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
@@ -76,12 +79,12 @@ const Admission = () => {
                     )}
                 </div>
 
-                <div className="rounded-md overflow-x-auto">
-                    {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} />}
-                    {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} />}
-                    {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} />}
-                    {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} />}
-                    {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} />}
+                <div className="rounded-md h-fit">
+                    {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                 </div>
             </div>
 

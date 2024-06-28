@@ -42,7 +42,8 @@ const initialMenus = [
                     { name: 'Admission', link: '/master/admission' },
                     { name: 'Fee Category', link: '/master/fee-category' },
                     { name: 'Fee Code', link: '/master/fee-code' },
-                    { name: 'Discount', link: '/master/discount' }
+                    { name: 'Discount', link: '/master/discount' },
+                    { name: 'Sectioning', link: '/master/sectioning' }
                 ]
             },
             {

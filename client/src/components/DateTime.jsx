@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoArrowBackOutline } from "react-icons/io5";
 
 const DateTime = () => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -34,8 +35,8 @@ const DateTime = () => {
         <h1 className="text-xl font-bold text-gray-800">
             {day}, {date} {month} {year} | {formattedHour}:{minute}:{second} {period}
         </h1>
-        <button onClick={() => navigate(-1)} className="px-3 py-2 bg-blue-600 text-sm text-white rounded hover:bg-blue-700 transition">
-            Go Back
+        <button onClick={() => navigate(-1)} className="px-3 py-2 text-sm text-blue-500 rounded hover:underline transition flex items-center gap-2">
+            <IoArrowBackOutline /> Go Back
         </button>
       </div>
       <hr className="h-[2px] bg-gray-300 my-4" />

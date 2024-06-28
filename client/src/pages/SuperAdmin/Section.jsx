@@ -40,7 +40,7 @@ const Section = () => {
 
     const [section,setSection] = useState('');
     const [gradeLevel,setGradeLevel] = useState('');
-    const [teacher,setTeacher] = useState('');
+    const [adviser,setAdviser] = useState('');
     const [department,setDepartment] = useState('');
 
     const [updateSection,setUpdateSection] = useState(false);
@@ -121,7 +121,7 @@ const Section = () => {
         e.preventDefault();
        
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`,{ section,gradeLevel,department });
+            const newSection = await axios.post(`${baseUrl()}/sections`,{ section,gradeLevel,department,adviser });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -178,10 +178,18 @@ const Section = () => {
                             )) }
                         </select>
                     </div>
-                    {/* <div className="flex flex-col mt-1">
+                    <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="adviser">Adviser</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setTeacher(e.target.value)} />
-                    </div> */}
+                        <select className="outline-none p-1 rounded-md border border-gray-300"
+                            onChange={(e) => setAdviser(e.target.value)}
+                            required
+                            >
+                            <option hidden>Select adviser</option>
+                            { teachers?.map(teacher => (
+                                <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
+                            )) }
+                        </select>
+                    </div>
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="department">Department</label>
                         <select className="outline-none p-1 rounded-md border border-gray-300"

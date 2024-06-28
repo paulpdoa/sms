@@ -1,11 +1,17 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
+import { useState } from 'react';
+import StudentAssistance from "./StudentAssistance";
 
 const StudentInfo = ({ id }) => {
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
+    const [studentAssistance,setStudentAssistance] = useState(false);
+    const [closeModal,setCloseModal] = useState(false);
+
     if (student.isAdmitted) {
         return (
+            <>
             <div className="mt-3 p-6 bg-white shadow-md rounded-md overflow-hidden">
                 <h2 className="text-xl font-bold text-green-600 mb-4">Student Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -63,9 +69,11 @@ const StudentInfo = ({ id }) => {
                     </div>
                 </div>
 
-                <button className="mt-4 text-sm text-blue-600 hover:underline font-semibold">Set Student Assistance</button>
-
+                <button onClick={() => setStudentAssistance(true)} className="mt-4 text-sm text-blue-600 hover:underline font-semibold">Set Student Assistance</button>
+                
             </div>
+            { studentAssistance && <StudentAssistance id={id} closeModal={setStudentAssistance} /> }
+            </>
         );
     }
 

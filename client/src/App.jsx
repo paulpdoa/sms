@@ -46,6 +46,10 @@ import EditTeacher from "./pages/Registrar/EditTeacher";
 import EditParent from "./pages/Registrar/EditParent";
 import Discount from "./pages/Discount";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Sectioning from "./pages/Registrar/Sectioning";
+
 function App() {
 
   const userToken = localStorage.getItem('userToken');
@@ -63,6 +67,7 @@ function App() {
           <Route path='/admission' element={<Admission />} />
           <Route path='/registrar' element={<Registrar />}>
             <Route path='new-student' element={<NewStudent />} />
+            <Route path='new-teacher' element={<NewTeacher />} />
             <Route path='edit-student/:id' element={<EditStudent />} />  
             <Route path='new-parent' element={<NewParent />} />
             <Route path='new-sibling' element={<NewSibling />} />
@@ -97,12 +102,13 @@ function App() {
             <Route path='parents' element={<Parents />} />
             <Route path='siblings' element={<Sibling />} />
             <Route path='discount' element={<Discount />} />
+            <Route path='sectioning' element={<Sectioning />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
 
-          <Route path='/school-admin' element={role === 'School Admin' && <SchoolAdmin />}>
+          <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin')  ? <SchoolAdmin /> : <Navigate to='/' /> }>
             <Route path='new-teacher' element={<NewTeacher />} />
           </Route>
 

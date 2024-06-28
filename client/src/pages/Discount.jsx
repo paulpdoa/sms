@@ -47,11 +47,17 @@ const Discount = () => {
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
-    const [department,setDepartment] = useState('');
 
-    const [updateDepartment,setUpdateDepartment] = useState(false);
-    const [departmentId,setDepartmentId] = useState('');
-    const [newDepartment,setNewDepartment] = useState('');
+
+    const [updateDiscount,setUpdateDiscount] = useState(false);
+    const [discountId,setDiscountId] = useState('');
+
+    const [newDiscountType,setNewDiscountType] = useState('');
+    const [newDiscountPercentage,setNewDiscountPercentage] = useState(0);
+    const [newAmount,setNewAmount] = useState(0);
+    const [newDiscountCode,setNewDiscountCode] = useState('');
+    const [newSchoolYear,setNewSchoolYear] = useState('');
+    const [newGradeLevel,setNewGradeLevel] = useState('');
 
     const [discountType,setDiscountType] = useState('');
     const [discountPercentage,setDiscountPercentage] = useState(0);
@@ -64,9 +70,14 @@ const Discount = () => {
     const session = localStorage.getItem('session');
 
     const enableEditDiscount = (record) => {
-        setUpdateDepartment(!updateDepartment);
-        setDepartmentId(record._id);
-        setNewDepartment(record.department);
+        setUpdateDiscount(!updateDiscount);
+        setDiscountId(record._id);
+        setNewDiscountType(record.discountType);
+        setNewDiscountPercentage(record.discountPercent);
+        setNewAmount(record.amount);
+        setNewDiscountCode(record.discountCode);
+        setNewSchoolYear(record.sessionId?._id);
+        setNewGradeLevel(record.gradeLevelId?._id);
     }
 
     const updateNewDiscount = async (id) => {
@@ -129,7 +140,7 @@ const Discount = () => {
     const addDiscount = async (e) => {
         e.preventDefault();
         try {
-            const newDiscount = await axios.post(`${baseUrl()}/discount`,{ discountType,discountCode,discountPercentage,amount,schoolYear,gradeLevel });
+            const newDiscount = await axios.post(`${baseUrl()}/discount`,{ discountType,discountCode,discountPercentage,amount,schoolYear,gradeLevel,inputter: currentUserId });
             toast.success(newDiscount.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -187,10 +198,35 @@ const Discount = () => {
                         <tbody>
                             { records?.map(record => (
                                 <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updateDepartment && (departmentId === record._id) ?
+                                    { updateDiscount && (discountId === record._id) ?
                                         <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="text" value={newDepartment} onChange={(e) => setNewDepartment(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
+                                            <input type="text" value={newDiscountType} onChange={(e) => setNewDiscountType(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <input type="number" value={newDiscountPercentage} onChange={(e) => setNewDiscountPercentage(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <input type="text" value={newAmount} onChange={(e) => setNewAmount(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <input type="text" value={newDiscountCode} onChange={(e) => setNewDiscountCode(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewGradeLevel(e.target.value)}>
+                                                <option hidden>{ record?.gradeLevelId ? record?.gradeLevelId?.gradeLevel : 'Select Grade Level' }</option>
+                                                { gradeLevels?.map(gradeLevel => (
+                                                    <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
+                                                )) }
+                                            </select>
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewSchoolYear(e.target.value)}>
+                                                <option hidden>{ record?.sessionId ? `${record?.sessionId?.startYear.split('-')[0]}-${record?.sessionId?.endYear.split('-')[0]}` : 'Select School Year' }</option>
+                                                { schoolYears?.map(schoolYear => (
+                                                    <option key={schoolYear._id} value={schoolYear._id}>{`${record?.sessionId?.startYear.split('-')[0]}-${record?.sessionId?.endYear.split('-')[0]}`}</option>
+                                                )) }
+                                            </select>                                        
                                         </th>
                                         <td scope="row" className="px-6 py-4 font-medium">
                                             { record.inputter.username }
@@ -199,7 +235,22 @@ const Discount = () => {
                                         :
                                         <>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.department }
+                                            { record.discountType }
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            { record.discountPercent * 100 }
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            { record.amount }
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            { record.discountCode }
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            { record.gradeLevelId.gradeLevel }
+                                        </th>
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            { record.sessionId.startYear.split('-')[0] }-{ record.sessionId.endYear.split('-')[0] }
                                         </th>
                                         <th scope="row" className="px-6 py-4 font-medium">
                                             { record.inputter?.username }
@@ -208,14 +259,14 @@ const Discount = () => {
                                     }
 
                                     <td className="px-6 py-4 flex gap-2 items-center">
-                                        { updateDepartment && (departmentId === record._id) ? 
+                                        { updateDiscount && (discountId === record._id) ? 
                                         <>
-                                        <button onClick={() => updateNewDepartment(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                                        <button onClick={() => enableEditDepartment(!updateDepartment)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
+                                        <button onClick={() => updateNewDiscount(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
+                                        <button onClick={() => enableEditDiscount(!updateDiscount)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
                                         </>
                                         :
                                         <>
-                                        <button onClick={() => enableEditDepartment(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                                        <button onClick={() => enableEditDiscount(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
                                         <button onClick={() => deleteDiscount(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
                                         </>
                                         }

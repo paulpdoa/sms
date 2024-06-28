@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { IoMdCloseCircleOutline } from "react-icons/io";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
+import { RiCloseLargeFill } from "react-icons/ri";
+
 
 const StudentInfoPopup = ({ id, closeModal }) => {
 
@@ -79,8 +80,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
             <div className="relative bg-white w-full max-w-4xl p-6 rounded-lg shadow-lg h-[90%] overflow-y-auto">
-                <div className="mb-6">
+                <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-700">{id?.firstName} {id?.lastName} Information</h1>
+                    <RiCloseLargeFill className="text-3xl text-red-400 cursor-pointer" onClick={() => closeModal(false)} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5, searchQuery }) => {
+const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5, searchQuery,viewRecord }) => {
+
     const navigate = useNavigate();
     const goToEdit = (id) => navigate(`${path}/${id}`);
 
@@ -56,6 +57,7 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5,
     };
 
     return (
+        <>
         <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -88,47 +90,52 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5,
                                 </td>
                             ))}
                             <td className="px-6 py-4 flex gap-2 items-center">
+                                { viewRecord ? 
+                                <button
+                                    onClick={() => viewRecord(record)}
+                                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                >
+                                    View
+                                </button>
+                                : 
                                 <button
                                     onClick={() => goToEdit(record._id)}
                                     className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                                 >
                                     Edit
-                                </button>
+                                </button> }
+                                { deleteRecord && 
                                 <button
                                     onClick={() => deleteRecord(record._id)}
                                     className="font-medium text-red-600 dark:text-red-500 hover:underline"
                                 >
                                     Delete
-                                </button>
+                                </button> }
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-            <div className="flex justify-center gap-5 p-2">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className={`bg-gray-500 text-white p-2 rounded text-sm ${
-                        currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-600'
-                    }`}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <span className="self-center text-sm">
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className={`bg-gray-500 text-white p-2 rounded text-sm ${
-                        currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-600'
-                    }`}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
-                </button>
-            </div>
+            
         </div>
+        <div className="flex justify-center items-center p-4 space-x-4 text-sm">
+            <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg border ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            >
+                Previous
+            </button>
+            <span className="font-medium">Page {currentPage} of {totalPages}</span>
+            <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg border ${currentPage === totalPages ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+            >
+                Next
+            </button>
+        </div>
+        </>
     );
 };
 

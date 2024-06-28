@@ -1,112 +1,57 @@
+import React, { useState, useMemo } from 'react';
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
-import { useState } from 'react';
+import AdmissionTable from '../AdmissionTable';;
 import StudentInfoPopup from "./StudentInfoPopup";
 
-const StudentInfoTable = ({ setViewRecord }) => {
-
-    // This student will display all students that are not admitted yet
-
+const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
     const columns = [
-        {
-            accessorKey: 'fullName',
-            header: 'Full Name',
-        },
-        {
-            accessorKey: 'studentNo',
-            header: 'Student No.'
-        },
-        {
-            accessorKey: 'registered',
-            header: 'Registered'
-        },
-        {
-            accessorKey: 'dateRegistered',
-            header: 'Date Registered'
-        },
-        {
-            header: 'Status'
-        },
-        {
-            header: 'Grade Level'
-        },
-        {
-            header: 'Strand'
-        },
-        {
-            header: 'Nationality'
-        },
-        {
-            accessorKey: 'action',
-            header: 'Action'
-        }
-    ]
+        { accessorKey: 'fullName', header: 'Full Name' },
+        { accessorKey: 'studentNo', header: 'Student No.' },
+        { accessorKey: 'registered', header: 'Registered' },
+        { accessorKey: 'dateRegistered', header: 'Date Registered' },
+        { accessorKey: 'status', header: 'Status' },
+        { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        { accessorKey: 'strand', header: 'Strand' },
+        { accessorKey: 'nationality', header: 'Nationality' },
+        { accessorKey: 'action', header: 'Action' }
+    ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
-
-    const [updatePopup,setUpdatePopup] = useState(false);
-    const [studentRec,setStudentRec] = useState([]);
-
+    const [updatePopup, setUpdatePopup] = useState(false);
+    const [studentRec, setStudentRec] = useState([]);
 
     const updateStudentInfo = (student) => {
         setUpdatePopup(!updatePopup);
-        setStudentRec(student)
-    }
+        setStudentRec(student);
+    };
 
-    // Loop student table
-    // Check if their id is existing in student table then get strand
-    
+    const actions = (student) => (
+        <div className="flex gap-2 items-center">
+            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
+            <button onClick={() => updateStudentInfo(student)} className="font-medium text-green-500 hover:underline">Update</button>
+        </div>
+    );
+
+    const formattedStudents = students?.map(student => ({
+        ...student,
+        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        studentNo: student.studentNo || 'Not assigned',
+        registered: student.isRegistered ? 'Yes' : 'No',
+        dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
+        gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
+        strand: student.academicId?.strandId?.strand || 'Not assigned',
+        nationality: student.nationality?.nationality || 'Not assigned',
+        status: student.status,
+        action: actions(student)
+    }));
 
     return (
         <>
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    { columns?.map((column,key) => (
-                        <th key={key} scope="col" className="px-6 py-3">
-                            { column.header }
-                        </th>
-                    )) }
-                </tr>
-            </thead>
-            <tbody>
-                { students?.filter(student => student.isAdmitted).map(student => (
-                    <tr key={student._id} className='odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700'>
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            { student.firstName } { student.middleName } { student.lastName }
-                        </th>
-                        <td className="px-6 py-4">
-                            { student?.studentNo ? student?.studentNo : 'Not assigned' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.isRegistered ? 'Yes' : 'No' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.dateRegistered ? student?.dateRegistered.split('T')[0] : 'Not Registered' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.status }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.academicId?.gradeLevelId?.gradeLevel ? student?.academicId?.gradeLevelId?.gradeLevel : 'Not Assigned' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.academicId?.strandId ? student?.academicId?.strandId?.strand : 'Not assigned' }
-                        </td>
-                        <td className="px-6 py-4">
-                            { student?.nationality?.nationality ? student?.nationality?.nationality : 'Not assigned' }
-                        </td>
-                        <td className="px-6 py-4 flex gap-2 items-center">
-                            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-                            <button onClick={() => updateStudentInfo(student)} className="font-medium text-green-500 hover:underline">Update</button>
-                        </td>
-                    </tr>
-                )) }
-            </tbody>
-        </table>
-        { updatePopup && <StudentInfoPopup id={studentRec} closeModal={setUpdatePopup}/> }
+            <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+            {updatePopup && <StudentInfoPopup id={studentRec} closeModal={setUpdatePopup} />}
         </>
-    )
-}
+    );
+};
 
 export default StudentInfoTable;
