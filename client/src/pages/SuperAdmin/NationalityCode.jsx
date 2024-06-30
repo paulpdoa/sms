@@ -15,7 +15,7 @@ const columns = [
     },
     {
         accessorKey: 'nationalityCode',
-        header: 'Nationality Code'
+        header: 'Nationality Code',
     },
     {
         header: 'Inputter'
@@ -26,31 +26,30 @@ const columns = [
     }
 ]
 
-const Nationality = () => {
+const NationalityCode = () => {
 
-    const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
-    const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
-
+    const { records, isLoading } = useFetch(`${baseUrl()}/nationality-codes`);
     const [nationality,setNationality] = useState('');
-    const [nationalityCodeId,setNationalityCodeId] = useState('');
+    const [nationalityCode,setNationalityCode] = useState('');
 
     const [updateNationality,setUpdateNationality] = useState(false);
     const [nationalityId,setNationalityId] = useState('');
     const [newNationality,setNewNationality] = useState('');
-    const [newNationalityCodeId,setNewNationalityCodeId] = useState('');
+    const [newNationalityCode,setNewNationalityCode] = useState('');
 
     const enableEditNationality = (record ) => {
+        console.log(record);
         setUpdateNationality(!updateNationality);
         setNationalityId(record._id);
         setNewNationality(record.nationality);
-        setNewNationalityCodeId(record.nationalityCode?._id);
+        setNewNationalityCode(record.nationalityCode);
     }
 
     const currentUserId = localStorage.getItem('id');
 
     const updateNewNationality = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality,newNationalityCodeId,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/nationality-code/${id}`,{ newNationality,newNationalityCode,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -66,7 +65,7 @@ const Nationality = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
-            toast.error('Cannot update nationality, please try again.', {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
@@ -76,12 +75,16 @@ const Nationality = () => {
                 progress: undefined,
                 theme: "light"
             });
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
+            
         }
     }        
 
     const deleteNationality = async (id) => {
         try {
-            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`);
+            const removeNationality = await axios.delete(`${baseUrl()}/nationality-code/${id}`);
             toast.success(removeNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -101,10 +104,10 @@ const Nationality = () => {
         }
     }
 
-    const addNationality = async (e) => {
+    const addNationalityCode = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId });
+            const newNationality = await axios.post(`${baseUrl()}/nationality-code`,{ nationality,nationalityCode,currentUserId });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -129,13 +132,13 @@ const Nationality = () => {
             <DateTime />
 
             <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Nationality</h1>
+                <h1 className="text-xl text-green-500 font-bold">Nationality Code</h1>
                 <Searchbar />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
-                <form onSubmit={addNationality} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Nationality</h1>
+                <form onSubmit={addNationalityCode} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                    <h1 className="font-semibold text-xl text-green-500">Add New Nationality Code</h1>
 
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="nationality">Nationality</label>
@@ -144,12 +147,7 @@ const Nationality = () => {
 
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="nationality">Nationality Code</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCodeId(e.target.value)}>
-                            <option hidden>Select nationality code</option>
-                            { nationalityCodes?.map(nc => (
-                                <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
-                            )) }
-                        </select>
+                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setNationalityCode(e.target.value)} />
                     </div>
 
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
@@ -175,12 +173,7 @@ const Nationality = () => {
                                             <input type="text" value={newNationality} onChange={(e) => setNewNationality(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewNationalityCodeId(e.target.value)}>
-                                                <option hidden>{record?.nationalityCodeId?.nationalityCode ?? 'Select Nationality Code'}</option>
-                                                { nationalityCodes?.map(nc => (
-                                                    <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
-                                                )) }
-                                            </select>                                        
+                                            <input type="text" value={newNationalityCode} onChange={(e) => setNewNationalityCode(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
                                         </th>
                                         <th scope="row" className="px-6 py-4 font-medium">
                                             { record.inputter?.username }
@@ -192,7 +185,7 @@ const Nationality = () => {
                                             { record.nationality }
                                         </th>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.nationalityCodeId?.nationalityCode ?? 'Not Assigned' }
+                                            { record.nationalityCode }
                                         </th>
                                         <th scope="row" className="px-6 py-4 font-medium">
                                             { record.inputter?.username }
@@ -223,4 +216,4 @@ const Nationality = () => {
     )
 }
 
-export default Nationality;
+export default NationalityCode;

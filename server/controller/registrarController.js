@@ -6,6 +6,9 @@ const Requirement = require('../model/Requirement');
 const Discount = require('../model/Discount');
 const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
+const ManageFee = require('../model/ManageFee');
+const FeeCode = require('../model/FeeCode');
+const GradeLevel = require('../model/GradeLevel')
 
 module.exports.get_students = async (req,res) => {
     try {
@@ -529,6 +532,85 @@ module.exports.add_sectioning = async (req,res) => {
         const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter });
         console.log('addSectioning',addSectioning);
         res.status(200).json({ mssg: `${updateStudentRec.firstName} has been added new section successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// For Manage Fees
+
+module.exports.get_manage_fees = async (req,res) => {
+
+    try {
+        const managedFees = await ManageFee.find()
+        .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
+        .populate('sy_id gradeLevelId strandId nationalityCodeId');
+        res.status(200).json(managedFees);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_manage_fee_detail = async(req,res) => {
+    const { id } = req.params;
+
+   
+
+    try {
+        const managedFee = await ManageFee.findById(id)
+        .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
+        .populate('sy_id gradeLevelId strandId nationalityCodeId');
+        res.status(200).json(managedFee);
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+module.exports.add_manage_fees = async (req,res) => {
+    let { sy_id, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationalityCodeId} = req.body;
+
+    // Fee Code > fee code + grade level + nationality Code
+    // Fee description > fee description + grade level + nationality Code
+    // Filter here if the gradelevel id is not 11 or 12, if not then do not add strand field
+    
+
+    try {
+        for(let i = 0; i < gradeLevelIds.length; i++) {
+            const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
+
+            if(checkGradeLevel.gradeLevel === 'Grade 11' || checkGradeLevel.gradeLevel === 'Grade 12') {
+                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationalityCodeId,strandId,feeDescription,amount,isApplied});
+            } else {
+                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationalityCodeId,feeDescription,amount,isApplied});
+            }
+
+        }
+
+        res.status(200).json({mssg: 'Fees has already been added to the record'});
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.delete_manage_fee = async(req,res) => {
+    const { id } = req.params;
+
+    try {
+        await ManageFee.findByIdAndDelete(id);
+        res.status(200).json({ mssg: `Fee has been deleted successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.edit_manage_fee = async (req,res) => {
+    const { id } = req.params;
+    let { sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationalityCodeId } = req.body;
+
+    console.log(req.body)
+    try {
+        await ManageFee.findByIdAndUpdate({ _id: id },{ sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationalityCodeId });
+        res.status(200).json({ mssg: `Fee has been updated successfully` });
     } catch(err) {
         console.log(err);
     }

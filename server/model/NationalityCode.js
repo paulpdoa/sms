@@ -5,15 +5,15 @@ const requiredString = {
     required: true
 }
 
-const nationalitySchema = new mongoose.Schema({
+const nationalityCodeSchema = new mongoose.Schema({
     nationality: {
         type:String,
         required:true,
         unique:true
     },
-    nationalityCodeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'nationalityCode'
+    nationalityCode: {
+        type: String,
+        required: true
     },
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
@@ -21,5 +21,5 @@ const nationalitySchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const NationalityModel = mongoose.model('nationality',nationalitySchema);
-module.exports = NationalityModel;
+const NationalityCodeModel = mongoose.model('nationalityCode',nationalityCodeSchema);
+module.exports = NationalityCodeModel;

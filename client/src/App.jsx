@@ -49,6 +49,10 @@ import Assessment from './pages/Registrar/Assessment'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Sectioning from "./pages/Registrar/Sectioning";
+import ManageFees from "./pages/Registrar/ManageFees";
+import NewManageFee from "./pages/Registrar/NewManageFee";
+import NationalityCode from "./pages/SuperAdmin/NationalityCode";
+import EditManageFee from "./pages/Registrar/EditManagedFee";
 
 function App() {
 
@@ -74,6 +78,9 @@ function App() {
             <Route path='edit-sibling/:id' element={<EditSibling />} />
             <Route path='edit-teacher/:id' element={<EditTeacher />} />
             <Route path='edit-parent/:id' element={<EditParent />} />
+            <Route path='manage-fees' element={<ManageFees />} />
+            <Route path='create-fees' element={<NewManageFee />} />
+            <Route path='edit-manage-fee/:id' element={<EditManageFee />} />
           </Route>
 
           {/* For Super admin */}
@@ -81,6 +88,7 @@ function App() {
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
             <Route path='nationality' element={<Nationality />} />
+            <Route path='nationality-code' element={<NationalityCode />} />
             <Route path='gender' element={<Gender />} />
             <Route path='departments' element={<Department />} />
             <Route path='sections' element={<Section />} />
@@ -103,6 +111,7 @@ function App() {
             <Route path='siblings' element={<Sibling />} />
             <Route path='discount' element={<Discount />} />
             <Route path='sectioning' element={<Sectioning />} />
+            <Route path='manage-fees' element={<ManageFees />} />
           </Route>
 
           <Route path='/teachers' element={<Teachers />} />

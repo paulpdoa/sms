@@ -69,7 +69,12 @@ add_sibling,
 delete_sibling,
 edit_sibling,
 get_student_sibling,
-edit_parent} = require('../controller/masterController');
+edit_parent,
+get_nationality_codes,
+add_nationality_code,
+get_nationality_code_detail,
+edit_nationality_code,
+delete_nationality_code} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 
@@ -99,6 +104,13 @@ route.post('/nationalities', add_nationality);
 route.delete('/nationality/:id', delete_nationality);
 route.get('/nationality/:id', get_nationality_detail);
 route.patch('/nationality/:id',edit_nationality);
+
+// Nationality Code
+route.get('/nationality-codes',get_nationality_codes);
+route.post('/nationality-code',add_nationality_code);
+route.get('/nationality-code/:id',get_nationality_code_detail);
+route.patch('/nationality-code/:id',edit_nationality_code);
+route.delete('/nationality-code/:id',delete_nationality_code);
 
 // Gender
 route.get('/genders', get_genders);

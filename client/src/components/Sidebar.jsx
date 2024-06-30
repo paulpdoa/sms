@@ -22,6 +22,7 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Religion', link: '/master/religion' },
                     { name: 'Nationality', link: '/master/nationality' },
+                    { name: 'Nationality Code', link: '/master/nationality-code' },
                     { name: 'Gender', link: '/master/gender' },
                     { name: 'Departments', link: '/master/departments' },
                     { name: 'Sections', link: '/master/sections' },
@@ -42,6 +43,7 @@ const initialMenus = [
                     { name: 'Admission', link: '/master/admission' },
                     { name: 'Fee Category', link: '/master/fee-category' },
                     { name: 'Fee Code', link: '/master/fee-code' },
+                    { name: 'Manage Fees', link: '/master/manage-fees' },
                     { name: 'Discount', link: '/master/discount' },
                     { name: 'Sectioning', link: '/master/sectioning' }
                 ]

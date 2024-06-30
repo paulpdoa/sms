@@ -14,6 +14,7 @@ const FeeCode = require('../model/FeeCode');
 const Parent = require('../model/Parent');
 const Student = require('../model/Students');
 const Sibling = require('../model/Sibling');
+const NationalityCode = require('../model/NationalityCode');
 
 const jwt = require('jsonwebtoken');
 
@@ -91,7 +92,7 @@ module.exports.edit_religion = async (req,res) => {
 
 module.exports.get_nationalities = async (req,res) => {
     try {
-        const nationalities = await Nationality.find().populate('inputter');
+        const nationalities = await Nationality.find().populate('inputter nationalityCodeId');
         res.status(200).json(nationalities);
     } catch(err) {
         console.log(err);
@@ -100,10 +101,10 @@ module.exports.get_nationalities = async (req,res) => {
 
 module.exports.add_nationality = async (req,res) => {
 
-    const { nationality,currentUserId: inputter } = req.body
+    const { nationality,nationalityCodeId,currentUserId: inputter } = req.body
 
     try {
-        const newNationality = await Nationality.create({ nationality,inputter });
+        const newNationality = await Nationality.create({ nationality,nationalityCodeId,inputter });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -125,7 +126,7 @@ module.exports.get_nationality_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const nationalityFind = await Nationality.findById(id);
+        const nationalityFind = await Nationality.findById(id).populate('inputter nationalityCodeId');
         res.status(200).json(nationalityFind);
     } catch(err) {
         console.log(err);
@@ -134,21 +135,76 @@ module.exports.get_nationality_detail = async (req,res) => {
 
 module.exports.edit_nationality = async (req,res) => {
     const { id } = req.params;
-    const { newNationality: nationality,currentUserId: inputter } = req.body;
-
+    const { newNationality: nationality,newNationalityCodeId: nationalityCodeId,currentUserId: inputter } = req.body;
+    console.log(req.body)
     try {
-        const currNationality = await Nationality.findById(id);
-        if(currNationality.nationality !== nationality) {
-            const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,inputter });
-            res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
-        } else {
-            res.status(400).json({ mssg: `Cannot update ${nationality}, still the same with old value` })
-        }
+        const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCodeId,inputter });
+        res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
+         
         
     } catch(err) {
         console.log(err);
     }
 
+}
+
+// For NationalityCode
+
+module.exports.get_nationality_codes = async(req,res) => {
+    try {
+        const nationalityCodes = await NationalityCode.find().populate('inputter');
+        res.status(200).json(nationalityCodes);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_nationality_code_detail = async(req,res) => {
+    const { id } = req.params;
+    
+    try {
+        const nationalityCode = await NationalityCode.findById(id).populate('inputter');
+        res.status(200).json(nationalityCode);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.add_nationality_code = async(req,res) => {
+
+    const { nationality,nationalityCode,currentUserId: inputter } = req.body;
+
+    try {   
+         const newCode = await NationalityCode.create({ nationality,nationalityCode,inputter });
+         res.status(200).json({ mssg:`${nationality} has been added to the record` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.edit_nationality_code = async(req,res) => {
+    const { id } = req.params;
+    const {  newNationality:nationality,newNationalityCode: nationalityCode,currentUserId: inputter} = req.body;
+
+    console.log(req.body)
+
+    try {
+        const newCode = await NationalityCode.findByIdAndUpdate({_id: id},{ nationality,nationalityCode,inputter });
+        res.status(200).json({mssg: `${nationality} has been updated successfully`});
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.delete_nationality_code = async(req,res) => {
+    const { id } = req.params;
+
+    try {
+        const nationalityCode = await NationalityCode.findByIdAndDelete(id);
+        res.status(200).json({ mssg: 'Nationality Code has been deleted successfully'});
+    } catch(err) {
+        console.log(err);
+    }
 }
 
 // For Gender

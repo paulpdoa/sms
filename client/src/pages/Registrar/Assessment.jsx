@@ -14,6 +14,8 @@ import StudentParentTable from '../../components/admission/parent/StudentParentT
 import StudentSibling from '../../components/admission/sibling/StudentSibling';
 import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
 
+import TotalFees from '../../components/assessment/TotalFees'
+
 const Assessment = () => {
     const admissionPages = ['Total Fees', 'Textbooks', 'Assistance', 'Payment Term'];
     const [currentPage, setCurrentPage] = useState('Total Fees');
@@ -66,17 +68,17 @@ const Assessment = () => {
                         ))}
                     </div>
 
-                    {enableView && currStudRec?._id ? (
+                    {/* {enableView && currStudRec?._id ? ( */}
                         <>
-                            {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
+                            {currentPage === 'Total Fees' && <TotalFees /> }
                             {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
                             {currentPage === 'Information' && <StudentInfo id={currStudRec._id} />}
                             {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} />}
                             {currentPage === 'Sibling' && <StudentSibling id={currStudRec} />}
                         </>
-                    ) : (
+                    {/* ) : (
                         <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
-                    )}
+                    )} */}
                 </div>
 
                 <div className="rounded-md h-fit">

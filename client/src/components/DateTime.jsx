@@ -32,7 +32,7 @@ const DateTime = () => {
   return (
     <div className="p-4 bg-gray-100 rounded-lg">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-800">
+        <h1 className="text-xl font-bold text-green-600">
             {day}, {date} {month} {year} | {formattedHour}:{minute}:{second} {period}
         </h1>
         <button onClick={() => navigate(-1)} className="px-3 py-2 text-sm text-blue-500 rounded hover:underline transition flex items-center gap-2">
