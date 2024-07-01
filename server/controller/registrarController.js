@@ -8,7 +8,11 @@ const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
 const ManageFee = require('../model/ManageFee');
 const FeeCode = require('../model/FeeCode');
-const GradeLevel = require('../model/GradeLevel')
+const GradeLevel = require('../model/GradeLevel');
+const Nationality = require('../model/Nationality');
+const NationalityCode = require('../model/NationalityCode');
+const StudentPayment = require('../model/StudentPayment');
+const Textbook = require('../model/Textbook'); 
 
 module.exports.get_students = async (req,res) => {
     try {
@@ -28,9 +32,13 @@ module.exports.get_students = async (req,res) => {
                 }
             ]
         })
+        .populate({ path: 'nationality',
+            populate: [
+                { path: 'nationalityCodeId' }
+            ]
+         })
         .populate('sex')
         .populate('religion')
-        .populate('nationality')
         .populate('sy_id')
         .populate('gradeLevel')
         res.status(200).json(students);
@@ -554,7 +562,6 @@ module.exports.get_manage_fees = async (req,res) => {
 module.exports.get_manage_fee_detail = async(req,res) => {
     const { id } = req.params;
 
-   
 
     try {
         const managedFee = await ManageFee.findById(id)
@@ -611,6 +618,175 @@ module.exports.edit_manage_fee = async (req,res) => {
     try {
         await ManageFee.findByIdAndUpdate({ _id: id },{ sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationalityCodeId });
         res.status(200).json({ mssg: `Fee has been updated successfully` });
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.generate_fees = async (req, res) => {
+    const { currentYear } = req.params;
+
+    try {
+        // Fetch students who are registered and admitted
+        const students = await Student.find({ isRegistered: true, isAdmitted: true })
+            .populate({
+                path: 'academicId',
+                populate: [
+                    { path: 'studentId' },
+                    { path: 'strandId' },
+                    { path: 'departmentId' },
+                    { path: 'gradeLevelId' },
+                    { path: 'sessionId' },
+                    { 
+                        path: 'sectionId',
+                        populate: { path: 'adviser' }
+                    }
+                ]
+            })
+            .populate({
+                path: 'nationality',
+                populate: { path: 'nationalityCodeId' }
+            })
+            .populate('sex')
+            .populate('religion')
+            .populate('sy_id')
+            .populate('gradeLevel');
+
+        // Fetch managed fees
+        const manageFees = await ManageFee.find()
+            .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
+            .populate('sy_id gradeLevelId strandId nationalityCodeId');
+        
+        const textbooks = await Textbook.find()
+            .populate('inputter gradeLevel strand schoolYear');
+
+        // Fetch the current school year
+        const currYear = await SchoolYear.findById(currentYear);
+
+        if (currYear) {
+            for (const student of students) {
+                for (const fee of manageFees) {
+                    // Check if the fee matches the current year, student's grade level, and nationality code
+                    if (fee.sy_id._id.equals(currYear._id) &&
+                        fee.gradeLevelId._id.equals(student.academicId.gradeLevelId._id) &&
+                        (!fee.nationalityCodeId || fee.nationalityCodeId._id.equals(student.nationality.nationalityCodeId?._id))) {
+
+                        console.log('Matching Fee:', {
+                            studentName: student.firstName,
+                            feeSyId: fee.sy_id._id,
+                            currYearId: currYear._id,
+                            feeGradeLevelId: fee.gradeLevelId._id,
+                            studentGradeLevelId: student.academicId.gradeLevelId._id,
+                            feeNationalityCodeId: fee.nationalityCodeId?._id,
+                            studentNationalityCodeId: student.nationality.nationalityCodeId?._id,
+                            manageFeeId: fee._id
+                        });
+
+                        const paymentInfo = {
+                            sy_id: currYear._id,
+                            studentId: student._id,
+                            gradeLevelId: student.academicId.gradeLevelId._id,
+                            feeCodeId: fee.feeDescription._id,
+                            manageFeeId: fee._id
+                        };
+
+                        const existingPayment = await StudentPayment.findOne(paymentInfo);
+
+                        if (existingPayment) {
+                            console.log(`Payment already exists for student ${student.firstName} with fee ${fee.feeDescription.description}`);
+                            continue;
+                        }
+
+                        await StudentPayment.create(paymentInfo);
+                    }
+                }
+
+                for (const textbook of textbooks) { 
+                    const matchesSchoolYear = textbook.schoolYear._id.equals(currYear._id);
+                    const matchesGradeLevel = textbook.gradeLevel?._id.equals(student.academicId.gradeLevelId?._id);
+                    const matchesStrand = !textbook.strand || textbook.strand._id.equals(student.academicId?.strandId?._id);
+
+                    console.log('Textbook Conditions:', {
+                        matchesSchoolYear,
+                        matchesGradeLevel,
+                        matchesStrand
+                    });
+
+                    if (matchesSchoolYear && matchesGradeLevel && matchesStrand) {
+                        console.log('Student Textbooks:', {
+                            sy_id: currYear._id,
+                            studentId: student._id,
+                            gradeLevelId: student.academicId.gradeLevelId._id,
+                            textBookId: textbook._id
+                        });
+
+                        const studentTextbook = {
+                            sy_id: currYear._id,
+                            studentId: student._id,
+                            gradeLevelId: student.academicId.gradeLevelId._id,
+                            textBookId: textbook._id
+                        };
+
+                        const existingTextbook = await StudentPayment.findOne(studentTextbook);
+
+                        if (existingTextbook) {
+                            console.log(`Textbook payment already exists for student ${student.firstName} with textbook ${textbook.title}`);
+                            continue;
+                        }
+
+                        await StudentPayment.create(studentTextbook);
+                    }
+                }
+            }
+
+            res.status(200).json({ mssg: 'Fees for students have been generated successfully' });
+        } else {
+            res.status(404).json({ error: 'Current school year not found' });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
+
+// For Student Payment
+
+module.exports.get_student_payments = async (req,res) => {
+    
+    try {
+        const studPayments = await StudentPayment.find()
+        .populate({ path: 'studentId', 
+            populate: [
+                { path: 'nationality', populate: 'nationalityCodeId' }
+            ]
+        })
+        .populate('sy_id gradeLevelId feeCodeId manageFeeId textBookId');
+        res.status(200).json(studPayments);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+module.exports.get_student_payment_detail = async (req,res) => {
+    const { id } = req.params;
+    
+    try {
+        const studentPayments = await StudentPayment.find({studentId: id})
+        .populate({ path: 'studentId', 
+            populate: [
+                { path: 'nationality', populate: 'nationalityCodeId' },
+                { path: 'academicId' }
+            ]
+        })
+        .populate({path: 'textBookId', 
+            populate: [
+                { path: 'strand' }
+            ]
+        })
+        .populate('sy_id gradeLevelId feeCodeId manageFeeId');
+        res.status(200).json(studentPayments);
     } catch(err) {
         console.log(err);
     }

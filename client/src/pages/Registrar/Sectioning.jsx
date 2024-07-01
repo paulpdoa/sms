@@ -20,7 +20,7 @@ const Sectioning = () =>{
         {
             accessorKey: 'academicId.sectionId.adviser',
             header: 'Adviser',
-            cell: (adviser) => `${adviser.firstName} ${adviser.lastName}`,
+            cell: (adviser) => `${adviser?.firstName} ${adviser?.lastName}` || 'Not assigned',
         },
     ];
 

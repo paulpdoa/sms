@@ -70,7 +70,7 @@ const Textbook = () => {
         setNewBookCode(record.bookCode);
         setNewBookTitle(record.bookTitle);
         setNewBookAmount(record.bookAmount);
-        setNewGradeLevel(record.gradeLevel?._id);
+        setNewGradeLevel(record?.gradeLevel?._id);
         setNewStrand(record.strand?._id);
         // Get the id of current user
         setNewInputter(localStorage.getItem('id'));
@@ -252,7 +252,7 @@ const Textbook = () => {
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewGradeLevel(e.target.value)}>
-                                                <option hidden>{record.gradeLevel.gradeLevel}</option>
+                                                <option hidden>{record.gradeLevel?.gradeLevel ?? 'Select Grade Level'}</option>
                                                 { gradeLevels?.map(gradeLevel => (
                                                     <option key={gradeLevel._id} value={gradeLevel._id}>{ gradeLevel.gradeLevel }</option>
                                                 )) }
@@ -283,7 +283,7 @@ const Textbook = () => {
                                             { record.bookTitle } 
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-400">
-                                            { record.gradeLevel?.gradeLevel ? record.gradeLevel?.gradeLevel : 'Not Assigned' } 
+                                            { record.gradeLevel?.gradeLevel ?? 'Not Assigned' } 
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-400">
                                             { record.strand?.strand ? record.strand?.strand : 'Not Assigned' } 

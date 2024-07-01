@@ -14,6 +14,7 @@ const EditStudent = () => {
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
+    const session = localStorage.getItem('session');
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -74,7 +75,8 @@ const EditStudent = () => {
             placeOfBirth,
             email,
             contactNumber,
-            address
+            address,
+            session
         };
 
         try {

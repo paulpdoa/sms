@@ -1,71 +1,57 @@
 import { baseUrl } from '../../baseUrl';
 import { useFetch } from '../../hooks/useFetch';
 
-const TotalFees = ({id}) => {
+const TotalFees = ({ record }) => {
+    const { records: studentPayments } = useFetch(`${baseUrl()}/student-payment/${record?._id}`);
 
-    const { records: manageFees } = useFetch(`${baseUrl()}/manage-fees`);
+    
+    const gradeLevel = record?.academicId?.gradeLevelId?._id;
+    const natlCode = record?.nationality?.nationalityCodeId?._id;
 
-    console.log(manageFees);
+    const filteredFeeLists = studentPayments?.filter(fee => {
+        return (
+            fee.gradeLevelId?._id === gradeLevel &&
+            fee?.studentId?.nationality?.nationalityCodeId?._id === natlCode &&
+            fee?.manageFeeId !== undefined
+        );
+    });
 
+    
+
+    const totalAmount = filteredFeeLists?.reduce((sum, fee) => sum + (fee?.manageFeeId?.amount || 0), 0);
+    
     return (
-        <div className="mt-3 p-6 bg-white shadow-md rounded-md overflow-hidden">
-            <h2 className="text-xl font-bold text-green-600 mb-4">Total Amount Fees</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Last Name:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">First Name:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Middle Name:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Gender:</label>
-                    <span className="text-sm truncate"></span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Date of Birth:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Place of Birth:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Address:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Nationality:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Religion:</label>
-                    <span className="text-sm truncate">{}</span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Contact:</label>
-                    <span className="text-sm truncate"></span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Email:</label>
-                    <span className="text-sm truncate"></span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">Status:</label>
-                    <span className="text-sm truncate"></span>
-                </div>
-                <div className="flex flex-col">
-                    <label className="font-semibold text-sm text-green-600">LRN:</label>
-                    <span className="text-sm truncate"></span>
-                </div>
+        <div className="mt-6 p-4 bg-white rounded-lg overflow-hidden">
+            <h2 className="text-2xl font-semibold text-green-700 mb-6">Total Amount Fees</h2>
+            <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-left text-gray-700">
+                    <thead className="border-b bg-gray-100">
+                        <tr>
+                            <th className="px-4 py-3">Fee Code</th>
+                            <th className="px-4 py-3">Fee Description</th>
+                            <th className="px-4 py-3 text-right">Total Amount Due</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredFeeLists?.map((fee, index) => (
+                            <tr key={index} className="border-b">
+                                <td className="px-4 py-3">{`${fee?.feeCodeId?.code} ${fee?.gradeLevelId?.gradeLevel} ${fee?.studentId?.nationality?.nationalityCodeId?.nationalityCode}`}</td>
+                                <td className="px-4 py-3">{fee?.feeCodeId?.description}</td>
+                                <td className="px-4 py-3 text-right">{(fee?.manageFeeId?.amount || 0).toFixed(2)}</td>
+                            </tr>
+                        ))}
+                        { filteredFeeLists.length > 0 &&
+                        <tr className="font-bold border-t">
+                            <td colSpan="2" className="px-4 py-3 text-right">Total:</td>
+                            <td className="px-4 py-3 text-right">{totalAmount?.toFixed(2)}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                { filteredFeeLists.length < 1 && <h2 className="text-sm text-red-500 p-2 animate-pulse">Nothing to display here</h2> }
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default TotalFees;
