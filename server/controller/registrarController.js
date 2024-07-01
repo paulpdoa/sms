@@ -26,6 +26,7 @@ module.exports.get_students = async (req,res) => {
                 { path: 'departmentId' },
                 { path: 'gradeLevelId' },
                 { path: 'sessionId' },
+                { path: 'paymentTermId' },
                 { 
                     path: 'sectionId',
                     populate: { path: 'adviser' }
@@ -345,17 +346,21 @@ module.exports.get_student_academic_detail = async (req,res) => {
 
 module.exports.add_academic = async (req,res) => {
 
-    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended } = req.body;
+    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId } = req.body;
 
     // This will also update students info upon posting
     console.log(req.body)
 
     if(strandId === '') {
-        strandId = null;
+        strandId = undefined;
+    }
+
+    if(paymentTermId === '') {
+        paymentTermId = undefined
     }
 
     try {
-        const academic = await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended });
+        const academic = await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId });
         const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
         res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
     } catch(err) {

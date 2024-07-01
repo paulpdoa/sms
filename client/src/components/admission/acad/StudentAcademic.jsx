@@ -12,11 +12,13 @@ const StudentAcademic = ({ id }) => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
+    const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
 
     const [gradeLevel, setGradeLevel] = useState('');
     const [strand, setStrand] = useState('');
     const [session, setSession] = useState('');
     const [lastSchool, setLastSchool] = useState('');
+    const [paymentTermId,setPaymentTermId] = useState('');
 
     const [grade11Id, setGrade11Id] = useState('');
     const [grade12Id, setGrade12Id] = useState('');
@@ -27,6 +29,7 @@ const StudentAcademic = ({ id }) => {
             setStrand(student?.academicId?.strandId?._id);
             setSession(student?.academicId?.sessionId?._id);
             setLastSchool(student?.academicId?.lastSchoolAttended);
+            setPaymentTermId(student?.academicId?.paymentTermId?._id);
         }
     }, [student]);
 
@@ -57,7 +60,8 @@ const StudentAcademic = ({ id }) => {
             strandId: strand,
             sessionId: session,
             lastSchoolAttended: lastSchool,
-            studentId: id
+            studentId: id,
+            paymentTermId
         }
 
 
@@ -138,6 +142,16 @@ const StudentAcademic = ({ id }) => {
                             <option hidden>{student?.academicId?.sessionId ? `${student?.academicId?.sessionId?.startYear.split('-')[0]}-${student?.academicId?.sessionId?.endYear.split('-')[0]}` : 'Not Assigned'}</option>
                             {schoolYears?.map(schoolYear => (
                                 <option key={schoolYear._id} value={schoolYear._id}>{schoolYear.startYear.split('-')[0]}-{schoolYear.endYear.split('-')[0]}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold" htmlFor="payment term">Payment Term</label>
+                        <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setPaymentTermId(e.target.value)}>
+                            <option hidden>{student?.academicId?.paymentTermId?.term ?? 'Not Assigned'}</option>
+                            {paymentTerms?.map(paymentTerm => (
+                                <option key={paymentTerm._id} value={paymentTerm._id}>{paymentTerm?.term}</option>
                             ))}
                         </select>
                     </div>
