@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5, searchQuery, viewRecord }) => {
     const navigate = useNavigate();
@@ -17,9 +18,18 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5,
         setSortConfig({ key, direction });
     };
 
-    // Helper function to access nested properties
+    // Helper function to access nested properties and format dates
     const getNestedValue = (obj, path) => {
-        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+        const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
+        return formatDate(value);
+    };
+
+    // Helper function to format dates
+    const formatDate = (date) => {
+        if (moment(date, 'YYYY-MM-DD', true).isValid()) {
+            return moment(date).format('MMM D, YYYY');
+        }
+        return date;
     };
 
     // Filter records based on search query

@@ -7,12 +7,13 @@ const Discount = require('../model/Discount');
 const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
 const ManageFee = require('../model/ManageFee');
-const FeeCode = require('../model/FeeCode');
 const GradeLevel = require('../model/GradeLevel');
-const Nationality = require('../model/Nationality');
-const NationalityCode = require('../model/NationalityCode');
 const StudentPayment = require('../model/StudentPayment');
 const Textbook = require('../model/Textbook'); 
+const PaymentSchedule = require('../model/PaymentSchedule');
+const PaymentTerm = require('../model/PaymentTerm');
+
+const moment = require('moment');
 
 module.exports.get_students = async (req,res) => {
     try {
@@ -645,7 +646,8 @@ module.exports.generate_fees = async (req, res) => {
                     { 
                         path: 'sectionId',
                         populate: { path: 'adviser' }
-                    }
+                    },
+                    { path: 'paymentTermId' }
                 ]
             })
             .populate({
@@ -657,19 +659,24 @@ module.exports.generate_fees = async (req, res) => {
             .populate('sy_id')
             .populate('gradeLevel');
 
-        // Fetch managed fees
+        // Fetch tables to be assigned to students fees
         const manageFees = await ManageFee.find()
             .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
             .populate('sy_id gradeLevelId strandId nationalityCodeId');
         
-        const textbooks = await Textbook.find()
-            .populate('inputter gradeLevel strand schoolYear');
+        const textbooks = await Textbook.find().populate('inputter gradeLevel strand schoolYear');
+
+        const paymentSchedules = await PaymentSchedule.find().populate('sy_id paymentTermId');
 
         // Fetch the current school year
         const currYear = await SchoolYear.findById(currentYear);
 
+        // Append here the total amount per student
+
         if (currYear) {
             for (const student of students) {
+                let totalPaymentAmount = 0; // Initialize total amount for each student
+
                 for (const fee of manageFees) {
                     // Check if the fee matches the current year, student's grade level, and nationality code
                     if (fee.sy_id._id.equals(currYear._id) &&
@@ -692,17 +699,19 @@ module.exports.generate_fees = async (req, res) => {
                             studentId: student._id,
                             gradeLevelId: student.academicId.gradeLevelId._id,
                             feeCodeId: fee.feeDescription._id,
-                            manageFeeId: fee._id
+                            manageFeeId: fee._id,
+                            amount: fee.amount // Add amount to the payment info
                         };
 
                         const existingPayment = await StudentPayment.findOne(paymentInfo);
 
                         if (existingPayment) {
-                            console.log(`Payment already exists for student ${student.firstName} with fee ${fee.feeDescription.description}`);
-                            continue;
+                            throw new Error(`Payment already exists for student ${student.firstName} with fee ${fee.feeDescription.description}`);
                         }
 
                         await StudentPayment.create(paymentInfo);
+
+                        totalPaymentAmount += fee.amount; // Accumulate the fee amount
                     }
                 }
 
@@ -722,24 +731,61 @@ module.exports.generate_fees = async (req, res) => {
                             sy_id: currYear._id,
                             studentId: student._id,
                             gradeLevelId: student.academicId.gradeLevelId._id,
-                            textBookId: textbook._id
+                            textBookId: textbook._id,
+                            bookAmount: textbook.bookAmount // Add bookAmount to the log
                         });
 
                         const studentTextbook = {
                             sy_id: currYear._id,
                             studentId: student._id,
                             gradeLevelId: student.academicId.gradeLevelId._id,
-                            textBookId: textbook._id
+                            textBookId: textbook._id,
+                            bookAmount: textbook.bookAmount // Add bookAmount to the textbook info
                         };
 
                         const existingTextbook = await StudentPayment.findOne(studentTextbook);
 
                         if (existingTextbook) {
-                            console.log(`Textbook payment already exists for student ${student.firstName} with textbook ${textbook.title}`);
-                            continue;
+                            throw new Error(`Textbook payment already exists for student ${student.firstName} with textbook ${textbook.title}`);
                         }
 
                         await StudentPayment.create(studentTextbook);
+
+                        totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
+                    }
+                }
+
+                for (const paymentSchedule of paymentSchedules) {
+                    const matchesSchoolYear = paymentSchedule.sy_id._id.equals(currYear._id);
+                    const matchesPaymentTerm = paymentSchedule.paymentTermId.equals(student.academicId.paymentTermId);
+
+                    // Insert here the manageFeeId.amount and textbook.bookAmount total
+                    if (matchesSchoolYear && matchesPaymentTerm) {
+                        console.log('Student Payment Schedule', {
+                            sy_id: currYear._id,
+                            studentId: student._id,
+                            gradeLevelId: student.academicId.gradeLevelId._id,
+                            paymentScheduleId: paymentSchedule._id,
+                            totalPaymentAmount, // Log the total amount,
+                            payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
+                        });
+                        
+                        const paymentScheduleInfo = {
+                            sy_id: currYear._id,
+                            studentId: student._id,
+                            gradeLevelId: student.academicId.gradeLevelId._id,
+                            paymentScheduleId: paymentSchedule._id,
+                            totalPaymentAmount, // Include the total amount in the payment schedule info
+                            payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
+                        };
+
+                        const existingPaymentSchedule = await StudentPayment.findOne(paymentScheduleInfo);
+
+                        if (existingPaymentSchedule) {
+                            throw new Error(`Payment schedule already exists for student ${student.firstName}`);
+                        }  
+
+                        await StudentPayment.create(paymentScheduleInfo);
                     }
                 }
             }
@@ -754,6 +800,16 @@ module.exports.generate_fees = async (req, res) => {
     }
 };
 
+
+module.exports.delete_generated_fees = async (req,res) => {
+
+    try {
+        const payments = await StudentPayment.deleteMany();
+        res.status(200).json({mssg: 'All fees has been removed'});
+    } catch(err) {
+        console.log(err);
+    }
+}
 
 
 // For Student Payment
@@ -782,7 +838,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },
-                { path: 'academicId' }
+                { path: 'academicId', populate: 'paymentTermId' }
             ]
         })
         .populate({path: 'textBookId', 
@@ -790,9 +846,72 @@ module.exports.get_student_payment_detail = async (req,res) => {
                 { path: 'strand' }
             ]
         })
-        .populate('sy_id gradeLevelId feeCodeId manageFeeId');
+        .populate('sy_id gradeLevelId feeCodeId manageFeeId paymentScheduleId');
         res.status(200).json(studentPayments);
     } catch(err) {
         console.log(err);
     }
 }
+
+// For Payment Schedule
+
+module.exports.get_payment_schedule = async (req,res) => {
+    try {
+        const paymentSchedules = await PaymentSchedule.find().populate('sy_id paymentTermId');
+        res.status(200).json(paymentSchedules);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+
+
+module.exports.add_payment_schedule = async (req, res) => {
+    const { schoolYearId } = req.body;
+
+    try {
+        // Get Payment Terms
+        const paymentTerms = await PaymentTerm.find();
+
+        // Get the current start of school year
+        const currentSchoolYear = await SchoolYear.findById(schoolYearId);
+        const yearStart = currentSchoolYear.startYear;
+        const initialStartDate = moment(yearStart);
+
+        // Create a program that will create a schedule depending on the month iteration 
+        let paymentSchedule = [];
+
+        for (const paymentTerm of paymentTerms) {
+            const { installmentBy, _id: paymentTermId } = paymentTerm;
+            let startDate = initialStartDate.clone(); // Reset the startDate to initial start date for each term
+
+            for (let j = 0; j < installmentBy; j++) {
+                paymentSchedule.push({
+                    sy_id: currentSchoolYear._id,
+                    paymentTermId: paymentTermId,
+                    dateSchedule: startDate.format('YYYY-MM-DD')
+                });
+
+                startDate.add(1, 'months'); // Increment the date by one month for the next installment
+            }
+        }
+
+        // Further logic to save the paymentSchedule to the database
+        for (const sched of paymentSchedule) {
+            const schedExists = await PaymentSchedule.findOne(sched);
+
+            if (schedExists) {
+                throw new Error(`This payment schedule is already existing, please reset first to generate again`);
+            }
+
+            await PaymentSchedule.create(sched);
+        }
+
+        res.status(200).json({ mssg: 'Payment schedule has been created successfully' });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ mssg: err.message });
+    }
+}
+
+

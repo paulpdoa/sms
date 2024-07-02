@@ -8,6 +8,7 @@ import AssessmentTable from '../../components/assessment/AssessmentTable';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import Textbooks from '../../components/assessment/Textbooks';
+import PaymentTerm from '../../components/assessment/PaymentTerm';
 
 const Assessment = () => {
 
@@ -65,6 +66,16 @@ const Assessment = () => {
 
     }
 
+    const deleteGeneratedFees = async () => {
+        try {
+            const { data } = await axios.delete(`${baseUrl()}/delete-student-payments`);
+            alert(data.mssg);
+            window.location.reload();
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
     return (
         <main className="p-4">
             <DateTime />
@@ -72,6 +83,7 @@ const Assessment = () => {
                 <h1 className="text-2xl text-green-500 font-bold">Assessment</h1>
                 <div className="flex items-center gap-2">
                     <Searchbar onSearch={handleSearch} />
+                    <button className="items-end text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white p-2 rounded-md" onClick={deleteGeneratedFees}>Delete Fees</button>
                     <button onClick={generateFees} className="items-end text-sm bg-green-500 hover:bg-green-600 cursor-pointer text-white p-2 rounded-md">{ isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
@@ -106,6 +118,7 @@ const Assessment = () => {
                         <>
                             {currentPage === 'Total Fees' && <TotalFees record={currStudRec}/> }
                             {currentPage === 'Textbooks' && <Textbooks record={currStudRec}/> }
+                            {currentPage === 'Payment Term' && <PaymentTerm record={currStudRec} /> }
                         </>
                     ) : (
                         <p className="text-sm text-red-500">Please select a student from the list to view details.</p>

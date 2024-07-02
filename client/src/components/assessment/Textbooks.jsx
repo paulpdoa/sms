@@ -50,15 +50,15 @@ const Textbooks = ({ record }) => {
                                     </tr>
                                 ))}
                                 { filteredFeeLists.length > 0 &&
-                        <tr className="font-bold border-t">
-                            <td colSpan="2" className="px-4 py-3 text-right">Total:</td>
-                            <td className="px-4 py-3 text-right">{totalAmount?.toFixed(2)}</td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-                { filteredFeeLists.length < 1 && <h2 className="text-sm text-red-500 p-2 animate-pulse">Nothing to display here</h2> }
-                </div>
+                                <tr className="font-bold border-t">
+                                    <td colSpan="2" className="px-4 py-3 text-right">Total:</td>
+                                    <td className="px-4 py-3 text-right">{totalAmount?.toFixed(2)}</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                        { filteredFeeLists.length < 1 && <h2 className="text-sm text-red-500 p-2 animate-pulse">Nothing to display here</h2> }
+                    </div>
                 </>
             )}
         </div>

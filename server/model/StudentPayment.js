@@ -30,6 +30,16 @@ const studentPaymentSchema = new mongoose.Schema({
     textBookId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'textbook'
+    },
+    paymentScheduleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'paymentSchedule'
+    },
+    totalPaymentAmount: {
+        type: Number
+    },
+    payEveryAmount: {
+        type: Number
     }
 }, { timestamps: true })
 
