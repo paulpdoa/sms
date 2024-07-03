@@ -53,7 +53,9 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Teachers', link: '/teachers' },
-                    { name: 'Strands', link: '/strands' }
+                    { name: 'Students', link: '/students' },
+                    { name: 'Admission', link: '/admission' },
+                    { name: 'Assessment', link: '/assessment' }
                 ]
             },
             {
@@ -61,26 +63,9 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/students' },
-                    { name: 'Registration' },
                     { name: 'Admission', link: '/admission' },
-                    { name: 'Sectioning', link:'/sectioning' },
                     { name: 'Assessment', link: '/assessment' }
                 ]
-            },
-            {
-                name: 'Parents',
-                icon: <RiParentFill />,
-                link: '/parents'
-            },
-            {
-                name: 'Library',
-                icon: <IoLibrary />,
-                link: '/library'
-            },
-            {
-                name: 'Account',
-                icon: <RiAccountPinBoxFill />,
-                link: '/account'
             },
             {
                 name: 'Settings',
@@ -115,19 +100,29 @@ const initialMenus = [
                 ]
             },
             {
-                name: 'Parents',
-                icon: <RiParentFill />,
-                link: '/parents'
+                name: 'Settings',
+                icon: <IoSettings />,
+                link: '/settings'
+            }
+        ]
+    },
+    {
+        role: 'Registrar',
+        menus: [
+            {
+                name: 'Dashboard',
+                icon: <AiFillDashboard />,
+                link: '/'
             },
             {
-                name: 'Library',
-                icon: <IoLibrary />,
-                link: '/library'
-            },
-            {
-                name: 'Account',
-                icon: <RiAccountPinBoxFill />,
-                link: '/account'
+                name: 'Registrar',
+                icon: <FaCashRegister />,
+                subMenus: [
+                    { name: 'Students', link: '/students' },
+                    { name: 'Registration' },
+                    { name: 'Admission' },
+                    { name: 'Sectioning', link: '/sectioning' }
+                ]
             },
             {
                 name: 'Settings',

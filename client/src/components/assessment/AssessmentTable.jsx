@@ -26,7 +26,7 @@ const AssessmentTable = ({ setViewRecord,searchQuery }) => {
         </div>
     );
 
-    const formattedStudents = students?.map(student => ({
+    const formattedStudents = students?.filter(student => student.isAdmitted && student.isRegistered).map(student => ({
         ...student,
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',

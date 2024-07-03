@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { baseUrl } from '../../baseUrl';
 import { useFetch } from '../../hooks/useFetch';
 
-const Textbooks = ({ record }) => {
+const TextBooks = ({ record }) => {
     const [loading, setLoading] = useState(true);
     const { records: studentPayments, loading: fetchLoading } = useFetch(`${baseUrl()}/student-payment/${record?._id}`);
 
@@ -65,4 +65,4 @@ const Textbooks = ({ record }) => {
     );
 };
 
-export default Textbooks;
+export default TextBooks;

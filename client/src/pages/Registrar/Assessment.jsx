@@ -7,8 +7,9 @@ import TotalFees from '../../components/assessment/TotalFees'
 import AssessmentTable from '../../components/assessment/AssessmentTable';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import Textbooks from '../../components/assessment/Textbooks';
 import PaymentTerm from '../../components/assessment/PaymentTerm';
+import TextBooks from '../../components/assessment/TextBooks';
+import Assistance from '../../components/assessment/Assistance';
 
 const Assessment = () => {
 
@@ -62,6 +63,7 @@ const Assessment = () => {
                 progress: undefined,
                 theme: "colored"
             });
+            setIsLoading(false)
         }
 
     }
@@ -69,8 +71,19 @@ const Assessment = () => {
     const deleteGeneratedFees = async () => {
         try {
             const { data } = await axios.delete(`${baseUrl()}/delete-student-payments`);
-            alert(data.mssg);
-            window.location.reload();
+            toast.success(data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000)
         } catch(err) {
             console.log(err);
         }
@@ -117,8 +130,9 @@ const Assessment = () => {
                     {enableView && currStudRec?._id ? (
                         <>
                             {currentPage === 'Total Fees' && <TotalFees record={currStudRec}/> }
-                            {currentPage === 'Textbooks' && <Textbooks record={currStudRec}/> }
+                            {currentPage === 'Textbooks' && <TextBooks record={currStudRec}/> }
                             {currentPage === 'Payment Term' && <PaymentTerm record={currStudRec} /> }
+                            {currentPage === 'Assistance' && <Assistance record={currStudRec} /> }
                         </>
                     ) : (
                         <p className="text-sm text-red-500">Please select a student from the list to view details.</p>

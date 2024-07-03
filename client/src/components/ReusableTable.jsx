@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
-const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 5, searchQuery, viewRecord }) => {
+const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10, searchQuery, viewRecord }) => {
     const navigate = useNavigate();
     const goToEdit = (id) => navigate(`${path}/${id}`);
 
