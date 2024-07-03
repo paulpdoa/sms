@@ -15,8 +15,11 @@ const Parent = require('../model/Parent');
 const Student = require('../model/Students');
 const Sibling = require('../model/Sibling');
 const NationalityCode = require('../model/NationalityCode');
+const PaymentSchedule = require('../model/PaymentSchedule');
+const StudentPayment = require('../model/StudentPayment');
 
 const jwt = require('jsonwebtoken');
+const StudentPaymentModel = require('../model/StudentPayment');
 
 const maxAge = 3 * 24 * 24 * 60;
 const createToken = (token) => {
@@ -636,7 +639,7 @@ module.exports.delete_school_year = async (req,res) => {
 
 module.exports.get_school_year_detail = async (req,res) => {
     const { id } = req.params;
-
+    console.log(id);
     try {
         const schoolYearFind = await SchoolYear.findById(id);
         res.status(200).json(schoolYearFind);
@@ -645,24 +648,33 @@ module.exports.get_school_year_detail = async (req,res) => {
     }
 }
 
-module.exports.edit_school_year = async (req,res) => {
+module.exports.edit_school_year = async (req, res) => {
     const { id } = req.params;
+    const { newSchoolTheme: schoolTheme, newEndYear: endYear, newStartYear: startYear, isYearDone } = req.body;
 
-    const { newSchoolTheme: schoolTheme, newEndYear:endYear, newStartYear:startYear,isYearDone } = req.body;
-
-    try {   
+    try {
         const currSchoolYear = await SchoolYear.findById(id);
-        // if(currSchoolYear.syTheme !== syTheme) {
-            const newSchoolYear = await SchoolYear.findByIdAndUpdate({ _id: id }, { schoolTheme,startYear,endYear,isYearDone });
+        const newSchoolYear = await SchoolYear.findByIdAndUpdate(id, { schoolTheme, startYear, endYear, isYearDone }, { new: true });
+
+        const existPaymentSchedule = await PaymentSchedule.find();
+
+        if (existPaymentSchedule.length > 0) {
+            // Delete all records in PaymentSchedule
+            await PaymentSchedule.deleteMany();
+
+            // Delete related records in StudentPayment
+            await StudentPayment.deleteMany({ paymentScheduleId: { $in: existPaymentSchedule.map(ps => ps._id) } });
+
+            res.status(200).json({ mssg: 'School year has been updated, please re-generate Payment Schedule for this year' });
+        } else {
             res.status(200).json({ mssg: `${newSchoolYear.startYear.split('-')[0]} to ${newSchoolYear.endYear.split('-')[0]} has been edited successfully!` });
-        // } else {
-        //     res.status(400).json({ mssg: `Cannot update ${syTheme}, still the same with old value` })
-        // }
-        
-    } catch(err) {
+        }
+    } catch (err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating the school year' });
     }
-}
+};
+
 
 // For Users
 

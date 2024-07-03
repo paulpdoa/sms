@@ -17,5 +17,15 @@ const paymentScheduleSchema = new mongoose.Schema({
     dateSchedule: requiredString
 }, { timestamps: true })
 
+
+paymentScheduleSchema.pre('remove', async function (next) {
+    try {
+        await StudentPayment.deleteMany({ paymentScheduleId: this._id });
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+
 const PaymentScheduleModel = mongoose.model('paymentSchedule',paymentScheduleSchema);
 module.exports = PaymentScheduleModel;

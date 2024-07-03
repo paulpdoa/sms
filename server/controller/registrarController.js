@@ -667,138 +667,182 @@ module.exports.generate_fees = async (req, res) => {
         const textbooks = await Textbook.find().populate('inputter gradeLevel strand schoolYear');
 
         const paymentSchedules = await PaymentSchedule.find().populate('sy_id paymentTermId');
+        const studentDiscounts = await StudentDiscount.find().populate('studentId sessionId discountId');
 
         // Fetch the current school year
         const currYear = await SchoolYear.findById(currentYear);
 
-        // Append here the total amount per student
-
-        if (currYear) {
-            for (const student of students) {
-                let totalPaymentAmount = 0; // Initialize total amount for each student
-
-                for (const fee of manageFees) {
-                    // Check if the fee matches the current year, student's grade level, and nationality code
-                    if (fee.sy_id._id.equals(currYear._id) &&
-                        fee.gradeLevelId._id.equals(student.academicId.gradeLevelId._id) &&
-                        (!fee.nationalityCodeId || fee.nationalityCodeId._id.equals(student.nationality.nationalityCodeId?._id))) {
-
-                        console.log('Matching Fee:', {
-                            studentName: student.firstName,
-                            feeSyId: fee.sy_id._id,
-                            currYearId: currYear._id,
-                            feeGradeLevelId: fee.gradeLevelId._id,
-                            studentGradeLevelId: student.academicId.gradeLevelId._id,
-                            feeNationalityCodeId: fee.nationalityCodeId?._id,
-                            studentNationalityCodeId: student.nationality.nationalityCodeId?._id,
-                            manageFeeId: fee._id
-                        });
-
-                        const paymentInfo = {
-                            sy_id: currYear._id,
-                            studentId: student._id,
-                            gradeLevelId: student.academicId.gradeLevelId._id,
-                            feeCodeId: fee.feeDescription._id,
-                            manageFeeId: fee._id,
-                            amount: fee.amount // Add amount to the payment info
-                        };
-
-                        const existingPayment = await StudentPayment.findOne(paymentInfo);
-
-                        if (existingPayment) {
-                            throw new Error(`Payment already exists for student ${student.firstName} with fee ${fee.feeDescription.description}`);
+        if(paymentSchedules.length > 0) {
+            if (currYear) {
+                for (const student of students) {
+                    let totalPaymentAmount = 0; // Initialize total amount for each student
+    
+                    for (const fee of manageFees) {
+                        // Check if the fee matches the current year, student's grade level, and nationality code
+                        if (fee.sy_id._id.equals(currYear._id) &&
+                            fee.gradeLevelId._id.equals(student.academicId.gradeLevelId._id) &&
+                            (!fee.nationalityCodeId || fee.nationalityCodeId._id.equals(student.nationality.nationalityCodeId?._id))) {
+    
+                            console.log('Matching Fee:', {
+                                studentName: student.firstName,
+                                feeSyId: fee.sy_id._id,
+                                currYearId: currYear._id,
+                                feeGradeLevelId: fee.gradeLevelId._id,
+                                studentGradeLevelId: student.academicId.gradeLevelId._id,
+                                feeNationalityCodeId: fee.nationalityCodeId?._id,
+                                studentNationalityCodeId: student.nationality.nationalityCodeId?._id,
+                                manageFeeId: fee._id,
+                                amount: fee.amount // Add amount to the log
+                            });
+    
+                            const paymentInfo = {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                feeCodeId: fee.feeDescription._id,
+                                manageFeeId: fee._id,
+                                amount: fee.amount // Add amount to the payment info
+                            };
+    
+                            const existingPayment = await StudentPayment.findOne(paymentInfo);
+    
+                            if (!existingPayment) {
+                                await StudentPayment.create(paymentInfo);
+                                totalPaymentAmount += fee.amount; // Accumulate the fee amount
+                                console.log(`Added fee amount: ${fee.amount}, Total Payment Amount: ${totalPaymentAmount}`);
+                            }
                         }
-
-                        await StudentPayment.create(paymentInfo);
-
-                        totalPaymentAmount += fee.amount; // Accumulate the fee amount
                     }
-                }
-
-                for (const textbook of textbooks) { 
-                    const matchesSchoolYear = textbook.schoolYear._id.equals(currYear._id);
-                    const matchesGradeLevel = textbook.gradeLevel?._id.equals(student.academicId.gradeLevelId?._id);
-                    const matchesStrand = !textbook.strand || textbook.strand._id.equals(student.academicId?.strandId?._id);
-
-                    console.log('Textbook Conditions:', {
-                        matchesSchoolYear,
-                        matchesGradeLevel,
-                        matchesStrand
-                    });
-
-                    if (matchesSchoolYear && matchesGradeLevel && matchesStrand) {
-                        console.log('Student Textbooks:', {
-                            sy_id: currYear._id,
-                            studentId: student._id,
-                            gradeLevelId: student.academicId.gradeLevelId._id,
-                            textBookId: textbook._id,
-                            bookAmount: textbook.bookAmount // Add bookAmount to the log
+    
+                    for (const textbook of textbooks) { 
+                        const matchesSchoolYear = textbook.schoolYear._id.equals(currYear._id);
+                        const matchesGradeLevel = textbook.gradeLevel?._id.equals(student.academicId.gradeLevelId?._id);
+                        const matchesStrand = !textbook.strand || textbook.strand._id.equals(student.academicId?.strandId?._id);
+    
+                        console.log('Textbook Conditions:', {
+                            matchesSchoolYear,
+                            matchesGradeLevel,
+                            matchesStrand
                         });
-
-                        const studentTextbook = {
-                            sy_id: currYear._id,
-                            studentId: student._id,
-                            gradeLevelId: student.academicId.gradeLevelId._id,
-                            textBookId: textbook._id,
-                            bookAmount: textbook.bookAmount // Add bookAmount to the textbook info
-                        };
-
-                        const existingTextbook = await StudentPayment.findOne(studentTextbook);
-
-                        if (existingTextbook) {
-                            throw new Error(`Textbook payment already exists for student ${student.firstName} with textbook ${textbook.title}`);
+    
+                        if (matchesSchoolYear && matchesGradeLevel && matchesStrand) {
+                            console.log('Student Textbooks:', {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                textBookId: textbook._id,
+                                bookAmount: textbook.bookAmount // Add bookAmount to the log
+                            });
+    
+                            const studentTextbook = {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                textBookId: textbook._id,
+                                bookAmount: textbook.bookAmount // Add bookAmount to the textbook info
+                            };
+    
+                            const existingTextbook = await StudentPayment.findOne(studentTextbook);
+    
+                            if (!existingTextbook) {
+                                await StudentPayment.create(studentTextbook);
+                                totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
+                                console.log(`Added book amount: ${textbook.bookAmount}, Total Payment Amount: ${totalPaymentAmount}`);
+                            }
                         }
-
-                        await StudentPayment.create(studentTextbook);
-
-                        totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
                     }
-                }
-
-                for (const paymentSchedule of paymentSchedules) {
-                    const matchesSchoolYear = paymentSchedule.sy_id._id.equals(currYear._id);
-                    const matchesPaymentTerm = paymentSchedule.paymentTermId.equals(student.academicId.paymentTermId);
-
-                    // Insert here the manageFeeId.amount and textbook.bookAmount total
-                    if (matchesSchoolYear && matchesPaymentTerm) {
-                        console.log('Student Payment Schedule', {
-                            sy_id: currYear._id,
-                            studentId: student._id,
-                            gradeLevelId: student.academicId.gradeLevelId._id,
-                            paymentScheduleId: paymentSchedule._id,
-                            totalPaymentAmount, // Log the total amount,
-                            payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
-                        });
-                        
-                        const paymentScheduleInfo = {
-                            sy_id: currYear._id,
-                            studentId: student._id,
-                            gradeLevelId: student.academicId.gradeLevelId._id,
-                            paymentScheduleId: paymentSchedule._id,
-                            totalPaymentAmount, // Include the total amount in the payment schedule info
-                            payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
-                        };
-
-                        const existingPaymentSchedule = await StudentPayment.findOne(paymentScheduleInfo);
-
-                        if (existingPaymentSchedule) {
-                            throw new Error(`Payment schedule already exists for student ${student.firstName}`);
-                        }  
-
-                        await StudentPayment.create(paymentScheduleInfo);
+    
+                    for (const paymentSchedule of paymentSchedules) {
+                        const matchesSchoolYear = paymentSchedule.sy_id._id.equals(currYear._id);
+                        const matchesPaymentTerm = paymentSchedule.paymentTermId.equals(student.academicId.paymentTermId);
+                        console.log(matchesSchoolYear,matchesPaymentTerm);
+                        if (matchesSchoolYear && matchesPaymentTerm) {
+                            console.log('Student Payment Schedule', {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                paymentScheduleId: paymentSchedule._id,
+                                totalPaymentAmount, // Log the total amount,
+                                payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
+                            });
+    
+                            const paymentScheduleInfo = {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                paymentScheduleId: paymentSchedule._id,
+                                totalPaymentAmount, // Include the total amount in the payment schedule info
+                                payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
+                            };
+    
+                            const existingPaymentSchedule = await StudentPayment.findOne(paymentScheduleInfo);
+    
+                            if (!existingPaymentSchedule) {
+                                await StudentPayment.create(paymentScheduleInfo);
+                            }
+                        }
                     }
+
+                    // For setting student assistance 
+                    // Get students id in StudentDiscount table
+                    // After getting studentDiscount id, insert in StudentPayment Table
+                    // Considerations -> must be same student id 
+                    // eto ang titingnan dapat ng system:
+
+                    // -nationality
+                    // -gradelevel
+                    // -payment term
+                    // -scholarship (kung meron)
+                    // -Sibling Rank
+                    // -Employee Gia (kung may parent na worker doon sa school)
+
+                    // dapat lahat yan nakalagay sa profile table or academic table para magamit ng system sa pag match
+
+                    // Ilagay sa Student Discount Table
+                    for(const studentDiscount of studentDiscounts) {
+                        const matchingStudent = studentDiscount.studentId._id.equals(student._id);
+
+                        if(matchingStudent) {
+                            console.log('Student Discount:', {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                studentDiscountId: studentDiscount._id,
+                            });
+    
+                            const studentDiscountInfo = {
+                                sy_id: currYear._id,
+                                studentId: student._id,
+                                gradeLevelId: student.academicId.gradeLevelId._id,
+                                studentDiscountId: studentDiscount._id,
+                            };
+    
+                            const existingStudentDiscount = await StudentPayment.findOne(studentDiscountInfo);
+    
+                            if (!existingStudentDiscount) {
+                                await StudentPayment.create(studentDiscountInfo);
+                                console.log('Student Discount has been created')
+                            }
+                        }
+                    }
+                    
+
                 }
+    
+                res.status(200).json({ mssg: 'Fees for students have been generated successfully' });
+            } else {
+                res.status(404).json({ error: 'Current school year not found' });
             }
-
-            res.status(200).json({ mssg: 'Fees for students have been generated successfully' });
         } else {
-            res.status(404).json({ error: 'Current school year not found' });
+            res.status(400).json({error: 'Please generate a payment schedule before creating fees'})
         }
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: err.message });
     }
 };
+
+
 
 
 module.exports.delete_generated_fees = async (req,res) => {
@@ -820,10 +864,21 @@ module.exports.get_student_payments = async (req,res) => {
         const studPayments = await StudentPayment.find()
         .populate({ path: 'studentId', 
             populate: [
-                { path: 'nationality', populate: 'nationalityCodeId' }
+                { path: 'nationality', populate: 'nationalityCodeId' },
+                { path: 'academicId', populate: 'paymentTermId' }
             ]
         })
-        .populate('sy_id gradeLevelId feeCodeId manageFeeId textBookId');
+        .populate({path: 'textBookId', 
+            populate: [
+                { path: 'strand' }
+            ]
+        })
+        .populate({ path: 'studentDiscountId',
+            populate: [
+                { path: 'discountId' }
+            ]
+        })
+        .populate('sy_id gradeLevelId feeCodeId manageFeeId paymentScheduleId');
         res.status(200).json(studPayments);
     } catch(err) {
         console.log(err);
@@ -844,6 +899,11 @@ module.exports.get_student_payment_detail = async (req,res) => {
         .populate({path: 'textBookId', 
             populate: [
                 { path: 'strand' }
+            ]
+        })
+        .populate({ path: 'studentDiscountId',
+            populate: [
+                { path: 'discountId' }
             ]
         })
         .populate('sy_id gradeLevelId feeCodeId manageFeeId paymentScheduleId');
@@ -882,7 +942,8 @@ module.exports.add_payment_schedule = async (req, res) => {
         let paymentSchedule = [];
 
         for (const paymentTerm of paymentTerms) {
-            const { installmentBy, _id: paymentTermId } = paymentTerm;
+            const { installmentBy, _id: paymentTermId, payEvery } = paymentTerm;
+            
             let startDate = initialStartDate.clone(); // Reset the startDate to initial start date for each term
 
             for (let j = 0; j < installmentBy; j++) {
@@ -892,7 +953,7 @@ module.exports.add_payment_schedule = async (req, res) => {
                     dateSchedule: startDate.format('YYYY-MM-DD')
                 });
 
-                startDate.add(1, 'months'); // Increment the date by one month for the next installment
+                startDate.add(payEvery, 'months'); // Increment the date by one month for the next installment
             }
         }
 

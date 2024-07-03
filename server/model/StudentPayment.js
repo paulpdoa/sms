@@ -35,6 +35,10 @@ const studentPaymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'paymentSchedule'
     },
+    studentDiscountId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'studentDiscount'
+    },
     totalPaymentAmount: {
         type: Number
     },
