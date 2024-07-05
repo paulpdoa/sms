@@ -1,108 +1,30 @@
+import React, { useState } from 'react';
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import AddReligionBtn from "../../components/AddReligionBtn";
-import { useState } from 'react';
+import MasterTable from '../../components/MasterTable';
 
 const columns = [
-    {
-        accessorKey: 'religion',
-        header: 'Religion',
-    },
-    {
-        header:'Inputter'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
+    { accessorKey: 'religion', header: 'Religion',editable: true },
+    { accessorKey: 'inputter', header: 'Inputter' },
+];
 
 const Religion = () => {
-
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
-
-    const [updateReligion,setUpdateReligion] = useState(false);
-    const [religionId,setReligionId] = useState('');
-    const [newReligion,setNewReligion] = useState('');
-
-    const [religion,setReligion] = useState('');
-    
-
-    const enableEditReligion = (record) => {
-        setUpdateReligion(!updateReligion);
-        setReligionId(record._id);
-        setNewReligion(record.religion)
-    }
+    const [searchQuery, setSearchQuery] = useState('');
+    const [religion, setReligion] = useState('');
 
     const currentUserId = localStorage.getItem('id');
-
-    const updateNewReligion = async (id) => {
-        try {
-            const newData = await axios.patch(`${baseUrl()}/religion/${id}`,{ newReligion,currentUserId });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
-            });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
-            });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        }
-    }      
-
-    const deleteReligion = async (id) => {
-        try {
-            const removeReligion = await axios.delete(`${baseUrl()}/religion/${id}`);
-            toast.success(removeReligion.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
-            });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        } catch(err) {
-            console.log(err);
-        }
-    }
+    const role = localStorage.getItem('role');
 
     const addReligion = async (e) => {
         e.preventDefault();
         try {
-            const newReligion = await axios.post(`${baseUrl()}/religions`,{ religion,currentUserId });
+            const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role });
             toast.success(newReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -111,98 +33,110 @@ const Religion = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "light",
             });
-
             setTimeout(() => {
                 window.location.reload();
-            },2000)
-        } catch(err) {
+            }, 2000);
+        } catch (err) {
             console.log(err);
         }
-    }
+    };
+
+    const updateReligion = async (id, updatedData) => {
+        console.log(id,updatedData);
+        try {
+            const response = await axios.patch(`${baseUrl()}/religion/${id}`, { newReligion: updatedData.religion, currentUserId, role });
+            console.log(response);
+            toast.success(response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (err) {
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+    };
+
+    const deleteReligion = async (id) => {
+        try {
+            const removeReligion = await axios.delete(`${baseUrl()}/religion/${id}`, { data: { role } });
+            toast.success(removeReligion.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const recordsWithInputter = records.map(record => ({
+        ...record,
+        inputter: record.inputter?.username,
+    }));
 
     return (
         <main className="p-2">
             <DateTime />
-            <div className="flex justify-between mx-4 my-2  items-center">
+            <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Religion</h1>
-                <Searchbar />
-                {/* <AddReligionBtn /> */}
+                <Searchbar onSearch={setSearchQuery} />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
-               <div>
-               <form onSubmit={addReligion} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
-
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="religion">Religion</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
-                    </div>
-
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
-                
-               </div>
+                <div>
+                    <form onSubmit={addReligion} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                        <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="religion">Religion</label>
+                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
+                        </div>
+                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                    </form>
+                </div>
 
                 <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                { columns?.map((column,key) => (
-                                    <th key={key} scope="col" className="px-6 py-3">
-                                        { column.header }
-                                    </th>
-                                )) }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updateReligion && (religionId === record._id) ?
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="text" value={newReligion} onChange={(e) => setNewReligion(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </th> 
-                                        </> 
-                                        :
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.religion }
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </th>  
-                                        </>
-                                    }
-
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        { updateReligion && (religionId === record._id) ? 
-                                        <>
-                                        <button onClick={() => updateNewReligion(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                                        <button onClick={() => enableEditReligion(!updateReligion)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
-                                        </>
-                                        :
-                                        <>
-                                        <button onClick={() => enableEditReligion(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                        <button onClick={() => deleteReligion(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                                        </>
-                                        }
-                                        
-                                    </td>
-                                </tr>
-                            )) }
-                        </tbody>
-                    </table>
-                </div>    
-            </div> 
-            <ToastContainer />          
+                    <MasterTable
+                        columns={columns}
+                        data={recordsWithInputter}
+                        searchQuery={searchQuery}
+                        onUpdate={updateReligion}
+                        onDelete={deleteReligion}
+                    />
+                </div>
+            </div>
+            <ToastContainer />
         </main>
-    )
-}
+    );
+};
 
 export default Religion;

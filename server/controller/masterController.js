@@ -19,7 +19,6 @@ const PaymentSchedule = require('../model/PaymentSchedule');
 const StudentPayment = require('../model/StudentPayment');
 
 const jwt = require('jsonwebtoken');
-const StudentPaymentModel = require('../model/StudentPayment');
 
 const maxAge = 3 * 24 * 24 * 60;
 const createToken = (token) => {
@@ -639,7 +638,7 @@ module.exports.delete_school_year = async (req,res) => {
 
 module.exports.get_school_year_detail = async (req,res) => {
     const { id } = req.params;
-    console.log(id);
+    
     try {
         const schoolYearFind = await SchoolYear.findById(id);
         res.status(200).json(schoolYearFind);

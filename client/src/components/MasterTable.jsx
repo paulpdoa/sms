@@ -1,61 +1,156 @@
+import React, { useState } from 'react';
 
-const MasterTable = ({ columns,records,updateTrigger,recordId }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
+    const [editId, setEditId] = useState(null);
+    const [editValues, setEditValues] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-    const getNestedValue = (obj, path) => {
-        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    const handleEditClick = (record) => {
+        setEditId(record._id);
+        setEditValues(record);
     };
 
+    const handleSaveClick = (id) => {
+        onUpdate(id, editValues);
+        setEditId(null);
+    };
+
+    const handleInputChange = (key, value) => {
+        setEditValues({ ...editValues, [key]: value });
+    };
+
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedData = [...data].sort((a, b) => {
+        if (sortConfig.key) {
+            const aValue = a[sortConfig.key];
+            const bValue = b[sortConfig.key];
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        }
+        return 0;
+    });
+
+    const filteredData = sortedData.filter(record => {
+        return columns.some(column => {
+            const value = record[column.accessorKey];
+            return value && value.toString().toLowerCase().includes(searchQuery.toLowerCase());
+        });
+    });
+
+    const indexOfLastRow = currentPage * rowsPerPage;
+    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+    const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
     return (
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    { columns?.map((column,key) => (
-                        <th key={key} scope="col" className="px-6 py-3">
-                            { column.header }
-                        </th>
-                    )) }
-                </tr>
-            </thead>
-            <tbody>
-                { records?.map(record => (
-                    <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                        { updateTrigger && (recordId === record._id) ?
-                            <>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <input type="text" value={newGender} onChange={(e) => setNewGender(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                            </th>
-                            <td scope="row" className="px-6 py-4 font-medium">
-                                { record.inputter?.username }
-                            </td>
-                            </>
-                            :
-                            <>
-                            { columns?.map(column => (
-                                column.accessorKey !== 'action' &&
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    {getNestedValue(record, column.accessorKey) ?? 'Not Assigned'}
-                                </th>   
-                            )) }
-                            </>
-                        }
-                        <td className="px-6 py-4 flex gap-2 items-center">
-                            { updateTrigger && (recordId === record._id) ? 
-                            <>
-                            <button onClick={() => updateNewGender(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                            <button onClick={() => enableEditGender(!updateTrigger)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
-                            </>
-                            :
-                            <>
-                            <button onClick={() => enableEditGender(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                            <button onClick={() => deleteGender(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                            </>
-                            }
-                        </td>
-                    </tr>
-                )) }
-            </tbody>
-        </table>
-    )
+        <>
+            <div className="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
+                <table className="min-w-full text-white">
+                    <thead className="bg-gray-800">
+                        <tr>
+                            {columns.map((column, index) => (
+                                <th
+                                    key={index}
+                                    className="py-2 px-4 border-b border-gray-700 cursor-pointer"
+                                    onClick={() => handleSort(column.accessorKey)}
+                                >
+                                    {column.header}
+                                    {sortConfig.key === column.accessorKey ? (
+                                        sortConfig.direction === 'asc' ? ' ▲' : ' ▼'
+                                    ) : ''}
+                                </th>
+                            ))}
+                            <th className="py-2 px-4 border-b border-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentRows.map(record => (
+                            <tr key={record._id} className="odd:bg-gray-800 even:bg-gray-700">
+                                {columns.map((column, index) => (
+                                    <td key={index} className="py-2 px-4 border-b border-gray-700">
+                                        {editId === record._id ? (
+                                            column.editable ? (
+                                                column.selectOptions ? (
+                                                    <select
+                                                        value={editValues[column.accessorKey]}
+                                                        onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
+                                                        className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
+                                                    >
+                                                        {column.selectOptions.map(option => (
+                                                            <option key={option.value} value={option.value}>
+                                                                {option.label}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        value={editValues[column.accessorKey]}
+                                                        onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
+                                                        className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
+                                                    />
+                                                )
+                                            ) : (
+                                                record[column.accessorKey]
+                                            )
+                                        ) : (
+                                            record[column.accessorKey]
+                                        )}
+                                    </td>
+                                ))}
+                                <td className="py-2 px-4 border-b border-gray-700 flex space-x-2">
+                                    {editId === record._id ? (
+                                        <>
+                                            <button onClick={() => handleSaveClick(record._id)} className="text-green-400 hover:underline">Save</button>
+                                            <button onClick={() => setEditId(null)} className="text-red-400 hover:underline">Cancel</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button onClick={() => handleEditClick(record)} className="text-blue-400 hover:underline">Edit</button>
+                                            <button onClick={() => onDelete(record._id)} className="text-red-400 hover:underline">Delete</button>
+                                        </>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="flex justify-center text-sm items-center mt-4 gap-4">
+                <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-700 rounded disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <div>
+                    <span>Page {currentPage} of {totalPages}</span>
+                </div>
+                <button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-700 rounded ml-2 disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
+        </>
+    );
 };
 
 export default MasterTable;

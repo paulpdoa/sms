@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useFetch = (url) => {
 
@@ -7,8 +8,10 @@ export const useFetch = (url) => {
    const [isLoading,setIsLoading] = useState(false);
 
    const userToken = localStorage.getItem('userToken');
+   const role = localStorage.getItem('role');
+   const navigate = useNavigate();
 
-   const header = {
+   const headers = {
       'Authorization':`Bearer ${userToken}` 
    }
    
@@ -19,17 +22,23 @@ export const useFetch = (url) => {
       const fetchData = async () => {
          setIsLoading(true);
          try {
-            const data = await axios.get(url,{ header });
+            const { data } = await axios.get(url, {
+               params: { role },
+               signal,
+               headers
+            });
             setIsLoading(false);
-            setRecords(data?.data);
+            setRecords(data);
          } catch(err) {
-            console.log(err);
+            const data = err.response?.data;
+            console.log(data);
+            navigate(data.redirect);
          }
       }
       fetchData();
       
       return () => abortCont.abort();
-   },[url,userToken])
+   },[url,userToken,role,navigate])
   
    return { records, isLoading } 
 }

@@ -7,29 +7,33 @@ import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useState } from 'react';
-
-const columns = [
-    {
-        accessorKey: 'nationality',
-        header: 'Nationality',
-    },
-    {
-        accessorKey: 'nationalityCode',
-        header: 'Nationality Code'
-    },
-    {
-        header: 'Inputter'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
+import MasterTable from "../../components/MasterTable";
 
 const Nationality = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
+
+    const columns = [
+        {
+            accessorKey: 'nationality',
+            header: 'Nationality',
+            editable: true,
+        },
+        {
+            accessorKey: 'nationalityCodeId',
+            header: 'Nationality Code',
+            editable: true,
+            selectOptions: nationalityCodes.map(nc => ({ value: nc._id, label: nc.nationalityCode })),
+        },
+        { 
+            accessorKey: 'inputter', 
+            header: 'Inputter' 
+        }
+    ];
+
+
+    const [searchQuery, setSearchQuery] = useState('');
 
     const [nationality,setNationality] = useState('');
     const [nationalityCodeId,setNationalityCodeId] = useState('');
@@ -47,10 +51,11 @@ const Nationality = () => {
     }
 
     const currentUserId = localStorage.getItem('id');
+    const role = localStorage.getItem('role');
 
     const updateNewNationality = async (id) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality,newNationalityCodeId,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality,newNationalityCodeId,currentUserId,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -66,7 +71,7 @@ const Nationality = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
-            toast.error('Cannot update nationality, please try again.', {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
@@ -81,7 +86,7 @@ const Nationality = () => {
 
     const deleteNationality = async (id) => {
         try {
-            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`);
+            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`,{ data: { role } });
             toast.success(removeNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -104,7 +109,7 @@ const Nationality = () => {
     const addNationality = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId });
+            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -120,9 +125,25 @@ const Nationality = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
             console.log(err);
         }
     }
+
+    const recordsWithInputter = records.map(record => ({
+        ...record,
+        nationalityCodeId: record.nationalityCodeId?.nationalityCode,
+        inputter: record.inputter?.username,
+    }));
 
     return (
         <main className="p-2">
@@ -156,66 +177,13 @@ const Nationality = () => {
                 </form>
 
                 <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                { columns?.map((column,key) => (
-                                    <th key={key} scope="col" className="px-6 py-3">
-                                        { column.header }
-                                    </th>
-                                )) }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updateNationality && (nationalityId === record._id) ?
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="text" value={newNationality} onChange={(e) => setNewNationality(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setNewNationalityCodeId(e.target.value)}>
-                                                <option hidden>{record?.nationalityCodeId?.nationalityCode ?? 'Select Nationality Code'}</option>
-                                                { nationalityCodes?.map(nc => (
-                                                    <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
-                                                )) }
-                                            </select>                                        
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </th>  
-                                        </>
-                                        :
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.nationality }
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.nationalityCodeId?.nationalityCode ?? 'Not Assigned' }
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </th>  
-                                        </>
-                                    }
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        { updateNationality && (nationalityId === record._id) ? 
-                                        <>
-                                        <button onClick={() => updateNewNationality(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                                        <button onClick={() => enableEditNationality(!updateNationality)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
-                                        </>
-                                        :
-                                        <>
-                                        <button onClick={() => enableEditNationality(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                        <button onClick={() => deleteNationality(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                                        </>
-                                        }
-                                    </td>
-                                </tr>
-                            )) }
-                        </tbody>
-                    </table>
+                    <MasterTable
+                        columns={columns}
+                        data={recordsWithInputter}
+                        searchQuery={searchQuery}
+                        onUpdate={updateNewNationality}
+                        onDelete={deleteNationality}
+                    />
                 </div>    
             </div> 
             <ToastContainer />          
