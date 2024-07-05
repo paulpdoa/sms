@@ -77,122 +77,121 @@ edit_nationality_code,
 delete_nationality_code} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
+const { allowUserView,allowUserAction } = require('../middleware/middlewares');
+
+const userRoles = ['School Admin', 'Super Admin'];
 
 route.post('/user-login',user_login);
 
 // Role
-route.get('/user-roles', get_roles);
+route.get('/user-roles',allowUserView(userRoles), get_roles);
 route.post('/user-roles', add_roles);
 route.put('/user-role/:id', delete_role);
-route.get('/user-role/:id', get_role_detail);
+route.get('/user-role/:id',allowUserView(userRoles), get_role_detail);
 route.patch('/user-role/:id',edit_role);
 
-
-// require auth for all workout routes
-// route.use(requireAuth)
-
 // Religion
-route.get('/religions',get_religions);
+route.get('/religions',allowUserView(userRoles),get_religions);
 route.post('/religions', add_religion);
 route.delete('/religion/:id', delete_religion);
-route.get('/religion/:id', get_religion_detail);
+route.get('/religion/:id',allowUserView(userRoles), get_religion_detail);
 route.patch('/religion/:id',edit_religion);
 
 // Nationality
-route.get('/nationalities', get_nationalities);
-route.post('/nationalities', add_nationality);
-route.delete('/nationality/:id', delete_nationality);
-route.get('/nationality/:id', get_nationality_detail);
-route.patch('/nationality/:id',edit_nationality);
+route.get('/nationalities',allowUserView(userRoles),get_nationalities);
+route.post('/nationalities',allowUserAction(userRoles), add_nationality);
+route.delete('/nationality/:id',allowUserAction(userRoles), delete_nationality);
+route.get('/nationality/:id',allowUserView(userRoles), get_nationality_detail);
+route.patch('/nationality/:id',allowUserAction(userRoles),edit_nationality);
 
 // Nationality Code
-route.get('/nationality-codes',get_nationality_codes);
+route.get('/nationality-codes',allowUserView(userRoles),get_nationality_codes);
 route.post('/nationality-code',add_nationality_code);
-route.get('/nationality-code/:id',get_nationality_code_detail);
+route.get('/nationality-code/:id',allowUserView(userRoles),get_nationality_code_detail);
 route.patch('/nationality-code/:id',edit_nationality_code);
 route.delete('/nationality-code/:id',delete_nationality_code);
 
 // Gender
-route.get('/genders', get_genders);
+route.get('/genders',allowUserView(userRoles), get_genders);
 route.post('/genders', add_gender);
 route.delete('/gender/:id', delete_gender);
-route.get('/gender/:id', get_gender_detail);
+route.get('/gender/:id',allowUserView(userRoles), get_gender_detail);
 route.patch('/gender/:id',edit_gender);
 
 // Department
-route.get('/departments', get_departments);
+route.get('/departments',allowUserView(userRoles), get_departments);
 route.post('/departments', add_departments);
 route.delete('/department/:id', delete_department);
-route.get('/department/:id', get_department_detail);
+route.get('/department/:id',allowUserView(userRoles), get_department_detail);
 route.patch('/department/:id',edit_department);
 
 // Section
-route.get('/sections', get_sections);
+route.get('/sections',allowUserView(userRoles), get_sections);
 route.post('/sections', add_sections);
 route.put('/section/:id', delete_section);
-route.get('/section/:id', get_section_detail);
+route.get('/section/:id',allowUserView(userRoles), get_section_detail);
 route.patch('/section/:id',edit_section);
 
 // GradeLevel
-route.get('/grade-levels', get_grade_levels);
+route.get('/grade-levels',allowUserView(userRoles), get_grade_levels);
 route.post('/grade-levels', add_grade_levels);
 route.delete('/grade-level/:id', delete_grade_level);
-route.get('/grade-level/:id', get_grade_level_detail);
+route.get('/grade-level/:id',allowUserView(userRoles), get_grade_level_detail);
 route.patch('/grade-level/:id',edit_grade_level);
 
 // Requirement
-route.get('/requirements', get_requirements);
+route.get('/requirements',allowUserView(userRoles), get_requirements);
 route.post('/requirements', add_requirements);
 route.delete('/requirement/:id', delete_requirement);
-route.get('/requirement/:id', get_requirement_detail);
+route.get('/requirement/:id',allowUserView(userRoles), get_requirement_detail);
 route.patch('/requirement/:id',edit_requirement);
 
 // School Year
-route.get('/school-years', get_school_years);
+route.get('/school-years',allowUserView(userRoles), get_school_years);
 route.post('/school-year', add_school_year);
 route.put('/school-year/:id', delete_school_year);
-route.get('/school-year/:id', get_school_year_detail);
+route.get('/school-year/:id',allowUserView(userRoles), get_school_year_detail);
 route.patch('/school-year/:id',edit_school_year);
 
 // User
-route.get('/users', get_users);
+route.get('/users',allowUserView(userRoles), get_users);
 route.post('/user', add_user);
 route.put('/user/:id', delete_user);
-route.get('/user/:id', get_user_detail);
+route.get('/user/:id',allowUserView(userRoles), get_user_detail);
 route.patch('/user/:id',edit_user);
 
 // Payment Term
-route.get('/payment-terms', get_payment_terms);
+route.get('/payment-terms',allowUserView(userRoles), get_payment_terms);
 route.post('/payment-term', add_payment_term);
 route.delete('/payment-term/:id', delete_payment_term);
-route.get('/payment-term/:id', get_payment_term_details);
+route.get('/payment-term/:id',allowUserView(userRoles), get_payment_term_details);
 route.patch('/payment-term/:id',edit_payment_term);
 
 // Fee Category
-route.get('/fee-categories', get_fee_categories);
+route.get('/fee-categories',allowUserView(userRoles), get_fee_categories);
 route.post('/fee-category',add_fee_category);
 route.delete('/fee-category/:id',delete_fee_category);
 route.patch('/fee-category/:id',edit_fee_category);
-route.get('/fee-category/:id',get_fee_category_detail);
+route.get('/fee-category/:id',allowUserView(userRoles),get_fee_category_detail);
 
 // Fee Code
-route.get('/fee-codes',get_fee_codes);
-route.post('/fee-code',add_fee_code);
+route.get('/fee-codes',allowUserView(userRoles),get_fee_codes);
+route.post('/fee-code',allowUserView(userRoles),add_fee_code);
 route.delete('/fee-code/:id',delete_fee_code);
 route.patch('/fee-code/:id',edit_fee_code);
 
 // Parent
 route.get('/parents',get_parents);
 route.get('/parent/:id',get_parent_detail);
-route.get('/student/parent/:id',get_student_parent);
+route.get('/student/parent/:id',allowUserView(userRoles),get_student_parent);
 route.post('/parent',add_parent);
 route.delete('/parent/:id',delete_parent);
 route.patch('/parent/:id',edit_parent);
 
 // Sibling
-route.get('/siblings',get_siblings);
-route.get('/sibling/:id',get_sibling_details);
-route.get('/sibling/student/:id',get_student_sibling);
+route.get('/siblings',allowUserView(userRoles),get_siblings);
+route.get('/sibling/:id',allowUserView(userRoles),get_sibling_details);
+route.get('/sibling/student/:id',allowUserView(userRoles),get_student_sibling);
 route.post('/sibling',add_sibling);
 route.delete('/sibling/:id',delete_sibling);
 route.patch('/sibling/:id',edit_sibling);

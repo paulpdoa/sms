@@ -84,7 +84,7 @@ function App() {
           </Route>
 
           {/* For Super admin */}
-          <Route path='/master' element={role === 'Super Admin' && <MasterLayout />}>
+          <Route path='/master' element={(role === 'Super Admin' || role === 'School Admin') && <MasterLayout />}>
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
             <Route path='nationality' element={<Nationality />} />
