@@ -90,6 +90,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
                                                         onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
                                                         className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
                                                     >
+                                                        <option hidden>{`${record[column.accessorKey] ?? `Select ${record[column.accessorKey]}` }`}</option>
                                                         {column.selectOptions.map(option => (
                                                             <option key={option.value} value={option.value}>
                                                                 {option.label}

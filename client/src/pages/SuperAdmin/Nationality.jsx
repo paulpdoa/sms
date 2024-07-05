@@ -38,24 +38,13 @@ const Nationality = () => {
     const [nationality,setNationality] = useState('');
     const [nationalityCodeId,setNationalityCodeId] = useState('');
 
-    const [updateNationality,setUpdateNationality] = useState(false);
-    const [nationalityId,setNationalityId] = useState('');
-    const [newNationality,setNewNationality] = useState('');
-    const [newNationalityCodeId,setNewNationalityCodeId] = useState('');
-
-    const enableEditNationality = (record ) => {
-        setUpdateNationality(!updateNationality);
-        setNationalityId(record._id);
-        setNewNationality(record.nationality);
-        setNewNationalityCodeId(record.nationalityCode?._id);
-    }
-
     const currentUserId = localStorage.getItem('id');
     const role = localStorage.getItem('role');
 
-    const updateNewNationality = async (id) => {
+    const updateNewNationality = async (id,updatedData) => {
+        
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality,newNationalityCodeId,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -151,12 +140,12 @@ const Nationality = () => {
 
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Nationality</h1>
-                <Searchbar />
+                <Searchbar onSearch={setSearchQuery} />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
                 <form onSubmit={addNationality} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Nationality</h1>
+                    <h1 className="font-semibold text-xl text-green-500">Add New Nati   onality</h1>
 
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="nationality">Nationality</label>
