@@ -124,7 +124,7 @@ const Religion = () => {
                     </form>
                 </div>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable
                         columns={columns}
                         data={recordsWithInputter}

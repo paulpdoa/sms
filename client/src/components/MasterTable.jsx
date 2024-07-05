@@ -59,29 +59,29 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
     return (
         <>
             <div className="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
-                <table className="min-w-full text-white">
-                    <thead className="bg-gray-800">
+                <table className="min-w-full text-gray-200">
+                    <thead className="bg-gray-800 font-light">
                         <tr>
                             {columns.map((column, index) => (
                                 <th
                                     key={index}
-                                    className="py-2 px-4 border-b border-gray-700 cursor-pointer"
+                                    className="py-2 px-4 border-b border-gray-700 cursor-pointer font-semibold text-sm text-left"
                                     onClick={() => handleSort(column.accessorKey)}
                                 >
                                     {column.header}
                                     {sortConfig.key === column.accessorKey ? (
-                                        sortConfig.direction === 'asc' ? ' ▲' : ' ▼'
+                                        sortConfig.direction === 'asc' ? '▲' : '▼'
                                     ) : ''}
                                 </th>
                             ))}
-                            <th className="py-2 px-4 border-b border-gray-700">Action</th>
+                            <th className="py-2 px-4 border-b border-gray-700 font-semibold text-sm text-left">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentRows.map(record => (
                             <tr key={record._id} className="odd:bg-gray-800 even:bg-gray-700">
                                 {columns.map((column, index) => (
-                                    <td key={index} className="py-2 px-4 border-b border-gray-700">
+                                    <td key={index} className="py-2 px-4 border-b border-gray-700 text-sm">
                                         {editId === record._id ? (
                                             column.editable ? (
                                                 column.selectOptions ? (
@@ -116,13 +116,13 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
                                 <td className="py-2 px-4 border-b border-gray-700 flex space-x-2">
                                     {editId === record._id ? (
                                         <>
-                                            <button onClick={() => handleSaveClick(record._id)} className="text-green-400 hover:underline">Save</button>
-                                            <button onClick={() => setEditId(null)} className="text-red-400 hover:underline">Cancel</button>
+                                            <button onClick={() => handleSaveClick(record._id)} className="text-sm text-green-400 hover:underline">Save</button>
+                                            <button onClick={() => setEditId(null)} className="text-sm text-red-400 hover:underline">Cancel</button>
                                         </>
                                     ) : (
                                         <>
-                                            <button onClick={() => handleEditClick(record)} className="text-blue-400 hover:underline">Edit</button>
-                                            <button onClick={() => onDelete(record._id)} className="text-red-400 hover:underline">Delete</button>
+                                            <button onClick={() => handleEditClick(record)} className="text-sm text-blue-400 hover:underline">Edit</button>
+                                            <button onClick={() => onDelete(record._id)} className="text-sm text-red-400 hover:underline">Delete</button>
                                         </>
                                     )}
                                 </td>

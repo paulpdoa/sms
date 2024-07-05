@@ -12,29 +12,20 @@ import MasterTable from "../../components/MasterTable";
 const Gender = () => {
 
     const columns = [
-        { accessorKey: 'gender', header: 'Gender' },
-        { accessorKey: 'inputter.username' ,header: 'Inputter' },
-        { accessorKey: 'action', header: 'Action' }
+        { accessorKey: 'gender', header: 'Gender',editable: true },
+        { accessorKey: 'inputter' ,header: 'Inputter' }
     ]
 
     const { records, isLoading } = useFetch(`${baseUrl()}/genders`);
     const [gender,setGender] = useState('');
-    
-    const [updateGender,setUpdateGender] = useState(false);
-    const [genderId,setGenderId] = useState('');
-    const [newGender,setNewGender] = useState('');
-
-    const enableEditGender = (record) => {
-        setUpdateGender(!updateGender);
-        setGenderId(record._id);
-        setNewGender(record.gender)
-    }
+    const [searchQuery,setSearchQuery] = useState('');
 
     const currentUserId = localStorage.getItem('id');
+    const role = localStorage.getItem('role');
 
-    const updateNewGender = async (id) => {
+    const updateNewGender = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender:updatedData.gender,currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -113,12 +104,17 @@ const Gender = () => {
         }
     }
 
+    const recordsWithInputter = records.map(record => ({
+        ...record,
+        inputter: record.inputter?.username,
+    }));
+
     return (
         <main className="p-2">
             <DateTime />
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Gender</h1>
-                <Searchbar onSearch/>
+                <Searchbar onSearch={setSearchQuery}/>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
@@ -133,12 +129,13 @@ const Gender = () => {
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <MasterTable 
-                        columns={columns} 
-                        records={records}
-                        updateTrigger={updateGender}
-                        recordId={genderId}
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                    <MasterTable
+                        columns={columns}
+                        data={recordsWithInputter}
+                        searchQuery={searchQuery}
+                        onUpdate={updateNewGender}
+                        onDelete={deleteGender}
                     />
                 </div>    
             </div> 

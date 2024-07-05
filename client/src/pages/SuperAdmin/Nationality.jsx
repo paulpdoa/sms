@@ -145,7 +145,7 @@ const Nationality = () => {
 
             <div className="grid grid-cols-3 gap-2 mt-5">
                 <form onSubmit={addNationality} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Nati   onality</h1>
+                    <h1 className="font-semibold text-xl text-green-500">Add New Nationality</h1>
 
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="nationality">Nationality</label>
@@ -165,7 +165,7 @@ const Nationality = () => {
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable
                         columns={columns}
                         data={recordsWithInputter}
