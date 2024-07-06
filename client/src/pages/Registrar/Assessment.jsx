@@ -8,7 +8,7 @@ import AssessmentTable from '../../components/assessment/AssessmentTable';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import PaymentTerm from '../../components/assessment/PaymentTerm';
-import TextBooks from '../../components/assessment/TextBooks';
+import AssessTextbooks from '../../components/assessment/AssessTextbooks';
 import Assistance from '../../components/assessment/Assistance';
 
 const Assessment = () => {
@@ -130,7 +130,7 @@ const Assessment = () => {
                     {enableView && currStudRec?._id ? (
                         <>
                             {currentPage === 'Total Fees' && <TotalFees record={currStudRec}/> }
-                            {currentPage === 'Textbooks' && <TextBooks record={currStudRec}/> }
+                            {currentPage === 'Textbooks' && <AssessTextbooks record={currStudRec}/> }
                             {currentPage === 'Payment Term' && <PaymentTerm record={currStudRec} /> }
                             {currentPage === 'Assistance' && <Assistance record={currStudRec} /> }
                         </>
