@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
     const [editId, setEditId] = useState(null);
@@ -7,18 +7,38 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+    useEffect(() => {
+        if (editId) {
+            const recordToEdit = data.find(record => record._id === editId);
+            console.log('Editing record:', recordToEdit); // Debugging line
+            setEditValues(recordToEdit || {});
+        }
+    }, [editId, data]);
+
     const handleEditClick = (record) => {
         setEditId(record._id);
-        setEditValues(record);
     };
 
     const handleSaveClick = (id) => {
-        onUpdate(id, editValues);
+        const updatedValues = columns.reduce((acc, column) => {
+            const keys = column.accessorKey.split('.');
+            if (keys.length > 1) {
+                acc[keys[0]] = {
+                    ...editValues[keys[0]],
+                    [keys[1]]: editValues[column.accessorKey] !== undefined ? editValues[column.accessorKey] : data.find(record => record._id === id)[column.accessorKey.split('.')[0]][column.accessorKey.split('.')[1]]
+                };
+            } else {
+                acc[column.accessorKey] = editValues[column.accessorKey] !== undefined ? editValues[column.accessorKey] : data.find(record => record._id === id)[column.accessorKey];
+            }
+            return acc;
+        }, {});
+        onUpdate(id, updatedValues);
         setEditId(null);
     };
 
     const handleInputChange = (key, value) => {
-        setEditValues({ ...editValues, [key]: value });
+        console.log(key, value);
+        setEditValues(prevValues => ({ ...prevValues, [key]: value }));
     };
 
     const handleSort = (key) => {
@@ -46,7 +66,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
 
     const filteredData = sortedData.filter(record => {
         return columns.some(column => {
-            const value = record[column.accessorKey];
+            const value = column.accessorKey.split('.').reduce((acc, key) => acc[key], record);
             return value && value.toString().toLowerCase().includes(searchQuery.toLowerCase());
         });
     });
@@ -80,17 +100,21 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
                     <tbody>
                         {currentRows.map(record => (
                             <tr key={record._id} className="odd:bg-gray-800 even:bg-gray-700">
-                                {columns.map((column, index) => (
-                                    <td key={index} className="py-2 px-4 border-b border-gray-700 text-sm">
-                                        {editId === record._id ? (
-                                            column.editable ? (
+                                {columns.map((column, index) => {
+                                    const value = column.accessorKey.split('.').reduce((acc, key) => acc[key], record);
+                                    const isEditing = editId === record._id;
+                                    const isEditable = column.editable;
+
+                                    return (
+                                        <td key={index} className="py-2 px-4 border-b border-gray-700 text-sm">
+                                            {isEditing && isEditable ? (
                                                 column.selectOptions ? (
                                                     <select
-                                                        value={editValues[column.accessorKey]}
+                                                        value={editValues[column.accessorKey] || ''}
                                                         onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
                                                         className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
                                                     >
-                                                        <option hidden>{`${record[column.accessorKey] ?? `Select ${record[column.accessorKey]}` }`}</option>
+                                                        <option value={editValues[column.accessorKey] || ''} disabled>{`Select ${column.header}`}</option>
                                                         {column.selectOptions.map(option => (
                                                             <option key={option.value} value={option.value}>
                                                                 {option.label}
@@ -100,19 +124,18 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
                                                 ) : (
                                                     <input
                                                         type="text"
-                                                        value={editValues[column.accessorKey]}
+                                                        value={editValues[column.accessorKey] || ''}
                                                         onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
                                                         className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
                                                     />
                                                 )
                                             ) : (
-                                                record[column.accessorKey]
-                                            )
-                                        ) : (
-                                            record[column.accessorKey]
-                                        )}
-                                    </td>
-                                ))}
+                                                value
+                                            )}
+                                        </td>
+                                    );
+                                })}
+
                                 <td className="py-2 px-4 border-b border-gray-700 flex space-x-2">
                                     {editId === record._id ? (
                                         <>

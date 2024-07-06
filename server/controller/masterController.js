@@ -389,6 +389,7 @@ module.exports.get_section_detail = async (req,res) => {
 
 module.exports.edit_section = async (req,res) => {
     const { id } = req.params;
+    console.log(req.body);
 
     const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser } = req.body;
    
@@ -398,7 +399,7 @@ module.exports.edit_section = async (req,res) => {
             const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser });
             res.status(200).json({ mssg: `${newSection.section} has been changed to ${section} successfully!` });
         // } else {
-            // res.status(400).json({ mssg: `Cannot update ${section}, still the same with old value` })
+        //     res.status(400).json({ mssg: `Cannot update ${section}, still the same with old value` })
         // }
         
     } catch(err) {

@@ -25,7 +25,7 @@ const Gender = () => {
 
     const updateNewGender = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender:updatedData.gender,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender:updatedData.gender,currentUserId,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -61,7 +61,7 @@ const Gender = () => {
 
     const deleteGender = async (id) => {
         try {
-            const removeGender = await axios.delete(`${baseUrl()}/gender/${id}`);
+            const removeGender = await axios.delete(`${baseUrl()}/gender/${id}`,{ data: { role } });
             toast.success(removeGender.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -84,7 +84,7 @@ const Gender = () => {
     const addGender = async (e) => {
         e.preventDefault();
         try {
-            const newGender = await axios.post(`${baseUrl()}/genders`,{ gender,inputter: currentUserId });
+            const newGender = await axios.post(`${baseUrl()}/genders`,{ gender,inputter: currentUserId, role });
             toast.success(newGender.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

@@ -27,6 +27,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [completedClearance, setCompletedClearance] = useState(id?.completedClearance);
     const [isRegistered,setIsRegistered] = useState(id?.isRegistered);
 
+
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
@@ -56,6 +57,8 @@ const StudentInfoPopup = ({ id, closeModal }) => {
             session,
             isRegistered
         }
+
+        
 
         try {
             const data = await axios.patch(`${baseUrl()}/student/${id?._id}`,studentInfo);

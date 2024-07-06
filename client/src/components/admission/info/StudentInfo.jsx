@@ -7,7 +7,6 @@ const StudentInfo = ({ id }) => {
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
     const [studentAssistance,setStudentAssistance] = useState(false);
-    const [closeModal,setCloseModal] = useState(false);
 
     if (student.isAdmitted) {
         return (
