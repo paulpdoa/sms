@@ -3,14 +3,13 @@ import React, { useState, useEffect } from 'react';
 const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+    const [rowsPerPage] = useState(10); // Set the number of rows per page
 
     useEffect(() => {
         if (editId) {
             const recordToEdit = data.find(record => record._id === editId);
-            console.log('Editing record:', recordToEdit); // Debugging line
             setEditValues(recordToEdit || {});
         }
     }, [editId, data]);
@@ -22,157 +21,182 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
     const handleSaveClick = (id) => {
         const updatedValues = columns.reduce((acc, column) => {
             const keys = column.accessorKey.split('.');
+            
             if (keys.length > 1) {
                 acc[keys[0]] = {
                     ...editValues[keys[0]],
-                    [keys[1]]: editValues[column.accessorKey] !== undefined ? editValues[column.accessorKey] : data.find(record => record._id === id)[column.accessorKey.split('.')[0]][column.accessorKey.split('.')[1]]
+                    [keys[1]]: editValues[column.accessorKey] !== undefined ? editValues[column.accessorKey] : data.find(record => record._id === id)[keys[0]][keys[1]]
                 };
             } else {
                 acc[column.accessorKey] = editValues[column.accessorKey] !== undefined ? editValues[column.accessorKey] : data.find(record => record._id === id)[column.accessorKey];
             }
             return acc;
         }, {});
+    
+        // Fixing the nested id update issue
+        if (editValues['gradeLevel.gradeLevel']) {
+            updatedValues.gradeLevel = { _id: editValues['gradeLevel.gradeLevel'] };
+        }
+        if (editValues['adviser.name']) {
+            updatedValues.adviser = { _id: editValues['adviser.name'] };
+        }
+    
         onUpdate(id, updatedValues);
         setEditId(null);
     };
 
-    const handleInputChange = (key, value) => {
-        console.log(key, value);
-        setEditValues(prevValues => ({ ...prevValues, [key]: value }));
+    const handleCancelClick = () => {
+        setEditId(null);
     };
 
-    const handleSort = (key) => {
+    const handleDeleteClick = (id) => {
+        onDelete(id);
+    };
+
+    const handleInputChange = (e, column) => {
+        const { name, value } = e.target;
+        setEditValues(prevValues => ({
+            ...prevValues,
+            [name]: value
+        }));
+    };
+
+    const handleSort = (column) => {
         let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+        if (sortConfig.key === column.accessorKey && sortConfig.direction === 'asc') {
             direction = 'desc';
         }
-        setSortConfig({ key, direction });
+        setSortConfig({ key: column.accessorKey, direction });
     };
 
-    const sortedData = [...data].sort((a, b) => {
-        if (sortConfig.key) {
-            const aValue = a[sortConfig.key];
-            const bValue = b[sortConfig.key];
-            if (aValue < bValue) {
-                return sortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (aValue > bValue) {
-                return sortConfig.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-        }
-        return 0;
-    });
+    const sortedData = () => {
+        if (!sortConfig.key) return data;
 
-    const filteredData = sortedData.filter(record => {
-        return columns.some(column => {
-            const value = column.accessorKey.split('.').reduce((acc, key) => acc[key], record);
-            return value && value.toString().toLowerCase().includes(searchQuery.toLowerCase());
+        return [...data].sort((a, b) => {
+            const aValue = sortConfig.key.split('.').reduce((obj, key) => obj[key], a);
+            const bValue = sortConfig.key.split('.').reduce((obj, key) => obj[key], b);
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
         });
-    });
+    };
+
+    const filteredData = sortedData().filter(record =>
+        columns.some(column =>
+            (column.accessorKey.split('.').reduce((obj, key) => obj[key], record) || '').toString().toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
 
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
     return (
         <>
-            <div className="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
-                <table className="min-w-full text-gray-200">
-                    <thead className="bg-gray-800 font-light">
-                        <tr>
-                            {columns.map((column, index) => (
-                                <th
-                                    key={index}
-                                    className="py-2 px-4 border-b border-gray-700 cursor-pointer font-semibold text-sm text-left"
-                                    onClick={() => handleSort(column.accessorKey)}
-                                >
-                                    {column.header}
-                                    {sortConfig.key === column.accessorKey ? (
-                                        sortConfig.direction === 'asc' ? '▲' : '▼'
-                                    ) : ''}
-                                </th>
-                            ))}
-                            <th className="py-2 px-4 border-b border-gray-700 font-semibold text-sm text-left">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentRows.map(record => (
-                            <tr key={record._id} className="odd:bg-gray-800 even:bg-gray-700">
-                                {columns.map((column, index) => {
-                                    const value = column.accessorKey.split('.').reduce((acc, key) => acc[key], record);
-                                    const isEditing = editId === record._id;
-                                    const isEditable = column.editable;
-
-                                    return (
-                                        <td key={index} className="py-2 px-4 border-b border-gray-700 text-sm">
-                                            {isEditing && isEditable ? (
-                                                column.selectOptions ? (
-                                                    <select
-                                                        value={editValues[column.accessorKey] || ''}
-                                                        onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
-                                                        className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
-                                                    >
-                                                        <option value={editValues[column.accessorKey] || ''} disabled>{`Select ${column.header}`}</option>
-                                                        {column.selectOptions.map(option => (
-                                                            <option key={option.value} value={option.value}>
-                                                                {option.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                ) : (
-                                                    <input
-                                                        type="text"
-                                                        value={editValues[column.accessorKey] || ''}
-                                                        onChange={(e) => handleInputChange(column.accessorKey, e.target.value)}
-                                                        className="w-full px-2 py-1 border border-gray-600 rounded bg-gray-800 text-white"
-                                                    />
-                                                )
-                                            ) : (
-                                                value
-                                            )}
-                                        </td>
-                                    );
-                                })}
-
-                                <td className="py-2 px-4 border-b border-gray-700 flex space-x-2">
+        <div className="text-gray-200 overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-600">
+                <thead className="bg-gray-700">
+                    <tr>
+                        {columns.map(column => (
+                            <th
+                                key={column.accessorKey}
+                                onClick={() => handleSort(column)}
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                            >
+                                {column.header}
+                                {sortConfig.key === column.accessorKey ? (
+                                    sortConfig.direction === 'asc' ? ' ▲' : ' ▼'
+                                ) : null}
+                            </th>
+                        ))}
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-gray-700 divide-y divide-gray-600">
+                    {currentRows.map((record) => (
+                        <tr key={record._id}>
+                            {columns.map(column => (
+                                <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
                                     {editId === record._id ? (
-                                        <>
-                                            <button onClick={() => handleSaveClick(record._id)} className="text-sm text-green-400 hover:underline">Save</button>
-                                            <button onClick={() => setEditId(null)} className="text-sm text-red-400 hover:underline">Cancel</button>
-                                        </>
+                                        column.editable ? (
+                                            column.selectOptions ? (
+                                                <select
+                                                    name={column.accessorKey}
+                                                    value={editValues[column.accessorKey] || ''}
+                                                    onChange={(e) => handleInputChange(e, column)}
+                                                    className="outline-none p-1 rounded-md border border-gray-500 bg-gray-800 text-gray-200"
+                                                >
+                                                    <option hidden>{column.header}</option>
+                                                    {column.selectOptions.map(option => (
+                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    name={column.accessorKey}
+                                                    value={editValues[column.accessorKey] || ''}
+                                                    onChange={(e) => handleInputChange(e, column)}
+                                                    className="outline-none p-1 rounded-md border border-gray-500 bg-gray-800 text-gray-200"
+                                                />
+                                            )
+                                        ) : (
+                                            column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
+                                        )
                                     ) : (
-                                        <>
-                                            <button onClick={() => handleEditClick(record)} className="text-sm text-blue-400 hover:underline">Edit</button>
-                                            <button onClick={() => onDelete(record._id)} className="text-sm text-red-400 hover:underline">Delete</button>
-                                        </>
+                                        column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
                                     )}
                                 </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="flex justify-center text-sm items-center mt-4 gap-4">
-                <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-700 rounded disabled:opacity-50"
-                >
-                    Previous
-                </button>
-                <div>
-                    <span>Page {currentPage} of {totalPages}</span>
-                </div>
-                <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 bg-gray-700 rounded ml-2 disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
+                            ))}
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                {editId === record._id ? (
+                                    <>
+                                        <button onClick={() => handleSaveClick(record._id)} className="text-green-400 hover:text-green-500">Save</button>
+                                        <button onClick={handleCancelClick} className="text-red-400 hover:text-red-500 ml-2">Cancel</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button onClick={() => handleEditClick(record)} className="text-blue-400 hover:text-blue-500">Edit</button>
+                                        <button onClick={() => handleDeleteClick(record._id)} className="text-red-400 hover:text-red-500 ml-2">Delete</button>
+                                    </>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            
+        </div>
+        <div className="pagination mt-4 flex justify-center items-center">
+            <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md focus:outline-none bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+            >
+                Previous
+            </button>
+            <ul className="flex mx-4">
+                {Array.from({ length: totalPages }, (_, index) => (
+                    <li key={index + 1} className="mx-1">
+                        <button
+                            onClick={() => paginate(index + 1)}
+                            className={`px-3 py-1 focus:outline-none ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}`}
+                        >
+                            {index + 1}
+                        </button>
+                    </li>
+                ))}
+            </ul>
+            <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md focus:outline-none bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+            >
+                Next
+            </button>
+        </div>
         </>
     );
 };

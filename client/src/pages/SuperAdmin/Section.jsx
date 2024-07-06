@@ -9,18 +9,16 @@ import axios from "axios";
 import { useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 
-
 const Section = () => {
-
     const { records, isLoading } = useFetch(`${baseUrl()}/sections`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
 
-    const [section,setSection] = useState('');
-    const [gradeLevel,setGradeLevel] = useState('');
-    const [adviser,setAdviser] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
-    // const [department,setDepartment] = useState('');
+    const [section, setSection] = useState('');
+    const [gradeLevel, setGradeLevel] = useState('');
+    const [adviser, setAdviser] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    // const [department, setDepartment] = useState('');
 
     const role = localStorage.getItem('role');
 
@@ -31,13 +29,13 @@ const Section = () => {
             editable: true
         },
         {
-            accessorKey: 'gradeLevel.gradeLevel',
+            accessorKey: 'gradeLevel.gradeLevel', // Update this line
             header: 'Grade Level',
             editable: true,
             selectOptions: gradeLevels.map(gl => ({ value: gl._id, label: gl.gradeLevel })),
         },
         {
-            accessorKey: 'adviser.name',
+            accessorKey: 'adviser.name', // Update this line
             header: 'Adviser',
             editable: true,
             selectOptions: teachers.map(teacher => ({ value: teacher._id, label: `${teacher.firstName} ${teacher.lastName}` })),
@@ -47,12 +45,16 @@ const Section = () => {
             header: 'Department'
         },
     ];
-    
 
-    const updateNewSection = async (id,updatedData) => {
-        console.log(updatedData);
+    const updateNewSection = async (id, updatedData) => {
+        
         try {
-            const newData = await axios.patch(`${baseUrl()}/section/${id}`,{ newSection: updatedData.section,newGradeLevel:updatedData.gradeLevel._id,newAdviser: updatedData.adviser._id,role });
+            const newData = await axios.patch(`${baseUrl()}/section/${id}`, {
+                newSection: updatedData.section,
+                newGradeLevel: updatedData.gradeLevel._id,
+                newAdviser: updatedData.adviser._id,
+                role
+            });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -66,25 +68,24 @@ const Section = () => {
 
             setTimeout(() => {
                 window.location.reload();
-            },2000)
-        } catch(err) {
-            console.log(err);
-            // toast.error(err.response.data.mssg, {
-            //     position: "top-center",
-            //     autoClose: 1000,
-            //     hideProgressBar: false,
-            //     closeOnClick: true,
-            //     pauseOnHover: true,
-            //     draggable: true,
-            //     progress: undefined,
-            //     theme: "light"
-            // });
+            }, 2000)
+        } catch (err) {
+            toast.error('Error has occurred while updating section record', {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            });
         }
     }
 
     const deleteSection = async (id) => {
         try {
-            const removeSection = await axios.put(`${baseUrl()}/section/${id}`,{ data: { role } });
+            const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { data: { role } });
             toast.success(removeSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -98,17 +99,17 @@ const Section = () => {
 
             setTimeout(() => {
                 window.location.reload();
-            },2000)
-        } catch(err) {
+            }, 2000)
+        } catch (err) {
             console.log(err);
         }
     }
 
     const addSection = async (e) => {
         e.preventDefault();
-       
+
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`,{ section,gradeLevel,adviser,role });
+            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -122,8 +123,8 @@ const Section = () => {
 
             setTimeout(() => {
                 window.location.reload();
-            },2000)
-        } catch(err) {
+            }, 2000)
+        } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -149,6 +150,7 @@ const Section = () => {
         },
         department: record?.gradeLevel?.department?.department
     }));
+
     return (
         <main className="p-2">
             <DateTime />
@@ -170,11 +172,11 @@ const Section = () => {
                         <select className="outline-none p-1 rounded-md border border-gray-300"
                             onChange={(e) => setGradeLevel(e.target.value)}
                             required
-                            >
+                        >
                             <option hidden>Grade Level</option>
-                            { gradeLevels?.map(gradeLevel => (
+                            {gradeLevels?.map(gradeLevel => (
                                 <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
-                            )) }
+                            ))}
                         </select>
                     </div>
                     <div className="flex flex-col mt-1">
@@ -182,17 +184,17 @@ const Section = () => {
                         <select className="outline-none p-1 rounded-md border border-gray-300"
                             onChange={(e) => setAdviser(e.target.value)}
                             required
-                            >
+                        >
                             <option hidden>Select adviser</option>
-                            { teachers?.map(teacher => (
+                            {teachers?.map(teacher => (
                                 <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
-                            )) }
+                            ))}
                         </select>
                     </div>
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                <div className="relative col-span-2  h-fit">
                     <MasterTable
                         columns={columns}
                         data={recordsWithoutInputter}
@@ -201,8 +203,8 @@ const Section = () => {
                         onDelete={deleteSection}
                     />
                 </div>
-            </div> 
-            <ToastContainer />          
+            </div>
+            <ToastContainer />
         </main>
     )
 }
