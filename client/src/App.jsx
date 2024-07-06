@@ -46,13 +46,12 @@ import EditTeacher from "./pages/Registrar/EditTeacher";
 import EditParent from "./pages/Registrar/EditParent";
 import Discount from "./pages/Discount";
 import Assessment from './pages/Registrar/Assessment'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Sectioning from "./pages/Registrar/Sectioning";
 import ManageFees from "./pages/Registrar/ManageFees";
 import NewManageFee from "./pages/Registrar/NewManageFee";
 import NationalityCode from "./pages/SuperAdmin/NationalityCode";
 import EditManageFee from "./pages/Registrar/EditManagedFee";
+import EditUser from "./components/master data/EditUser";
 
 function App() {
 
@@ -83,6 +82,7 @@ function App() {
             <Route path='edit-manage-fee/:id' element={<EditManageFee />} />
           </Route>
 
+          <Route path='/edit-user/:id' element={<EditUser />} />
           {/* For Super admin */}
           <Route path='/master' element={(role === 'Super Admin' || role === 'School Admin') && <MasterLayout />}>
             <Route path='dashboard' element={<Dashboard />} />

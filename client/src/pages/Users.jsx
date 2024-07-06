@@ -1,35 +1,13 @@
 import DateTime from "../components/DateTime";
 import Searchbar from "../components/Searchbar";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
 import { useState } from 'react';
-
-const columns = [
-    {
-        accessorKey: 'fullName',
-        header: 'Full Name',
-    },
-    {
-        accessorKey: 'username',
-        header: 'Username',
-    },
-    {
-        accessorKey: 'role',
-        header: 'Role',
-    },
-    {
-        accessorKey: 'isActive',
-        header: 'Active',
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
+import MasterTable from "../components/MasterTable";
 
 const Users = () => {
 
@@ -43,10 +21,35 @@ const Users = () => {
     const [username,setUsername] = useState('');
     const [password,setPassword] = useState('');
     const [confirmPassword,setConfirmPassword] = useState('');
+    const navigate = useNavigate();
+
+    const [searchQuery,setSearchQuery] = useState('');
+
+    const userRole = localStorage.getItem('role');
+
+    
+    const columns = [
+        {
+            accessorKey: 'fullName',
+            header: 'Full Name'
+        },
+        {
+            accessorKey: 'username',
+            header: 'Username',
+        },
+        {
+            accessorKey: 'role.userRole',
+            header: 'Role',
+        },
+        {
+            accessorKey: 'isActive',
+            header: 'Active',
+        },
+    ]
 
     const deleteUser = async (id) => {
         try {
-            const removeUser = await axios.put(`${baseUrl()}/user/${id}`);
+            const removeUser = await axios.put(`${baseUrl()}/user/${id}`,{ data: { role: userRole } });
             toast.success(removeUser.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -69,7 +72,7 @@ const Users = () => {
     const addUser = async (e) => {
         e.preventDefault();
         try {
-            const newUser = await axios.post(`${baseUrl()}/user`,{ firstName,middleName,lastName,username,role,password,confirmPassword });
+            const newUser = await axios.post(`${baseUrl()}/user`,{ firstName,middleName,lastName,username,role,password,confirmPassword,userRole });
             localStorage.setItem('user',newUser.data.token);
             toast.success(newUser.data.mssg, {
                 position: "top-center",
@@ -99,13 +102,21 @@ const Users = () => {
         }
     }
 
+    const recordsWithoutInputter = records?.filter(record => record.isActive).map(record => ({
+        ...record,
+        fullName: record?.firstName + ' ' + record?.lastName,
+        inputter: record?.inputter?.username,
+        isActive: record?.isActive ? 'Yes' : 'No'
+    }));
+
+    const goToEdit = (id) => navigate(`/edit-user/${id}`)
+
     return (
         <main className="p-2">
             <DateTime />
             <div className="flex justify-between mx-4 my-2  items-center">
                 <h1 className="text-xl text-green-500 font-bold">User</h1>
-                <Searchbar />
-                {/* <AddReligionBtn /> */}
+                <Searchbar onSearch={setSearchQuery} />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
@@ -148,45 +159,18 @@ const Users = () => {
                         <input className="outline-none p-1 rounded-md border border-gray-300" type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
                     </div>
 
-                    
-
+                
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                { columns?.map((column,key) => (
-                                    <th key={key} scope="col" className="px-6 py-3">
-                                        { column.header }
-                                    </th>
-                                )) }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        { record.firstName } { record.middleName } { record.lastName } 
-                                    </th>
-                                    <td className="px-6 py-4 gap-2">
-                                        { record.username }
-                                    </td>
-                                    <td className="px-6 py-4 gap-2">
-                                        { record.role?.userRole }
-                                    </td>
-                                    <td className="px-6 py-4 gap-2">
-                                        { record.isActive ? 'Yes' : 'No' }
-                                    </td>
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        <Link to={`/master/edit-user/${record._id}`} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
-                                        <button onClick={() => deleteUser(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                                    </td>
-                                </tr>
-                            )) }
-                        </tbody>
-                    </table>
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                    <MasterTable 
+                        columns={columns}
+                        data={recordsWithoutInputter}
+                        searchQuery={searchQuery}
+                        onDelete={deleteUser}
+                        goToEdit={goToEdit}
+                    />
                 </div>    
             </div> 
             <ToastContainer />          

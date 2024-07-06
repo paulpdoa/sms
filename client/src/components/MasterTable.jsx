@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -158,7 +158,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <button onClick={() => handleEditClick(record)} className="text-blue-400 hover:text-blue-500">Edit</button>
+                                        <button onClick={() => onUpdate ? handleEditClick(record) : goToEdit(record._id)} className="text-blue-400 hover:text-blue-500">Edit</button>
                                         <button onClick={() => handleDeleteClick(record._id)} className="text-red-400 hover:text-red-500 ml-2">Delete</button>
                                     </>
                                 )}

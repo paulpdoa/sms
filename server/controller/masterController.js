@@ -722,7 +722,7 @@ module.exports.get_user_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const userFind = await User.findById(id);
+        const userFind = await User.findById(id).populate('role');
         res.status(200).json(userFind);
     } catch(err) {
         console.log(err);
@@ -731,13 +731,21 @@ module.exports.get_user_detail = async (req,res) => {
 
 module.exports.edit_user = async (req,res) => {
     const { id } = req.params;
+    console.log(req.body);
+    const { firstName, middleName, lastName, userRole: role, username,isActive,password, confirmPassword } = req.body;
 
-    const { newFirstName: firstName, newMiddleName: middleName, newLastName: lastName, newRole: role, newIsActive: isActive } = req.body;
+    // Fix password for updating 
+    
 
     try {   
         const currUser = await User.findById(id);
+
+        if(password === '' && confirmPassword === '') {
+            
+        }
+
         if(currUser.firstName !== firstName || currUser.middleName !== middleName || currUser.lastName !== lastName || currUser.role !== role || currUser.isActive !== isActive) {
-            const newUser = await User.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,role,isActive });
+            const newUser = await User.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,role,username,isActive });
             res.status(200).json({ mssg: `${newUser.firstName} has been edited successfully!` });
         } else {
             res.status(400).json({ mssg: `Cannot update ${firstName}'s record, still the same with old value` })
