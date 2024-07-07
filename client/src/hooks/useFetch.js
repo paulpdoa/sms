@@ -6,6 +6,7 @@ export const useFetch = (url) => {
 
    const [records,setRecords] = useState([]);
    const [isLoading,setIsLoading] = useState(false);
+   const [error,setError] = useState('');
 
    const userToken = localStorage.getItem('userToken');
    const role = localStorage.getItem('role');
@@ -22,16 +23,18 @@ export const useFetch = (url) => {
       const fetchData = async () => {
          setIsLoading(true);
          try {
-            const { data } = await axios.get(url, {
+            const data  = await axios.get(url, {
                params: { role },
                signal,
                headers
             });
+            if (!data.statusText === 'OK') throw new Error('Network response not ok');
             setIsLoading(false);
-            setRecords(data);
+            setRecords(data.data);
          } catch(err) {
             const data = err.response?.data;
             console.log(data);
+            setError(data.mssg);
             navigate(data.redirect);
          }
       }
