@@ -38,9 +38,10 @@ const Requirements = () => {
     const role = localStorage.getItem('role');
 
     const updateNewRequirement = async (id,updatedData) => {
+        let isRequired = updatedData.isRequired === 'Yes' ? true : false;
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/requirement/${id}`,{ newRequirement:updatedData.requirement,newIsRequired:updatedData.isRequired,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/requirement/${id}`,{ newRequirement:updatedData.requirement,newIsRequired:isRequired,currentUserId,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

@@ -40,6 +40,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
         if (editValues['adviser.name']) {
             updatedValues.adviser = { _id: editValues['adviser.name'] };
         }
+
     
         onUpdate(id, updatedValues);
         setEditId(null);
@@ -100,9 +101,9 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
             <table className="min-w-full divide-y divide-gray-600">
                 <thead className="bg-gray-700">
                     <tr>
-                        {columns.map(column => (
+                        {columns.map((column,key) => (
                             <th
-                                key={column.accessorKey}
+                                key={key}
                                 onClick={() => handleSort(column)}
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
                             >
@@ -140,6 +141,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
                                                     value={editValues[column.accessorKey] || ''}
                                                     onChange={(e) => handleInputChange(e, column)}
                                                     className="outline-none p-1 rounded-md border border-gray-500 bg-gray-800 text-gray-200"
+                                                    type={column.type || ''}
                                                 />
                                             )
                                         ) : (

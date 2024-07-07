@@ -1,61 +1,32 @@
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useState } from 'react';
-
-const columns = [
-    {
-        accessorKey: 'startYear',
-        header: 'Start Year',
-    },
-    {
-        accessorKey: 'endYear',
-        header: 'End Year',
-    },
-    {
-        accessorKey: 'schoolTheme',
-        header: 'School Theme',
-    },
-    {
-        header: 'Status'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
+import MasterTable from "../../components/MasterTable";
 
 const SchoolYear = () => {
 
-    const { records, isLoading } = useFetch(`${baseUrl()}/school-years`);
+    const { records } = useFetch(`${baseUrl()}/school-years`);
     const [yearStart,setYearStart] = useState('');
     const [yearEnd,setYearEnd] = useState('');
     const [syTheme,setSyTheme] = useState('');
+    const [searchQuery,setSearchQuery] = useState('');
 
-    const [updateSchoolYear,setUpdateSchoolYear] = useState(false);
-    const [schoolYearId,setSchoolYearId] = useState('');
-    const [newStartYear,setNewStartYear] = useState('');
-    const [newEndYear,setNewEndYear] = useState('');
-    const [newSchoolTheme,setNewSchoolTheme] = useState('');
-    const [isYearDone,setIsYearDone] = useState();
+    const columns = [
+        { accessorKey: 'startYear', header: 'Start Year',editable: true,type: "date" },
+        { accessorKey: 'endYear', header: 'End Year',editable: true,type: "date" },
+        { accessorKey: 'schoolTheme', header: 'School Theme',editable: true, type: "text" },
+        { accessorKey: 'isYearDone' ,header: 'Status',editable: true, selectOptions: ['Yes','No'].map(isReq => ({ value: `${isReq === 'No' ? true : false }`, label: isReq }))}
+    ]
 
-    const enableEditSchoolYear = (record) => {
-        setUpdateSchoolYear(!updateSchoolYear);
-        setSchoolYearId(record._id);
-        setNewStartYear(record.startYear)
-        setNewEndYear(record.endYear);
-        setNewSchoolTheme(record.schoolTheme);
-        setIsYearDone(record.isYearDone);
-    }
-
-    const updateNewStartYear = async (id) => {
+    const updateNewStartYear = async (id,updatedData) => {
+        let isYearDone = updatedData.isYearDone === 'Done' ? true : false;
         try {
-            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear,newEndYear,newSchoolTheme,isYearDone });
+            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear:updatedData.startYear,newEndYear:updatedData.endYear,newSchoolTheme:updatedData.schoolTheme,isYearDone });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -133,13 +104,18 @@ const SchoolYear = () => {
         }
     }
 
+    const recordsWithoutInputter = records.map(record => ({
+        ...record,
+        isYearDone: record.isYearDone ? 'Done' : 'Ongoing'
+    }));
+
     return (
         <main className="p-2">
             <DateTime />
 
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">School Year</h1>
-                <Searchbar />
+                <Searchbar onSearch={setSearchQuery} />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
@@ -162,74 +138,14 @@ const SchoolYear = () => {
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                { columns?.map((column,key) => (
-                                    <th key={key} scope="col" className="px-6 py-3">
-                                        { column.header }
-                                    </th>
-                                )) }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updateSchoolYear && (schoolYearId === record._id) ?
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="date" value={newStartYear} onChange={(e) => setNewStartYear(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="date" value={newEndYear} onChange={(e) => setNewEndYear(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="text" value={newSchoolTheme} onChange={(e) => setNewSchoolTheme(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <select className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" onChange={(e) => setIsYearDone(e.target.value)}>
-                                                <option hidden>{record.isYearDone ? 'Done' : 'Ongoing'}</option>
-                                                <option value={true}>Done</option>
-                                                <option value={false}>Ongoing</option>
-                                            </select>                                        
-                                        </th>
-                                        </>
-                                        :
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.startYear }
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.endYear }
-                                        </th>
-                                        <td scope="row" className="px-6 py-4 font-medium">
-                                            { record.schoolTheme }
-                                        </td>
-                                        <td scope="row" className="px-6 py-4 font-medium">
-                                            { record.isYearDone ? 'Done' : 'Ongoing' }
-                                        </td>
-                                        </>
-                                    }
-
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        { updateSchoolYear && (schoolYearId === record._id) ? 
-                                        <>
-                                        <button onClick={() => updateNewStartYear(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                                        <button onClick={() => enableEditSchoolYear(!updateSchoolYear)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
-                                        </>
-                                        :
-                                        <>
-                                        <button onClick={() => enableEditSchoolYear(record  )} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                        <button onClick={() => deleteSchoolYear(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                                        </>
-                                        }
-                                        
-                                    </td>
-                                </tr>
-                            )) }
-                        </tbody>
-                    </table>
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                    <MasterTable 
+                        columns={columns}
+                        data={recordsWithoutInputter}
+                        searchQuery={searchQuery}
+                        onDelete={deleteSchoolYear}
+                        onUpdate={updateNewStartYear}
+                    />
                 </div>    
             </div> 
             <ToastContainer />          
