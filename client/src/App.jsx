@@ -52,6 +52,7 @@ import NewManageFee from "./pages/Registrar/NewManageFee";
 import NationalityCode from "./pages/SuperAdmin/NationalityCode";
 import EditManageFee from "./pages/Registrar/EditManagedFee";
 import EditUser from "./components/master data/EditUser";
+import { MainProvider } from "./helpers/MainContext";
 
 function App() {
 
@@ -133,7 +134,11 @@ function App() {
     )
   )
 
-  return <RouterProvider router={router} />
+  return (
+    <MainProvider>
+      <RouterProvider router={router} />
+    </MainProvider>
+  )
 }
 
 export default App

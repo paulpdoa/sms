@@ -5,8 +5,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from "../../helpers/MainContext";
 
 const SchoolYear = () => {
 
@@ -14,7 +15,8 @@ const SchoolYear = () => {
     const [yearStart,setYearStart] = useState('');
     const [yearEnd,setYearEnd] = useState('');
     const [syTheme,setSyTheme] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
+
+    const { role,currentUserId,setSearchQuery,searchQuery } = useContext(MainContext);
 
     const columns = [
         { accessorKey: 'startYear', header: 'Start Year',editable: true,type: "date" },
@@ -26,7 +28,7 @@ const SchoolYear = () => {
     const updateNewStartYear = async (id,updatedData) => {
         let isYearDone = updatedData.isYearDone === 'Done' ? true : false;
         try {
-            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear:updatedData.startYear,newEndYear:updatedData.endYear,newSchoolTheme:updatedData.schoolTheme,isYearDone });
+            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`,{ newStartYear:updatedData.startYear,newEndYear:updatedData.endYear,newSchoolTheme:updatedData.schoolTheme,isYearDone,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -61,7 +63,7 @@ const SchoolYear = () => {
 
     const deleteSchoolYear = async (id) => {
         try {
-            const removeSchoolYear = await axios.put(`${baseUrl()}/school-year/${id}`);
+            const removeSchoolYear = await axios.put(`${baseUrl()}/school-year/${id}`,{ data: { role } });
             toast.success(removeSchoolYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -84,7 +86,7 @@ const SchoolYear = () => {
     const addSchoolYear = async (e) => {
         e.preventDefault();
         try {
-            const newStartYear = await axios.post(`${baseUrl()}/school-year`,{ yearStart,yearEnd,syTheme });
+            const newStartYear = await axios.post(`${baseUrl()}/school-year`,{ yearStart,yearEnd,syTheme,role });
             toast.success(newStartYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

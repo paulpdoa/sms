@@ -41,6 +41,10 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
             updatedValues.adviser = { _id: editValues['adviser.name'] };
         }
 
+        if(editValues['strand.strand']) {
+            updatedValues.strand = { _id: editValues['strand.strand'] }
+        }
+
     
         onUpdate(id, updatedValues);
         setEditId(null);
