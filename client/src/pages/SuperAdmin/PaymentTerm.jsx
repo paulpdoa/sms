@@ -5,30 +5,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
+import MasterTable from '../../components/MasterTable';
+import { MainContext } from "../../helpers/MainContext";
 
-const columns = [
-    {
-        accessorKey: 'terms',
-        header: 'Terms',
-    },
-    {
-        accessorKey: 'payEvery',
-        header: 'Pay Every(months)'
-    },
-    {
-        accessorKey: 'installmentBy',
-        header: 'Installment By'
-    },
-    {
-        accessorKey: 'inputter',
-        header: 'Inputter'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
 
 const PaymentTerm = () => {
 
@@ -37,26 +17,35 @@ const PaymentTerm = () => {
     const [term,setTerm] = useState('');
     const [installmentBy,setInstallmentBy] = useState(0);
     const [payEvery,setPayEvery] = useState(0);
-    
-    const [updatePaymentTerm,setUpdatePaymentTerm] = useState(false);
-    const [paymentTermId,setPaymentTermId] = useState('');
-    const [newTerm,setNewTerm] = useState('');
-    const [newInstallmentBy,setNewInstallmentBy] = useState('');
-    const [newPayEvery,setNewPayEvery] = useState('');
 
-    const enableEditPaymentTerm = (record) => {
-        setUpdatePaymentTerm(!updatePaymentTerm);
-        setPaymentTermId(record._id);
-        setNewTerm(record.term);
-        setNewInstallmentBy(record.installmentBy);
-        setNewPayEvery(record.payEvery);
-    }
+    const columns = [
+        {
+            accessorKey: 'term',
+            header: 'Terms',
+            editable: true
+        },
+        {
+            accessorKey: 'payEvery',
+            header: 'Pay Every(months)',
+            editable: true,
+            selectOptions: [1,3,6,12].map(month => ({ value: month, label: `${month} month/s` }))
+        },
+        {
+            accessorKey: 'installmentBy',
+            header: 'Installment By',
+            editable: true,
+            selectOptions: [1,2,4,10].map(month => ({ value: month, label: `${month} term/s` }))
+        }
+    ]
 
-    const currentUserId = localStorage.getItem('id');
+    const { currentUserId, role, searchQuery, setSearchQuery } = useContext(MainContext);
 
-    const updateNewPaymentTerm = async (id) => {
+
+    const updateNewPaymentTerm = async (id,updatedData) => {
+
+        console.log(updatedData);
         try {
-            const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm,newPayEvery,newInstallmentBy,currentUserId });
+            const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm: updatedData.term,newPayEvery: updatedData.payEvery,newInstallmentBy: updatedData.installmentBy,currentUserId,role });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -92,7 +81,7 @@ const PaymentTerm = () => {
 
     const deletePaymentTerm = async (id) => {
         try {
-            const removePaymentTerm = await axios.delete(`${baseUrl()}/payment-term/${id}`);
+            const removePaymentTerm = await axios.delete(`${baseUrl()}/payment-term/${id}`,{ data: { role } });
             toast.success(removePaymentTerm.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -115,7 +104,7 @@ const PaymentTerm = () => {
     const addPaymentTerm = async (e) => {
         e.preventDefault();
         try {
-            const newPaymentTerm = await axios.post(`${baseUrl()}/payment-term`,{ term,payEvery,installmentBy,inputter: currentUserId });
+            const newPaymentTerm = await axios.post(`${baseUrl()}/payment-term`,{ term,payEvery,installmentBy,inputter: currentUserId,role });
             toast.success(newPaymentTerm.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -135,12 +124,16 @@ const PaymentTerm = () => {
         }
     }
 
+    const recordsWithoutInputter = records.map(record => ({
+        ...record,
+    }));
+
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Payment Terms</h1>
-                <Searchbar />
+                <Searchbar onSearch={setSearchQuery} />
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-5">
@@ -181,69 +174,14 @@ const PaymentTerm = () => {
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
 
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                { columns?.map((column,key) => (
-                                    <th key={key} scope="col" className="px-6 py-3">
-                                        { column.header }
-                                    </th>
-                                )) }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { records?.map(record => (
-                                <tr key={record._id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    { updatePaymentTerm && (paymentTermId === record._id) ?
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <input type="text" value={newTerm} onChange={(e) => setNewTerm(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </th>
-                                        <td scope="row" className="px-6 py-4 font-medium">
-                                            <input type="text" value={newPayEvery} onChange={(e) => setNewPayEvery(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </td>
-                                        <td scope="row" className="px-6 py-4 font-medium">
-                                            <input type="text" value={newInstallmentBy} onChange={(e) => setNewInstallmentBy(e.target.value)} className="outline-none p-1 rounded-md border border-gray-700 bg-gray-900" />
-                                        </td>
-                                        <td scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </td>
-                                        </>  
-                                        :
-                                        <>
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { record.term} 
-                                        </th>     
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.payEvery }
-                                        </th>
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.installmentBy }
-                                        </th>  
-                                        <th scope="row" className="px-6 py-4 font-medium">
-                                            { record.inputter?.username }
-                                        </th>  
-                                        </>
-                                    }
-
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        { updatePaymentTerm && (paymentTermId === record._id) ? 
-                                        <>
-                                        <button onClick={() => updateNewPaymentTerm(record._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Update</button>
-                                        <button onClick={() => enableEditPaymentTerm(!updatePaymentTerm)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Close</button>
-                                        </>
-                                        :
-                                        <>
-                                        <button onClick={() => enableEditPaymentTerm(record)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                                        <button onClick={() => deletePaymentTerm(record._id)} className="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
-                                        </>
-                                        }
-                                    </td>
-                                </tr>
-                            )) }
-                        </tbody>
-                    </table>
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                    <MasterTable 
+                        columns={columns}
+                        onUpdate={updateNewPaymentTerm}
+                        onDelete={deletePaymentTerm}
+                        data={recordsWithoutInputter}
+                        searchQuery={searchQuery}
+                    />
                 </div>    
             </div> 
             <ToastContainer />          

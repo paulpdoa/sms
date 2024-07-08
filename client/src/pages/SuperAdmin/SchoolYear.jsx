@@ -113,7 +113,7 @@ const SchoolYear = () => {
 
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
 
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">School Year</h1>

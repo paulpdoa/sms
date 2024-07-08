@@ -69,7 +69,7 @@ const Students = () => {
 
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex justify-between items-center">
                 <Searchbar onSearch={setSearchQuery} />
                 <AddStudentBtn />

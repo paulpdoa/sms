@@ -10,9 +10,10 @@ const Login = () => {
 
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
-    const [username,setUsername] = useState('');
-    const [password,setPassword] = useState('');
-    const [schoolYear,setSchoolYear] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [schoolYear, setSchoolYear] = useState('');
+    const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
     const navigate = useNavigate();
 
@@ -20,18 +21,18 @@ const Login = () => {
 
         e.preventDefault();
         try {
-            const data = await axios.post(`${baseUrl()}/user-login`,{ username,password,session: schoolYear });
+            const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
             
-            localStorage.setItem('userToken',data.data.token);
-            localStorage.setItem('role',data.data.role);
-            localStorage.setItem('username',data.data.data.username);
-            localStorage.setItem('id',data.data.data._id);
-            localStorage.setItem('session',schoolYear);
+            localStorage.setItem('userToken', data.data.token);
+            localStorage.setItem('role', data.data.role);
+            localStorage.setItem('username', data.data.data.username);
+            localStorage.setItem('id', data.data.data._id);
+            localStorage.setItem('session', schoolYear);
 
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -41,8 +42,8 @@ const Login = () => {
             setTimeout(() => {
                 window.location.reload()
                 navigate(data.data.redirect);
-            },2000)
-        } catch(err) {
+            }, 2000)
+        } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -55,7 +56,7 @@ const Login = () => {
             });
             console.log(err.response.data.mssg);
         }
-    } 
+    }
 
     return (
         <main className="bg-green-300 h-screen flex items-center justify-center">
@@ -76,18 +77,29 @@ const Login = () => {
                     <input onChange={(e) => setUsername(e.target.value)} className="border border-gray-300 outline-none p-2 bg-transparent rounded-md" type="text" />
                 </div>
 
-                <div className="flex flex-col gap-2 my-2">
+                <div className="flex flex-col gap-2 my-2 relative">
                     <span className="text-gray-700">Password</span>
-                    <input onChange={(e) => setPassword(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md" type="password" />
+                    <input
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="border outline-none border-gray-300 p-2 bg-transparent rounded-md"
+                        type={showPassword ? "text" : "password"}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2 top-11 bg-transparent border-none cursor-pointer text-gray-500 text-xs"
+                    >
+                        {(showPassword) ? "Hide" : "Show"}
+                    </button>
                 </div>
 
                 <div className="flex flex-col gap-2 my-2">
                     <span className="text-gray-700">Session</span>
                     <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
                         <option hidden>Select session</option>
-                        { schoolYears?.map(sy => (
+                        {schoolYears?.map(sy => (
                             <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
-                        )) }
+                        ))}
                     </select>
                 </div>
 

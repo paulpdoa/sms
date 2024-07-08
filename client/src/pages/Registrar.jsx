@@ -4,7 +4,7 @@ import DateTime from "../components/DateTime";
 const Registrar = () => {
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex items-center justify-center">
                <Outlet />
             </div>

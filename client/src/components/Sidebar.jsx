@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import { AiFillDashboard } from "react-icons/ai";
 import { PiStudentFill, PiChalkboardTeacherFill } from "react-icons/pi";
 import { RiParentFill, RiAccountPinBoxFill } from "react-icons/ri";
@@ -6,6 +6,9 @@ import { IoLibrary, IoSettings } from "react-icons/io5";
 import { FaUsers, FaCashRegister, FaRegUserCircle } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+import { MainContext } from "../helpers/MainContext"; 
+import { useFetch } from '../hooks/useFetch';
+import { baseUrl } from '../baseUrl';
 
 const initialMenus = [
     {
@@ -134,17 +137,28 @@ const initialMenus = [
 ];
 
 const Sidebar = () => {
-    const currentRole = localStorage.getItem('role');
-    const currentUser = localStorage.getItem('username');
-
+    const { role: currentRole, currentUser } = useContext(MainContext);
+    const sessionId = localStorage.getItem('session'); // School Year id
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
+    const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
     const [menus] = useState(initialMenus);
+    const [openDropdown, setOpenDropdown] = useState(null); // State to manage open dropdown
 
     const userMenus = menus.find(menu => menu.role === currentRole)?.menus || [];
+
+    const handleToggleDropdown = (index) => {
+        if (openDropdown === index) {
+            setOpenDropdown(null); // Close dropdown if it's already open
+        } else {
+            setOpenDropdown(index); // Open the clicked dropdown
+        }
+    };
 
     return (
         <nav className="w-full col-span-2 bg-sky-950 h-full">
             <div>
-                <div className="bg-green-600 p-3">
+                <div className="bg-green-600 p-3 flex items-center justify-between gap-2">
+                    <span className="font-semibold text-xl text-gray-100">S.Y {currentSy}</span>
                     <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
                 </div>
 
@@ -159,25 +173,36 @@ const Sidebar = () => {
                 <ul className="max-h-full text-gray-100">
                     {userMenus.map((menu, id) => (
                         <div key={id}>
-                            <li className="px-7 py-3 my-3 flex flex-col gap-2 hover cursor-pointer group">
+                            <li className="px-7 py-3 my-3 flex flex-col gap-2 cursor-pointer">
                                 {menu.link ? (
-                                    <Link to={menu.link} className="flex items-center gap-2 p-1 hover:bg-sky-900">
+                                    <Link to={menu.link} className="flex items-center gap-2 hover:bg-sky-900 p-1 ">
                                         <span className="text-green-500">{menu.icon}</span>
                                         <span className="text-gray-100">{menu.name}</span>
-                                        {menu.subMenus && <MdOutlineKeyboardArrowUp className="rotate-180 group-hover:rotate-0" />}
+                                        {menu.subMenus && (
+                                            <MdOutlineKeyboardArrowUp 
+                                                className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                            />
+                                        )}
                                     </Link>
                                 ) : (
-                                    <button className="flex items-center gap-2 hover:bg-sky-900 p-1">
+                                    <button 
+                                        className="flex items-center gap-2 p-1 hover:bg-sky-900" 
+                                        onClick={() => handleToggleDropdown(id)}
+                                    >
                                         <span className="text-green-500">{menu.icon}</span>
                                         <span className="text-gray-100">{menu.name}</span>
-                                        {menu.subMenus && <MdOutlineKeyboardArrowUp className="rotate-180 group-hover:rotate-0" />}
+                                        {menu.subMenus && (
+                                            <MdOutlineKeyboardArrowUp 
+                                                className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                            />
+                                        )}
                                     </button>
                                 )}
                                 {menu.subMenus && (
-                                    <ul className="group-hover:flex flex-col gap-3 hidden">
+                                    <ul className={`transition-all duration-300 ${openDropdown === id ? 'block' : 'hidden'}`}>
                                         {menu.subMenus.map((subMenu, subId) => (
-                                            <Link key={subId} className="hover:bg-sky-900 p-1" to={subMenu.link}>
-                                                <li className="text-sm px-5">{subMenu.name}</li>
+                                            <Link key={subId} to={subMenu.link}>
+                                                <li className="text-sm px-5 hover:bg-sky-900 p-2">{subMenu.name}</li>
                                             </Link>
                                         ))}
                                     </ul>
@@ -187,7 +212,6 @@ const Sidebar = () => {
                     ))}
                 </ul>
             </div>
-            {/* <button className="text-green-500 px-7 py-3 cursor-pointer my-3 flex items-center gap-2 absolute bottom-5 w-full"><IoIosLogOut /> <span className="text-gray-100">Logout</span></button> */}
         </nav>
     );
 }

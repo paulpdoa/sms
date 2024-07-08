@@ -8,9 +8,10 @@ export const MainProvider = ({ children }) => {
   const role = localStorage.getItem('role');
   const session = localStorage.getItem('session');
   const currentUserId = localStorage.getItem('id');
+  const currentUser = localStorage.getItem('username');
 
   return (
-    <MainContext.Provider value={{ searchQuery,setSearchQuery,role,session,currentUserId }}>
+    <MainContext.Provider value={{ searchQuery,setSearchQuery,role,session,currentUserId, currentUser }}>
       {children}
     </MainContext.Provider>
   );

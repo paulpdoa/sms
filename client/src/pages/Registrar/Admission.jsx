@@ -34,7 +34,7 @@ const Admission = () => {
 
     return (
         <main className="p-4">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-green-500 font-bold">Admission</h1>
                 <Searchbar onSearch={handleSearch} />

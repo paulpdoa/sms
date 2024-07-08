@@ -45,6 +45,10 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
             updatedValues.strand = { _id: editValues['strand.strand'] }
         }
 
+        if(editValues['feeCateg.feeCateg']) {
+            updatedValues.feeCateg = { _id: editValues['feeCateg.feeCateg'] }
+        }
+
     
         onUpdate(id, updatedValues);
         setEditId(null);
@@ -105,16 +109,30 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
             <table className="min-w-full divide-y divide-gray-600">
                 <thead className="bg-gray-700">
                     <tr>
-                        {columns.map((column,key) => (
+                        {columns.map((column, key) => (
                             <th
                                 key={key}
                                 onClick={() => handleSort(column)}
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
                             >
-                                {column.header}
-                                {sortConfig.key === column.accessorKey ? (
-                                    sortConfig.direction === 'asc' ? ' ▲' : ' ▼'
-                                ) : null}
+                                <div className="flex items-center">
+                                    {column.header}
+                                    {sortConfig.key === column.accessorKey ? (
+                                        sortConfig.direction === 'asc' ? (
+                                            <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                            </svg>
+                                        ) : (
+                                            <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        )
+                                    ) : (
+                                        <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    )}
+                                </div>
                             </th>
                         ))}
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>

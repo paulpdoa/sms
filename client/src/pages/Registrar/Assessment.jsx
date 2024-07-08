@@ -91,7 +91,7 @@ const Assessment = () => {
 
     return (
         <main className="p-4">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-green-500 font-bold">Assessment</h1>
                 <div className="flex items-center gap-2">

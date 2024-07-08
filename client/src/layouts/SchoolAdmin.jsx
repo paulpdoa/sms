@@ -3,7 +3,7 @@ import DateTime from "../components/DateTime";
 const SchoolAdmin = () => {
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex items-center justify-center">
                <Outlet />
             </div>

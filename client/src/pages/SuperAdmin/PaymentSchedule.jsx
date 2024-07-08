@@ -62,7 +62,7 @@ const PaymentSchedule = () => {
 
     return (
         <main className="p-2">
-            <DateTime />
+            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Payment Schedule</h1>
                 <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ const PaymentSchedule = () => {
             </div>
 
             <div className="mt-5">
-                <div className="relative col-span-2 overflow-x-auto shadow-md sm:rounded-lg h-fit">
+                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <ReusableTable 
                         records={records} 
                         columns={columns} 

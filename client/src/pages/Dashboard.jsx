@@ -24,16 +24,16 @@ const Dashboard = () => {
 
     return (
         <main className="bg-gray-100">
-            <DateTime />
+            
 
             <section className="p-8">
                 <div className="flex flex-col items-center justify-center bg-green-300 p-5 rounded-lg shadow-md">
                     <h1 className="text-4xl font-semibold text-green-700 italic text-center">
                         {schoolYear?.schoolTheme ? `"${schoolYear.schoolTheme}"` : 'Admin has not set any theme yet'}
                     </h1>
-                    <span className="text-base font-semibold mt-2">
+                    {/* <span className="text-base font-semibold mt-2">
                         {schoolYear?.startYear ? `S.Y ${schoolYear.startYear.split('-')[0]}-${schoolYear.endYear.split('-')[0]}` : 'Please wait'}
-                    </span>
+                    </span> */}
                 </div>
 
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-8 mt-8">
