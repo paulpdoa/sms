@@ -53,6 +53,8 @@ import NationalityCode from "./pages/SuperAdmin/NationalityCode";
 import EditManageFee from "./pages/Registrar/EditManagedFee";
 import EditUser from "./components/master data/EditUser";
 import { MainProvider } from "./helpers/MainContext";
+import EditTextbook from "./components/master data/EditTextbook";
+import NewTextbook from "./pages/SuperAdmin/NewTextbook";
 
 function App() {
 
@@ -84,6 +86,8 @@ function App() {
           </Route>
 
           <Route path='/edit-user/:id' element={<EditUser />} />
+          <Route path='/edit-textbook/:id' element={<EditTextbook />} />
+          
           {/* For Super admin */}
           <Route path='/master' element={(role === 'Super Admin' || role === 'School Admin') && <MasterLayout />}>
             <Route path='dashboard' element={<Dashboard />} />
@@ -120,6 +124,8 @@ function App() {
           <Route path='/sectioning' element={<Sectioning />} />
           <Route path='/assessment' element={<Assessment />} />
 
+
+          <Route path='/new-textbook' element={<NewTextbook />} />
           <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin')  ? <SchoolAdmin /> : <Navigate to='/' /> }>
             <Route path='new-teacher' element={<NewTeacher />} />
           </Route>

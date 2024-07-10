@@ -134,6 +134,9 @@ const NewStudent = () => {
                 <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
                     Submit
                 </button>
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                    Cancel
+                </button>
             </form>
             <ToastContainer />
         </main>

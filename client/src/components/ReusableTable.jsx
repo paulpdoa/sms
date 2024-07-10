@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
-const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10, searchQuery, viewRecord }) => {
+const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10, searchQuery, viewRecord,disableAction }) => {
     const navigate = useNavigate();
     const goToEdit = (id) => navigate(`${path}/${id}`);
 
@@ -98,7 +98,7 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10
                                     </div>
                                 </th>
                             ))}
-                            <th scope="col" className="px-6 py-3">Action</th>
+                            { !disableAction && <th scope="col" className="px-6 py-3">Action</th>  }
                         </tr>
                     </thead>
                     <tbody>
@@ -112,29 +112,32 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10
                                         {typeof column.cell === 'function' ? column.cell(getNestedValue(record, column.accessorKey)) : getNestedValue(record, column.accessorKey) ?? 'Not Assigned'}
                                     </td>
                                 ))}
-                                <td className="px-6 py-4 flex gap-2 items-center">
-                                    {viewRecord ?
-                                        <button
-                                            onClick={() => viewRecord(record)}
-                                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >
-                                            View
-                                        </button>
-                                        :
-                                        <button
-                                            onClick={() => goToEdit(record._id)}
-                                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >
-                                            Edit
-                                        </button>}
-                                    {deleteRecord &&
-                                        <button
-                                            onClick={() => deleteRecord(record._id)}
-                                            className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                                        >
-                                            Delete
-                                        </button>}
-                                </td>
+                                { !disableAction && (
+                                    <td className="px-6 py-4 flex gap-2 items-center">
+                                        {viewRecord ?
+                                            <button
+                                                onClick={() => viewRecord(record)}
+                                                className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                            >
+                                                View
+                                            </button>
+                                            :
+                                            <button
+                                                onClick={() => goToEdit(record._id)}
+                                                className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                            >
+                                                Edit
+                                            </button>
+                                        }  
+                                        {deleteRecord &&
+                                            <button
+                                                onClick={() => deleteRecord(record._id)}
+                                                className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                                            >
+                                                Delete
+                                            </button>}
+                                    </td>
+                                ) }
                             </tr>
                         ))}
                     </tbody>

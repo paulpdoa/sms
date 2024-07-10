@@ -1,16 +1,19 @@
 import DateTime from "../DateTime";
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from "../../baseUrl";
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { MainContext } from "../../helpers/MainContext";
 
 const EditUser = () => {
     const { id } = useParams();
     const { records: user } = useFetch(`${baseUrl()}/user/${id}`);
     const { records: userRoles } = useFetch(`${baseUrl()}/user-roles`);
+
+    const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -23,7 +26,7 @@ const EditUser = () => {
 
     const [currentRole,setCurrentRole] = useState('');
     
-    const role = localStorage.getItem('role');
+    const { role } = useContext(MainContext);
 
     useEffect(() => {
        if(user) {
@@ -45,12 +48,12 @@ const EditUser = () => {
             toast.error('Passwords do not match', {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             return;
         }
@@ -96,9 +99,8 @@ const EditUser = () => {
     }
 
     return (
-        <main>
-            <DateTime />
-            <form onSubmit={handleSubmit} className="space-y-8 bg-white shadow-lg p-8 rounded-lg max-w-4xl mx-auto border border-gray-200">
+        <main className="min-h-screen flex justify-center items-center">
+            <form onSubmit={handleSubmit} className="space-y-8 bg-white w-3/4 shadow-lg p-8 rounded-lg mx-auto border border-gray-200">
                 <h1 className="font-bold text-green-600 text-2xl mb-4">Edit User: {user?.username}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -114,6 +116,7 @@ const EditUser = () => {
                 <button type="submit" className="bg-green-600 text-white text-sm p-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400">
                     Update User
                 </button>
+                <button onClick={() => navigate(-1)} type="button" className="bg-red-600 text-white text-sm p-3 ml-3 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
             </form>
             <ToastContainer />
         </main>

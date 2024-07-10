@@ -382,7 +382,10 @@ const NewTeacher = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-500 text-white p-2 mt-6 rounded-md w-full">Submit</button>
+                <button className="bg-green-500 text-white p-2 mt-6 rounded-md">Submit</button>
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                    Cancel
+                </button>
             </form>
             <ToastContainer />
         </main>

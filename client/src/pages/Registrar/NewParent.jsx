@@ -70,7 +70,7 @@ const NewParent = () => {
             });
 
             setTimeout(() => {
-                window.location.reload();
+                navigate(-1)
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -92,6 +92,7 @@ const NewParent = () => {
                                 type="text"
                                 id="motherName"
                                 onChange={(e) => setMotherName(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex flex-col">
@@ -119,6 +120,7 @@ const NewParent = () => {
                                 type="text"
                                 id="motherContact"
                                 onChange={(e) => setMotherContact(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex flex-col">
@@ -143,6 +145,7 @@ const NewParent = () => {
                                 type="text"
                                 id="fatherName"
                                 onChange={(e) => setFatherName(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex flex-col">
@@ -170,6 +173,7 @@ const NewParent = () => {
                                 type="text"
                                 id="fatherContact"
                                 onChange={(e) => setFatherContact(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="flex flex-col">
@@ -256,6 +260,9 @@ const NewParent = () => {
 
                 <button className="bg-green-500 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
+                </button>
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                    Cancel
                 </button>
             </form>
             <ToastContainer />

@@ -4,7 +4,7 @@ import { RiAccountPinBoxFill } from "react-icons/ri";
 import { IoSettings } from "react-icons/io5";
 import { FaCashRegister, FaRegUserCircle } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-import { MdOutlineKeyboardArrowUp, MdOutlineMenu, MdClose } from "react-icons/md";
+import { MdOutlineKeyboardArrowUp, MdClose } from "react-icons/md";
 import { MainContext } from "../helpers/MainContext"; 
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
@@ -24,8 +24,6 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Religion', link: '/master/religion' },
                     { name: 'Nationality', link: '/master/nationality' },
-                    // { name: 'Nationality Code', link: '/master/nationality-code' },
-                    // { name: 'Gender', link: '/master/gender' },
                     { name: 'Departments', link: '/master/departments' },
                     { name: 'Sections', link: '/master/sections' },
                     { name: 'Students', link: '/master/students' },
@@ -141,7 +139,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
     const [menus] = useState(initialMenus);
-    const [openDropdown, setOpenDropdown] = useState(null); // State to manage open dropdown
+    const [openDropdown, setOpenDropdown] = useState(null);
 
     const userMenus = menus.find(menu => menu.role === currentRole)?.menus || [];
 
@@ -168,17 +166,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </div>
                 </div>
 
-                <ul className="max-h-full text-gray-100">
+                <ul className="max-h-[calc(100%-4rem)] overflow-auto pb-20"> {/* Add padding at the bottom */}
                     {userMenus.map((menu, id) => (
                         <div key={id}>
                             <li className="px-7 py-3 my-3 flex flex-col gap-2 cursor-pointer">
                                 {menu.link ? (
-                                    <Link to={menu.link} className="flex items-center gap-2 hover:bg-sky-900 p-1 ">
+                                    <Link to={menu.link} className="flex items-center gap-2 hover:bg-sky-900 p-1">
                                         <span className="text-green-500">{menu.icon}</span>
                                         <span className="text-gray-100">{menu.name}</span>
                                         {menu.subMenus && (
                                             <MdOutlineKeyboardArrowUp
-                                                className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                             />
                                         )}
                                     </Link>
@@ -191,7 +189,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                         <span className="text-gray-100">{menu.name}</span>
                                         {menu.subMenus && (
                                             <MdOutlineKeyboardArrowUp
-                                                className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                             />
                                         )}
                                     </button>
@@ -200,7 +198,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                     <ul className={`transition-all duration-300 ${openDropdown === id ? 'block' : 'hidden'}`}>
                                         {menu.subMenus.map((subMenu, subId) => (
                                             <Link key={subId} to={subMenu.link}>
-                                                <li className="text-sm px-5 hover:bg-sky-900 p-2">{subMenu.name}</li>
+                                                <li className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{subMenu.name}</li>
                                             </Link>
                                         ))}
                                     </ul>
@@ -210,7 +208,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     ))}
                 </ul>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center">
+            <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center bg-sky-950"> {/* Ensure background color matches */}
                 <span className="text-gray-100 text-sm break-words">
                     {`${schoolYear?.schoolTheme ?? 'No school theme yet'}`}
                 </span>

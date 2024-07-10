@@ -186,14 +186,20 @@ module.exports.get_textbooks = async (req,res) => {
 module.exports.add_textbook = async (req,res) => {
 
     const status = true;
-    const { schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session } = req.body;
+    let { schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session } = req.body;
+    
+    if(strand === '') {
+        strand = undefined;
+    }
 
     try {
-        const newTextbook = await Textbook.create({ schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session, status });
+        await Textbook.create({ schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session, status });
         res.status(200).json({ mssg: `${bookTitle} has been added to the record` });
     } catch(err) {
-        console.log(err.message);
-        res.status(400).json({ mssg: err.message });
+        if(err.code === 11000) {
+            console.log(err.keyValue.bookCode);
+            res.status(400).json({ mssg: err.keyValue.bookCode + ' has been added in the record, please add unique book code' });
+        }
     }
 }
 

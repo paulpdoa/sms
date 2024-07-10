@@ -107,11 +107,19 @@ const Sectioning = () =>{
                         <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
                     </form>
                     :
-                    <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
-                        <h1 className="text-red-500 text-lg font-semibold">
-                            Please select view on table to view student record
-                        </h1>
-                    </div>
+                    studentLists?.length < 1 ? (
+                        <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
+                            <h1 className="text-red-500 text-sm font-semibold">
+                               No student records yet
+                            </h1>
+                        </div>
+                    ) : (
+                        <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
+                            <h1 className="text-red-500 text-sm font-semibold">
+                                Please select view on table to view student record
+                            </h1>
+                        </div>
+                    )
                 }
                 <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                     <ReusableTable 
