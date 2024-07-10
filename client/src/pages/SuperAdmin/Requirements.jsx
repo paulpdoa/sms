@@ -1,20 +1,18 @@
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
-
+import { MainContext } from '../../helpers/MainContext';
 const Requirements = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/requirements`);
     const [requirement,setRequirement] = useState('');
     const [isRequired,setIsRequired] = useState(false);
-    const [searchQuery,setSearchQuery] = useState('');
 
     const columns = [
         {
@@ -27,15 +25,10 @@ const Requirements = () => {
             header: 'Required',
             editable: true,
             selectOptions: ['Yes','No'].map(isReq => ({ value: `${isReq === 'No' ? false : true }`, label: isReq }))
-        },
-        {
-            accessorKey: 'inputter',
-            header: 'Inputter'
         }
     ]
 
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext);
 
     const updateNewRequirement = async (id,updatedData) => {
         let isRequired = updatedData.isRequired === 'Yes' ? true : false;
@@ -121,7 +114,6 @@ const Requirements = () => {
 
     const recordsWithoutInputter = records.map(record => ({
         ...record,
-        inputter: record?.inputter?.username,
         isRequired: record?.isRequired ? 'Yes' : 'No'
     }));
 

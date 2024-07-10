@@ -6,15 +6,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from '../../helpers/MainContext';
 
 const NationalityCode = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationality-codes`);
     const [nationality,setNationality] = useState('');
     const [nationalityCode,setNationalityCode] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
+    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
 
     const columns = [
         {
@@ -27,14 +28,9 @@ const NationalityCode = () => {
             header: 'Nationality Code',
             editable: true,
         },
-        { 
-            accessorKey: 'inputter', 
-            header: 'Inputter' 
-        }
     ];
 
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    
 
     const updateNewNationality = async (id,updatedData) => {
         console.log(updatedData);
@@ -119,7 +115,6 @@ const NationalityCode = () => {
 
     const recordsWithInputter = records.map(record => ({
         ...record,
-        inputter: record.inputter?.username,
     }));
 
     return (

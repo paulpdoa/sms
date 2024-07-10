@@ -5,19 +5,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from '../../helpers/MainContext';
 
 const Department = () => {
 
     const { records } = useFetch(`${baseUrl()}/departments`);
     const [department,setDepartment] = useState('');
 
-    const [searchQuery,setSearchQuery] = useState('');
-
-    const currentUserId = localStorage.getItem('id');
-    const session = localStorage.getItem('session');
-    const role = localStorage.getItem('role');
+    const { role,session,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
 
     const columns = [
         {

@@ -6,8 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import MasterTable from "../components/MasterTable";
+import { MainContext } from "../helpers/MainContext";
 
 const Users = () => {
 
@@ -23,9 +24,7 @@ const Users = () => {
     const [confirmPassword,setConfirmPassword] = useState('');
     const navigate = useNavigate();
 
-    const [searchQuery,setSearchQuery] = useState('');
-
-    const userRole = localStorage.getItem('role');
+    const { role: userRole,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext);
 
     
     const columns = [
@@ -105,7 +104,6 @@ const Users = () => {
     const recordsWithoutInputter = records?.filter(record => record.isActive).map(record => ({
         ...record,
         fullName: record?.firstName + ' ' + record?.lastName,
-        inputter: record?.inputter?.username,
         isActive: record?.isActive ? 'Yes' : 'No'
     }));
 

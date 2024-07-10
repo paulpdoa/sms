@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext';
 
 const EditStudent = () => {
     const navigate = useNavigate();
@@ -14,7 +15,8 @@ const EditStudent = () => {
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
-    const session = localStorage.getItem('session');
+
+    const { session } = useContext(MainContext);
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -88,12 +90,11 @@ const EditStudent = () => {
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
-                window.location.reload();
+                navigate('/students');
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -104,8 +105,7 @@ const EditStudent = () => {
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
-                progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };

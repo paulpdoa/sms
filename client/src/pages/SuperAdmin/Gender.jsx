@@ -6,22 +6,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from '../../helpers/MainContext';
 
 const Gender = () => {
 
     const columns = [
         { accessorKey: 'gender', header: 'Gender',editable: true },
-        { accessorKey: 'inputter' ,header: 'Inputter' }
     ]
 
     const { records, isLoading } = useFetch(`${baseUrl()}/genders`);
     const [gender,setGender] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
-
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
 
     const updateNewGender = async (id,updatedData) => {
         try {
@@ -106,7 +103,6 @@ const Gender = () => {
 
     const recordsWithInputter = records.map(record => ({
         ...record,
-        inputter: record.inputter?.username,
     }));
 
     return (

@@ -1,11 +1,10 @@
-import { useState,useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AiFillDashboard } from "react-icons/ai";
-import { PiStudentFill, PiChalkboardTeacherFill } from "react-icons/pi";
-import { RiParentFill, RiAccountPinBoxFill } from "react-icons/ri";
-import { IoLibrary, IoSettings } from "react-icons/io5";
-import { FaUsers, FaCashRegister, FaRegUserCircle } from "react-icons/fa";
+import { RiAccountPinBoxFill } from "react-icons/ri";
+import { IoSettings } from "react-icons/io5";
+import { FaCashRegister, FaRegUserCircle } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+import { MdOutlineKeyboardArrowUp, MdOutlineMenu, MdClose } from "react-icons/md";
 import { MainContext } from "../helpers/MainContext"; 
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
@@ -25,8 +24,8 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Religion', link: '/master/religion' },
                     { name: 'Nationality', link: '/master/nationality' },
-                    { name: 'Nationality Code', link: '/master/nationality-code' },
-                    { name: 'Gender', link: '/master/gender' },
+                    // { name: 'Nationality Code', link: '/master/nationality-code' },
+                    // { name: 'Gender', link: '/master/gender' },
                     { name: 'Departments', link: '/master/departments' },
                     { name: 'Sections', link: '/master/sections' },
                     { name: 'Students', link: '/master/students' },
@@ -136,9 +135,9 @@ const initialMenus = [
     }
 ];
 
-const Sidebar = () => {
-    const { role: currentRole, currentUser } = useContext(MainContext);
-    const sessionId = localStorage.getItem('session'); // School Year id
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+    const { role: currentRole, currentUser, session: sessionId } = useContext(MainContext);
+
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
     const [menus] = useState(initialMenus);
@@ -147,19 +146,18 @@ const Sidebar = () => {
     const userMenus = menus.find(menu => menu.role === currentRole)?.menus || [];
 
     const handleToggleDropdown = (index) => {
-        if (openDropdown === index) {
-            setOpenDropdown(null); // Close dropdown if it's already open
-        } else {
-            setOpenDropdown(index); // Open the clicked dropdown
-        }
+        setOpenDropdown(openDropdown === index ? null : index);
     };
 
     return (
-        <nav className="w-full col-span-2 bg-sky-950 h-full">
+        <nav className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 w-full bg-sky-950 h-full relative`}>
             <div>
                 <div className="bg-green-600 p-3 flex items-center justify-between gap-2">
-                    <span className="font-semibold text-xl text-gray-100">S.Y {currentSy}</span>
                     <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
+                    <span className="font-normal text-sm text-gray-100">S.Y {currentSy}</span>
+                    <button onClick={toggleSidebar} className="text-gray-100">
+                        <MdClose size={24} />
+                    </button>
                 </div>
 
                 <div className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg">
@@ -179,20 +177,20 @@ const Sidebar = () => {
                                         <span className="text-green-500">{menu.icon}</span>
                                         <span className="text-gray-100">{menu.name}</span>
                                         {menu.subMenus && (
-                                            <MdOutlineKeyboardArrowUp 
+                                            <MdOutlineKeyboardArrowUp
                                                 className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                             />
                                         )}
                                     </Link>
                                 ) : (
-                                    <button 
-                                        className="flex items-center gap-2 p-1 hover:bg-sky-900" 
+                                    <button
+                                        className="flex items-center gap-2 p-1 hover:bg-sky-900"
                                         onClick={() => handleToggleDropdown(id)}
                                     >
                                         <span className="text-green-500">{menu.icon}</span>
                                         <span className="text-gray-100">{menu.name}</span>
                                         {menu.subMenus && (
-                                            <MdOutlineKeyboardArrowUp 
+                                            <MdOutlineKeyboardArrowUp
                                                 className={`transition-transform duration-300 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                             />
                                         )}
@@ -212,8 +210,13 @@ const Sidebar = () => {
                     ))}
                 </ul>
             </div>
+            <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center">
+                <span className="text-gray-100 text-sm break-words">
+                    {`${schoolYear?.schoolTheme ?? 'No school theme yet'}`}
+                </span>
+            </div>
         </nav>
     );
-}
+};
 
 export default Sidebar;

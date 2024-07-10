@@ -6,8 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from '../../helpers/MainContext';
 
 const Section = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/sections`);
@@ -17,10 +18,9 @@ const Section = () => {
     const [section, setSection] = useState('');
     const [gradeLevel, setGradeLevel] = useState('');
     const [adviser, setAdviser] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
     // const [department, setDepartment] = useState('');
 
-    const role = localStorage.getItem('role');
+    const { role,searchQuery,setSearchQuery } = useContext(MainContext);
 
     const columns = [
         {

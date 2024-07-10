@@ -6,34 +6,27 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
-
+import { MainContext } from "../../helpers/MainContext";
 
 
 const UserRoles = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/user-roles`);
     const [userRole,setUserRole] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
-
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    
+    const { role,currentUserId,searchQuery,setSearchQuery} = useContext(MainContext);
 
     const columns = [
         {
             accessorKey: 'userRole',
             header: 'User Role',
             editable: true,
-        },
-        {
-            accessorKey: 'inputter',
-            header: 'Inputter'
         }
     ]
 
     const updateNewUserRole = async (id,updatedData) => {
-        console.log(updatedData);
         try {
             const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole:updatedData.userRole,currentUserId,role });
             toast.success(newData.data.mssg, {
@@ -123,7 +116,6 @@ const UserRoles = () => {
 
     const recordsWithoutInputter = records.map(record => ({
         ...record,
-        inputter: record?.inputter?.username
     }));
 
     return (

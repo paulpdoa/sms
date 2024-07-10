@@ -78,10 +78,24 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10
                                     className="px-6 py-3 cursor-pointer"
                                     onClick={() => handleSort(column.accessorKey)}
                                 >
-                                    {column.header}
-                                    {sortConfig.key === column.accessorKey && (
-                                        <span className="text-white z-50">{sortConfig.direction === 'asc' ? ' ↑' : ' ↓'}</span>
-                                    )}
+                                    <div className="flex items-center">
+                                        {column.header}
+                                        {sortConfig.key === column.accessorKey ? (
+                                            sortConfig.direction === 'asc' ? (
+                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                                </svg>
+                                            ) : (
+                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            )
+                                        ) : (
+                                            <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                            </svg>
+                                        )}
+                                    </div>
                                 </th>
                             ))}
                             <th scope="col" className="px-6 py-3">Action</th>

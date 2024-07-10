@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,19 +7,17 @@ import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import MasterTable from '../../components/MasterTable';
+import { MainContext } from '../../helpers/MainContext';
 
-const columns = [
-    { accessorKey: 'religion', header: 'Religion',editable: true },
-    { accessorKey: 'inputter', header: 'Inputter' },
-];
 
 const Religion = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
-    const [searchQuery, setSearchQuery] = useState('');
     const [religion, setReligion] = useState('');
+    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext);
 
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    const columns = [
+        { accessorKey: 'religion', header: 'Religion',editable: true }
+    ];
 
     const addReligion = async (e) => {
         e.preventDefault();
@@ -101,7 +99,6 @@ const Religion = () => {
 
     const recordsWithInputter = records.map(record => ({
         ...record,
-        inputter: record.inputter?.username,
     }));
 
     return (

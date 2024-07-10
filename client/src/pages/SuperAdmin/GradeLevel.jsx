@@ -6,8 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import MasterTable from '../../components/MasterTable';
+import { MainContext } from '../../helpers/MainContext';
 
 const GradeLevel = () => {
 
@@ -15,10 +16,8 @@ const GradeLevel = () => {
     const { records:departments } = useFetch(`${baseUrl()}/departments`);
     const [gradeLevel,setGradeLevel] = useState('');
     const [department,setDepartment] = useState('');
-    const [searchQuery,setSearchQuery] = useState('');
 
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
+    const { currentUserId, searchQuery,setSearchQuery, role } = useContext(MainContext);
 
     const columns = [
         {
@@ -31,17 +30,12 @@ const GradeLevel = () => {
             header: 'Department',
             editable: true,
             selectOptions: departments.map(department => ({ value: department._id, label: `${department.department}` })),
-        },
-        { 
-            accessorKey: 'inputter', 
-            header: 'Inputter'
         }
     ];
 
     
 
     const updateNewGradeLevel = async (id,updatedData) => {
-        console.log(updatedData);
         try {
             const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel: updatedData.gradeLevel,inputter: currentUserId,department: updatedData.department._id,role });
             toast.success(newData.data.mssg, {
@@ -126,8 +120,7 @@ const GradeLevel = () => {
         department: {
             _id: record?.department._id,
             department: record?.department?.department
-        },
-        inputter: record?.inputter?.username
+        }
     }));
 
     return (

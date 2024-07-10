@@ -89,8 +89,8 @@ function App() {
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
             <Route path='nationality' element={<Nationality />} />
-            <Route path='nationality-code' element={<NationalityCode />} />
-            <Route path='gender' element={<Gender />} />
+              {/* <Route path='nationality-code' element={<NationalityCode />} />
+              <Route path='gender' element={<Gender />} /> */}
             <Route path='departments' element={<Department />} />
             <Route path='sections' element={<Section />} />
             <Route path='grade-levels' element={<GradeLevel />} />

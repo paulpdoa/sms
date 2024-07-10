@@ -39,7 +39,7 @@ const Navbar = () => {
     return (
         <>
             <nav className="w-full bg-gradient-to-r from-green-500 to-green-600 p-3 flex items-center justify-between shadow-lg">
-                <h1 className="font-semibold text-lg text-white">{ pathName }</h1>
+                <h1 className="font-semibold text-lg text-white ml-9">{ pathName }</h1>
                 <div className="flex items-center gap-4">
                     <div className="relative">
                         <FaRegUserCircle 

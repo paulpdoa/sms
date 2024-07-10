@@ -70,7 +70,8 @@ const Textbook = () => {
             newStrand:updatedData.strand._id,
             newInputter: currentUserId,
             newSchoolYear: updatedData.schoolYear._id,
-            session: session
+            session: session,
+            role
         }
 
         try {
@@ -110,7 +111,7 @@ const Textbook = () => {
 
     const deleteTextbook = async (id) => {
         try {
-            const removeTextbook = await axios.put(`${baseUrl()}/textbook/${id}`);
+            const removeTextbook = await axios.put(`${baseUrl()}/textbook/${id}`,{ data: { role } });
             toast.success(removeTextbook.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -141,7 +142,8 @@ const Textbook = () => {
             gradeLevel,
             strand,
             inputter: localStorage.getItem('id'),
-            session: schoolYear
+            session: schoolYear,
+            role
         }
         try {
             const newtextbook = await axios.post(`${baseUrl()}/textbook`,bookInfo);

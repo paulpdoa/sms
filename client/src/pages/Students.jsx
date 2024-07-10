@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
 import AddStudentBtn from "../components/AddStudentBtn";
 import DateTime from "../components/DateTime";
 import Searchbar from "../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import ReusableTable from "../components/ReusableTable";
+import { useContext } from "react";
+import { MainContext } from '../helpers/MainContext';
+import ReusableTable from '../components/ReusableTable';
 
 const columns = [
     {
@@ -22,10 +22,6 @@ const columns = [
     {
         accessorKey: 'middleName',
         header: 'Middle Name',
-    },
-    {
-        accessorKey: 'suffix',
-        header: 'Suffix',
     },
     {
         accessorKey: 'dateOfBirth',
@@ -43,8 +39,7 @@ const columns = [
 
 const Students = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
-    const [searchQuery, setSearchQuery] = useState('');
-
+    const { searchQuery,setSearchQuery } = useContext(MainContext);
     const deleteStudent = async (id) => {
         try {
             const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`);

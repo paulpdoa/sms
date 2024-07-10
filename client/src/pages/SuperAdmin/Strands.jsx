@@ -21,10 +21,6 @@ const Strands = () => {
             accessorKey: 'strand',
             header: 'Strand',
             editable: true
-        },
-        {
-            accessorKey: 'inputter',
-            header:'Inputter'
         }
     ]
 
@@ -111,7 +107,6 @@ const Strands = () => {
 
     const recordsWithoutInputter = records.map(record => ({
         ...record,
-        inputter: record?.inputter?.username
     }));
 
     return (

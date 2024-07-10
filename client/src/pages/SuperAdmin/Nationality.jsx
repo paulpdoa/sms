@@ -1,18 +1,19 @@
 import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
+import { MainContext } from "../../helpers/MainContext";
 
 const Nationality = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
+    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
 
     const columns = [
         {
@@ -26,20 +27,11 @@ const Nationality = () => {
             editable: true,
             selectOptions: nationalityCodes.map(nc => ({ value: nc._id, label: nc.nationalityCode })),
         },
-        { 
-            accessorKey: 'inputter', 
-            header: 'Inputter' 
-        }
+       
     ];
-
-
-    const [searchQuery, setSearchQuery] = useState('');
 
     const [nationality,setNationality] = useState('');
     const [nationalityCodeId,setNationalityCodeId] = useState('');
-
-    const currentUserId = localStorage.getItem('id');
-    const role = localStorage.getItem('role');
 
     const updateNewNationality = async (id,updatedData) => {
         
@@ -131,7 +123,6 @@ const Nationality = () => {
     const recordsWithInputter = records.map(record => ({
         ...record,
         nationalityCodeId: record.nationalityCodeId?.nationalityCode,
-        inputter: record.inputter?.username,
     }));
 
     return (
