@@ -438,7 +438,7 @@ module.exports.edit_discount = async (req,res) => {
     const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter } = req.body;
 
     try {
-        const discount = await Discount.findByIdAndUpdate({_id:id},{ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory });
+        const discount = await Discount.findByIdAndUpdate({_id:id},{ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter });
         res.status(200).json({ mssg: `${discount.discountType} has been updated successfully!` });
     } catch(err) {
         console.log(err);
