@@ -197,12 +197,13 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
             <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded-md focus:outline-none bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
             >
                 Previous
             </button>
             <ul className="flex mx-4">
-                {Array.from({ length: totalPages }, (_, index) => (
+                <span className="text-sm">Page { currentPage } of { totalPages }</span>
+                {/* {Array.from({ length: totalPages }, (_, index) => (
                     <li key={index + 1} className="mx-1">
                         <button
                             onClick={() => paginate(index + 1)}
@@ -211,12 +212,12 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
                             {index + 1}
                         </button>
                     </li>
-                ))}
+                ))} */}
             </ul>
             <button
                 onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded-md focus:outline-none bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                disabled={currentPage === totalPages || totalPages < 1}
+                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
             >
                 Next
             </button>

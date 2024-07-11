@@ -44,11 +44,12 @@ const NewManageFee = () => {
             amount,
             nationalityCodeId,
         };
-        setIsLoading(true);
-        isLoading &&
-            toast.success('Please wait while creating some fees', {
+
+        if(amount === 0) {
+            toast.error("Error adding fee. amount cannot be zero", {
                 position: "top-center",
-                hideProgressBar: false,
+                autoClose: 1000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -56,13 +57,28 @@ const NewManageFee = () => {
                 theme: "colored"
             });
 
+            return;
+        }
+
+        setIsLoading(true);
+        isLoading &&
+        toast.success('Please wait while creating some fees', {
+            position: "top-center",
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored"
+        });
+
         try {
             const { data } = await axios.post(`${baseUrl()}/manage-fee`, feeInformation);
             setIsLoading(false);
             toast.success(data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -77,7 +93,7 @@ const NewManageFee = () => {
             toast.error("Error adding fee. Please try again.", {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -123,7 +139,7 @@ const NewManageFee = () => {
                                 </span>
                             }
                         </div>
-                        {renderSelect("feeDescription", "Fee Description", feeDescription, setFeeDescription, feeCodes, "Fee Description")}
+                        {renderSelect("feeDescription", "Fee Description", feeDescription, setFeeDescription, feeCodes, "Fee Description",true)}
 
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="gradelevel">Grade Level</label>
@@ -161,12 +177,15 @@ const NewManageFee = () => {
 
                         {renderInput('amount', 'Fee Amount', amount, setAmount, 'number')}
                         {showStrand && renderSelect("strand", "Strand", strandId, setStrandId, strands, "Select Strand")}
-                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code")}
+                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code",true)}
                     </div>
                 </section>
 
                 <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
                     Submit
+                </button>
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-600 ml-2 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-700 transition duration-300">
+                    Cancel
                 </button>
             </form>
             <ToastContainer />
@@ -174,7 +193,7 @@ const NewManageFee = () => {
     );
 };
 
-const renderSelect = (id, label, value, onChange, options, placeholder) => (
+const renderSelect = (id, label, value, onChange, options, placeholder,required = false) => (
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
@@ -182,6 +201,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            required={required}
         >
             <option value="" hidden>{placeholder}</option>
             {options?.map(option => (

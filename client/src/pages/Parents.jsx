@@ -5,10 +5,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import AddParentBtn from "../components/AddParentBtn";
+import AddParentBtn from "../components/buttons/AddParentBtn";
 import { useContext } from "react";
 import { MainContext } from '../helpers/MainContext';
-import ReusableTable from '../components/ReusableTable';
+import MasterTable from '../components/MasterTable';
+import { useNavigate } from 'react-router-dom';
 
 const columns = [
     {
@@ -24,20 +25,19 @@ const columns = [
         header: 'Guardian Name',
     },
     {
-        accessorKey: 'studentId',
+        accessorKey: 'studentId.fullname',
         header: 'Student Name',
-        cell: (student) => `${student.firstName} ${student.middleName} ${student.lastName}` ?? 'Not Assigned' 
     }
 ]
 
 const Parents = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/parents`);
-    const { searchQuery,setSearchQuery } = useContext(MainContext);
-
+    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const navigate = useNavigate();
     const deleteParent = async (id) => {
         try {
-            const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`);
+            const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ data: { role } });
             toast.success(removeParent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -57,6 +57,15 @@ const Parents = () => {
         }
     }
 
+    const goToEdit = (id) => navigate(`/registrar/edit-parent/${id}`)
+
+    const recordsWithoutInputter = records.map(record => ({
+        ...record,
+        studentId: {
+            fullname: record?.studentId?.firstName + ' ' + record?.studentId?.middleName + ' ' + record?.studentId?.lastName
+        }
+    }))
+
     return (
         <main className="p-2">
             {/* <DateTime /> */}
@@ -66,12 +75,12 @@ const Parents = () => {
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                <ReusableTable 
-                    records={records} 
-                    columns={columns} 
-                    path='/registrar/edit-parent' 
-                    deleteRecord={deleteParent} 
+                <MasterTable 
+                    columns={columns}
+                    data={recordsWithoutInputter}
+                    onDelete={deleteParent}
                     searchQuery={searchQuery}
+                    goToEdit={goToEdit}
                 />
             </div> 
             <ToastContainer />          

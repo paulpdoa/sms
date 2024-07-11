@@ -8,7 +8,7 @@ import axios from "axios";
 import { useState,useContext } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
-import AddTextbookBtn from "../../components/AddTextbookBtn";
+import AddTextbookBtn from "../../components/buttons/AddTextbookBtn";
 import { useNavigate } from 'react-router-dom';
 
 const Textbook = () => {

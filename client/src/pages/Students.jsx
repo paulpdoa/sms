@@ -1,4 +1,4 @@
-import AddStudentBtn from "../components/AddStudentBtn";
+import AddStudentBtn from "../components/buttons/AddStudentBtn";
 import DateTime from "../components/DateTime";
 import Searchbar from "../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,6 +9,8 @@ import axios from "axios";
 import { useContext } from "react";
 import { MainContext } from '../helpers/MainContext';
 import ReusableTable from '../components/ReusableTable';
+import MasterTable from "../components/MasterTable";
+import { useNavigate } from 'react-router-dom';
 
 const columns = [
     {
@@ -39,10 +41,13 @@ const columns = [
 
 const Students = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
-    const { searchQuery,setSearchQuery } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    
+    const navigate = useNavigate();
+    
     const deleteStudent = async (id) => {
         try {
-            const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`);
+            const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`, { data: { role } });
             toast.success(removeStudent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -62,6 +67,8 @@ const Students = () => {
         }
     }
 
+    const goToEdit = (id) => navigate(`/registrar/edit-student/${id}`);
+
     return (
         <main className="p-2">
             {/* <DateTime /> */}
@@ -71,12 +78,13 @@ const Students = () => {
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                <ReusableTable 
-                    records={records} 
-                    columns={columns} 
-                    path='/registrar/edit-student' 
-                    deleteRecord={deleteStudent} 
+                
+                <MasterTable 
+                    columns={columns}
+                    data={records}
+                    onDelete={deleteStudent}
                     searchQuery={searchQuery}
+                    goToEdit={goToEdit}
                 />
             </div>
             <ToastContainer />

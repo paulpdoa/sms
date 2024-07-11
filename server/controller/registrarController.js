@@ -585,7 +585,9 @@ module.exports.add_manage_fees = async (req,res) => {
     // Fee Code > fee code + grade level + nationality Code
     // Fee description > fee description + grade level + nationality Code
     // Filter here if the gradelevel id is not 11 or 12, if not then do not add strand field
-    
+    if(strandId === '') {
+        strandId = undefined
+    }
 
     try {
         for(let i = 0; i < gradeLevelIds.length; i++) {
@@ -927,7 +929,9 @@ module.exports.get_payment_schedule = async (req,res) => {
 
 
 module.exports.add_payment_schedule = async (req, res) => {
-    const { schoolYearId } = req.body;
+    const { schoolYearId, isReset } = req.body;
+
+    // Create logic here if isReset = true, then delete PaymentSchedule
 
     try {
         // Get Payment Terms
@@ -937,6 +941,10 @@ module.exports.add_payment_schedule = async (req, res) => {
         const currentSchoolYear = await SchoolYear.findById(schoolYearId);
         const yearStart = currentSchoolYear.startYear;
         const initialStartDate = moment(yearStart);
+
+        if(isReset) {
+            await PaymentSchedule.deleteMany();
+        }
 
         // Create a program that will create a schedule depending on the month iteration 
         let paymentSchedule = [];

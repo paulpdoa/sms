@@ -55,6 +55,7 @@ import EditUser from "./components/master data/EditUser";
 import { MainProvider } from "./helpers/MainContext";
 import EditTextbook from "./components/master data/EditTextbook";
 import NewTextbook from "./pages/SuperAdmin/NewTextbook";
+import NewUser from "./pages/SuperAdmin/NewUser";
 
 function App() {
 
@@ -87,6 +88,8 @@ function App() {
 
           <Route path='/edit-user/:id' element={<EditUser />} />
           <Route path='/edit-textbook/:id' element={<EditTextbook />} />
+
+          <Route path='/new-user' element={<NewUser />} />
           
           {/* For Super admin */}
           <Route path='/master' element={(role === 'Super Admin' || role === 'School Admin') && <MasterLayout />}>

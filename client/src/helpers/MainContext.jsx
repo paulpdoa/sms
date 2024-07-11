@@ -5,13 +5,15 @@ export const MainContext = createContext();
 
 export const MainProvider = ({ children }) => {
   const [searchQuery,setSearchQuery] = useState('');
-  const role = localStorage.getItem('role');
+  
   const session = localStorage.getItem('session');
   const currentUserId = localStorage.getItem('id');
   const currentUser = localStorage.getItem('username');
-
+  const userToken = localStorage.getItem('userToken');
+  const role = localStorage.getItem('role');
+  
   return (
-    <MainContext.Provider value={{ searchQuery,setSearchQuery,role,session,currentUserId, currentUser }}>
+    <MainContext.Provider value={{ searchQuery,setSearchQuery,role,session,currentUserId, currentUser,userToken }}>
       {children}
     </MainContext.Provider>
   );

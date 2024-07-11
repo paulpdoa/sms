@@ -138,7 +138,7 @@ const Requirements = () => {
                     <div className="flex flex-col mt-1">
                         <label className="text-sm" htmlFor="isRequired">Required</label>
                         <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setIsRequired(e.target.value)}>
-                            <option hidden>Choose if required</option>
+                            <option hidden>Choose if strongly required</option>
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </select>

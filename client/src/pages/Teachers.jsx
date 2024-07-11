@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import AddTeacherBtn from "../components/AddTeacherBtn";
-import DateTime from "../components/DateTime";
+import { useContext } from 'react';
+import AddTeacherBtn from "../components/buttons/AddTeacherBtn";
 import Searchbar from "../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import ReusableTable from "../components/ReusableTable";
+import { MainContext } from '../helpers/MainContext';
+import { useNavigate } from 'react-router-dom';
+import MasterTable from '../components/MasterTable';
 
 const columns = [
     {
@@ -33,20 +34,30 @@ const columns = [
     {
         accessorKey: 'nationality.nationality',
         header: 'Nationality'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
     }
 ];
 
 const Teachers = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/teachers`);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+
+    const navigate = useNavigate();
+
+    const recordsWithoutInputter = records.map(record => ({
+        ...record,
+        sex: {
+            _id: record?.sex?._id,
+            gender: record?.sex?.gender || 'Not Assigned'
+        },
+        nationality: {
+            _id: record?.nationality?._id,
+            nationality: record?.nationality?.nationality || 'Not Assigned'
+        }
+    }))
 
     const deleteTeacher = async (id) => {
         try {
-            const removeTeacher = await axios.delete(`${baseUrl()}/teacher/${id}`);
+            const removeTeacher = await axios.delete(`${baseUrl()}/teacher/${id}`, { data: { role } });
             toast.success(removeTeacher.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -66,6 +77,8 @@ const Teachers = () => {
         }
     };
 
+    const goToEdit = (id) => navigate(`/registrar/edit-teacher/${id}`)
+
     return (
         <main className="p-2">
             {/* <DateTime /> */}
@@ -75,12 +88,12 @@ const Teachers = () => {
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                <ReusableTable 
-                    columns={columns} 
-                    records={records} 
-                    path={'/registrar/edit-teacher'} 
-                    deleteRecord={deleteTeacher} 
+                <MasterTable 
+                    columns={columns}
+                    data={recordsWithoutInputter}
+                    onDelete={deleteTeacher}
                     searchQuery={searchQuery}
+                    goToEdit={goToEdit}
                 />
             </div> 
             <ToastContainer />          

@@ -64,7 +64,14 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Students', link: '/students' },
                     { name: 'Admission', link: '/admission' },
-                    { name: 'Assessment', link: '/assessment' }
+                    { name: 'Assessment', link: '/assessment' },
+                    {
+                        name: 'Enrollment Process',
+                        subMenus: [
+                            { name: 'Admission', link: '/admission' },
+                            { name: 'Assessment', link: '/assessment' }
+                        ]
+                    }
                 ]
             },
             {
@@ -140,11 +147,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
     const [menus] = useState(initialMenus);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [openSubDropdown, setOpenSubDropdown] = useState(null);
 
     const userMenus = menus.find(menu => menu.role === currentRole)?.menus || [];
 
     const handleToggleDropdown = (index) => {
         setOpenDropdown(openDropdown === index ? null : index);
+    };
+
+    const handleToggleSubDropdown = (index) => {
+        setOpenSubDropdown(openSubDropdown === index ? null : index);
     };
 
     return (
@@ -197,9 +209,32 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                 {menu.subMenus && (
                                     <ul className={`transition-all duration-300 ${openDropdown === id ? 'block' : 'hidden'}`}>
                                         {menu.subMenus.map((subMenu, subId) => (
-                                            <Link key={subId} to={subMenu.link}>
-                                                <li className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{subMenu.name}</li>
-                                            </Link>
+                                            <div key={subId}>
+                                                {subMenu.link ? (
+                                                    <Link to={subMenu.link}>
+                                                        <li className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{subMenu.name}</li>
+                                                    </Link>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900 w-full text-left flex gap-2 items-center"
+                                                            onClick={() => handleToggleSubDropdown(subId)}
+                                                        >
+                                                            {subMenu.name}
+                                                            <MdOutlineKeyboardArrowUp
+                                                                className={`transition-transform duration-300 text-white ${openSubDropdown === subId ? 'rotate-0' : 'rotate-180'}`}
+                                                            />
+                                                        </button>
+                                                        <ul className={`transition-all duration-300 ${openSubDropdown === subId ? 'block' : 'hidden'}`}>
+                                                            {subMenu.subMenus?.map((sb, key) => (
+                                                                <Link key={key} to={sb.link}>
+                                                                    <li className="text-sm py-3 ml-9 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{sb.name}</li>
+                                                                </Link>
+                                                            ))}
+                                                        </ul>
+                                                    </>
+                                                )}
+                                            </div>
                                         ))}
                                     </ul>
                                 )}
