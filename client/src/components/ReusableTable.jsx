@@ -75,7 +75,7 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10
                                 <th
                                     key={key}
                                     scope="col"
-                                    className="px-6 py-3 cursor-pointer"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
                                     onClick={() => handleSort(column.accessorKey)}
                                 >
                                     <div className="flex items-center">
@@ -101,7 +101,7 @@ const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10
                             { !disableAction && <th scope="col" className="px-6 py-3">Action</th>  }
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-gray-700 divide-y divide-gray-600">
                         {paginatedRecords?.map((record) => (
                             <tr
                                 key={record._id}

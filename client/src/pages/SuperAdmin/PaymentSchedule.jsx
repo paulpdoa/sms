@@ -8,6 +8,7 @@ import { useState,useContext } from 'react';
 import ReusableTable from "../../components/ReusableTable";
 import { MainContext } from '../../helpers/MainContext';
 import ConfirmationPopup from "../../components/ConfirmationPopup";
+import MasterTable from "../../components/MasterTable";
 
 const columns = [
     { accessorKey: 'paymentTermId.term', header: 'Payment Term' },
@@ -58,15 +59,10 @@ const PaymentSchedule = () => {
         }
     }
 
-    
-
-    
-
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Payment Schedule</h1>
+                <h1 className="text-2xl text-green-600 font-bold">Payment Schedule</h1>
                 <div className="flex items-center gap-2">
                     <Searchbar onSearch={setSearchQuery} />
 
@@ -85,9 +81,9 @@ const PaymentSchedule = () => {
 
             <div className="mt-5">
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
-                    <ReusableTable 
-                        records={records} 
-                        columns={columns} 
+                    <MasterTable 
+                        columns={columns}
+                        data={records}
                         searchQuery={searchQuery}
                         disableAction={true}
                     />
@@ -95,6 +91,8 @@ const PaymentSchedule = () => {
             </div> 
             <ToastContainer />
 
+
+            {/* Popup goes here */}
             { openPopup && 
             <ConfirmationPopup 
                 message={'Are you sure you want to regenerate payment schedule? This will affect students payments schedule'} 

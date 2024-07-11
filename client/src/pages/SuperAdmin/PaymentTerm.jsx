@@ -8,7 +8,7 @@ import axios from "axios";
 import { useState,useContext } from 'react';
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from "../../helpers/MainContext";
-
+import TabActions from '../../components/TabActions';
 
 const PaymentTerm = () => {
 
@@ -38,12 +38,11 @@ const PaymentTerm = () => {
         }
     ]
 
-    const { currentUserId, role, searchQuery, setSearchQuery } = useContext(MainContext);
+    const { currentUserId, role, searchQuery, setSearchQuery,showForm } = useContext(MainContext);
 
 
     const updateNewPaymentTerm = async (id,updatedData) => {
 
-        console.log(updatedData);
         try {
             const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm: updatedData.term,newPayEvery: updatedData.payEvery,newInstallmentBy: updatedData.installmentBy,currentUserId,role });
             toast.success(newData.data.mssg, {
@@ -131,48 +130,48 @@ const PaymentTerm = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Payment Terms</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="Payment Term" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-                <form onSubmit={addPaymentTerm} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Payment Terms</h1>
 
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="term">Term</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setTerm(e.target.value)}>
-                            <option hidden>Select installment term</option>
-                            <option value="Installment">Installment</option>
-                            <option value="Quarterly">Quarterly</option>
-                            <option value="Semi-annual">Semi-Annual</option>
-                            <option value="Annually">Annually</option>
-                        </select>
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="pay every">Pay Every</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setPayEvery(e.target.value)}>
-                            <option hidden>Select pay every term</option>
-                            <option value={1}>1 month</option>
-                            <option value={3}>3 months</option>
-                            <option value={6}>6 months</option>
-                            <option value={12}>12 months</option>
-                        </select>
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="installment by">Installment By</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setInstallmentBy(e.target.value)}>
-                            <option hidden>Select installment by term</option>
-                            <option value={10}>10 terms</option>
-                            <option value={4}>4 terms</option>
-                            <option value={2}>2 terms</option>
-                            <option value={1}>1 term</option>
-                        </select>
-                    </div>
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+                { showForm && (
+                    <form onSubmit={addPaymentTerm} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                        <h1 className="font-semibold text-xl text-green-500">Add New Payment Terms</h1>
 
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="term">Term</label>
+                            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setTerm(e.target.value)}>
+                                <option hidden>Select installment term</option>
+                                <option value="Installment">Installment</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Semi-annual">Semi-Annual</option>
+                                <option value="Annually">Annually</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="pay every">Pay Every</label>
+                            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setPayEvery(e.target.value)}>
+                                <option hidden>Select pay every term</option>
+                                <option value={1}>1 month</option>
+                                <option value={3}>3 months</option>
+                                <option value={6}>6 months</option>
+                                <option value={12}>12 months</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="installment by">Installment By</label>
+                            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setInstallmentBy(e.target.value)}>
+                                <option hidden>Select installment by term</option>
+                                <option value={10}>10 terms</option>
+                                <option value={4}>4 terms</option>
+                                <option value={2}>2 terms</option>
+                                <option value={1}>1 term</option>
+                            </select>
+                        </div>
+
+                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                    </form>
+                ) }
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable 

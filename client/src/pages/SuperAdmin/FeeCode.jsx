@@ -8,6 +8,7 @@ import axios from "axios";
 import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
+import TabActions from '../../components/TabActions';
 
 const FeeCode = () => {
 
@@ -18,7 +19,7 @@ const FeeCode = () => {
     const [code,setCode] = useState('');
     const [feeCategory,setFeeCategory] = useState('');
 
-    const { currentUserId,role,searchQuery,setSearchQuery } = useContext(MainContext);
+    const { currentUserId,role,searchQuery,showForm } = useContext(MainContext);
 
     const columns = [
         {
@@ -131,15 +132,12 @@ const FeeCode = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2  items-center">
-                <h1 className="text-xl text-green-500 font-bold">Fee Code</h1>
-                <Searchbar onSearch={setSearchQuery} />
-                {/* <AddReligionBtn /> */}
-            </div>
+            <TabActions title="Fee Code" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-               <div>
-               <form onSubmit={addFeeCode} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+               
+               { showForm && (
+                <form onSubmit={addFeeCode} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
                     <h1 className="font-semibold text-xl text-green-500">Add Fee Code</h1>
 
                     <div className="flex flex-col mt-1">
@@ -162,8 +160,9 @@ const FeeCode = () => {
 
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
+               ) }
                 
-               </div>
+               
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable

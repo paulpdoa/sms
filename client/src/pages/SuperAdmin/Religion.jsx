@@ -1,6 +1,4 @@
 import React, { useState,useContext } from 'react';
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
@@ -8,12 +6,13 @@ import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
+import TabActions from '../../components/TabActions';
 
 
 const Religion = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
     const [religion, setReligion] = useState('');
-    const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext);
+    const { role,currentUserId,searchQuery,showForm } = useContext(MainContext);
 
     const columns = [
         { accessorKey: 'religion', header: 'Religion',editable: true }
@@ -104,22 +103,21 @@ const Religion = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Religion</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="Religion" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-                <div>
-                    <form onSubmit={addReligion} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                        <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
-                        <div className="flex flex-col mt-1">
-                            <label className="text-sm" htmlFor="religion">Religion</label>
-                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
-                        </div>
-                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                    </form>
-                </div>
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+                { showForm && (
+                    <div>
+                        <form onSubmit={addReligion} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                            <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
+                            <div className="flex flex-col mt-1">
+                                <label className="text-sm" htmlFor="religion">Religion</label>
+                                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
+                            </div>
+                            <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                        </form>
+                    </div>
+                ) }
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable

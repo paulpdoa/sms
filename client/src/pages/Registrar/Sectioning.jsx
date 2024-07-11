@@ -4,9 +4,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useContext } from 'react';
 import Searchbar from "../../components/Searchbar";
 import axios from 'axios';
+import TabActions from '../../components/TabActions';
+import MasterTable from "../../components/MasterTable";
+import { useNavigate } from 'react-router-dom';
+import { MainContext } from "../../helpers/MainContext";
 
 const Sectioning = () =>{
 
@@ -24,14 +28,16 @@ const Sectioning = () =>{
         },
     ];
 
+    const navigate = useNavigate();
+
+    const { searchQuery,showForm,currentUserId } = useContext(MainContext);
+
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
-    const [searchQuery, setSearchQuery] = useState('');
     const [sectionId,setSectionId] = useState('');
     const [adviser,setAdviser] = useState('');
 
     const currentSession = localStorage.getItem('session');
-    const currentUserId = localStorage.getItem('id');
 
     const studentLists = students.filter(student => student.isRegistered && student.isAdmitted);
 
@@ -67,12 +73,12 @@ const Sectioning = () =>{
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -86,39 +92,37 @@ const Sectioning = () =>{
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Sectioning</h1>
-                <Searchbar onSearch={setSearchQuery} />
-                {/* <AddStudentBtn /> */}
-            </div>
+            <TabActions title="Sectioning" />
+            <div className={`${showForm ? 'grid grid-cols-2' : ''} gap-2 mt-5`}>
+                { showForm && 
+                    (
+                        studentRecord ? 
+                        <form onSubmit={submitSectioning} className="p-4 col-span-1 bg-white shadow-md rounded-md h-fit border border-gray-300 mt-5">
+                            <h1 className="font-semibold text-xl text-green-600">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
+                            <div className="grid grid-cols-2 gap-5 mt-4">
+                                {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
+                                {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
+                                {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
+                                {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
+                                {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : adviser,'Adviser')}
+                            </div>
 
-            <div className="grid grid-cols-2 gap-2">
-                { studentRecord ? 
-                    <form onSubmit={submitSectioning} className="p-4 col-span-1 bg-white shadow-md rounded-md h-fit border border-gray-300 mt-5">
-                        <h1 className="font-semibold text-xl text-green-600">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
-                        <div className="grid grid-cols-2 gap-5 mt-4">
-                            {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
-                            {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
-                            {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
-                            {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
-                            {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : adviser,'Adviser')}
-                        </div>
-
-                        <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
-                    </form>
-                    :
-                    studentLists?.length < 1 ? (
-                        <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
-                            <h1 className="text-red-500 text-sm font-semibold">
-                               No student records yet
-                            </h1>
-                        </div>
-                    ) : (
-                        <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
-                            <h1 className="text-red-500 text-sm font-semibold">
-                                Please select view on table to view student record
-                            </h1>
-                        </div>
+                            <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
+                        </form>
+                        :
+                        studentLists?.length < 1 ? (
+                            <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
+                                <h1 className="text-red-500 text-sm font-semibold">
+                                No student records yet
+                                </h1>
+                            </div>
+                        ) : (
+                            <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
+                                <h1 className="text-red-500 text-sm font-semibold">
+                                    Please select view on table to view student record
+                                </h1>
+                            </div>
+                        )
                     )
                 }
                 <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
@@ -128,6 +132,12 @@ const Sectioning = () =>{
                         searchQuery={searchQuery}
                         viewRecord={setStudentRecord}
                     />
+
+                    {/* <MasterTable 
+                        data={studentLists}
+                        columns={columns}
+                        searchQuery={searchQuery}
+                    /> */}
                 </div>
             </div>
             <ToastContainer />

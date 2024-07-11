@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,disableAction }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -135,7 +135,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
                                 </div>
                             </th>
                         ))}
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                        { !disableAction && <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th> }
                     </tr>
                 </thead>
                 <tbody className="bg-gray-700 divide-y divide-gray-600">
@@ -174,6 +174,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
                                     )}
                                 </td>
                             ))}
+                            { !disableAction && 
                             <td className="px-6 py-4 whitespace-nowrap">
                                 {editId === record._id ? (
                                     <>
@@ -187,6 +188,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit 
                                     </>
                                 )}
                             </td>
+                            }
                         </tr>
                     ))}
                 </tbody>

@@ -9,6 +9,7 @@ import axios from "axios";
 import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
+import TabActions from '../../components/TabActions';
 
 const Section = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/sections`);
@@ -20,7 +21,7 @@ const Section = () => {
     const [adviser, setAdviser] = useState('');
     // const [department, setDepartment] = useState('');
 
-    const { role,searchQuery,setSearchQuery } = useContext(MainContext);
+    const { role,searchQuery,setSearchQuery,showForm } = useContext(MainContext);
 
     const columns = [
         {
@@ -154,45 +155,44 @@ const Section = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2  items-center">
-                <h1 className="text-xl text-green-500 font-bold">Section</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="Section" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-                <form onSubmit={addSection} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Section</h1>
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+                { showForm && (
+                    <form onSubmit={addSection} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                        <h1 className="font-semibold text-xl text-green-500">Add New Section</h1>
 
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="section">Section</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSection(e.target.value)} required />
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="grade level">Grade Level</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300"
-                            onChange={(e) => setGradeLevel(e.target.value)}
-                            required
-                        >
-                            <option hidden>Grade Level</option>
-                            {gradeLevels?.map(gradeLevel => (
-                                <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="adviser">Adviser</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300"
-                            onChange={(e) => setAdviser(e.target.value)}
-                            required
-                        >
-                            <option hidden>Select adviser</option>
-                            {teachers?.map(teacher => (
-                                <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="section">Section</label>
+                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSection(e.target.value)} required />
+                        </div>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="grade level">Grade Level</label>
+                            <select className="outline-none p-1 rounded-md border border-gray-300"
+                                onChange={(e) => setGradeLevel(e.target.value)}
+                                required
+                            >
+                                <option hidden>Grade Level</option>
+                                {gradeLevels?.map(gradeLevel => (
+                                    <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="adviser">Adviser</label>
+                            <select className="outline-none p-1 rounded-md border border-gray-300"
+                                onChange={(e) => setAdviser(e.target.value)}
+                                required
+                            >
+                                <option hidden>Select adviser</option>
+                                {teachers?.map(teacher => (
+                                    <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                    </form>
+                ) }
 
                 <div className="relative col-span-2  h-fit">
                     <MasterTable

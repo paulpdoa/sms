@@ -8,8 +8,7 @@ import axios from "axios";
 import { useState,useContext } from 'react';
 import MasterTable from "../components/MasterTable";
 import { MainContext } from "../helpers/MainContext";
-
-
+import TabActions from '../components/TabActions';
 
 const Discount = () => {
 
@@ -17,7 +16,7 @@ const Discount = () => {
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
-    const { session,currentUserId,role,searchQuery,setSearchQuery } = useContext(MainContext);
+    const { session,currentUserId,role,searchQuery,showForm } = useContext(MainContext);
 
     const [discountType,setDiscountType] = useState('');
     const [discountPercentage,setDiscountPercentage] = useState(0);
@@ -145,26 +144,25 @@ const Discount = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">Discount</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="Discount" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-                <form onSubmit={addDiscount} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New Discount</h1>
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+                { showForm && (
+                    <form onSubmit={addDiscount} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                        <h1 className="font-semibold text-xl text-green-500">Add New Discount</h1>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {renderInput('discount type','Discount Type',setDiscountType,'text')}
-                        {renderInput('discount percentage','Discount Percentage',setDiscountPercentage,'number')}
-                        {renderInput('discount amount','Discount Amount',setAmount,'number')}
-                        {renderInput('discount code','Discount Code',setDiscountCode,'text')}
-                        {renderSelect('gradeLevel','Grade Level',setGradeLevel,gradeLevels,'grade level')}
-                        {/* {renderSelect('session','School Year',setSchoolYear,schoolYears,'school year')} */}
-                    </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {renderInput('discount type','Discount Type',setDiscountType,'text')}
+                            {renderInput('discount percentage','Discount Percentage',setDiscountPercentage,'number')}
+                            {renderInput('discount amount','Discount Amount',setAmount,'number')}
+                            {renderInput('discount code','Discount Code',setDiscountCode,'text')}
+                            {renderSelect('gradeLevel','Grade Level',setGradeLevel,gradeLevels,'grade level')}
+                            {/* {renderSelect('session','School Year',setSchoolYear,schoolYears,'school year')} */}
+                        </div>
 
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
+                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                    </form>
+                ) }
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable 

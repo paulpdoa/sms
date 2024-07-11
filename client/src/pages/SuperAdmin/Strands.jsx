@@ -8,11 +8,12 @@ import axios from "axios";
 import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
+import TabActions from '../../components/TabActions';
 
 const Strands = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/strands`);
-    const { role,currentUserId,setSearchQuery, searchQuery } = useContext(MainContext);
+    const { role,currentUserId,showForm, searchQuery } = useContext(MainContext);
 
     const [strand,setStrand] = useState('');
 
@@ -35,7 +36,7 @@ const Strands = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -51,7 +52,7 @@ const Strands = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -112,14 +113,11 @@ const Strands = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2  items-center">
-                <h1 className="text-xl text-green-500 font-bold">Strand</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="Strand" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-               <div>
-               <form onSubmit={addStrand} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+               { showForm && (
+                <form onSubmit={addStrand} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
                     <h1 className="font-semibold text-xl text-green-500">Add New Strand</h1>
 
                     <div className="flex flex-col mt-1">
@@ -129,9 +127,8 @@ const Strands = () => {
 
                     <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
                 </form>
+               ) }
                 
-               </div>
-
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable 
                         columns={columns}

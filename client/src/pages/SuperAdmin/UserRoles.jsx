@@ -9,6 +9,7 @@ import axios from "axios";
 import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
+import TabActions from '../../components/TabActions';
 
 
 const UserRoles = () => {
@@ -16,7 +17,7 @@ const UserRoles = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/user-roles`);
     const [userRole,setUserRole] = useState('');
     
-    const { role,currentUserId,searchQuery,setSearchQuery} = useContext(MainContext);
+    const { role,currentUserId,searchQuery,showForm } = useContext(MainContext);
 
     const columns = [
         {
@@ -121,22 +122,21 @@ const UserRoles = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-xl text-green-500 font-bold">User Roles</h1>
-                <Searchbar onSearch={setSearchQuery} />
-            </div>
+            <TabActions title="User Roles" />
 
-            <div className="grid grid-cols-3 gap-2 mt-5">
-                <form onSubmit={addUserRoles} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add New User Role</h1>
+            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+                { showForm && (
+                    <form onSubmit={addUserRoles} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
+                        <h1 className="font-semibold text-xl text-green-500">Add New User Role</h1>
 
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="user role">User Roles</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setUserRole(e.target.value)} />
-                    </div>
+                        <div className="flex flex-col mt-1">
+                            <label className="text-sm" htmlFor="user role">User Roles</label>
+                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setUserRole(e.target.value)} />
+                        </div>
 
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
+                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
+                    </form>
+                ) }
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable

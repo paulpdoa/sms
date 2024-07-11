@@ -54,8 +54,13 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Teachers', link: '/teachers' },
                     { name: 'Students', link: '/students' },
-                    { name: 'Admission', link: '/admission' },
-                    { name: 'Assessment', link: '/assessment' }
+                    {
+                        name: 'Enrollment Process',
+                        subMenus: [
+                            { name: 'Admission', link: '/admission' },
+                            { name: 'Assessment', link: '/assessment' }
+                        ]
+                    }
                 ]
             },
             {
@@ -63,8 +68,6 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/students' },
-                    { name: 'Admission', link: '/admission' },
-                    { name: 'Assessment', link: '/assessment' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
