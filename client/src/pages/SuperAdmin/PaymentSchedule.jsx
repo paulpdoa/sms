@@ -61,9 +61,9 @@ const PaymentSchedule = () => {
 
     return (
         <main className="p-2">
-            <div className="flex justify-between mx-4 my-2 items-center">
+            <div className="flex flex-col mx-4 my-2 gap-2">
                 <h1 className="text-2xl text-green-600 font-bold">Payment Schedule</h1>
-                <div className="flex items-center gap-2">
+                <div className="flex items- w-full justify-between gap-2">
                     <Searchbar onSearch={setSearchQuery} />
 
                     { records.length < 1 ? 

@@ -8,9 +8,9 @@ const TabActions = ({ title }) => {
     const { setSearchQuery,setShowForm } = useContext(MainContext);
 
     return (
-        <div className="flex justify-between mx-4 my-2">
+        <div className="mx-4 my-2">
             <h1 className="text-2xl text-green-600 font-bold">{title}</h1>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex mt-3 w-full gap-2 justify-between">
                 <Searchbar onSearch={setSearchQuery} />
                 <AddNewData label={title} onShow={setShowForm}  />
             </div>

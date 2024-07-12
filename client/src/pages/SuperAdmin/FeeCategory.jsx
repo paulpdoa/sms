@@ -9,11 +9,12 @@ import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
+import MasterDataForm from "../../components/MasterDataForm";
 
 const FeeCategory = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/fee-categories`);
-    const { currentUserId,role,searchQuery,setSearchQuery,showForm } = useContext(MainContext);
+    const { currentUserId,role,searchQuery,setShowForm,showForm } = useContext(MainContext);
 
     const [category,setCategory] = useState('');
     const [feeCode,setFeeCode] = useState('');
@@ -116,28 +117,28 @@ const FeeCategory = () => {
         ...record,
     }));
 
+    const form = () => (
+        <>
+        <h1 className="font-semibold text-xl text-green-500">Add Fee Category</h1>
+
+        <div className="flex flex-col mt-1">
+            <label className="text-sm" htmlFor="category">Category</label>
+            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setCategory(e.target.value)} />
+        </div>
+        <div className="flex flex-col mt-1">
+            <label className="text-sm" htmlFor="fee code">Fee Code</label>
+            <input className="outline-none p-1 rounded-md border border-gray-300 uppercase" type="text" onChange={(e) => setFeeCode(e.target.value)} />
+        </div>
+        </>
+    )
+
     return (
-        <main className="p-2">
+        <main className="p-2 relative">
             {/* <DateTime /> */}
             <TabActions title="Fee Category" />
 
-            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
-                { showForm && (
-                    <form onSubmit={addFeeCategory} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                        <h1 className="font-semibold text-xl text-green-500">Add Fee Category</h1>
-
-                        <div className="flex flex-col mt-1">
-                            <label className="text-sm" htmlFor="category">Category</label>
-                            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setCategory(e.target.value)} />
-                        </div>
-                        <div className="flex flex-col mt-1">
-                            <label className="text-sm" htmlFor="fee code">Fee Code</label>
-                            <input className="outline-none p-1 rounded-md border border-gray-300 uppercase" type="text" onChange={(e) => setFeeCode(e.target.value)} />
-                        </div>
-
-                        <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                    </form>
-                ) }
+            <div className={`gap-2 mt-5`}>
+                { showForm && MasterDataForm(form,addFeeCategory,setShowForm) }
 
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable

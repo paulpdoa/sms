@@ -204,17 +204,17 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 Previous
             </button>
             <ul className="flex mx-4">
-                <span className="text-sm">Page { currentPage } of { totalPages }</span>
-                {/* {Array.from({ length: totalPages }, (_, index) => (
+                {/* <span className="text-sm">Page { currentPage } of { totalPages }</span> */}
+                {Array.from({ length: totalPages }, (_, index) => (
                     <li key={index + 1} className="mx-1">
                         <button
                             onClick={() => paginate(index + 1)}
-                            className={`px-3 py-1 focus:outline-none ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}`}
+                            className={`px-3 py-1 focus:outline-none ${currentPage === index + 1 ? 'text-gray-200 rounded-md bg-gray-500' : 'hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md'}`}
                         >
                             {index + 1}
                         </button>
                     </li>
-                ))} */}
+                ))}
             </ul>
             <button
                 onClick={() => paginate(currentPage + 1)}

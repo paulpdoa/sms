@@ -9,6 +9,7 @@ import { useState,useContext } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
+import MasterDataForm from "../../components/MasterDataForm";
 
 const FeeCode = () => {
 
@@ -19,7 +20,7 @@ const FeeCode = () => {
     const [code,setCode] = useState('');
     const [feeCategory,setFeeCategory] = useState('');
 
-    const { currentUserId,role,searchQuery,showForm } = useContext(MainContext);
+    const { currentUserId,role,searchQuery,showForm,setShowForm } = useContext(MainContext);
 
     const columns = [
         {
@@ -129,38 +130,39 @@ const FeeCode = () => {
         }
     }));
 
+    const form = () => (
+        <>
+        <h1 className="font-semibold text-xl text-green-500">Add Fee Code</h1>
+
+        <div className="flex flex-col mt-1">
+            <label className="text-sm" htmlFor="description">Description</label>
+            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="flex flex-col mt-1">
+            <label className="text-sm" htmlFor="category code">Category Code</label>
+            <input className="outline-none p-1 rounded-md border border-gray-300 uppercase" type="text" onChange={(e) => setCode(e.target.value)} />
+        </div>
+        <div className="flex flex-col mt-1">
+            <label className="text-sm" htmlFor="fee category">Fee Category</label>
+            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setFeeCategory(e.target.value)}>
+                <option hidden>Select fee category</option>
+                { feeCategories?.map(feeCateg => (
+                    <option key={feeCateg._id} value={feeCateg._id}>{ feeCateg.category }</option>
+                )) }
+            </select>                    
+        </div>
+
+       
+        </>
+    )
+
     return (
-        <main className="p-2">
-            {/* <DateTime /> */}
+        <main className="p-2 relative">
             <TabActions title="Fee Code" />
 
-            <div className={`${showForm ? 'grid grid-cols-3' : ''} gap-2 mt-5`}>
+            <div className={`gap-2 mt-5`}>
                
-               { showForm && (
-                <form onSubmit={addFeeCode} className="p-4 col-span-1 h-fit rounded-lg border border-gray-300">
-                    <h1 className="font-semibold text-xl text-green-500">Add Fee Code</h1>
-
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="description">Description</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setDescription(e.target.value)} />
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="category code">Category Code</label>
-                        <input className="outline-none p-1 rounded-md border border-gray-300 uppercase" type="text" onChange={(e) => setCode(e.target.value)} />
-                    </div>
-                    <div className="flex flex-col mt-1">
-                        <label className="text-sm" htmlFor="fee category">Fee Category</label>
-                        <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setFeeCategory(e.target.value)}>
-                            <option hidden>Select fee category</option>
-                            { feeCategories?.map(feeCateg => (
-                                <option key={feeCateg._id} value={feeCateg._id}>{ feeCateg.category }</option>
-                            )) }
-                        </select>                    
-                    </div>
-
-                    <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-                </form>
-               ) }
+               { showForm && MasterDataForm(form,addFeeCode,setShowForm) }
                 
                
 

@@ -72,10 +72,9 @@ const Users = () => {
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
-            <div className="flex justify-between mx-4 my-2  items-center">
-                <h1 className="text-2xl text-green-500 font-bold">User</h1>
-                <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col justify-between mx-4 my-2 gap-2">
+                <h1 className="text-2xl text-green-600 font-bold">User</h1>
+                <div className="flex justify-between w-full gap-2">
                     <Searchbar onSearch={setSearchQuery} />
                     <AddUserBtn />
                 </div>
