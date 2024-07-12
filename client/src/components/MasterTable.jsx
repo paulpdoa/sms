@@ -105,15 +105,15 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
 
     return (
         <>
-        <div className="text-gray-200 overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-600">
-                <thead className="bg-gray-700">
+        <div className="text-gray-900 overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
+                <thead className="bg-gray-100">
                     <tr>
                         {columns.map((column, key) => (
                             <th
                                 key={key}
                                 onClick={() => handleSort(column)}
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider cursor-pointer"
                             >
                                 <div className="flex items-center">
                                     {column.header}
@@ -135,10 +135,10 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                 </div>
                             </th>
                         ))}
-                        { !disableAction && <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th> }
+                        { !disableAction && <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Actions</th> }
                     </tr>
                 </thead>
-                <tbody className="bg-gray-700 divide-y divide-gray-600">
+                <tbody className="bg-gray-1 00 divide-y divide-gray-300">
                     {currentRows.map((record) => (
                         <tr key={record._id}>
                             {columns.map(column => (
@@ -196,34 +196,50 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
             
         </div>
         <div className="pagination mt-4 flex justify-center items-center">
+    <button
+        onClick={() => paginate(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+    >
+        Previous
+    </button>
+    <ul className="flex mx-4">
+        {currentPage > 1 && (
+            <li className="mx-1">
+                <button
+                    onClick={() => paginate(currentPage - 1)}
+                    className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                >
+                    {currentPage - 1}
+                </button>
+            </li>
+        )}
+        <li className="mx-1">
             <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500"
             >
-                Previous
+                {currentPage}
             </button>
-            <ul className="flex mx-4">
-                {/* <span className="text-sm">Page { currentPage } of { totalPages }</span> */}
-                {Array.from({ length: totalPages }, (_, index) => (
-                    <li key={index + 1} className="mx-1">
-                        <button
-                            onClick={() => paginate(index + 1)}
-                            className={`px-3 py-1 focus:outline-none ${currentPage === index + 1 ? 'text-gray-200 rounded-md bg-gray-500' : 'hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md'}`}
-                        >
-                            {index + 1}
-                        </button>
-                    </li>
-                ))}
-            </ul>
-            <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages || totalPages < 1}
-                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
-            >
-                Next
-            </button>
-        </div>
+        </li>
+        {currentPage < totalPages && (
+            <li className="mx-1">
+                <button
+                    onClick={() => paginate(currentPage + 1)}
+                    className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                >
+                    {currentPage + 1}
+                </button>
+            </li>
+        )}
+    </ul>
+    <button
+        onClick={() => paginate(currentPage + 1)}
+        disabled={currentPage === totalPages || totalPages < 1}
+        className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+    >
+        Next
+    </button>
+</div>
         </>
     );
 };

@@ -39,13 +39,11 @@ const initialMenus = [
                     { name: 'Textbooks', link: '/master/text-books' },
                     { name: 'Payment Terms', link: '/master/payment-terms' },
                     { name: 'Payment Schedule', link: '/master/payment-schedule' },
-                    { name: 'Late Payment Penalty', link: '/master/payment-penalty' },
-                    { name: 'Admission', link: '/master/admission' },
+                    // { name: 'Late Payment Penalty', link: '/master/payment-penalty' },
                     { name: 'Fee Category', link: '/master/fee-category' },
                     { name: 'Fee Code', link: '/master/fee-code' },
                     { name: 'Manage Fees', link: '/master/manage-fees' },
                     { name: 'Discount', link: '/master/discount' },
-                    { name: 'Sectioning', link: '/master/sectioning' }
                 ]
             },
             {
@@ -58,7 +56,8 @@ const initialMenus = [
                         name: 'Enrollment Process',
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' }
+                            { name: 'Assessment', link: '/assessment' },
+                            { name: 'Sectioning', link: '/sectioning' }
                         ]
                     }
                 ]
@@ -72,7 +71,8 @@ const initialMenus = [
                         name: 'Enrollment Process',
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' }
+                            { name: 'Assessment', link: '/assessment' },
+                            { name: 'Sectioning', link: '/sectioning' }
                         ]
                     }
                 ]
@@ -96,7 +96,16 @@ const initialMenus = [
                 name: 'School Admin',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Teachers', link: '/teachers' }
+                    { name: 'Teachers', link: '/teachers' },
+                    { name: 'Students', link: '/students' },
+                    {
+                        name: 'Enrollment Process',
+                        subMenus: [
+                            { name: 'Admission', link: '/admission' },
+                            { name: 'Assessment', link: '/assessment' },
+                            { name: 'Sectioning', link: '/sectioning' }
+                        ]
+                    }
                 ]
             },
             {
@@ -104,9 +113,14 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/students' },
-                    { name: 'Registration' },
-                    { name: 'Admission' },
-                    { name: 'Sectioning', link: '/sectioning' }
+                    {
+                        name: 'Enrollment Process',
+                        subMenus: [
+                            { name: 'Admission', link: '/admission' },
+                            { name: 'Assessment', link: '/assessment' },
+                            { name: 'Sectioning', link: '/sectioning' }
+                        ]
+                    }
                 ]
             },
             {
@@ -129,9 +143,14 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/students' },
-                    { name: 'Registration' },
-                    { name: 'Admission' },
-                    { name: 'Sectioning', link: '/sectioning' }
+                    {
+                        name: 'Enrollment Process',
+                        subMenus: [
+                            { name: 'Admission', link: '/admission' },
+                            { name: 'Assessment', link: '/assessment' },
+                            { name: 'Sectioning', link: '/sectioning' }
+                        ]
+                    }
                 ]
             },
             {
@@ -144,7 +163,7 @@ const initialMenus = [
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-    const { role: currentRole, currentUser, session: sessionId } = useContext(MainContext);
+    const { role: currentRole, currentUser, session: sessionId,setShowForm } = useContext(MainContext);
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
@@ -214,7 +233,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                         {menu.subMenus.map((subMenu, subId) => (
                                             <div key={subId}>
                                                 {subMenu.link ? (
-                                                    <Link to={subMenu.link}>
+                                                    <Link onClick={() => setShowForm(false)} to={subMenu.link}>
                                                         <li className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{subMenu.name}</li>
                                                     </Link>
                                                 ) : (
@@ -230,7 +249,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                                         </button>
                                                         <ul className={`transition-all duration-300 ${openSubDropdown === subId ? 'block' : 'hidden'}`}>
                                                             {subMenu.subMenus?.map((sb, key) => (
-                                                                <Link key={key} to={sb.link}>
+                                                                <Link onClick={() => setShowForm(false)} key={key} to={sb.link}>
                                                                     <li className="text-sm py-3 ml-9 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{sb.name}</li>
                                                                 </Link>
                                                             ))}

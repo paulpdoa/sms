@@ -12,6 +12,7 @@ const StudentPayment = require('../model/StudentPayment');
 const Textbook = require('../model/Textbook'); 
 const PaymentSchedule = require('../model/PaymentSchedule');
 const PaymentTerm = require('../model/PaymentTerm');
+const FeeCode = require('../model/FeeCode');
 
 const moment = require('moment');
 
@@ -600,11 +601,40 @@ module.exports.add_manage_fees = async (req,res) => {
             }
 
         }
-
         res.status(200).json({mssg: 'Fees has already been added to the record'});
     } catch(err) {
         console.log(err);
     }
+}
+
+// This function will automate creation of adding of fees for grade levels then assigning them fees
+module.exports.automate_fees = async (req,res) => {
+
+    try {
+        // Fetch all grade levels
+        const gradeLevels = await GradeLevel.find();
+
+        // Get fees
+        const fees = await FeeCode.find();
+        
+        // Assign a fee for each gradeLevel
+        for(const gradeLevel of gradeLevels) {
+            for(let fee of fees) {
+                const manageFeesInfo = {
+                    gradeLevelId: gradeLevel._id,
+                    feeDescription: fee._id,
+                    amount: 0
+                }
+                
+                await ManageFee.create(manageFeesInfo);
+            }
+        }
+
+        res.status(200).json({ mssg: 'Fees has been automatically created' });
+    } catch(err) {
+        console.log(err);
+    }
+
 }
 
 module.exports.delete_manage_fee = async(req,res) => {

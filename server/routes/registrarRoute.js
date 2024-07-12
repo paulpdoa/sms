@@ -1,5 +1,5 @@
 const express = require('express');
-const { get_students, add_student, delete_student, get_student_detail, submit_student_requirements, get_admission, add_admission, get_admission_student, update_student_info, get_academics, add_academic, get_student_academic_detail, get_student_academic, delete_academic, get_discounts, get_discount_detail, add_discount, delete_discount, edit_discount, get_student_discounts, get_student_discount_detail, get_discounts_of_student, delete_student_discount, add_student_discount, get_sectioning, add_sectioning, get_manage_fees, add_manage_fees, get_manage_fee_detail, delete_manage_fee, edit_manage_fee, generate_fees, get_student_payments, get_student_payment_detail, get_payment_schedule, add_payment_schedule, delete_generated_fees } = require('../controller/registrarController');
+const { get_students, add_student, delete_student, get_student_detail, submit_student_requirements, get_admission, add_admission, get_admission_student, update_student_info, get_academics, add_academic, get_student_academic_detail, get_student_academic, delete_academic, get_discounts, get_discount_detail, add_discount, delete_discount, edit_discount, get_student_discounts, get_student_discount_detail, get_discounts_of_student, delete_student_discount, add_student_discount, get_sectioning, add_sectioning, get_manage_fees, add_manage_fees, get_manage_fee_detail, delete_manage_fee, edit_manage_fee, generate_fees, get_student_payments, get_student_payment_detail, get_payment_schedule, add_payment_schedule, delete_generated_fees, automate_fees } = require('../controller/registrarController');
 const route = express.Router();
 const { allowUserAction,allowUserView } = require('../middleware/middlewares');
 
@@ -49,6 +49,7 @@ route.get('/manage-fee/:id',allowUserView(userRoles),get_manage_fee_detail);
 route.delete('/manage-fee/:id',delete_manage_fee);
 route.patch('/manage-fee/:id',edit_manage_fee);
 route.get('/generate-fees/:currentYear',allowUserView(userRoles),generate_fees);
+route.get('/automate-fees',automate_fees);
 
 // Student Payment
 route.get('/student-payments',allowUserView(userRoles),get_student_payments);

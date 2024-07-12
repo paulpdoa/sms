@@ -98,7 +98,7 @@ const EditManageFee = () => {
                                 </span>
                             }
                         </div>
-                        {renderSelect("feeDescription", "Fee Description", feeDescription, setFeeDescription, feeCodes, "Fee Description")}
+                        {renderSelect("feeDescription", "Fee Description", feeDescription, setFeeDescription, feeCodes, "Fee Description",true)}
 
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="gradelevel">Grade Level</label>
@@ -111,12 +111,15 @@ const EditManageFee = () => {
                         </div>
                         {renderInput('amount', 'Fee Amount', amount, setAmount, 'number')}
                         {showStrand && renderSelect("strand", "Strand", strandId, setStrandId, strands, "Select Strand")}
-                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code")}
+                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code",true)}
                     </div>
                 </section>
 
                 <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300" disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Submit'}
+                </button>
+                <button type="button" onClick={() => navigate(-1)} className="ml-2 bg-red-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-700 transition duration-300" disabled={isLoading}>
+                    Cancel
                 </button>
             </form>
             <ToastContainer />
@@ -124,7 +127,7 @@ const EditManageFee = () => {
     );
 };
 
-const renderSelect = (id, label, value, onChange, options, placeholder) => (
+const renderSelect = (id, label, value, onChange, options, placeholder,disabled = false) => (
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
@@ -132,6 +135,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
         >
             <option value="" hidden>{placeholder}</option>
             {options?.map(option => (

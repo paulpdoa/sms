@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import ManageFeeBtn from '../../components/ManageFeeBtn';
+import ManageFeeBtn from '../../components/buttons/ManageFeeBtn';
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
@@ -91,7 +91,10 @@ const ManageFees = () => {
         <main className="p-2">
             <div className="flex justify-between items-center">
                 <Searchbar onSearch={setSearchQuery} />
-                <ManageFeeBtn />
+                <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">Generate Fees</button>
+                    <ManageFeeBtn />
+                </div>
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
