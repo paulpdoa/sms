@@ -45,7 +45,7 @@ const EditManageFee = () => {
             gradeLevelId,
             strandId,
             amount,
-            nationalityCodeId,
+            nationality,
         };
 
         setIsLoading(true);
