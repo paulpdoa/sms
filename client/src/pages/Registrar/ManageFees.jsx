@@ -89,7 +89,7 @@ const ManageFees = () => {
 
         try {
             const { data } = await axios.get(`${baseUrl()}/automate-fees`);
-            toast.update(data.mssg, {
+            toast.update(toastId, {
                 render: data.mssg,
                 type: "success",
                 isLoading: false,

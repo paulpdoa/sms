@@ -581,7 +581,7 @@ module.exports.get_manage_fee_detail = async(req,res) => {
 }
 
 module.exports.add_manage_fees = async (req,res) => {
-    let { sy_id, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationalityCodeId} = req.body;
+    let { sy_id, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality } = req.body;
 
     // Fee Code > fee code + grade level + nationality Code
     // Fee description > fee description + grade level + nationality Code
@@ -594,10 +594,10 @@ module.exports.add_manage_fees = async (req,res) => {
         for(let i = 0; i < gradeLevelIds.length; i++) {
             const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
 
-            if(checkGradeLevel.gradeLevel === 'Grade 11' || checkGradeLevel.gradeLevel === 'Grade 12') {
-                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationalityCodeId,strandId,feeDescription,amount,isApplied});
+            if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
+                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied});
             } else {
-                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationalityCodeId,feeDescription,amount,isApplied});
+                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied});
             }
 
         }
@@ -664,11 +664,11 @@ module.exports.delete_manage_fee = async(req,res) => {
 
 module.exports.edit_manage_fee = async (req,res) => {
     const { id } = req.params;
-    let { sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationalityCodeId } = req.body;
+    let { sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality } = req.body;
 
     console.log(req.body)
     try {
-        await ManageFee.findByIdAndUpdate({ _id: id },{ sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationalityCodeId });
+        await ManageFee.findByIdAndUpdate({ _id: id },{ sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality });
         res.status(200).json({ mssg: `Fee has been updated successfully` });
     } catch(err) {
         console.log(err);

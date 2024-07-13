@@ -22,7 +22,7 @@ const NewManageFee = () => {
     const [showGradeLevels, setShowGradeLevels] = useState(false);
     const [amount, setAmount] = useState(0);
     const [strandId, setStrandId] = useState('');
-    const [nationalityCodeId, setNationalityCodeId] = useState('');
+    const [nationality, setNationality] = useState('Foreigner');
     const [showStrand, setShowStrand] = useState(false);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ const NewManageFee = () => {
             gradeLevelIds: selectedGradeLevels,
             strandId,
             amount,
-            nationalityCodeId,
+            nationality,
         };
 
         if(amount === 0) {
@@ -59,25 +59,15 @@ const NewManageFee = () => {
 
             return;
         }
-
-        setIsLoading(true);
-        isLoading &&
-        toast.success('Please wait while creating some fees', {
-            position: "top-center",
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored"
-        });
+        const toastId = toast.loading('Please wait while creating some fees');
 
         try {
             const { data } = await axios.post(`${baseUrl()}/manage-fee`, feeInformation);
-            setIsLoading(false);
-            toast.success(data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
+            toast.update(toastId, {
+                render: data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -90,9 +80,11 @@ const NewManageFee = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error("Error adding fee. Please try again.", {
-                position: "top-center",
-                autoClose: 1000,
+            toast.update(toastId, {
+                render: 'An error occurred while creating fee',
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -177,7 +169,7 @@ const NewManageFee = () => {
 
                         {renderInput('amount', 'Fee Amount', amount, setAmount, 'number')}
                         {showStrand && renderSelect("strand", "Strand", strandId, setStrandId, strands, "Select Strand")}
-                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code",true)}
+                        {renderInput('nationality', 'Nationality', nationality, setNationality, 'text',true)}                    
                     </div>
                 </section>
 
