@@ -11,9 +11,8 @@ import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 
 const ManageFees = () => {
-
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery, setSearchQuery, role } = useContext(MainContext);
     const navigate = useNavigate();
 
     const columns = [
@@ -65,16 +64,16 @@ const ManageFees = () => {
 
     const deleteManagedFees = async (id) => {
         try {
-            const removeManageFee = await axios.delete(`${baseUrl()}/manage-fee/${id}`,{ data: { role } });
+            const removeManageFee = await axios.delete(`${baseUrl()}/manage-fee/${id}`, { data: { role } });
             toast.success(removeManageFee.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -85,14 +84,54 @@ const ManageFees = () => {
         }
     }
 
+    const automateFees = async () => {
+        const toastId = toast.loading("Generating fees, please do not leave the page...");
+
+        try {
+            const { data } = await axios.get(`${baseUrl()}/automate-fees`);
+            toast.update(data.mssg, {
+                render: data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000)
+        } catch (err) {
+            toast.update(toastId, {
+                render: "An error occurred while generating fees",
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+            console.log(err);
+        }
+    }
+
     const goToEdit = id => navigate(`/registrar/edit-manage-fee/${id}`);
 
     return (
-        <main className="p-2">
+        <main className="p-2 relative">
             <div className="flex justify-between items-center">
                 <Searchbar onSearch={setSearchQuery} />
                 <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">Generate Fees</button>
+                    <button onClick={automateFees} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
+                        Generate Fees
+                    </button>
                     <ManageFeeBtn />
                 </div>
             </div>

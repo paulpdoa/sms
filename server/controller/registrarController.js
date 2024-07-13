@@ -13,7 +13,7 @@ const Textbook = require('../model/Textbook');
 const PaymentSchedule = require('../model/PaymentSchedule');
 const PaymentTerm = require('../model/PaymentTerm');
 const FeeCode = require('../model/FeeCode');
-
+const Strand = require('../model/Strand');
 const moment = require('moment');
 
 module.exports.get_students = async (req,res) => {
@@ -559,7 +559,7 @@ module.exports.get_manage_fees = async (req,res) => {
     try {
         const managedFees = await ManageFee.find()
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
-        .populate('sy_id gradeLevelId strandId nationalityCodeId');
+        .populate('sy_id gradeLevelId strandId');
         res.status(200).json(managedFees);
     } catch(err) {
         console.log(err);
@@ -573,7 +573,7 @@ module.exports.get_manage_fee_detail = async(req,res) => {
     try {
         const managedFee = await ManageFee.findById(id)
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
-        .populate('sy_id gradeLevelId strandId nationalityCodeId');
+        .populate('sy_id gradeLevelId strandId');
         res.status(200).json(managedFee);
     } catch(err) {
         console.log(err)
@@ -607,35 +607,49 @@ module.exports.add_manage_fees = async (req,res) => {
     }
 }
 
-// This function will automate creation of adding of fees for grade levels then assigning them fees
-module.exports.automate_fees = async (req,res) => {
-
+// This function will automate the creation of fees for grade levels and assign them fees
+module.exports.automate_fees = async (req, res) => {
     try {
-        // Fetch all grade levels
-        const gradeLevels = await GradeLevel.find();
+        // Fetch all grade levels, fees, and strands
+        const [gradeLevels, fees, strands] = await Promise.all([
+            GradeLevel.find(),
+            FeeCode.find(),
+            Strand.find({ status: true })
+        ]);
 
-        // Get fees
-        const fees = await FeeCode.find();
-        
-        // Assign a fee for each gradeLevel
-        for(const gradeLevel of gradeLevels) {
-            for(let fee of fees) {
-                const manageFeesInfo = {
-                    gradeLevelId: gradeLevel._id,
-                    feeDescription: fee._id,
-                    amount: 0
+        // Assign fees for each grade level
+        for (const gradeLevel of gradeLevels) {
+            const isSenior = gradeLevel.gradeLevel.includes(11) || gradeLevel.gradeLevel.includes(12);
+            const manageFeesInfo = fee => ({
+                gradeLevelId: gradeLevel._id,
+                feeDescription: fee._id,
+                amount: 0,
+                nationality: 'Local'
+            });
+
+            if (isSenior) {
+                for (const strand of strands) {
+                    for (const fee of fees) {
+                        await ManageFee.create({
+                            ...manageFeesInfo(fee),
+                            strandId: strand._id
+                        });
+                    }
                 }
-                
-                await ManageFee.create(manageFeesInfo);
+            } else {
+                for (const fee of fees) {
+                    await ManageFee.create(manageFeesInfo(fee));
+                }
             }
         }
 
-        res.status(200).json({ mssg: 'Fees has been automatically created' });
-    } catch(err) {
-        console.log(err);
+        res.status(200).json({ message: 'Fees have been automatically created' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred while automating fees' });
     }
+};
 
-}
 
 module.exports.delete_manage_fee = async(req,res) => {
     const { id } = req.params;

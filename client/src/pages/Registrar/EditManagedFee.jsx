@@ -23,7 +23,7 @@ const EditManageFee = () => {
     const [gradeLevelId,setGradeLevelId] = useState('');
     const [amount, setAmount] = useState('');
     const [strandId, setStrandId] = useState('');
-    const [nationalityCodeId, setNationalityCodeId] = useState('');
+    const [nationality, setNationality] = useState('');
     const [showStrand, setShowStrand] = useState(false);
 
     useEffect(() => {   
@@ -32,7 +32,7 @@ const EditManageFee = () => {
             setGradeLevelId(manageFee?.gradeLevelId?._id || undefined);
             setAmount(manageFee?.amount || '');
             setStrandId(manageFee?.strandId?._id || undefined);
-            setNationalityCodeId(manageFee?.nationalityCodeId?._id || undefined);
+            setNationality(manageFee?.nationality || undefined);
         }
     }, [manageFee]);
 
@@ -111,7 +111,7 @@ const EditManageFee = () => {
                         </div>
                         {renderInput('amount', 'Fee Amount', amount, setAmount, 'number')}
                         {showStrand && renderSelect("strand", "Strand", strandId, setStrandId, strands, "Select Strand")}
-                        {renderSelect("nationalityCode", "Nationality Code", nationalityCodeId, setNationalityCodeId, nationalityCodes, "Select Nationality Code",true)}
+                        {renderInput('nationality', 'Nationality', nationality, setNationality, 'text',true)}                    
                     </div>
                 </section>
 

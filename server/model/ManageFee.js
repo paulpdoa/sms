@@ -26,9 +26,8 @@ const manageFeeSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    nationalityCodeId   : {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'nationalityCode'
+    nationality: {
+        type: String
     },
     isApplied: {
         type: Boolean
