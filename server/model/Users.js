@@ -32,7 +32,7 @@ userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();
 
     if(!validator.isStrongPassword(this.password)) {
-        throw Error('Password not strong enough')
+        throw Error('Password not strong enough, please create another password')
     }
 
     this.password = await bcrypt.hash(this.password,salt);
@@ -56,6 +56,37 @@ userSchema.statics.login = async function(username,password,session) {
     } 
     throw Error('This username doesn\'t exist');
 }
+
+userSchema.statics.updateUser = async function(id, firstName, middleName, lastName, role, username, password, isActive) {
+    const user = await this.findOne({ username });
+
+    if (user && user._id.toString() !== id.toString()) {
+        throw Error('This username is already taken, please choose another username');
+    }
+
+    if(!validator.isStrongPassword(password)) {
+        throw Error('Password not strong enough, please create another password')
+    }
+
+    const salt = await bcrypt.genSalt();
+    const newPassword = password ? await bcrypt.hash(password, salt) : undefined;
+
+    const updatedFields = {
+        firstName,
+        middleName,
+        lastName,
+        role,
+        username,
+        isActive,
+    };
+
+    if (newPassword) {
+        updatedFields.password = newPassword;
+    }
+
+    return await this.findByIdAndUpdate(id, updatedFields, { new: true });
+};
+
 
 const UserModel = mongoose.model('user',userSchema);
 module.exports = UserModel;

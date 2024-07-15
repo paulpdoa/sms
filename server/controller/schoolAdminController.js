@@ -24,6 +24,7 @@ module.exports.get_teachers = async (req,res) => {
 }
 
 module.exports.add_teacher = async (req,res) => {
+
     const { firstName,
         middleName,
         lastName,
@@ -46,48 +47,37 @@ module.exports.add_teacher = async (req,res) => {
         // department,
         // gradeLevel,
         // section,
-        username,
-        password,
-        confirmPassword
+        // username,
+        // password,
+        // confirmPassword
      } = req.body;
 
-     console.log(req.body);
-
-
-     const role = 'Teacher';
+    //  const role = 'Teacher';
      const activeStatus = true;
 
     try {
-        if(password === confirmPassword) {
-            const findRoleId = await Role.find({ userRole: role });
-            const addTeacherToUser = await User.create({ firstName,middleName,lastName,username,password,role: findRoleId[0]._id, isActive: activeStatus});
-            const addTeacher = await Teacher.create({firstName,
-                middleName,
-                lastName,
-                dateOfBirth,
-                age,
-                sex,
-                religion,
-                nationality,
-                placeOfBirth,
-                email,
-                contactNumber,
-                address,
-                spouseName,
-                spouseCel,
-                education,
-                schoolGraduated,
-                yearGraduated,
-                yearsOfExperience,
-                joiningDate,
-                // department,
-                // gradeLevel,
-                // section,
-                username,
-                password });
-                const token = createToken(addTeacher._id);
-            res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
-        }
+           
+        const addTeacher = await Teacher.create({firstName,
+            middleName,
+            lastName,
+            dateOfBirth,
+            age,
+            sex,
+            religion,
+            nationality,
+            placeOfBirth,
+            email,
+            contactNumber,
+            address,
+            spouseName,
+            spouseCel,
+            education,
+            schoolGraduated,
+            yearGraduated,
+            yearsOfExperience,
+            joiningDate,
+            });
+        res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {
         console.log(err.message);
         res.status(400).json({ mssg: err.message })
@@ -120,24 +110,11 @@ module.exports.get_teacher_detail = async (req,res) => {
 module.exports.edit_teacher = async (req,res) => {
 
     const { id } = req.params;
-    const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username,password,confirmPassword } = req.body;
+    const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate } = req.body;
 
     try {
-        if(password === '' && confirmPassword === '') {
-            await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username });
-        } else {
-            const salt = await bcrypt.genSalt();
-            const newPassword = await bcrypt.hash(password,salt);
-
-            if(password !== confirmPassword) {
-                throw new Error('Password does not match, please check your password')
-            } else {
-                await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,nationality,religion,lastName,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username,password: newPassword} )
-            }
-        }
-
+        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
-        
     } catch(err) {
         console.log(err);
     }

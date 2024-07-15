@@ -17,6 +17,7 @@ const Sibling = require('../model/Sibling');
 const NationalityCode = require('../model/NationalityCode');
 const PaymentSchedule = require('../model/PaymentSchedule');
 const StudentPayment = require('../model/StudentPayment');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 
@@ -733,32 +734,34 @@ module.exports.get_user_detail = async (req,res) => {
     }
 }
 
-module.exports.edit_user = async (req,res) => {
+module.exports.edit_user = async (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
-    const { firstName, middleName, lastName, userRole: role, username,isActive,password, confirmPassword } = req.body;
+    const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword } = req.body;
 
-    // Fix password for updating 
-    
-
-    try {   
+    try {
         const currUser = await User.findById(id);
+        
+        if (!currUser) {
+            return res.status(404).json({ mssg: 'User not found' });
+        }
 
         if(password === '' && confirmPassword === '') {
-            
-        }
-
-        if(currUser.firstName !== firstName || currUser.middleName !== middleName || currUser.lastName !== lastName || currUser.role !== role || currUser.isActive !== isActive) {
-            const newUser = await User.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,role,username,isActive });
-            res.status(200).json({ mssg: `${newUser.firstName} has been edited successfully!` });
+            await User.findByIdAndUpdate({_id: id}, {firstName, middleName, lastName, userRole: role, username, isActive});
         } else {
-            res.status(400).json({ mssg: `Cannot update ${firstName}'s record, still the same with old value` })
-        }
-        
-    } catch(err) {
+            if (password && password !== confirmPassword) {
+                return res.status(400).json({ mssg: 'Passwords do not match' });
+            }
+    
+            await User.updateUser(id, firstName, middleName, lastName, role, username, password, isActive);
+        } 
+
+        res.status(200).json({ mssg: `${firstName} has been edited successfully!`, redirect: '/users' });
+    } catch (err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating the user', error: err.message });
     }
-}
+};
+
 
 module.exports.user_login = async (req,res) => {
 

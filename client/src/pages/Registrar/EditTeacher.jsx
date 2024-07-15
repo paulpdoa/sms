@@ -221,14 +221,14 @@ const EditTeacher = () => {
                     </div>
                 </section>
 
-                <section>
+                {/* <section>
                     <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Credentials</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {renderInput("username", "Username", username, setUsername, "text")}
                         {renderInput("password", "Password", password, setPassword, "password")}
                         {renderInput("confirm-password", "Confirm Password", confirmPassword, setConfirmPassword, "password")}
                     </div>
-                </section>
+                </section> */}
 
                 <div className="flex items-center justify-end gap-2">
                     <button type="submit" className="bg-green-500 hover:bg-green-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>

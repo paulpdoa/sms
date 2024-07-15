@@ -101,9 +101,6 @@ const NewTeacher = () => {
             yearGraduated,
             yearsOfExperience,
             joiningDate,
-            username,
-            password,
-            confirmPassword,
             age: getAge 
         };
 
@@ -217,15 +214,6 @@ const NewTeacher = () => {
                         {/* <Select label="Department" name="department" value={department} options={departments} onChange={handleChange} />
                         <Select label="Grade Level" name="gradeLevel" value={gradeLevel} options={gradeLevels} onChange={handleChange} />
                         <Select label="Section" name="section" value={section} options={sections} onChange={handleChange} /> */}
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Account Information</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <Input label="Username" type="text" name="username" value={username} onChange={setUsername} />
-                        <Input label="Password" type="password" name="password" value={password} onChange={setPassword} />
-                        <Input label="Confirm Password" type="password" name="confirmPassword" value={confirmPassword} onChange={setConfirmPassword} />
                     </div>
                 </section>
 

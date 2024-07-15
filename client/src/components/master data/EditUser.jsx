@@ -82,10 +82,11 @@ const EditUser = () => {
             });
 
             setTimeout(() => {
-                window.location.reload();
+                navigate(newData.data.redirect)
             }, 2000);
         } catch (err) {
-            toast.error('Error has occurred while updating user record', {
+            console.log(err);
+            toast.error(err.response.data.error, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
