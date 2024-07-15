@@ -233,7 +233,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                         <li className="mx-1">
                             <button
                                 onClick={() => paginate(currentPage - 1)}
-                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-sm text-gray-900 bg-white border border-gray-400 rounded-md"
                             >
                                 {currentPage - 1}
                             </button>
@@ -241,7 +241,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     )}
                     <li className="mx-1">
                         <button
-                            className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500"
+                            className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500 text-sm"
                         >
                             {currentPage}
                         </button>
@@ -250,7 +250,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                         <li className="mx-1">
                             <button
                                 onClick={() => paginate(currentPage + 1)}
-                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 text-sm bg-white border border-gray-400 rounded-md"
                             >
                                 {currentPage + 1}
                             </button>

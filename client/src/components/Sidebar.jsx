@@ -139,6 +139,34 @@ const initialMenus = [
                 link: '/'
             },
             {
+                name: 'Master Data',
+                icon: <RiAccountPinBoxFill />,
+                subMenus: [
+                    { name: 'Religion', link: '/master/religion' },
+                    { name: 'Nationality', link: '/master/nationality' },
+                    { name: 'Departments', link: '/master/departments' },
+                    { name: 'Sections', link: '/master/sections' },
+                    { name: 'Students', link: '/master/students' },
+                    { name: 'Teachers', link: '/master/teachers' },
+                    { name: 'Parents', link: '/master/parents' },
+                    { name: 'Siblings', link: '/master/siblings' },
+                    { name: 'Grade Level', link: '/master/grade-levels' },
+                    { name: 'Requirements', link: '/master/requirements' },
+                    { name: 'User Roles', link: '/master/user-roles' },
+                    { name: 'School Year', link: '/master/school-year' },
+                    { name: 'Users', link: '/master/users' },
+                    { name: 'Strands', link: '/master/strands' },
+                    { name: 'Textbooks', link: '/master/text-books' },
+                    { name: 'Payment Terms', link: '/master/payment-terms' },
+                    { name: 'Payment Schedule', link: '/master/payment-schedule' },
+                    // { name: 'Late Payment Penalty', link: '/master/payment-penalty' },
+                    { name: 'Fee Category', link: '/master/fee-category' },
+                    { name: 'Fee Code', link: '/master/fee-code' },
+                    { name: 'Manage Fees', link: '/master/manage-fees' },
+                    { name: 'Discount', link: '/master/discount' },
+                ]
+            },
+            {
                 name: 'Registrar',
                 icon: <FaCashRegister />,
                 subMenus: [
