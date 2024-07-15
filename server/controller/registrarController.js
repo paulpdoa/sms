@@ -611,47 +611,50 @@ module.exports.add_manage_fees = async (req,res) => {
 module.exports.automate_fees = async (req, res) => {
 
     const { isReset } = req.body
-    console.log(isReset);
 
-    // try {
-    //     // Fetch all grade levels, fees, and strands
-    //     const [gradeLevels, fees, strands] = await Promise.all([
-    //         GradeLevel.find(),
-    //         FeeCode.find(),
-    //         Strand.find({ status: true })
-    //     ]);
+    try {
 
-    //     // Assign fees for each grade level
-    //     for (const gradeLevel of gradeLevels) {
-    //         const isSenior = gradeLevel.gradeLevel.includes(11) || gradeLevel.gradeLevel.includes(12);
-    //         const manageFeesInfo = fee => ({
-    //             gradeLevelId: gradeLevel._id,
-    //             feeDescription: fee._id,
-    //             amount: 0,
-    //             nationality: 'Local'
-    //         });
+        if(isReset) {
+            await ManageFee.deleteMany();
+        }
+        // Fetch all grade levels, fees, and strands
+        const [gradeLevels, fees, strands] = await Promise.all([
+            GradeLevel.find(),
+            FeeCode.find(),
+            Strand.find({ status: true })
+        ]);
 
-    //         if (isSenior) {
-    //             for (const strand of strands) {
-    //                 for (const fee of fees) {
-    //                     await ManageFee.create({
-    //                         ...manageFeesInfo(fee),
-    //                         strandId: strand._id
-    //                     });
-    //                 }
-    //             }
-    //         } else {
-    //             for (const fee of fees) {
-    //                 await ManageFee.create(manageFeesInfo(fee));
-    //             }
-    //         }
-    //     }
+        // Assign fees for each grade level
+        for (const gradeLevel of gradeLevels) {
+            const isSenior = gradeLevel.gradeLevel.includes(11) || gradeLevel.gradeLevel.includes(12);
+            const manageFeesInfo = fee => ({
+                gradeLevelId: gradeLevel._id,
+                feeDescription: fee._id,
+                amount: 0,
+                nationality: 'Local'
+            });
 
-    //     res.status(200).json({ message: 'Fees have been automatically created' });
-    // } catch (err) {
-    //     console.error(err);
-    //     res.status(500).json({ error: 'An error occurred while automating fees' });
-    // }
+            if (isSenior) {
+                for (const strand of strands) {
+                    for (const fee of fees) {
+                        await ManageFee.create({
+                            ...manageFeesInfo(fee),
+                            strandId: strand._id
+                        });
+                    }
+                }
+            } else {
+                for (const fee of fees) {
+                    await ManageFee.create(manageFeesInfo(fee));
+                }
+            }
+        }
+
+        res.status(200).json({ message: 'Fees have been automatically created' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred while automating fees' });
+    }
 };
 
 
