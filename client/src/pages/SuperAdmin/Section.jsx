@@ -148,7 +148,7 @@ const Section = () => {
         },
         adviser: {
             _id: record?.adviser?._id,
-            name: `${record?.adviser?.firstName} ${record?.adviser?.lastName}`
+            name: record?.adviser ? `${record?.adviser?.firstName} ${record?.adviser?.lastName}` : 'Not assigned'
         },
         department: record?.gradeLevel?.department?.department
     }));

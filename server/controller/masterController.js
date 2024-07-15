@@ -352,8 +352,12 @@ module.exports.get_sections = async (req,res) => {
 
 module.exports.add_sections = async (req,res) => {
 
-    const { section,gradeLevel,adviser } = req.body;
+    let { section,gradeLevel,adviser } = req.body;
     const status = true;
+
+    if(adviser === '') {
+        adviser = undefined;
+    }
 
     try {
         const newSection = await Section.addSection(section,gradeLevel,adviser,status);

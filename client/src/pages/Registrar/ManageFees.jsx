@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext,useState } from 'react';
 import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,11 +9,13 @@ import ManageFeeBtn from '../../components/buttons/ManageFeeBtn';
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationPopup from '../../components/ConfirmationPopup';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
     const { searchQuery, setSearchQuery, role } = useContext(MainContext);
     const navigate = useNavigate();
+    const [openPopup,setOpenPopup] = useState(false);
 
     const columns = [
         {
@@ -84,11 +86,12 @@ const ManageFees = () => {
         }
     }
 
-    const automateFees = async () => {
+    const automateFees = async (isReset) => {
         const toastId = toast.loading("Generating fees, please do not leave the page...");
 
+        
         try {
-            const { data } = await axios.get(`${baseUrl()}/automate-fees`);
+            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ isReset });
             toast.update(toastId, {
                 render: data.mssg,
                 type: "success",
@@ -129,9 +132,15 @@ const ManageFees = () => {
             <div className="flex justify-between items-center">
                 <Searchbar onSearch={setSearchQuery} />
                 <div className="flex items-center gap-2">
+                    { recordsWithoutInputter.length < 1 ? 
                     <button onClick={automateFees} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
                         Generate Fees
                     </button>
+                    :
+                    <button onClick={() => setOpenPopup(true)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
+                        Re-generate Fees
+                    </button>
+                    }
                     <ManageFeeBtn />
                 </div>
             </div>
@@ -146,6 +155,13 @@ const ManageFees = () => {
                 />
             </div>
             <ToastContainer />
+             {/* Popup goes here */}
+             {openPopup &&
+                <ConfirmationPopup
+                    message={'Are you sure you want to regenerate fees? This will affect fees generated in the system'}
+                    onConfirm={() => automateFees(true)}
+                    onClose={() => setOpenPopup(false)}
+                />}
         </main>
     )
 }

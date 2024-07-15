@@ -49,7 +49,7 @@ route.get('/manage-fee/:id',allowUserView(userRoles),get_manage_fee_detail);
 route.delete('/manage-fee/:id',delete_manage_fee);
 route.patch('/manage-fee/:id',edit_manage_fee);
 route.get('/generate-fees/:currentYear',allowUserView(userRoles),generate_fees);
-route.get('/automate-fees',automate_fees);
+route.post('/automate-fees',automate_fees);
 
 // Student Payment
 route.get('/student-payments',allowUserView(userRoles),get_student_payments);
