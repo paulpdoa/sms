@@ -28,9 +28,9 @@ const NewManageFee = () => {
     useEffect(() => {
         const gradeLevelNames = gradeLevels
             .filter(gradeLevel => selectedGradeLevels.includes(gradeLevel._id))
-            .map(gradeLevel => gradeLevel.gradeLevel);
+            .map(gradeLevel => gradeLevel.gradeLevel.toLowerCase());
 
-        setShowStrand(gradeLevelNames.includes('Grade 11') || gradeLevelNames.includes('Grade 12'));
+        setShowStrand(gradeLevelNames.includes('grade 11') || gradeLevelNames.includes('grade 12'));
     }, [selectedGradeLevels, gradeLevels]);
 
     const addManagedFees = async (e) => {
@@ -47,6 +47,22 @@ const NewManageFee = () => {
 
         if(amount === 0) {
             toast.error("Error adding fee. amount cannot be zero", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            return;
+        }
+      
+        if(selectedGradeLevels.length < 1) {
+           
+            toast.error("Error adding fee. grade level cannot be empty", {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: true,
@@ -119,7 +135,7 @@ const NewManageFee = () => {
     return (
         <main className="p-8 bg-gray-100 flex items-center justify-center">
             <form onSubmit={addManagedFees} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Apply New Fees</h1>
+                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Add New Fees</h1>
 
                 <section>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

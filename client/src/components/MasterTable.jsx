@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,disableAction }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,openPopup,onOpenPopup }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage] = useState(10); // Set the number of rows per page
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // For school year component confirmation popup
+    const isConfirmedEdit = localStorage.getItem('isConfirmedEdit') === 'true';
+    
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const savedPage = queryParams.get('page');
+        if (savedPage) {
+            setCurrentPage(Number(savedPage));
+        }
+    }, [location.search]);
 
     useEffect(() => {
         if (editId) {
@@ -15,8 +30,15 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     }, [editId, data]);
 
     const handleEditClick = (record) => {
-        setEditId(record._id);
+        navigate(`${location.pathname}?page=${currentPage}`);
+        onOpenPopup && onOpenPopup(true)
+        setEditId(record._id);       
     };
+
+    useEffect(() => {
+        setCurrentPage(1);
+        navigate(`${location.pathname}?page=1`);
+    }, [searchQuery, navigate, location.pathname]);
 
     const handleSaveClick = (id) => {
         const updatedValues = columns.reduce((acc, column) => {
@@ -32,7 +54,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
             }
             return acc;
         }, {});
-    
+
         // Fixing the nested id update issue
         if (editValues['gradeLevel.gradeLevel']) {
             updatedValues.gradeLevel = { _id: editValues['gradeLevel.gradeLevel'] };
@@ -41,21 +63,22 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
             updatedValues.adviser = { _id: editValues['adviser.name'] };
         }
 
-        if(editValues['strand.strand']) {
+        if (editValues['strand.strand']) {
             updatedValues.strand = { _id: editValues['strand.strand'] }
         }
 
-        if(editValues['feeCateg.feeCateg']) {
+        if (editValues['feeCateg.feeCateg']) {
             updatedValues.feeCateg = { _id: editValues['feeCateg.feeCateg'] }
         }
 
-    
         onUpdate(id, updatedValues);
         setEditId(null);
+        setEditValues({});
     };
 
     const handleCancelClick = () => {
         setEditId(null);
+        setEditValues({});
     };
 
     const handleDeleteClick = (id) => {
@@ -100,146 +123,148 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
     const currentRows = filteredData.slice(indexOfFirstRow, indexOfLastRow);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        navigate(`${location.pathname}?page=${pageNumber}`);
+    };
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
     return (
         <>
-        <div className="text-gray-900 overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
-                <thead className="bg-gray-100">
-                    <tr>
-                        {columns.map((column, key) => (
-                            <th
-                                key={key}
-                                onClick={() => handleSort(column)}
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider cursor-pointer"
-                            >
-                                <div className="flex items-center">
-                                    {column.header}
-                                    {sortConfig.key === column.accessorKey ? (
-                                        sortConfig.direction === 'asc' ? (
-                                            <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className="shadow-md sm:rounded-lg">
+                <table className="w-full text-sm text-left text-gray-500">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+                        <tr>
+                            {columns.map((column, key) => (
+                                <th
+                                    key={key}
+                                    onClick={() => handleSort(column)}
+                                    className="py-3 px-6 cursor-pointer"
+                                >
+                                    <div className="flex items-center">
+                                        {column.header}
+                                        {sortConfig.key === column.accessorKey ? (
+                                            sortConfig.direction === 'asc' ? (
+                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                                </svg>
+                                            ) : (
+                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            )
+                                        ) : (
+                                            <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
                                             </svg>
-                                        ) : (
-                                            <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                            </svg>
-                                        )
-                                    ) : (
-                                        <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
-                                        </svg>
-                                    )}
-                                </div>
-                            </th>
-                        ))}
-                        { !disableAction && <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">Actions</th> }
-                    </tr>
-                </thead>
-                <tbody className="bg-gray-1 00 divide-y divide-gray-300">
-                    {currentRows.map((record) => (
-                        <tr key={record._id}>
-                            {columns.map(column => (
-                                <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
-                                    {editId === record._id ? (
-                                        column.editable ? (
-                                            column.selectOptions ? (
-                                                <select
-                                                    name={column.accessorKey}
-                                                    value={editValues[column.accessorKey] || ''}
-                                                    onChange={(e) => handleInputChange(e, column)}
-                                                    className="outline-none p-1 rounded-md border border-gray-500 bg-gray-800 text-gray-200"
-                                                >
-                                                    <option hidden>{column.header}</option>
-                                                    {column.selectOptions.map(option => (
-                                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                                    ))}
-                                                </select>
+                                        )}
+                                    </div>
+                                </th>
+                            ))}
+                            {!disableAction && <th className="py-3 px-6">Actions</th>}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentRows.map((record) => (
+                            <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
+                                {columns.map(column => (
+                                    <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
+                                        {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                            column.editable ? (
+                                                column.selectOptions ? (
+                                                    <select
+                                                        name={column.accessorKey}
+                                                        value={editValues[column.accessorKey] || ''}
+                                                        onChange={(e) => handleInputChange(e, column)}
+                                                        className="outline-none p-1 rounded-md border border-gray-300"
+                                                    >
+                                                        <option value="" hidden>{column.header}</option>
+                                                        {column.selectOptions.map(option => (
+                                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <input
+                                                        name={column.accessorKey}
+                                                        value={editValues[column.accessorKey] || ''}
+                                                        onChange={(e) => handleInputChange(e, column)}
+                                                        className="outline-none p-1 rounded-md border border-gray-300"
+                                                        type={column.type || ''}
+                                                    />
+                                                )
                                             ) : (
-                                                <input
-                                                    name={column.accessorKey}
-                                                    value={editValues[column.accessorKey] || ''}
-                                                    onChange={(e) => handleInputChange(e, column)}
-                                                    className="outline-none p-1 rounded-md border border-gray-500 bg-gray-800 text-gray-200"
-                                                    type={column.type || ''}
-                                                />
+                                                column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
                                             )
                                         ) : (
                                             column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                        )
-                                    ) : (
-                                        column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                    )}
-                                </td>
-                            ))}
-                            { !disableAction && 
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                {editId === record._id ? (
-                                    <>
-                                        <button onClick={() => handleSaveClick(record._id)} className="text-green-400 hover:text-green-500">Save</button>
-                                        <button onClick={handleCancelClick} className="text-red-400 hover:text-red-500 ml-2">Cancel</button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button onClick={() => onUpdate ? handleEditClick(record) : goToEdit(record._id)} className="text-blue-400 hover:text-blue-500">Edit</button>
-                                        <button onClick={() => handleDeleteClick(record._id)} className="text-red-400 hover:text-red-500 ml-2">Delete</button>
-                                    </>
-                                )}
-                            </td>
-                            }
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            
-        </div>
-        <div className="pagination mt-4 flex justify-center items-center">
-            <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
-            >
-                Previous
-            </button>
-            <ul className="flex mx-4">
-                {currentPage > 1 && (
+                                        )}
+                                    </td>
+                                ))}
+                                {!disableAction &&
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                            <>
+                                                <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
+                                                <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => goToEdit ? goToEdit(record) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
+                                                <button onClick={() => handleDeleteClick(record._id)} className="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
+                                            </>
+                                        )}
+                                    </td>
+                                }
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="pagination mt-4 flex justify-center items-center">
+                <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                >
+                    Previous
+                </button>
+                <ul className="flex mx-4">
+                    {currentPage > 1 && (
+                        <li className="mx-1">
+                            <button
+                                onClick={() => paginate(currentPage - 1)}
+                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                            >
+                                {currentPage - 1}
+                            </button>
+                        </li>
+                    )}
                     <li className="mx-1">
                         <button
-                            onClick={() => paginate(currentPage - 1)}
-                            className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                            className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500"
                         >
-                            {currentPage - 1}
+                            {currentPage}
                         </button>
                     </li>
-                )}
-                <li className="mx-1">
-                    <button
-                        className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500"
-                    >
-                        {currentPage}
-                    </button>
-                </li>
-                {currentPage < totalPages && (
-                    <li className="mx-1">
-                        <button
-                            onClick={() => paginate(currentPage + 1)}
-                            className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
-                        >
-                            {currentPage + 1}
-                        </button>
-                    </li>
-                )}
-            </ul>
-            <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages || totalPages < 1}
-                className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
-            >
-                Next
-            </button>
-        </div>
+                    {currentPage < totalPages && (
+                        <li className="mx-1">
+                            <button
+                                onClick={() => paginate(currentPage + 1)}
+                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 bg-white border border-gray-400 rounded-md"
+                            >
+                                {currentPage + 1}
+                            </button>
+                        </li>
+                    )}
+                </ul>
+                <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages || totalPages < 1}
+                    className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                >
+                    Next
+                </button>
+            </div>
         </>
     );
 };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { get_teachers, delete_teacher, get_teacher_detail, add_teacher, get_strands, add_strand, delete_strand, get_strand_detail, edit_strand, get_textbooks, add_textbook, delete_textbook, get_textbook_detail, edit_textbook } = require('../controller/schoolAdminController');
+const { get_teachers, delete_teacher, get_teacher_detail, add_teacher, get_strands, add_strand, delete_strand, get_strand_detail, edit_strand, get_textbooks, add_textbook, delete_textbook, get_textbook_detail, edit_textbook, edit_teacher } = require('../controller/schoolAdminController');
 const route = express.Router();
 const { allowUserView,allowUserAction } = require('../middleware/middlewares');
 
@@ -10,6 +10,7 @@ route.get('/teachers',allowUserView(userRoles), get_teachers);
 route.post('/teachers', add_teacher);
 route.delete('/teacher/:id', delete_teacher);
 route.get('/teacher/:id',allowUserView(userRoles), get_teacher_detail);
+route.patch('/teacher/:id',edit_teacher);
 
 // Strand
 route.get('/strands',allowUserView(userRoles),get_strands);

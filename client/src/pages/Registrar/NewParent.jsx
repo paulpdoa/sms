@@ -70,7 +70,7 @@ const NewParent = () => {
             });
 
             setTimeout(() => {
-                navigate(-1)
+                navigate('/parents')
             }, 2000);
         } catch (err) {
             console.log(err);

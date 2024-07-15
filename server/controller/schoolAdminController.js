@@ -86,7 +86,8 @@ module.exports.add_teacher = async (req,res) => {
             res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
         }
     } catch(err) {
-        console.log(err);
+        console.log(err.message);
+        res.status(400).json({ mssg: err.message })
     }
 } 
 
@@ -107,6 +108,16 @@ module.exports.get_teacher_detail = async (req,res) => {
     try {
         const teacherFind = await Teacher.findById(id);
         res.status(200).json(teacherFind);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+// Update teacher
+module.exports.edit_teacher = async (req,res) => {
+    console.log(req.body);
+    try {
+
     } catch(err) {
         console.log(err);
     }

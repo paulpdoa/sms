@@ -71,7 +71,7 @@ const NewStudent = () => {
             });
 
             setTimeout(() => {
-                navigate(data.data.redirect);
+                navigate('/students');
             }, 2000);
         } catch (err) {
             console.log(err);

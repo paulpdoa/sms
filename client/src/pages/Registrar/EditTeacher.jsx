@@ -106,28 +106,28 @@ const EditTeacher = () => {
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
-                navigate('/'); // Redirect to the teachers list page or wherever you need
+                navigate(-1); // Redirect to the teachers list page or wherever you need
             }, 2000);
         } catch (err) {
             console.log(err);
             toast.error("Error editing teacher. Please try again.", {
                 position: "top-center",
                 autoClose: 2000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };
@@ -187,7 +187,10 @@ const EditTeacher = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-500 text-white p-2 mt-6 rounded-md w-full">Submit</button>
+                <div className="flex items-center justify-end gap-2">
+                    <button type="submit" className="bg-green-500 hover:bg-green-600 text-white p-2 mt-6 rounded-md">Submit</button>
+                    <button type="button" onClick={() => navigate('/teachers')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                </div>
             </form>
             <ToastContainer />
         </main>

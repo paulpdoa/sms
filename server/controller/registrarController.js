@@ -975,6 +975,8 @@ module.exports.get_payment_schedule = async (req,res) => {
 module.exports.add_payment_schedule = async (req, res) => {
     const { schoolYearId, isReset } = req.body;
 
+    console.log(req.body)
+
     // Create logic here if isReset = true, then delete PaymentSchedule
 
     try {
