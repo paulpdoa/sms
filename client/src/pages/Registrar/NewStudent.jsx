@@ -5,10 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { genders as genderSelections } from '../../data/genders.json';
 
 const NewStudent = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
-    const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
     const navigate = useNavigate();
@@ -102,7 +102,7 @@ const NewStudent = () => {
                         {renderInput("suffix", "Ext/Suffix", suffix, setSuffix, "text")}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
-                        {renderSelect("sex", "Sex", sex, setSex, genders, "Gender")}
+                        {renderSelect("sex", "Gender", sex, setSex, genderSelections, "Gender")}
                         {renderSelect("religion", "Religion", religion, setReligion, religions, "Religion")}
                         {renderSelect("nationality", "Nationality", nationality, setNationality, nationalities, "Nationality")}
                         {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
@@ -170,7 +170,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
         >
             <option value="" hidden>{placeholder}</option>
             {options?.map(option => (
-                <option key={option._id} value={option._id}>{option[Object.keys(option)[1]]}</option>
+                <option key={option._id} value={id === 'sex' ? option.name : option._id}>{option[Object.keys(option)[1]]}</option>
             ))}
         </select>
     </div>

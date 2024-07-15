@@ -6,13 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
+import { genders as genderSelections } from '../../data/genders.json';
 
 const EditStudent = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { records, isLoading } = useFetch(`${baseUrl()}/student/${id}`);
 
-    const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
@@ -40,7 +40,7 @@ const EditStudent = () => {
             setSuffix(records.suffix);
             setDateOfBirth(records.dateOfBirth);
             setAge(calculateAge(records.dateOfBirth));
-            setSex(records.sex?._id);
+            setSex(records.sex);
             setReligion(records.religion?._id);
             setNationality(records.nationality?._id);
             setPlaceOfBirth(records.placeOfBirth);
@@ -124,7 +124,7 @@ const EditStudent = () => {
                         {renderInput("suffix", "Ext/Suffix", suffix, setSuffix, "text")}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
-                        {renderSelect("sex", "Sex", sex, setSex, genders, "Gender")}
+                        {renderSelect("sex", "Sex", sex, setSex, genderSelections, "Gender")}
                         {renderSelect("religion", "Religion", religion, setReligion, religions, "Religion")}
                         {renderSelect("nationality", "Nationality", nationality, setNationality, nationalities, "Nationality")}
                         {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
@@ -190,12 +190,12 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
             onChange={(e) => onChange(e.target.value)}
             required
         >
-            <option value="" hidden>{placeholder}</option>
+            <option value="" hidden>{value ?? placeholder}</option>
             {options?.map(option => (
-                <option key={option._id} value={option._id}>
+                <option key={option._id} value={label === 'Sex' ? option.name : option._id}>
                     { label === 'Religion' && option.religion }
                     { label === 'Nationality' && option.nationality }
-                    { label === 'Sex' && option.gender }
+                    { label === 'Sex' && option.name }
                 </option>
             ))}
         </select>

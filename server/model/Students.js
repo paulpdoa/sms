@@ -49,10 +49,7 @@ const studentSchema = new mongoose.Schema({
     age: {
         type: Number
     },
-    sex: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'gender' 
-    },
+    sex: requiredString,
     religion: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'religion' 

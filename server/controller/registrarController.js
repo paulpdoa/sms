@@ -40,7 +40,6 @@ module.exports.get_students = async (req,res) => {
                 { path: 'nationalityCodeId' }
             ]
          })
-        .populate('sex')
         .populate('religion')
         .populate('sy_id')
         .populate('gradeLevel')

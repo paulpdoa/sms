@@ -30,7 +30,7 @@ const columns = [
         header: 'Date Of Birth',
     },
     {
-        accessorKey: 'sex.gender',
+        accessorKey: 'sex',
         header: 'Gender',
     },
     {
@@ -51,12 +51,12 @@ const Students = () => {
             toast.success(removeStudent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -71,14 +71,12 @@ const Students = () => {
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
             <div className="flex justify-between items-center">
                 <Searchbar onSearch={setSearchQuery} />
                 <AddStudentBtn />
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                
                 <MasterTable 
                     columns={columns}
                     data={records}
