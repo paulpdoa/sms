@@ -16,7 +16,8 @@ const sectionSchema = new mongoose.Schema({
     },
     adviser: {
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'teacher' 
+        ref: 'teacher',
+        unique: true 
     },
     status: {
         type: Boolean,

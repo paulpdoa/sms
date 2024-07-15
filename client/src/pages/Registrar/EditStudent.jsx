@@ -156,6 +156,9 @@ const EditStudent = () => {
                 <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
                     Submit
                 </button>
+                <button type="button" onClick={() => navigate('/students')} className="bg-red-600 text-white text-sm p-3 mt-5 ml-2 rounded-md hover:bg-red-700 transition duration-300">
+                    Cancel
+                </button>
             </form>
             <ToastContainer />
         </main>

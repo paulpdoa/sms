@@ -5,14 +5,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { genders as genderSelections } from '../../data/genders.json';
 
 const EditTeacher = () => {
+    
     const navigate = useNavigate();
     const { id } = useParams();
     const { records, isLoading } = useFetch(`${baseUrl()}/teacher/${id}`);
-    const { records: departments, isLoading: departmentsLoading } = useFetch(`${baseUrl()}/departments`);
-    const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
-    const { records: sections } = useFetch(`${baseUrl()}/sections`);
+    const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
+    const { records: religions } = useFetch(`${baseUrl()}/religions`);
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -32,9 +33,6 @@ const EditTeacher = () => {
     const [yearGraduated, setYearGraduated] = useState('');
     const [yearsOfExperience, setYearsOfExperience] = useState('');
     const [joiningDate, setJoiningDate] = useState('');
-    const [department, setDepartment] = useState('');
-    const [gradeLevel, setGradeLevel] = useState('');
-    const [section, setSection] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -45,9 +43,9 @@ const EditTeacher = () => {
             setMiddleName(records.middleName);
             setLastName(records.lastName);
             setDateOfBirth(records.dateOfBirth);
-            setSex(records.sex?._id);
-            setReligion(records.religion?._id);
-            setNationality(records.nationality?._id);
+            setSex(records?.sex);
+            setReligion(records?.religion?._id);
+            setNationality(records?.nationality?._id);
             setPlaceOfBirth(records.placeOfBirth);
             setEmail(records.email);
             setContactNumber(records.contactNumber);
@@ -59,12 +57,10 @@ const EditTeacher = () => {
             setYearGraduated(records.yearGraduated);
             setYearsOfExperience(records.yearsOfExperience);
             setJoiningDate(records.joiningDate);
-            setDepartment(records.department?._id);
-            setGradeLevel(records.gradeLevel?._id);
-            setSection(records.section?._id);
             setUsername(records.username);
         }
     }, [records]);
+
 
     const handleDateOfBirthChange = (e) => {
         const dob = e.target.value;
@@ -93,9 +89,6 @@ const EditTeacher = () => {
             yearGraduated,
             yearsOfExperience,
             joiningDate,
-            department,
-            gradeLevel,
-            section,
             username,
             password,
             confirmPassword
@@ -115,7 +108,7 @@ const EditTeacher = () => {
             });
 
             setTimeout(() => {
-                navigate(-1); // Redirect to the teachers list page or wherever you need
+                navigate(data.data.redirect); // Redirect to the teachers list page or wherever you need
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -132,6 +125,7 @@ const EditTeacher = () => {
         }
     };
 
+
     return (
         <main className="p-4 bg-gray-100">
             <form onSubmit={editTeacher} className="bg-white p-6 rounded-lg shadow-lg">
@@ -147,6 +141,55 @@ const EditTeacher = () => {
                         {renderInput("spouse-name", "Spouse Name", spouseName, setSpouseName, "text")}
                         {renderInput("spouse-cel", "Spouse Contact Number", spouseCel, setSpouseCel, "text")}
                         {renderInput("address", "Address", address, setAddress, "text")}
+                        
+                        {/* For Gender Selection */}
+                        <div className="mb-4">
+                            <label  className="block text-gray-700 mb-2">Gender</label>
+                            <select
+                                value={sex}
+                                onChange={(e) => setSex(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                required
+                            >
+                                <option value="" hidden>{`Select gender` ?? sex}</option>
+                                {genderSelections?.map((option) => (
+                                    <option key={option._id} value={option.name}>{option.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* For Nationality */}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 mb-2">Nationality</label>
+                            <select
+                                value={nationality}
+                                onChange={(e) => setNationality(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                required
+                            >
+                                <option value={nationality || ''} hidden>{nationality ? nationalities?.find(natl => natl._id === nationality)?.nationality : `Select nationality`}</option>
+                                {nationalities?.map((option) => (
+                                    <option key={option._id} value={option._id}>{option.nationality}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* For Religions*/}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 mb-2">Religion</label>
+                            <select
+                                value={religion}
+                                onChange={(e) => setReligion(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                required
+                            >
+                                <option value={religion || ''} hidden>{ religion ? religions?.find(rel => rel._id === religion)?.religion : 'Select religion'}</option>
+                                {religions?.map((option) => (
+                                    <option key={option._id} value={option._id}>{option.religion}</option>
+                                ))}
+                            </select>
+                        </div>
+
                     </div>
                 </section>
 
@@ -172,9 +215,9 @@ const EditTeacher = () => {
                     <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">School Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {renderInput("joining-date", "Joining Date", joiningDate, setJoiningDate, "date")}
-                        {renderSelect("department", "Department", department, setDepartment, departments, "Department")}
+                        {/* {renderSelect("department", "Department", department, setDepartment, departments, "Department")}
                         {renderSelect("grade-level", "Grade Level", gradeLevel, setGradeLevel, gradeLevels, "Grade Level")}
-                        {renderSelect("section", "Section", section, setSection, sections, "Section")}
+                        {renderSelect("section", "Section", section, setSection, sections, "Section")} */}
                     </div>
                 </section>
 
@@ -188,7 +231,7 @@ const EditTeacher = () => {
                 </section>
 
                 <div className="flex items-center justify-end gap-2">
-                    <button type="submit" className="bg-green-500 hover:bg-green-600 text-white p-2 mt-6 rounded-md">Submit</button>
+                    <button type="submit" className="bg-green-500 hover:bg-green-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
                     <button type="button" onClick={() => navigate('/teachers')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
@@ -218,10 +261,11 @@ const renderSelect = (id, label, value, onChange, options, optionLabel) => (
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            required
         >
-            <option value="">{`Select ${optionLabel}`}</option>
+            <option value="" hidden>{`Select ${optionLabel}` ?? value}</option>
             {options?.map((option) => (
-                <option key={option._id} value={option._id}>{option.name}</option>
+                <option key={option._id} value={option._id}>{option[id]}</option>
             ))}
         </select>
     </div>

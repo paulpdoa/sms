@@ -8,7 +8,9 @@ import { useState } from 'react';
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const pathName = location.pathname === '/' ? 'Dashboard' : location.pathname.slice(1).replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+    // const pathName = location.pathname === '/' ? 'Dashboard' : location.pathname.slice(1).replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+
+    const pathName = 'School Name';
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 

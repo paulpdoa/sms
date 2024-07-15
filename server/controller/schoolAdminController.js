@@ -3,6 +3,7 @@ const Role = require('../model/Roles');
 const User = require('../model/Users');
 const Strand = require('../model/Strand');
 const Textbook = require('../model/Textbook');
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 
@@ -15,7 +16,7 @@ const createToken = (token) => {
 
 module.exports.get_teachers = async (req,res) => {
     try {
-        const teachers = await Teacher.find().populate('sex religion nationality');
+        const teachers = await Teacher.find().populate('religion nationality');
         res.status(200).json(teachers);
     } catch(err) {
         console.log(err);
@@ -28,7 +29,7 @@ module.exports.add_teacher = async (req,res) => {
         lastName,
         dateOfBirth,
         age,
-        sex,
+        gender: sex,
         religion,
         nationality,
         placeOfBirth,
@@ -42,13 +43,15 @@ module.exports.add_teacher = async (req,res) => {
         yearGraduated,
         yearsOfExperience,
         joiningDate,
-        department,
-        gradeLevel,
-        section,
+        // department,
+        // gradeLevel,
+        // section,
         username,
         password,
         confirmPassword
      } = req.body;
+
+     console.log(req.body);
 
 
      const role = 'Teacher';
@@ -77,9 +80,9 @@ module.exports.add_teacher = async (req,res) => {
                 yearGraduated,
                 yearsOfExperience,
                 joiningDate,
-                department,
-                gradeLevel,
-                section,
+                // department,
+                // gradeLevel,
+                // section,
                 username,
                 password });
                 const token = createToken(addTeacher._id);
@@ -106,7 +109,7 @@ module.exports.get_teacher_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const teacherFind = await Teacher.findById(id);
+        const teacherFind = await Teacher.findById(id).populate('religion nationality');
         res.status(200).json(teacherFind);
     } catch(err) {
         console.log(err);
@@ -115,9 +118,26 @@ module.exports.get_teacher_detail = async (req,res) => {
 
 // Update teacher
 module.exports.edit_teacher = async (req,res) => {
-    console.log(req.body);
-    try {
 
+    const { id } = req.params;
+    const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username,password,confirmPassword } = req.body;
+
+    try {
+        if(password === '' && confirmPassword === '') {
+            await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username });
+        } else {
+            const salt = await bcrypt.genSalt();
+            const newPassword = await bcrypt.hash(password,salt);
+
+            if(password !== confirmPassword) {
+                throw new Error('Password does not match, please check your password')
+            } else {
+                await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,nationality,religion,lastName,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,username,password: newPassword} )
+            }
+        }
+
+        res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
+        
     } catch(err) {
         console.log(err);
     }

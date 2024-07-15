@@ -29,7 +29,7 @@ const columns = [
     },
     {
         accessorKey: 'sex.gender',
-        header: 'Sex'
+        header: 'Gender'
     },
     {
         accessorKey: 'nationality.nationality',
@@ -46,8 +46,7 @@ const Teachers = () => {
     const recordsWithoutInputter = records.map(record => ({
         ...record,
         sex: {
-            _id: record?.sex?._id,
-            gender: record?.sex?.gender || 'Not Assigned'
+            gender: record?.sex
         },
         nationality: {
             _id: record?.nationality?._id,

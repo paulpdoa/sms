@@ -12,15 +12,13 @@ const teacherSchema = new mongoose.Schema({
     middleName: requiredString,
     lastName: requiredString,
     dateOfBirth: requiredString,
+    placeOfBirth: requiredString,
     address: requiredString,
     religion: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'religion' 
     },
-    sex: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'gender' 
-    },
+    sex: requiredString,
     nationality: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'nationality' 
@@ -37,6 +35,9 @@ const teacherSchema = new mongoose.Schema({
     education: requiredString,
     yearGraduated: requiredString,
     schoolGraduated: requiredString,
+    contactNumber: {
+        type: String
+    },
     yearsOfExperience: {
         type: Number,
         required: true
@@ -67,7 +68,7 @@ teacherSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();
 
     if(!validator.isStrongPassword(this.password)) {
-        throw Error('Password not strong enough')
+        throw Error('Password not strong enough, please create stronger password');
     }
 
     this.password = await bcrypt.hash(this.password,salt);

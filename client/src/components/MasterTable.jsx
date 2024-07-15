@@ -209,7 +209,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                             </>
                                         ) : (
                                             <>
-                                                <button onClick={() => goToEdit ? goToEdit(record) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
+                                                <button onClick={() => goToEdit ? goToEdit(record._id) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
                                                 <button onClick={() => handleDeleteClick(record._id)} className="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
                                             </>
                                         )}
