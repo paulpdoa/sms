@@ -35,28 +35,34 @@ const Assessment = () => {
     const generateFees = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        const toastId = toast.loading('Creating fees, please wait...');
+
         try {
             const { data } = await axios.get(`${baseUrl()}/generate-fees/${session}`);
             setIsLoading(false);
-            toast.success(data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+            toast.update(toastId, {
+                render: data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             }, 2000)
         } catch(err) {
-            toast.error(err.response.data.error, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+            toast.update(toastId, {
+                render: err.response.data.error,
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,

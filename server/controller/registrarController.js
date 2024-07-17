@@ -353,7 +353,6 @@ module.exports.get_student_academic_detail = async (req,res) => {
 module.exports.add_academic = async (req,res) => {
 
     let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId } = req.body;
-
     // This will also update students info upon posting
     console.log(req.body)
 
@@ -366,10 +365,14 @@ module.exports.add_academic = async (req,res) => {
     }
 
     try {
+
+        await Academic.findOneAndDelete({ studentId: studentId });
+
         const academic = await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId });
         const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
         res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
     } catch(err) {
+        console.log(err);
         res.status(400).json({ mssg: 'Error on creating academic record, please ensure all fields were entered' });
     }
 }
@@ -614,7 +617,7 @@ module.exports.add_manage_fees = async (req,res) => {
 // This function will automate the creation of fees for grade levels and assign them fees
 module.exports.automate_fees = async (req, res) => {
 
-    const { isReset } = req.body
+    const { isReset,session } = req.body
 
     try {
 
@@ -635,7 +638,8 @@ module.exports.automate_fees = async (req, res) => {
                 gradeLevelId: gradeLevel._id,
                 feeDescription: fee._id,
                 amount: 0,
-                nationality: 'Local'
+                nationality: 'Local',
+                sy_id: session
             });
 
             if (isSenior) {
@@ -656,7 +660,7 @@ module.exports.automate_fees = async (req, res) => {
 
         res.status(200).json({ message: 'Fees have been automatically created' });
     } catch (err) {
-        console.error(err);
+        console.log(err);
         res.status(500).json({ error: 'An error occurred while automating fees' });
     }
 };
@@ -719,7 +723,7 @@ module.exports.generate_fees = async (req, res) => {
         // Fetch tables to be assigned to students fees
         const manageFees = await ManageFee.find()
             .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
-            .populate('sy_id gradeLevelId strandId nationalityCodeId');
+            .populate('sy_id gradeLevelId strandId');
         
         const textbooks = await Textbook.find().populate('inputter gradeLevel strand schoolYear');
 
@@ -738,7 +742,7 @@ module.exports.generate_fees = async (req, res) => {
                         // Check if the fee matches the current year, student's grade level, and nationality code
                         if (fee.sy_id._id.equals(currYear._id) &&
                             fee.gradeLevelId._id.equals(student.academicId.gradeLevelId._id) &&
-                            (!fee.nationalityCodeId || fee.nationalityCodeId._id.equals(student.nationality.nationalityCodeId?._id))) {
+                            (!fee.nationality || fee.nationality.equals(student.nationality.nationalityCodeId?.nationalityCode))) {
     
                             console.log('Matching Fee:', {
                                 studentName: student.firstName,
@@ -747,7 +751,7 @@ module.exports.generate_fees = async (req, res) => {
                                 feeGradeLevelId: fee.gradeLevelId._id,
                                 studentGradeLevelId: student.academicId.gradeLevelId._id,
                                 feeNationalityCodeId: fee.nationalityCodeId?._id,
-                                studentNationalityCodeId: student.nationality.nationalityCodeId?._id,
+                                studentNationalityCodeId: student.nationality.nationalityCodeId?.nationalityCode,
                                 manageFeeId: fee._id,
                                 amount: fee.amount // Add amount to the log
                             });

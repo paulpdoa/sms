@@ -13,7 +13,7 @@ import ConfirmationPopup from '../../components/ConfirmationPopup';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
-    const { searchQuery, setSearchQuery, role } = useContext(MainContext);
+    const { searchQuery, setSearchQuery, role,session } = useContext(MainContext);
     const navigate = useNavigate();
     const [openPopup,setOpenPopup] = useState(false);
 
@@ -89,9 +89,8 @@ const ManageFees = () => {
     const automateFees = async (isReset) => {
         const toastId = toast.loading("Generating fees, please do not leave the page...");
 
-        
         try {
-            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ isReset });
+            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset });
             toast.update(toastId, {
                 render: data.mssg,
                 type: "success",
@@ -109,6 +108,7 @@ const ManageFees = () => {
                 window.location.reload();
             }, 2000)
         } catch (err) {
+            console.log(err);
             toast.update(toastId, {
                 render: "An error occurred while generating fees",
                 type: "error",
@@ -121,7 +121,7 @@ const ManageFees = () => {
                 progress: undefined,
                 theme: "colored"
             });
-            console.log(err);
+            
         }
     }
 
@@ -133,7 +133,7 @@ const ManageFees = () => {
                 <Searchbar onSearch={setSearchQuery} />
                 <div className="flex items-center gap-2">
                     { recordsWithoutInputter.length < 1 ? 
-                    <button onClick={automateFees} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
+                    <button onClick={() => automateFees(false)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
                         Generate Fees
                     </button>
                     :

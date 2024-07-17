@@ -56,10 +56,12 @@ import { MainProvider } from "./helpers/MainContext";
 import EditTextbook from "./components/master data/EditTextbook";
 import NewTextbook from "./pages/SuperAdmin/NewTextbook";
 import NewUser from "./pages/SuperAdmin/NewUser";
+import { useCookies } from 'react-cookie';
 
 function App() {
 
-  const userToken = localStorage.getItem('userToken');
+  const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
+  const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
 
   const router = createBrowserRouter(

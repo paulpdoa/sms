@@ -83,7 +83,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Student Grade Levels',
       data: Object.entries(gradeLevelCounts).map(([, count]) => count),
-      backgroundColor: '#9966FF',
+      backgroundColor: ['#4BC0C0', '#FF9F40','#9966FF'],
     }],
   };
 

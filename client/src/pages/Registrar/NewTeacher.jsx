@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
 
-const Input = ({ label, type, name, value, onChange,disabled = false }) => (
+const Input = ({ label, type, name, value, onChange,disabled = false, required }) => (
     <div className="flex flex-col">
         <label className="text-sm mb-1" htmlFor={name}>{label}</label>
         <input
@@ -17,7 +17,7 @@ const Input = ({ label, type, name, value, onChange,disabled = false }) => (
             name={name}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required
+            required={required}
             disabled={disabled}
         />
     </div>
@@ -37,8 +37,8 @@ const Select = ({ label, name, value, options, onChange }) => (
             <option value="" hidden>{label}</option>
             {options && options.length > 0 ? (
                 options.map(option => (
-                    <option key={option._id} value={option._id}>
-                        { option[name] }
+                    <option key={option._id} value={label === 'Gender' ? option.name : option._id}>
+                        { label === 'Gender' ? option.name : option[name] }
                     </option>
                 ))
             ) : (
@@ -158,7 +158,7 @@ const NewTeacher = () => {
                         />
                         <Select 
                             label="Religion" 
-                            name="religion" 
+                            name="religion"     
                             value={religion} 
                             options={religions} 
                             onChange={setReligion} 
@@ -172,8 +172,8 @@ const NewTeacher = () => {
                         />
 
                         <Input label="Place of Birth" type="text" name="placeOfBirth" value={placeOfBirth} onChange={setPlaceOfBirth} />
-                        <Input label="Spouse Name" type="text" name="spouseName" value={spouseName} onChange={setSpouseName} />
-                        <Input label="Spouse Contact Number" type="text" name="spouseCel" value={spouseCel} onChange={setSpouseCel} />
+                        <Input label="Spouse Name" type="text" name="spouseName" value={spouseName} onChange={setSpouseName} required={false} />
+                        <Input label="Spouse Contact Number" type="text" name="spouseCel" value={spouseCel} onChange={setSpouseCel} required={false} />
                         <Input label="Address" type="text" name="address" value={address} onChange={setAddress} />
                     </div>
                 </section>

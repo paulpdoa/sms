@@ -4,15 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useState } from 'react';
+import { useCookies } from 'react-cookie';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    // const pathName = location.pathname === '/' ? 'Dashboard' : location.pathname.slice(1).replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-
     const pathName = 'School Name';
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies(['userToken']); // Importing removeCookie
 
     const userLogout = () => {
         setIsLoggingOut(true);
@@ -20,6 +20,9 @@ const Navbar = () => {
 
         // Clear user data from localStorage
         ['userToken', 'username', 'role', 'id', 'session', 'user'].forEach(item => localStorage.removeItem(item));
+
+        // Remove userToken cookie
+        removeCookie('userToken', { path: '/' });
 
         toast.success(message, {
             position: "top-center",
