@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { genders as genderSelections } from '../../data/genders.json';
 
 const Input = ({ label, type, name, value, onChange,disabled = false }) => (
     <div className="flex flex-col">
@@ -152,7 +153,7 @@ const NewTeacher = () => {
                             label="Gender" 
                             name="gender" 
                             value={gender} 
-                            options={genders} 
+                            options={genderSelections} 
                             onChange={setGender} 
                         />
                         <Select 
