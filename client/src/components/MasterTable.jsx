@@ -6,7 +6,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(10); // Set the number of rows per page
+    const [rowsPerPage,setRowsPerPage] = useState(10); // Set the number of rows per page
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -131,9 +131,15 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
 
     return (
         <>
-            <div className="shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+            <div className="sm:rounded-lg">
+                <div className="flex items-center gap-2 pb-2 px-4">
+                    <span className="text-gray-500 text-sm">Display</span>
+                    <input className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300" value={rowsPerPage} type="number" onChange={(e) => setRowsPerPage(e.target.value)} />
+                    <span className="text-gray-500 text-sm">result/s</span>
+                </div>
+
+                <table className="w-full text-sm text-left text-gray-500 shadow-md">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-100 border border-gray-200">
                         <tr>
                             {columns.map((column, key) => (
                                 <th
@@ -170,7 +176,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                 currentRows.map((record) => (
                                     <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
                                         {columns.map(column => (
-                                            <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
+                                            <td key={column.accessorKey} className="px-6 py-4">
                                                 {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
                                                     column.editable ? (
                                                         column.selectOptions ? (

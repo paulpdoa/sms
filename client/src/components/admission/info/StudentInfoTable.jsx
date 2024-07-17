@@ -3,6 +3,7 @@ import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import AdmissionTable from '../AdmissionTable';;
 import StudentInfoPopup from "./StudentInfoPopup";
+import MasterTable from '../../MasterTable';
 
 const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
     const columns = [
@@ -14,7 +15,6 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
-        { accessorKey: 'action', header: 'Action' }
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
@@ -43,12 +43,13 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
-        action: actions(student)
+        // action: actions(student)
     }));
 
     return (
         <>
-            <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+            {/* <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} /> */}
+            <MasterTable columns={columns} data={formattedStudents} searchQuery={searchQuery} viewRecord={setViewRecord} />
             {updatePopup && <StudentInfoPopup id={studentRec} closeModal={setUpdatePopup} />}
         </>
     );

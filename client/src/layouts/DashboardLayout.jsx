@@ -11,6 +11,8 @@ const DashboardLayout = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+
+
     return (
         <main className="grid grid-cols-10 bg-gray-100 h-screen">
             {isSidebarOpen && (

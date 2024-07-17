@@ -93,15 +93,15 @@ const Dashboard = () => {
   };
 
   return (
-    <main className="bg-gray-100 min-h-screen flex">
+    <main className="bg-gray-100 min-h-screen flex w-full">
       
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="p-6 w-full">
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-800">Welcome {localStorage.getItem('username')}!</h1>
         </header>
 
-        <section className="grid lg:grid-cols-3 gap-6 mb-6">
+        <section className="grid md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
             <div>
               <h2 className="text-gray-600 text-lg">Registered Students</h2>

@@ -16,14 +16,13 @@ const StudentSiblingTable = ({ setViewRecord,searchQuery }) => {
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
-        { accessorKey: 'action', header: 'Action' }
     ];
 
-    const actions = (student) => (
-        <div className="flex gap-2 items-center">
-            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-        </div>
-    );
+    // const actions = (student) => (
+    //     <div className="flex gap-2 items-center">
+    //         <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
+    //     </div>
+    // );
 
     const formattedStudents = students?.filter(student => student.isAdmitted).map(student => ({
         ...student,
@@ -35,14 +34,14 @@ const StudentSiblingTable = ({ setViewRecord,searchQuery }) => {
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
-        action: actions(student)
+        // action: actions(student)
     }));
 
     
 
     return (
         // <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
-        <MasterTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+        <MasterTable columns={columns} data={formattedStudents} viewRecord={setViewRecord} searchQuery={searchQuery} />
     )
 }
 

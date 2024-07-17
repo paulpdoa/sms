@@ -52,6 +52,8 @@ module.exports.add_teacher = async (req,res) => {
         // confirmPassword
      } = req.body;
 
+     console.log(req.body);
+
     //  const role = 'Teacher';
      const activeStatus = true;
 
@@ -79,7 +81,7 @@ module.exports.add_teacher = async (req,res) => {
             });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {
-        console.log(err.message);
+        console.log(err);
         res.status(400).json({ mssg: err.message })
     }
 } 

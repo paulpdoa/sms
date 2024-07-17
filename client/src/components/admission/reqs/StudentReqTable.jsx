@@ -1,6 +1,7 @@
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import AdmissionTable from "../AdmissionTable";
+import MasterTable from "../../MasterTable";
 
 const StudentReqTable = ({ setViewRecord, searchQuery }) => {
 
@@ -13,10 +14,9 @@ const StudentReqTable = ({ setViewRecord, searchQuery }) => {
         { accessorKey: 'admitted', header: 'Admitted' },
         { accessorKey: 'dateRegistered', header: 'Date Registered' },
         { accessorKey: 'status', header: 'Status' },
-        { accessorKey: 'gradeLevel', header: 'Grade Level' },
-        { accessorKey: 'strand', header: 'Strand' },
+        // { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        // { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
-        { accessorKey: 'action', header: 'Action' }
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
@@ -33,15 +33,14 @@ const StudentReqTable = ({ setViewRecord, searchQuery }) => {
         registered: student.isRegistered ? 'Yes' : 'No',
         admitted: student.isAdmitted ? 'Yes' : 'No',
         dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
-        gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
-        strand: student.academicId?.strandId?.strand || 'Not assigned',
+        // gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
+        // strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
-        status: student.status,
-        action: actions(student)
+        status: student.status    
     }));
 
     return (
-        <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+        <MasterTable columns={columns} data={formattedStudents} viewRecord={setViewRecord} searchQuery={searchQuery} /> 
     )
 }
 

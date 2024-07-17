@@ -62,16 +62,16 @@ const teacherSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-teacherSchema.pre('save', async function(next) {
-    const salt = await bcrypt.genSalt();
+// teacherSchema.pre('save', async function(next) {
+//     const salt = await bcrypt.genSalt();
 
-    if(!validator.isStrongPassword(this.password)) {
-        throw Error('Password not strong enough, please create stronger password');
-    }
+//     if(!validator.isStrongPassword(this.password)) {
+//         throw Error('Password not strong enough, please create stronger password');
+//     }
 
-    this.password = await bcrypt.hash(this.password,salt);
-    next();
-});
+//     this.password = await bcrypt.hash(this.password,salt);
+//     next();
+// });
 
 const TeacherModel = mongoose.model('teacher',teacherSchema);
 module.exports = TeacherModel;

@@ -121,6 +121,7 @@ const NewTeacher = () => {
                 navigate(data.data.redirect);
             }, 2000);
         } catch (err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

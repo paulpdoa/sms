@@ -40,7 +40,7 @@ const Admission = () => {
                 <Searchbar onSearch={handleSearch} />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
                 <div className="p-4 bg-white rounded-lg border border-gray-300 h-fit">
                     <h1 className="font-semibold text-xl text-green-500 mb-4">
                         {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
