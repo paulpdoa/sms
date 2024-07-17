@@ -1,6 +1,7 @@
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import AdmissionTable from '../AdmissionTable';
+import MasterTable from "../../MasterTable";
 
 const StudentParentTable = ({ setViewRecord, searchQuery }) => {
 
@@ -40,7 +41,8 @@ const StudentParentTable = ({ setViewRecord, searchQuery }) => {
     }));
 
     return (
-        <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+        // <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+        <MasterTable columns={columns} data={formattedStudents} viewRecord={setViewRecord} searchQuery={searchQuery} />
     )
 }
 

@@ -31,6 +31,10 @@ const EditStudent = () => {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
+    const [isRegistered,setIsRegistered] = useState(false);
+    const [passedReportCard,setPassedReportCard] = useState(false);
+    const [settledArrears,setSettledArrears] = useState(false);
+    const [completedClearance,setCompletedClearance] = useState(false);
 
     useEffect(() => {
         if(records) {
@@ -47,6 +51,10 @@ const EditStudent = () => {
             setEmail(records.email);
             setContactNumber(records.contactNumber);
             setAddress(records.address);
+            setIsRegistered(records.isRegistered);
+            setPassedReportCard(records.passedReportCard);
+            setSettledArrears(records.settledArrears);
+            setCompletedClearance(records.completedClearance);
         }
     }, [records]);
 
@@ -78,7 +86,11 @@ const EditStudent = () => {
             email,
             contactNumber,
             address,
-            session
+            session,
+            isRegistered,
+            passedReportCard,
+            settledArrears,
+            completedClearance
         };
 
         try {

@@ -28,8 +28,8 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
 
     const actions = (student) => (
         <div className="flex gap-2 items-center">
-            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-            <button onClick={() => updateStudentInfo(student)} className="font-medium text-green-500 hover:underline">Update</button>
+            <button onClick={() => setViewRecord(student)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
+            <button onClick={() => updateStudentInfo(student)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Update</button>
         </div>
     );
 
@@ -49,7 +49,7 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
     return (
         <>
             {/* <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} /> */}
-            <MasterTable columns={columns} data={formattedStudents} searchQuery={searchQuery} viewRecord={setViewRecord} />
+            <MasterTable columns={columns} data={formattedStudents} searchQuery={searchQuery} viewRecord={setViewRecord} actions={actions} />
             {updatePopup && <StudentInfoPopup id={studentRec} closeModal={setUpdatePopup} />}
         </>
     );

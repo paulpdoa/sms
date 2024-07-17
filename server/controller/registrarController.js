@@ -87,6 +87,7 @@ module.exports.get_student_detail = async (req, res) => {
                     { path: 'departmentId' },
                     { path: 'gradeLevelId' },
                     { path: 'sessionId' },
+                    { path: 'paymentTermId' },
                     { 
                         path: 'sectionId',
                         populate: { path: 'adviser' }
@@ -233,10 +234,14 @@ module.exports.update_student_info = async (req, res) => {
         isRegistered,
     } = req.body;
 
+    console.log(isRegistered);
+
     if(completedClearance && passedReportCard && settledArrears) {
         isRegistered = true
+        console.log('go here true')
     } else {
         isRegistered = false;
+        console.log('go here false');
     }
 
     try {

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdmissionTable from '../AdmissionTable';
+import MasterTable from "../../MasterTable";
 
 const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
 
@@ -18,7 +19,6 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
-        { accessorKey: 'action', header: 'Action' }
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
@@ -29,12 +29,12 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             setTimeout(() => {
                 window.location.reload();
@@ -43,12 +43,12 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     } 
@@ -56,8 +56,8 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
     const actions = (student) => (
         <>
         <div className="flex gap-2 items-center">
-            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-            <button onClick={() => deleteAcadRecord(student.academicId._id)} className="font-medium text-red-500 dark:text-red-500 hover:underline">Delete</button>
+            <button onClick={() => setViewRecord(student)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
+            <button onClick={() => deleteAcadRecord(student.academicId._id)} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Delete</button>
         </div>
         </>
     );
@@ -71,14 +71,14 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
-        action: actions(student)
     }));
 
     
 
     return (
-        <>
-            <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+        <>  
+            <MasterTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
+            {/* <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} /> */}
             <ToastContainer /> 
         </> 
     )

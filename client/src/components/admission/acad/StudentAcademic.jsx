@@ -102,7 +102,7 @@ const StudentAcademic = ({ id }) => {
 
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="studentNo">Student Number:</label>
-                        <span className="p-2 rounded-md outline-none border border-gray-400 bg-gray-100">{student?.studentNo}</span>
+                        <span className="p-2 rounded-md outline-none border border-gray-400 bg-gray-100">{student?.studentNo ?? 'No student number yet'}</span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="grade level">Grade Level</label>
@@ -149,7 +149,7 @@ const StudentAcademic = ({ id }) => {
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="payment term">Payment Term</label>
                         <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setPaymentTermId(e.target.value)}>
-                            <option hidden>{student?.academicId?.paymentTermId?.term ?? 'Not Assigned'}</option>
+                            <option hidden>{ student?.academicId?.paymentTermId?.term ?? 'Not Assigned'}</option>
                             {paymentTerms?.map(paymentTerm => (
                                 <option key={paymentTerm._id} value={paymentTerm._id}>{paymentTerm?.term}</option>
                             ))}
