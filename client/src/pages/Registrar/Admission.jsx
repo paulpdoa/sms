@@ -41,6 +41,14 @@ const Admission = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
+                <div className="rounded-md h-fit">
+                    {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                    {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
+                </div>
+                
                 <div className="p-4 bg-white rounded-lg border border-gray-300 h-fit">
                     <h1 className="font-semibold text-xl text-green-500 mb-4">
                         {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
@@ -79,13 +87,7 @@ const Admission = () => {
                     )}
                 </div>
 
-                <div className="rounded-md h-fit">
-                    {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                    {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                    {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                    {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                    {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                </div>
+                
             </div>
 
             <ToastContainer />

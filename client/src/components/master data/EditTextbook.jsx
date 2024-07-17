@@ -36,6 +36,10 @@ const EditTextbook = () => {
         }
     }, [textbook]);
 
+    const currentGradeLevel = gradeLevels.filter(gl => gl._id === gradeLevelId).find(gl => gl._id === gradeLevelId)?.gradeLevel.toLowerCase();
+
+    const isGrade11Or12 = currentGradeLevel === 'grade 11' || currentGradeLevel === 'grade 12';
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -84,14 +88,14 @@ const EditTextbook = () => {
     return (
         <main className="min-h-screen flex justify-center items-center">
             <form onSubmit={handleSubmit} className="space-y-8 bg-white w-3/4 shadow-lg p-8 rounded-lg mx-auto border border-gray-200">
-                <h1 className="font-bold text-green-600 text-2xl mb-4">Edit User: {textbook?.bookTitle}</h1>
+                <h1 className="font-bold text-green-600 text-2xl mb-4">Edit Textbook: {textbook?.bookTitle}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                     {renderInput('bookTitle', 'Book Title', bookTitle, setBookTitle, 'text')}
                     {renderInput('bookCode', 'Book Code', bookCode, setBookCode, 'text')}
                     {renderInput('bookAmount', 'Book Amount', bookAmount, setBookAmount, 'number', { step: "0.01" })}
                     {renderSelect('gradeLevel', 'Grade Level', gradeLevelId, setGradeLevelId, gradeLevels, 'Select Grade Level')}
-                    {renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', true)}
+                    { isGrade11Or12 && renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', true) }
                 </div>
 
                 <button type="submit" className="bg-green-600 text-white text-sm p-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400">

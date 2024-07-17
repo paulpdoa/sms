@@ -21,7 +21,7 @@ const Login = () => {
         try {
             const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
             
-            setCookie('userToken', data.data.token, { path: '/', maxAge: 3600 }); // Set cookie with token
+            setCookie('userToken', data.data.token, { maxAge: 3600 }); // Set cookie with token
             localStorage.setItem('role', data.data.role);
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
@@ -38,10 +38,10 @@ const Login = () => {
                 theme: "colored"
             });
             setTimeout(() => {
-                window.location.reload();
                 navigate(data.data.redirect);
             }, 2000);
         } catch (err) {
+            console.log(err.response.data.mssg);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -52,7 +52,6 @@ const Login = () => {
                 progress: undefined,
                 theme: "colored"
             });
-            console.log(err.response.data.mssg);
         }
     };
 

@@ -126,19 +126,19 @@ const Sectioning = () =>{
                     )
                 }
                 <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                    {/* <ReusableTable 
+                    <ReusableTable 
                         records={studentLists} 
                         columns={columns}
                         searchQuery={searchQuery}
                         viewRecord={setStudentRecord}
-                    /> */}
+                    />
 
-                    <MasterTable 
+                    {/* <MasterTable 
                         data={studentLists}
                         columns={columns}
                         searchQuery={searchQuery}
                         viewRecord={setStudentRecord}
-                    />
+                    /> */}
                 </div>
             </div>
             <ToastContainer />

@@ -740,10 +740,18 @@ module.exports.generate_fees = async (req, res) => {
     
                     for (const fee of manageFees) {
                         // Check if the fee matches the current year, student's grade level, and nationality code
-                        if (fee.sy_id._id.equals(currYear._id) &&
-                            fee.gradeLevelId._id.equals(student.academicId.gradeLevelId._id) &&
-                            (!fee.nationality || fee.nationality.equals(student.nationality.nationalityCodeId?.nationalityCode))) {
-    
+
+                        const matchesSchoolYear = fee.sy_id?._id.equals(currYear._id);
+                        const matchesGradeLevel = fee.gradeLevelId?._id.equals(student.academicId.gradeLevelId._id);
+                        const matchesNationality = !fee.nationality || fee.nationality === student.nationality.nationalityCodeId?.nationality
+
+                        console.log('Fee Conditions: ', {
+                            matchesSchoolYear,
+                            matchesGradeLevel,
+                            matchesNationality
+                        })
+
+                        if(matchesSchoolYear && matchesGradeLevel && matchesNationality) {
                             console.log('Matching Fee:', {
                                 studentName: student.firstName,
                                 feeSyId: fee.sy_id._id,

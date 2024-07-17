@@ -10,15 +10,28 @@ import { baseUrl } from '../../baseUrl';
 import PaymentTerm from '../../components/assessment/PaymentTerm';
 import AssessTextbooks from '../../components/assessment/AssessTextbooks';
 import Assistance from '../../components/assessment/Assistance';
+import MasterTable from '../../components/MasterTable';
+import { useFetch } from '../../hooks/useFetch';
 
 const Assessment = () => {
 
+    const { records: students } = useFetch(`${baseUrl()}/students`);
     const admissionPages = ['Total Fees', 'Textbooks', 'Assistance', 'Payment Term'];
     const [currentPage, setCurrentPage] = useState('Total Fees');
     const [currStudRec, setCurrStudRec] = useState(undefined);
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading,setIsLoading] = useState(false);
+
+    const columns = [
+        { accessorKey: 'fullName', header: 'Full Name' },
+        { accessorKey: 'studentNo', header: 'Student No.' },
+        { accessorKey: 'registered', header: 'Registered' },
+        { accessorKey: 'dateRegistered', header: 'Date Registered' },
+        { accessorKey: 'status', header: 'Status' },
+        { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        { accessorKey: 'nationality', header: 'Nationality' },
+    ];
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
@@ -93,7 +106,20 @@ const Assessment = () => {
         } catch(err) {
             console.log(err);
         }
-    }
+    };
+
+    const formattedStudents = students?.filter(student => student.isAdmitted && student.isRegistered).map(student => ({
+        ...student,
+        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        studentNo: student.studentNo || 'Not assigned',
+        registered: student.isRegistered ? 'Yes' : 'No',
+        admitted: student.isAdmitted ? 'Yes' : 'No',
+        dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
+        gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
+        strand: student.academicId?.strandId?.strand || 'Not assigned',
+        nationality: student.nationality?.nationality || 'Not assigned',
+        status: student.status,
+    }));
 
     return (
         <main className="p-4">
@@ -107,7 +133,12 @@ const Assessment = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-5">
+            <div className="grid grid-cols-1 gap-4 mt-5">
+
+                <div className="rounded-md h-fit w-full">
+                    <MasterTable columns={columns} data={formattedStudents} viewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
+                </div>
+
                 <div className="p-4 bg-white rounded-lg border border-gray-300 h-fit">
                     <h1 className="font-semibold text-xl text-green-500 mb-4">
                         {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
@@ -145,9 +176,7 @@ const Assessment = () => {
                     )}
                 </div>
 
-                <div className="rounded-md h-fit w-full">
-                    <AssessmentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
-                </div>
+                
             </div>
 
             <ToastContainer />
