@@ -173,6 +173,7 @@ const FeeCode = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewFeeCode}
                         onDelete={deleteFeeCode}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

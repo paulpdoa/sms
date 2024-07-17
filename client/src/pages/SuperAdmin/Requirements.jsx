@@ -155,6 +155,7 @@ const Requirements = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewRequirement}
                         onDelete={deleteRequirement}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

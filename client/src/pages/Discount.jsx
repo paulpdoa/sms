@@ -171,6 +171,7 @@ const Discount = () => {
                         onUpdate={updateNewDiscount}
                         onDelete={deleteDiscount}
                         searchQuery={searchQuery}
+                        isLoading={isLoading}
                     />
                 </div> 
             </div> 

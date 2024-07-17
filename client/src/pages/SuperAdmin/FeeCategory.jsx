@@ -147,6 +147,7 @@ const FeeCategory = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewFeeCategory}
                         onDelete={deleteFeeCategory}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

@@ -152,6 +152,7 @@ const ManageFees = () => {
                     onDelete={deleteManagedFees}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}
+                    isLoading={isLoading}
                 />
             </div>
             <ToastContainer />

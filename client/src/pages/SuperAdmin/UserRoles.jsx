@@ -145,6 +145,7 @@ const UserRoles = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewUserRole}
                         onDelete={deleteUserRoles}
+                        isLoading={isLoading}
                     />
                 </div>
             </div>

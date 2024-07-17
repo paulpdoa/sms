@@ -124,6 +124,7 @@ const Religion = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateReligion}
                         onDelete={deleteReligion}
+                        isLoading={isLoading}
                     />
                 </div>
             </div>

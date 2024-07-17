@@ -162,6 +162,7 @@ const GradeLevel = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewGradeLevel}
                         onDelete={deleteGradeLevel}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

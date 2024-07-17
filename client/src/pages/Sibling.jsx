@@ -69,6 +69,7 @@ const Sibling = () => {
                     onDelete={deleteSibling}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}
+                    isLoading={isLoading}
                 />
             </div> 
             <ToastContainer />          

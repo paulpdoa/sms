@@ -17,7 +17,7 @@ const columns = [
 
 const PaymentSchedule = () => {
 
-    const { records } = useFetch(`${baseUrl()}/payment-schedules`);
+    const { records,isLoading: loading } = useFetch(`${baseUrl()}/payment-schedules`);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);
@@ -92,6 +92,7 @@ const PaymentSchedule = () => {
                         data={records}
                         searchQuery={searchQuery}
                         disableAction={true}
+                        isLoading={loading}
                     />
                 </div>
             </div>

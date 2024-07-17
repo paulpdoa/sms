@@ -35,8 +35,8 @@ const StudentAcademic = ({ id }) => {
 
     useEffect(() => {
         if (gradeLevels && gradeLevels.length > 0) {
-            const grade11 = gradeLevels.find(gl => gl.gradeLevel === 'Grade 11');
-            const grade12 = gradeLevels.find(gl => gl.gradeLevel === 'Grade 12');
+            const grade11 = gradeLevels.find(gl => gl.gradeLevel.toLowerCase() === 'grade 11');
+            const grade12 = gradeLevels.find(gl => gl.gradeLevel.toLowerCase() === 'grade 12');
             setGrade11Id(grade11?._id || '');
             setGrade12Id(grade12?._id || '');
         }

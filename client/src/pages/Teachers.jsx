@@ -93,6 +93,7 @@ const Teachers = () => {
                     onDelete={deleteTeacher}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}
+                    isLoading={isLoading}
                 />
             </div> 
             <ToastContainer />          

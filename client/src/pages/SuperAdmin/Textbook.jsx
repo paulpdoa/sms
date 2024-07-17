@@ -109,6 +109,7 @@ const Textbook = () => {
                         onDelete={deleteTextbook}
                         // onUpdate={updateNewTextbook}
                         goToEdit={goToEdit}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

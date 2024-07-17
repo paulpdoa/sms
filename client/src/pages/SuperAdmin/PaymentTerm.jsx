@@ -183,6 +183,7 @@ const PaymentTerm = () => {
                         onDelete={deletePaymentTerm}
                         data={recordsWithoutInputter}
                         searchQuery={searchQuery}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

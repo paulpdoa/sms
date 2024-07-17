@@ -12,7 +12,7 @@ import ConfirmationPopup from '../../components/ConfirmationPopup';
 
 const SchoolYear = () => {
 
-    const { records } = useFetch(`${baseUrl()}/school-years`);
+    const { records,isLoading } = useFetch(`${baseUrl()}/school-years`);
     const [yearStart, setYearStart] = useState('');
     const [yearEnd, setYearEnd] = useState('');
     const [syTheme, setSyTheme] = useState('');
@@ -146,6 +146,7 @@ const SchoolYear = () => {
                         onUpdate={updateNewStartYear}
                         onOpenPopup={setOpenPopup}
                         openPopup={openPopup}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

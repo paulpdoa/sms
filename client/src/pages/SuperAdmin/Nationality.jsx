@@ -163,6 +163,7 @@ const Nationality = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewNationality}
                         onDelete={deleteNationality}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

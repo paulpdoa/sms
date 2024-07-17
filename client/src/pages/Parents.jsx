@@ -81,6 +81,7 @@ const Parents = () => {
                     onDelete={deleteParent}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}
+                    isLoading={isLoading}
                 />
             </div> 
             <ToastContainer />          

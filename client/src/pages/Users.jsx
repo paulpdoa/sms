@@ -88,6 +88,7 @@ const Users = () => {
                         searchQuery={searchQuery}
                         onDelete={deleteUser}
                         goToEdit={goToEdit}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

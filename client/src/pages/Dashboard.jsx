@@ -95,7 +95,6 @@ const Dashboard = () => {
   return (
     <main className="bg-gray-100 min-h-screen flex">
       
-
       {/* Main Content */}
       <div className="flex-1 p-6">
         <header className="flex justify-between items-center mb-6">
@@ -150,7 +149,7 @@ const Dashboard = () => {
 
         <section className="bg-white p-6 rounded-lg shadow-md mb-6">
           <h2 className="text-lg font-semibold mb-4">Students by Grade Level</h2>
-          <div style={{ height: '400px' }}>
+          <div style={{ width: '100%', height: '400px' }}>
             <Bar data={studentBarData} options={chartOptions} />
           </div>
         </section>

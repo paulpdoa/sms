@@ -13,7 +13,7 @@ import MasterDataForm from "../../components/MasterDataForm";
 
 const Department = () => {
 
-    const { records } = useFetch(`${baseUrl()}/departments`);
+    const { records,isLoading } = useFetch(`${baseUrl()}/departments`);
     const [department,setDepartment] = useState('');
 
     const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext)
@@ -136,6 +136,7 @@ const Department = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewDepartment}
                         onDelete={deleteDepartment}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

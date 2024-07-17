@@ -136,6 +136,7 @@ const Strands = () => {
                         searchQuery={searchQuery}
                         onDelete={deleteStrand}
                         onUpdate={updateNewStrand}
+                        isLoading={isLoading}
                     />
                 </div>    
             </div> 

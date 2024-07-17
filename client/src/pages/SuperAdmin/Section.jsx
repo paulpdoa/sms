@@ -202,6 +202,7 @@ const Section = () => {
                         searchQuery={searchQuery}
                         onUpdate={updateNewSection}
                         onDelete={deleteSection}
+                        isLoading={isLoading}
                     />
                 </div>
             </div>

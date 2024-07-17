@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,openPopup,onOpenPopup }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -165,58 +165,72 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                         </tr>
                     </thead>
                     <tbody>
-                        {currentRows.map((record) => (
-                            <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
-                                {columns.map(column => (
-                                    <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
-                                        {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
-                                            column.editable ? (
-                                                column.selectOptions ? (
-                                                    <select
-                                                        name={column.accessorKey}
-                                                        value={editValues[column.accessorKey] || ''}
-                                                        onChange={(e) => handleInputChange(e, column)}
-                                                        className="outline-none p-1 rounded-md border border-gray-300"
-                                                    >
-                                                        <option value="" hidden>{column.header}</option>
-                                                        {column.selectOptions.map(option => (
-                                                            <option key={option.value} value={option.value}>{option.label}</option>
-                                                        ))}
-                                                    </select>
+                        { !isLoading ? (
+                            currentRows.length > 0 ? (
+                                currentRows.map((record) => (
+                                    <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
+                                        {columns.map(column => (
+                                            <td key={column.accessorKey} className="px-6 py-4 whitespace-nowrap">
+                                                {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                                    column.editable ? (
+                                                        column.selectOptions ? (
+                                                            <select
+                                                                name={column.accessorKey}
+                                                                value={editValues[column.accessorKey] || ''}
+                                                                onChange={(e) => handleInputChange(e, column)}
+                                                                className="outline-none p-1 rounded-md border border-gray-300"
+                                                            >
+                                                                <option value="" hidden>{column.header}</option>
+                                                                {column.selectOptions.map(option => (
+                                                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <input
+                                                                name={column.accessorKey}
+                                                                value={editValues[column.accessorKey] || ''}
+                                                                onChange={(e) => handleInputChange(e, column)}
+                                                                className="outline-none p-1 rounded-md border border-gray-300"
+                                                                type={column.type || ''}
+                                                            />
+                                                        )
+                                                    ) : (
+                                                        column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
+                                                    )
                                                 ) : (
-                                                    <input
-                                                        name={column.accessorKey}
-                                                        value={editValues[column.accessorKey] || ''}
-                                                        onChange={(e) => handleInputChange(e, column)}
-                                                        className="outline-none p-1 rounded-md border border-gray-300"
-                                                        type={column.type || ''}
-                                                    />
-                                                )
-                                            ) : (
-                                                column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                            )
-                                        ) : (
-                                            column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                        )}
-                                    </td>
-                                ))}
-                                {!disableAction &&
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
-                                            <>
-                                                <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
-                                                <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => goToEdit ? goToEdit(record._id) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
-                                                <button onClick={() => handleDeleteClick(record._id)} className="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
-                                            </>
-                                        )}
-                                    </td>
-                                }
+                                                    column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
+                                                )}
+                                            </td>
+                                        ))}
+                                        {!disableAction &&
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                { !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                                    <>
+                                                        <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
+                                                        <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button onClick={() => goToEdit ? goToEdit(record._id) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
+                                                        <button onClick={() => handleDeleteClick(record._id)} className="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
+                                                    </>
+                                                ) : 
+                                                <button onClick={() => viewRecord(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr className="border-b hover:bg-gray-100 w-full">
+                                    <td className="px-6 py-4 text-xl animate-pulse">Nothing to display</td>
+                                </tr>
+                            )
+                        ) : (
+                            <tr className="border-b hover:bg-gray-100 w-full">
+                                <td className="px-6 py-4 text-xl animate-pulse">Loading please wait...</td>
                             </tr>
-                        ))}
+                        ) }
                     </tbody>
                 </table>
             </div>
