@@ -147,10 +147,10 @@ route.get('/requirement/:id',allowUserView(userRoles), get_requirement_detail);
 route.patch('/requirement/:id',edit_requirement);
 
 // School Year
-route.get('/school-years',allowUserView(userRoles), get_school_years);
+route.get('/school-years', get_school_years);
 route.post('/school-year', add_school_year);
 route.put('/school-year/:id', delete_school_year);
-route.get('/school-year/:id',allowUserView(userRoles), get_school_year_detail);
+route.get('/school-year/:id', get_school_year_detail);
 route.patch('/school-year/:id',edit_school_year);
 
 // User

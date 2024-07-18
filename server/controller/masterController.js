@@ -738,6 +738,8 @@ module.exports.edit_user = async (req, res) => {
     const { id } = req.params;
     const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword } = req.body;
 
+    
+
     try {
         const currUser = await User.findById(id);
         
@@ -746,7 +748,7 @@ module.exports.edit_user = async (req, res) => {
         }
 
         if(password === '' && confirmPassword === '') {
-            await User.findByIdAndUpdate({_id: id}, {firstName, middleName, lastName, userRole: role, username, isActive});
+            await User.findByIdAndUpdate({_id: id}, {firstName, middleName, lastName, role, username, isActive});
         } else {
             if (password && password !== confirmPassword) {
                 return res.status(400).json({ mssg: 'Passwords do not match' });

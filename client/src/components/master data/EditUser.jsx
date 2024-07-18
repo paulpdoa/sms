@@ -7,11 +7,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { MainContext } from "../../helpers/MainContext";
+import { useCookies } from 'react-cookie';
+
 
 const EditUser = () => {
     const { id } = useParams();
     const { records: user } = useFetch(`${baseUrl()}/user/${id}`);
     const { records: userRoles } = useFetch(`${baseUrl()}/user-roles`);
+    const [cookies, setCookie, removeCookie] = useCookies(['userToken']); // Importing removeCookie
+
 
     const navigate = useNavigate();
 
@@ -26,7 +30,7 @@ const EditUser = () => {
 
     const [currentRole,setCurrentRole] = useState('');
     
-    const { role } = useContext(MainContext);
+    const { role,currentUserId } = useContext(MainContext);
 
     useEffect(() => {
        if(user) {
@@ -36,7 +40,7 @@ const EditUser = () => {
             setUsername(user?.username || '');
             setUserRole(user?.role || '');
             setIsActive(user?.isActive || ''); 
-            setCurrentRole(user?.role?.userRole)
+            setCurrentRole(user?.role?.userRole || '');
        }
     },[user])
 
@@ -73,28 +77,42 @@ const EditUser = () => {
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
-            setTimeout(() => {
-                navigate(newData.data.redirect)
-            }, 2000);
+            // Set the local storage if the user updated his role
+            // localStorage.setItem('role',userRole);
+            // console.log(currentRole);
+            
+            // Logout the user after updating his profile
+            if(user._id === currentUserId) {
+                setTimeout(() => {
+                    removeCookie('userToken',{ path: '/login' });
+                },2000)
+            } else {
+                setTimeout(() => {
+                    navigate(newData.data.redirect);
+                    // window.location.reload();
+    
+                }, 2000);
+            }
+            
         } catch (err) {
             console.log(err);
             toast.error(err.response.data.error, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }
@@ -148,7 +166,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder,currentVa
             onChange={(e) => onChange(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         >
-            <option hidden>{currentValue ?? placeholder}</option>
+            <option value={currentValue || ''} hidden>{ currentValue ?? placeholder }</option>
             {options?.map((option) => (
                 <option key={option._id} value={option._id}>
                     {option[id]}

@@ -1,11 +1,11 @@
 const allowUserView = (roles) => {
     return (req,res,next) => {
         const { role } = req.query;
-        
+        next()
         // if(roles.includes(role)) {
-            next()
+        //     next()
         // } else {
-        //     res.status(401).json({ mssg: 'You are not authorized to view this page', redirect: '/' });
+        //      res.status(401).json({ mssg: 'You are not authorized to view this page', redirect: '/' });
         // }
         
 

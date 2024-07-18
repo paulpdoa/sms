@@ -57,6 +57,7 @@ import EditTextbook from "./components/master data/EditTextbook";
 import NewTextbook from "./pages/SuperAdmin/NewTextbook";
 import NewUser from "./pages/SuperAdmin/NewUser";
 import { useCookies } from 'react-cookie';
+import Profile from "./pages/Profile";
 
 function App() {
 
@@ -128,6 +129,8 @@ function App() {
           <Route path='/strands' element={<Strands />} />
           <Route path='/sectioning' element={<Sectioning />} />
           <Route path='/assessment' element={<Assessment />} />
+
+          <Route path='/profile/:id' element={<Profile />} />
 
 
           <Route path='/new-textbook' element={<NewTextbook />} />

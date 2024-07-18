@@ -8,6 +8,7 @@ import { MdOutlineKeyboardArrowUp, MdClose } from "react-icons/md";
 import { MainContext } from "../helpers/MainContext"; 
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
+import { useNavigate } from 'react-router-dom';
 
 const initialMenus = [
     {
@@ -191,7 +192,9 @@ const initialMenus = [
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-    const { role: currentRole, currentUser, session: sessionId,setShowForm } = useContext(MainContext);
+    const { role: currentRole, currentUser, currentUserId , session: sessionId,setShowForm } = useContext(MainContext);
+
+    const navigate = useNavigate();
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
@@ -220,7 +223,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </button>
                 </div>
 
-                <div className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg">
+                <div onClick={() => navigate(`/profile/${currentUserId}`)} className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg cursor-pointer hover:bg-sky-800">
                     <FaRegUserCircle className="text-5xl" />
                     <div className="text-gray-100 flex flex-col">
                         <h2 className="text-lg">{currentUser}</h2>

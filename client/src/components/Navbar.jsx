@@ -22,22 +22,21 @@ const Navbar = () => {
         ['userToken', 'username', 'role', 'id', 'session', 'user'].forEach(item => localStorage.removeItem(item));
 
         // Remove userToken cookie
-        removeCookie('userToken', { path: '/' });
+        removeCookie('userToken',{ path: '/login' });
 
         toast.success(message, {
             position: "top-center",
             autoClose: 1000,
-            hideProgressBar: false,
+            hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: "light"
+            theme: "colored"
         });
 
         setTimeout(() => {
             navigate('/login');
-            window.location.reload();
         }, 2000);
     };
 
