@@ -420,7 +420,7 @@ module.exports.add_discount = async (req,res) => {
     discountPercent = discountPercent / 100 //Divide to 100 to get decimal percentage equivalent
 
     try {
-        const discount = await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode,inputter });
+        await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode,inputter });
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
     } catch(err) {
         if(err.code === 11000) {

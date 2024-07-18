@@ -751,7 +751,7 @@ module.exports.edit_user = async (req, res) => {
             if (password && password !== confirmPassword) {
                 return res.status(400).json({ mssg: 'Passwords do not match' });
             }
-    
+            
             await User.updateUser(id, firstName, middleName, lastName, role, username, password, isActive);
         } 
 

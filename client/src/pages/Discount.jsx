@@ -43,7 +43,7 @@ const Discount = () => {
         },
         {
             accessorKey: 'discountCode',
-            header: 'Discount Code',
+            header: 'Discount Category',
             editable: true
         },
         {
@@ -148,10 +148,10 @@ const Discount = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {renderInput('discount type','Discount Type',setDiscountType,'text')}
-            {renderInput('discount percentage','Discount Percentage',setDiscountPercentage,'number')}
-            {renderInput('discount amount','Discount Amount',setAmount,'number')}
-            {renderInput('discount code','Discount Code',setDiscountCode,'text')}
-            {renderSelect('gradeLevel','Grade Level',setGradeLevel,gradeLevels,'grade level')}
+            {renderInput('discount percentage','Discount Percentage',setDiscountPercentage,'number',true,{ step: "0.01" })}
+            {renderInput('discount amount','Discount Amount',setAmount,'number',{ step: "0.01" },null,'Leave this empty if n/a')}
+            {renderInput('discount code','Discount Category',setDiscountCode,'text',true)}
+            {renderSelect('gradeLevel','Grade Level',setGradeLevel,gradeLevels,'grade level','Leave this empty if n/a')}
             {/* {renderSelect('session','School Year',setSchoolYear,schoolYears,'school year')} */}
         </div>
         </>
@@ -182,21 +182,22 @@ const Discount = () => {
 
 export default Discount;
 
-const renderInput = (label,value,onChange,inputType) => (
+const renderInput = (label,value,onChange,inputType,required = false, extraProps = {},placeholder) => (
     <div className="flex flex-col mt-2">
         <label className="text-sm" htmlFor={label}>{value}</label>
-        <input className="outline-none p-1 rounded-md border border-gray-300" type={inputType} onChange={(e) => onChange(e.target.value)} />
+        <input placeholder={placeholder} required={required} className="outline-none p-1 rounded-md border border-gray-300" type={inputType} onChange={(e) => onChange(e.target.value)} { ...extraProps } />
     </div>
 )
 
-const renderSelect = (label,value,onChange,options,placeholder) => (
+const renderSelect = (label,value,onChange,options,placeholder, required = false) => (
     <div className="flex flex-col mt-2">
         <label className="text-sm" htmlFor={label}>{value}</label>
         <select 
             className="outline-none p-1 rounded-md border border-gray-300"
             onChange={(e) => onChange(e.target.value)}
+            
         >
-            <option hidden>Select {placeholder}</option>
+            <option value="" className="text-xs text-gray-200" hidden>Leave this empty if n/a</option>
             { options?.map(option => (
                 <option key={option._id} value={option._id}>
                     { label === 'session' ? `${option.startYear.split('-')[0]}-${option.endYear.split('-')[0]}` : option[label]}
