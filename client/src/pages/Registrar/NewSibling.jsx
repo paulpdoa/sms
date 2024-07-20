@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext'; 
 
 const NewSibling = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const NewSibling = () => {
     const [email, setEmail] = useState('');
     const [studentId, setStudentId] = useState('');
 
-    const currentUserId = localStorage.getItem('id');
+    const { currentUserId, session } = useContext(MainContext);
 
     const addSibling = async (e) => {
         e.preventDefault();
@@ -27,7 +28,8 @@ const NewSibling = () => {
             lastName,
             email,
             inputter: currentUserId,
-            studentId
+            studentId,
+            session
         };
 
         try {
@@ -36,16 +38,16 @@ const NewSibling = () => {
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 2000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
-                window.location.reload();
+                navigate('/siblings')
             }, 2000);
            }
         } catch (err) {
@@ -53,12 +55,12 @@ const NewSibling = () => {
             toast.error("Error adding sibling. Please try again.", {
                 position: "top-center",
                 autoClose: 2000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };

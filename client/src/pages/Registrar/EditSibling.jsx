@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext';
 
 const EditSibling = () => {
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ const EditSibling = () => {
     const [email, setEmail] = useState('');
     const [studentId, setStudentId] = useState('');
 
-    const currentUserId = localStorage.getItem('id');
+    const { currentUserId } = useContext(MainContext);
 
     useEffect(() => {
         if (records) {
@@ -57,7 +58,7 @@ const EditSibling = () => {
             });
 
             setTimeout(() => {
-                window.location.reload();
+                navigate('/siblings')
             }, 2000);
         } catch (err) {
             console.log(err);

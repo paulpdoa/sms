@@ -22,11 +22,15 @@ const sectionSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         required: true
+    },
+    sessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'schoolYear'
     }
     
 }, { timestamps: true })
 
-sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,status) {
+sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,status,sessionId) {
     const exist = await this.findOne({ section });
     if(exist && exist.status) {
         throw Error('This section is already existing');
@@ -36,7 +40,7 @@ sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,sta
         throw Error('Grade level must not be empty')
     }
     
-    const newSection = await this.create({ section,gradeLevel,adviser,status });
+    const newSection = await this.create({ section,gradeLevel,adviser,status,sessionId });
     return newSection;
 }
 

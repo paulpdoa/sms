@@ -319,8 +319,10 @@ module.exports.update_student_info = async (req, res) => {
 // For Academic
 
 module.exports.get_academics = async (req,res) => {
+    const { session } = req.query;
+
     try {
-        const academics = await Academic.find()
+        const academics = await Academic.find({ sessionId: session })
         .populate({ path: 'sectionId', populate: { path: 'adviser' }})
         .populate('gradeLevelId studentId departmentId strandId sessionId');
         res.status(200).json(academics);
@@ -330,9 +332,9 @@ module.exports.get_academics = async (req,res) => {
 }
 
 module.exports.get_student_academic = async (req,res) => {
-    
+    const { session } = req.query;
     try {
-        const studentAcademic = await Academic.find().populate({ path: 'studentId' });
+        const studentAcademic = await Academic.find({ sessionId: session }).populate({ path: 'studentId' });
         res.status(200).json(studentAcademic);
     } catch(err) {
         console.log(err);
@@ -341,9 +343,10 @@ module.exports.get_student_academic = async (req,res) => {
 
 module.exports.get_student_academic_detail = async (req,res) => {
     const { studentId } = req.params;
+    const { session } = req.query;
     
     try {
-        const studentAcademic = await Academic.find({ studentId },{ sort: { 'createdAt': -1 } });
+        const studentAcademic = await Academic.find({ studentId, sessionId: session },{ sort: { 'createdAt': -1 } });
         res.status(200).json(studentAcademic);
     } catch(err) {
         console.log(err);
@@ -354,7 +357,7 @@ module.exports.add_academic = async (req,res) => {
 
     let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId } = req.body;
     // This will also update students info upon posting
-    console.log(req.body)
+    
 
     if(strandId === '') {
         strandId = undefined;
@@ -394,9 +397,9 @@ module.exports.delete_academic = async (req,res) => {
 // For Discounts
 
 module.exports.get_discounts = async (req,res) => {
-
+    const { session } = req.query;
     try {
-        const discount = await Discount.find().populate('sessionId gradeLevelId inputter');
+        const discount = await Discount.find({ sessionId: session }).populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
@@ -405,9 +408,10 @@ module.exports.get_discounts = async (req,res) => {
 
 module.exports.get_discount_detail = async (req,res) => {
     const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const discount = await Discount.findById(id).populate('sessionId gradeLevelId inputter');
+        const discount = await Discount.findOne({ _id: id,sessionId: session }).populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
@@ -416,7 +420,6 @@ module.exports.get_discount_detail = async (req,res) => {
 
 module.exports.add_discount = async (req, res) => {
     let { schoolYear: sessionId, gradeLevel: gradeLevelId, discountType, discountPercentage: discountPercent, amount, discountCode, inputter } = req.body;
-    console.log(req.body);
     discountPercent = discountPercent / 100; // Divide to 100 to get decimal percentage equivalent
 
     if (amount !== null && amount < 0) {
@@ -578,10 +581,12 @@ module.exports.add_sectioning = async (req,res) => {
 
 module.exports.get_manage_fees = async (req,res) => {
 
+    const { session } = req.query;
+
     try {
-        const managedFees = await ManageFee.find()
+        const managedFees = await ManageFee.find({ sessionId: session })
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
-        .populate('sy_id gradeLevelId strandId');
+        .populate('sessionId gradeLevelId strandId');
         res.status(200).json(managedFees);
     } catch(err) {
         console.log(err);
@@ -589,13 +594,14 @@ module.exports.get_manage_fees = async (req,res) => {
 }
 
 module.exports.get_manage_fee_detail = async(req,res) => {
-    const { id } = req.params;
 
+    const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const managedFee = await ManageFee.findById(id)
+        const managedFee = await ManageFee.findById({ _id: id,sessionId: session })
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
-        .populate('sy_id gradeLevelId strandId');
+        .populate('sessionId gradeLevelId strandId');
         res.status(200).json(managedFee);
     } catch(err) {
         console.log(err)
@@ -603,7 +609,7 @@ module.exports.get_manage_fee_detail = async(req,res) => {
 }
 
 module.exports.add_manage_fees = async (req,res) => {
-    let { sy_id, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality } = req.body;
+    let { sessionId, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality } = req.body;
 
     // Fee Code > fee code + grade level + nationality Code
     // Fee description > fee description + grade level + nationality Code
@@ -617,15 +623,16 @@ module.exports.add_manage_fees = async (req,res) => {
             const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
 
             if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
-                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied});
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied});
             } else {
-                await ManageFee.create({ sy_id,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied});
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied});
             }
 
         }
-        res.status(200).json({mssg: 'Fees has already been added to the record'});
+        res.status(200).json({mssg: 'Fees has been added to the record'});
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error has occurred while creating fees' });
     }
 }
 
@@ -654,7 +661,7 @@ module.exports.automate_fees = async (req, res) => {
                 feeDescription: fee._id,
                 amount: 0,
                 nationality: 'Local',
-                sy_id: session
+                sessionId: session
             });
 
             if (isSenior) {
@@ -694,11 +701,10 @@ module.exports.delete_manage_fee = async(req,res) => {
 
 module.exports.edit_manage_fee = async (req,res) => {
     const { id } = req.params;
-    let { sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality } = req.body;
+    let { sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality } = req.body;
 
-    console.log(req.body)
     try {
-        await ManageFee.findByIdAndUpdate({ _id: id },{ sy_id, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality });
+        await ManageFee.findByIdAndUpdate({ _id: id },{ sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality });
         res.status(200).json({ mssg: `Fee has been updated successfully` });
     } catch(err) {
         console.log(err);
@@ -1000,8 +1006,12 @@ module.exports.get_student_payment_detail = async (req,res) => {
 // For Payment Schedule
 
 module.exports.get_payment_schedule = async (req,res) => {
+
+    const { session } = req.query;
+
     try {
-        const paymentSchedules = await PaymentSchedule.find().populate('sy_id paymentTermId');
+        const paymentSchedules = await PaymentSchedule.find({ sessionId:session })
+        .populate('sessionId paymentTermId');
         res.status(200).json(paymentSchedules);
     } catch(err) {
         console.log(err);
@@ -1011,7 +1021,7 @@ module.exports.get_payment_schedule = async (req,res) => {
 
 
 module.exports.add_payment_schedule = async (req, res) => {
-    const { schoolYearId, isReset } = req.body;
+    const { session, isReset } = req.body;
 
     console.log(req.body)
 
@@ -1022,7 +1032,7 @@ module.exports.add_payment_schedule = async (req, res) => {
         const paymentTerms = await PaymentTerm.find();
 
         // Get the current start of school year
-        const currentSchoolYear = await SchoolYear.findById(schoolYearId);
+        const currentSchoolYear = await SchoolYear.findById(session);
         const yearStart = currentSchoolYear.startYear;
         const initialStartDate = moment(yearStart);
 
@@ -1040,9 +1050,9 @@ module.exports.add_payment_schedule = async (req, res) => {
 
             for (let j = 0; j < installmentBy; j++) {
                 paymentSchedule.push({
-                    sy_id: currentSchoolYear._id,
+                    sessionId: currentSchoolYear._id,
                     paymentTermId: paymentTermId,
-                    dateSchedule: startDate.format('YYYY-MM-DD')
+                    dateSchedule: startDate.format('YYYY-MM-DD'),
                 });
 
                 startDate.add(payEvery, 'months'); // Increment the date by one month for the next installment

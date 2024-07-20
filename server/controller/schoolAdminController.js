@@ -184,9 +184,12 @@ module.exports.edit_strand = async (req,res) => {
 
 // For textbooks
 module.exports.get_textbooks = async (req,res) => {
+    const { session } = req.query;
+
     try {
         // Will return active statuses
-        const textbooks = await Textbook.find({ status: true }).populate('inputter gradeLevel strand session schoolYear');
+        const textbooks = await Textbook.find({ status: true,sessionId: session })
+        .populate('inputter gradeLevel strand sessionId schoolYear');
         res.status(200).json(textbooks);
     } catch(err) {
         console.log(err);
@@ -203,7 +206,7 @@ module.exports.add_textbook = async (req,res) => {
     }
 
     try {
-        await Textbook.create({ schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session, status });
+        await Textbook.create({ schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status });
         res.status(200).json({ mssg: `${bookTitle} has been added to the record` });
     } catch(err) {
         if(err.code === 11000) {
@@ -228,8 +231,10 @@ module.exports.delete_textbook = async (req,res) => {
 module.exports.get_textbook_detail = async (req,res) => {
     const { id } = req.params;
 
+    const { session } = req.query;
+
     try {
-        const textbookFind = await Textbook.findById(id);
+        const textbookFind = await Textbook.findOne({ _id: id, sessionId: session});
         res.status(200).json(textbookFind);
     } catch(err) {
         console.log(err);
@@ -240,10 +245,16 @@ module.exports.edit_textbook = async (req,res) => {
     const { id } = req.params;
 
     const { newBookCode: bookCode,newBookTitle:bookTitle,newBookAmount:bookAmount,newGradeLevel:gradeLevel,newStrand:strand,newInputter:inputter,newSession:session,newSchoolYear:schoolYear } = req.body;
-  
-    try {   
-        const newTextbook = await Textbook.findByIdAndUpdate({ _id: id }, { bookTitle,bookCode,bookAmount,gradeLevel,strand,inputter,session,schoolYear });
-        res.status(200).json({ mssg: `${newTextbook.bookTitle} has been edited successfully!` });
+    
+    try { 
+        if(strand === '') {
+            await Textbook.findByIdAndUpdate({ _id: id }, { bookTitle,bookCode,bookAmount,gradeLevel,inputter,sessionId: session,schoolYear });
+        } else {
+            await Textbook.findByIdAndUpdate({ _id: id }, { bookTitle,bookCode,bookAmount,gradeLevel,strand,inputter,sessionId: session,schoolYear });
+        }
+
+        
+        res.status(200).json({ mssg: `${bookTitle} has been edited successfully!` });
     } catch(err) {
         console.log(err);
     }

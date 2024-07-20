@@ -341,19 +341,23 @@ module.exports.edit_department = async (req,res) => {
 // For Section
 
 module.exports.get_sections = async (req,res) => {
+    
+    const { session } = req.query;
+
     try {
-        const sections = await Section.find({ status: true })
+        const sections = await Section.find({ status: true,sessionId: session })
         .populate({ path: 'gradeLevel', populate: { path: 'department' } })
         .populate('adviser');
         res.status(200).json(sections);
     } catch(err) {
         console.log(err);
+        res.status(404).json({ mssg: 'Section cannot be found' })
     }
 }
 
 module.exports.add_sections = async (req,res) => {
 
-    let { section,gradeLevel,adviser } = req.body;
+    let { section,gradeLevel,adviser,sessionId } = req.body;
     const status = true;
 
     if(adviser === '') {
@@ -361,7 +365,7 @@ module.exports.add_sections = async (req,res) => {
     }
 
     try {
-        const newSection = await Section.addSection(section,gradeLevel,adviser,status);
+        const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -381,14 +385,21 @@ module.exports.delete_section = async (req,res) => {
     }
 }
 
-module.exports.get_section_detail = async (req,res) => {
+module.exports.get_section_detail = async (req, res) => {
     const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const sectionFind = await Section.findById(id);
+        const sectionFind = await Section.findOne({ _id: id, sessionId: session });
+
+        if (!sectionFind) {
+            return res.status(404).json({ mssg: "Section not found for the specified session" });
+        }
+
         res.status(200).json(sectionFind);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
+        res.status(500).json({ mssg: "Server error" });
     }
 }
 
@@ -396,12 +407,12 @@ module.exports.edit_section = async (req,res) => {
     const { id } = req.params;
     console.log(req.body);
 
-    const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser } = req.body;
+    const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser,sessionId } = req.body;
    
     try {   
         const currSection = await Section.findById(id);
         // if(currSection.section !== section) {
-            const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser });
+            const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser,sessionId });
             res.status(200).json({ mssg: `${newSection.section} has been changed to ${section} successfully!` });
         // } else {
         //     res.status(400).json({ mssg: `Cannot update ${section}, still the same with old value` })
@@ -479,8 +490,9 @@ module.exports.edit_grade_level = async (req,res) => {
 // For Requirement
 
 module.exports.get_requirements = async (req,res) => {
+    const { session } = req.query
     try {
-        const requirements = await Requirement.find().populate('inputter');
+        const requirements = await Requirement.find({ sessionId: session }).populate('inputter');
         res.status(200).json(requirements);
     } catch(err) {
         console.log(err);
@@ -489,10 +501,10 @@ module.exports.get_requirements = async (req,res) => {
 
 module.exports.add_requirements = async (req,res) => {
 
-    const { requirement,isRequired,currentUserId } = req.body
+    const { requirement,isRequired,currentUserId, session } = req.body
 
     try {
-        const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId });
+        const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId,sessionId: session });
         res.status(200).json({ mssg: `${newRequirement.requirement} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -512,9 +524,10 @@ module.exports.delete_requirement = async (req,res) => {
 
 module.exports.get_requirement_detail = async (req,res) => {
     const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const requirementFind = await Requirement.findById(id);
+        const requirementFind = await Requirement.findOne({ _id: id, sessionId: session });
         res.status(200).json(requirementFind);
     } catch(err) {
         console.log(err);
@@ -524,12 +537,12 @@ module.exports.get_requirement_detail = async (req,res) => {
 module.exports.edit_requirement = async (req,res) => {
     const { id } = req.params;
 
-    const { newRequirement: requirement,newIsRequired: isRequired,currentUserId: inputter } = req.body;
+    const { newRequirement: requirement,newIsRequired: isRequired,currentUserId: inputter, session } = req.body;
 
     try {   
         const currRequirement = await Requirement.findById(id);
         // if(currRequirement.requirement !== requirement && currRequirement.isRequired !== isRequired) {
-            const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter });
+            const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter, sessionId: session });
             res.status(200).json({ mssg: `${newRequirement.requirement} has been changed to ${requirement} successfully!` });
         // } else {
         //     res.status(400).json({ mssg: `Cannot update ${requirement}, still the same with old value` })
@@ -611,7 +624,7 @@ module.exports.edit_role = async (req,res) => {
 
 module.exports.get_school_years = async (req,res) => {
     try {
-        const schoolYears = await SchoolYear.find();
+        const schoolYears = await SchoolYear.find({ isYearDone: false });
         res.status(200).json(schoolYears);
     } catch(err) {
         console.log(err);
@@ -646,7 +659,7 @@ module.exports.get_school_year_detail = async (req,res) => {
     const { id } = req.params;
     
     try {
-        const schoolYearFind = await SchoolYear.findById(id);
+        const schoolYearFind = await SchoolYear.findOne({ _id: id, isYearDone: false });
         res.status(200).json(schoolYearFind);
     } catch(err) {
         console.log(err);
@@ -1092,8 +1105,10 @@ module.exports.delete_parent = async (req,res) => {
 
 module.exports.get_siblings = async (req,res) => {
 
+    const { session } = req.query;
+
     try {
-        const siblings = await Sibling.find().populate('studentId');
+        const siblings = await Sibling.find({ sessionId: session }).populate('studentId');
         res.status(200).json(siblings);
     } catch(err) {
         console.log(err);
@@ -1102,11 +1117,11 @@ module.exports.get_siblings = async (req,res) => {
 }
 
 module.exports.add_sibling = async (req,res) => {
-    const { studentId,firstName,middleName,lastName,email,inputter } = req.body;
+    const { studentId,firstName,middleName,lastName,email,inputter,session } = req.body;
 
     try {
         const existingStudent = await Student.findById(studentId);
-        const sibling = await Sibling.create({studentId,firstName,middleName,lastName,email,inputter});
+        await Sibling.create({studentId,firstName,middleName,lastName,email,inputter,sessionId: session});
         res.status(200).json({ mssg: `${existingStudent.firstName}'s sibling ${firstName} has been added to the record`,redirect:'/'});
     } catch(err) {
         console.log(err);
@@ -1117,7 +1132,7 @@ module.exports.delete_sibling = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const sibling = await Sibling.findByIdAndDelete(id);
+        await Sibling.findByIdAndDelete(id);
         res.status(200).json({ mssg: `${sibling.firstName} has been delete in the record` });
     } catch(err) {
         console.log(err);
@@ -1126,9 +1141,10 @@ module.exports.delete_sibling = async (req,res) => {
 
 module.exports.get_sibling_details = async (req,res) => {
     const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const sibling = await Sibling.findById(id).populate('studentId');
+        const sibling = await Sibling.findOne({ _id: id, sessionId: session}).populate('studentId');
         res.status(200).json(sibling)
     } catch(err) {
         console.log(err);
@@ -1137,9 +1153,10 @@ module.exports.get_sibling_details = async (req,res) => {
 
 module.exports.get_student_sibling = async (req,res) => {
     const { id } = req.params;
+    const { session } = req.query;
   
     try {
-        const studentSibling = await Sibling.findById(id).populate('studentId');
+        const studentSibling = await Sibling.findOne({ _id: id, sessionId: session }).populate('studentId');
         res.status(200).json(studentSibling);
     } catch(err) {
         console.log(err);
@@ -1152,10 +1169,10 @@ module.exports.edit_sibling = async (req,res) => {
         middleName,
         lastName,
         email,
-        inputter,studentId} = req.body;
+        inputter,studentId, session} = req.body;
 
     try {
-        const sibling = await Sibling.findByIdAndUpdate({_id:id},{ firstName,middleName,lastName,email,inputter,studentId });
+        const sibling = await Sibling.findByIdAndUpdate({_id:id},{ firstName,middleName,lastName,email,inputter,studentId, sessionId: session });
         res.status(200).json({ mssg: `${sibling.firstName}'s record has been updated successfully!` });
     } catch(err) {
         console.log(err);

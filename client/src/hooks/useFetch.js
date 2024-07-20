@@ -1,15 +1,19 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { MainContext } from '../helpers/MainContext';
 
 export const useFetch = (url) => {
 
    const [records,setRecords] = useState([]);
    const [isLoading,setIsLoading] = useState(false);
    const [error,setError] = useState('');
+   const [cookies, setCookie] = useCookies(['userToken']);
 
-   const userToken = localStorage.getItem('userToken');
-   const role = localStorage.getItem('role');
+   const { session, role } = useContext(MainContext);
+
+   const userToken = cookies.userToken;
    const navigate = useNavigate();
 
    const headers = {
@@ -24,7 +28,7 @@ export const useFetch = (url) => {
          setIsLoading(true);
          try {
             const data  = await axios.get(url, {
-               params: { role },
+               params: { role,session },
                signal,
                headers
             });
@@ -32,6 +36,7 @@ export const useFetch = (url) => {
             setIsLoading(false);
             setRecords(data.data);
          } catch(err) {
+            console.log(err);
             const data = err.response?.data;
             console.log(data);
             setError(data.mssg);

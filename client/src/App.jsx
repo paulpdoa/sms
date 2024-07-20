@@ -137,7 +137,8 @@ function App() {
           <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin')  ? <SchoolAdmin /> : <Navigate to='/' /> }>
             <Route path='new-teacher' element={<NewTeacher />} />
           </Route>
-
+        
+          <Route path='/siblings' element={<Sibling />} />
           <Route path='/parents' element={<Parents />} />
           <Route path='/library' element={<Library />} />
           <Route path='/account' element={<Account />} />

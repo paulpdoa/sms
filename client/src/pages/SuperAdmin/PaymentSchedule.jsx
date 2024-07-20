@@ -22,14 +22,14 @@ const PaymentSchedule = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);
 
-    const { session: schoolYearId, role } = useContext(MainContext);
+    const { session, role } = useContext(MainContext);
 
     const generatePaymentSchedule = async (isReset) => {
         setIsLoading(true);
         const toastId = toast.loading('Creating payment schedule, please wait...');
 
         try {
-            const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { schoolYearId, role, isReset });
+            const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { session, role, isReset });
             setIsLoading(false);
             toast.update(toastId, {
                 render: data.mssg,

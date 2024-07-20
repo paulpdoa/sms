@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext';
 
 const NewManageFee = () => {
+
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
-    const sessionId = localStorage.getItem('session');
-    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
+    const { session } = useContext(MainContext);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
@@ -37,7 +39,7 @@ const NewManageFee = () => {
         e.preventDefault();
 
         const feeInformation = {
-            sy_id: sessionId,
+            sessionId: session,
             feeDescription,
             gradeLevelIds: selectedGradeLevels,
             strandId,

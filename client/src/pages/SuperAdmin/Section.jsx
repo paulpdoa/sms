@@ -22,7 +22,7 @@ const Section = () => {
     const [adviser, setAdviser] = useState('');
     // const [department, setDepartment] = useState('');
 
-    const { role,searchQuery,setSearchQuery,showForm,setShowForm } = useContext(MainContext);
+    const { role,searchQuery,setSearchQuery,showForm,setShowForm,session } = useContext(MainContext);
 
     const columns = [
         {
@@ -55,17 +55,18 @@ const Section = () => {
                 newSection: updatedData.section,
                 newGradeLevel: updatedData.gradeLevel._id,
                 newAdviser: updatedData.adviser._id,
-                role
+                role,
+                sessionId: session
             });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -75,12 +76,12 @@ const Section = () => {
             toast.error('Error has occurred while updating section record', {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }
@@ -111,16 +112,16 @@ const Section = () => {
         e.preventDefault();
 
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role });
+            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -130,12 +131,12 @@ const Section = () => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }

@@ -197,7 +197,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
-    const currentSy = schoolYear?.startYear?.split('-')[0] + '-' + schoolYear?.endYear?.split('-')[0];
+    const currentSy = schoolYear 
+    ? `${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
+    : 'Loading...';    
     const [menus] = useState(initialMenus);
     const [openDropdown, setOpenDropdown] = useState(null);
     const [openSubDropdown, setOpenSubDropdown] = useState(null);
@@ -217,7 +219,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <div>
                 <div className="bg-green-600 p-3 flex items-center justify-between gap-2">
                     <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
-                    <span className="font-normal text-sm text-gray-100">S.Y {currentSy}</span>
+                    <span className="font-normal text-sm text-gray-100">{currentSy}</span>
                     <button onClick={toggleSidebar} className="text-gray-100">
                         <MdClose size={24} />
                     </button>

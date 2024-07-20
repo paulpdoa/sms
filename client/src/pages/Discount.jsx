@@ -130,7 +130,18 @@ const Discount = () => {
             role
         } 
 
-
+        if(discountPercentage === 0) {
+            toast.error("Discount percentage cannot be zero", {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
+            return;
+        }
         if (discountType === '') {
             toast.error("Discount type is not provided", {
                 position: "top-center",
