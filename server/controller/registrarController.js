@@ -414,20 +414,30 @@ module.exports.get_discount_detail = async (req,res) => {
     }
 }
 
-module.exports.add_discount = async (req,res) => {
-    let { schoolYear: sessionId,gradeLevel: gradeLevelId,discountType,discountPercentage: discountPercent,amount,discountCode,inputter } = req.body;
+module.exports.add_discount = async (req, res) => {
+    let { schoolYear: sessionId, gradeLevel: gradeLevelId, discountType, discountPercentage: discountPercent, amount, discountCode, inputter } = req.body;
+    console.log(req.body);
+    discountPercent = discountPercent / 100; // Divide to 100 to get decimal percentage equivalent
 
-    discountPercent = discountPercent / 100 //Divide to 100 to get decimal percentage equivalent
+    if (amount !== null && amount < 0) {
+        return res.status(400).json({ mssg: "Discount amount cannot be negative" });
+    }   
 
     try {
-        await Discount.create({ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCode,inputter });
+        if(gradeLevelId === '') {
+            await Discount.create({ sessionId, discountType, discountPercent, discountCode, inputter });
+        } else {
+            await Discount.create({ sessionId, gradeLevelId, discountType, discountPercent, amount, discountCode, inputter });
+        }
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
-    } catch(err) {
-        if(err.code === 11000) {
+    } catch (err) {
+        console.log(err);
+        if (err.code === 11000) {
             res.status(400).json({ mssg: `${discountType} has been already added to the record, please create new discount type` });
-        } 
+        }
     }
-}
+};
+
 
 module.exports.delete_discount = async (req,res) => {
     const { id } = req.params;
@@ -444,6 +454,11 @@ module.exports.edit_discount = async (req,res) => {
     const { id } = req.params;
 
     const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter } = req.body;
+
+
+    if(amount < 0) {
+        return res.status(400).json({ mssg: "Discount amount cannot be negative" });
+    }
 
     try {
         const discount = await Discount.findByIdAndUpdate({_id:id},{ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter });

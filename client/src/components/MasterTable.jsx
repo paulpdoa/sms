@@ -187,9 +187,14 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                 className="outline-none p-1 rounded-md border border-gray-300"
                                                             >   
                                                                 <option value={record._id || ''} hidden>
-                                                                    { column.header === 'Adviser' && record.adviser.name}
-                                                                    { column.header === 'Grade Level' && record.gradeLevel.gradeLevel }
-                                                                    { column.header === 'Department' && record.department.department }
+                                                                    { 
+                                                                        column.header === 'Adviser' ? record.adviser.name : 
+                                                                        column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
+                                                                        column.header === 'Department' ? record.department.department : 
+                                                                        column.header === 'Fee Category' ? record.feeCateg.feeCateg : 
+                                                                        column.header
+                                                                    }
+                                                                   
                                                                 </option>
                                                                 {column.selectOptions.map(option => (
                                                                     <option key={option.value} value={option.value}>{option.label}</option>

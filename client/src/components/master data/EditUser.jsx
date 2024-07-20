@@ -97,8 +97,6 @@ const EditUser = () => {
             } else {
                 setTimeout(() => {
                     navigate(newData.data.redirect);
-                    // window.location.reload();
-    
                 }, 2000);
             }
             

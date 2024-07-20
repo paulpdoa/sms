@@ -16,7 +16,6 @@ const allowUserAction = (roles) => {
     return (req,res,next) => {
         const role = req.body.role;
         
-        console.log(role);
         if(roles.includes(role)) {
             next();
         } else {

@@ -25,7 +25,9 @@ const discountSchema = new mongoose.Schema({
         required: true
     },
     discountPercent: requiredNumber,
-    amount: requiredNumber,
+    amount: {
+        type: Number
+    },
     discountCode: requiredString,
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
