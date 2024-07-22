@@ -21,7 +21,6 @@ const Login = () => {
         try {
             const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
             
-            setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
             localStorage.setItem('role', data.data.role);
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
@@ -38,6 +37,7 @@ const Login = () => {
                 theme: "colored"
             });
             setTimeout(() => {
+                setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
                 navigate(data.data.redirect);
             }, 2000);
         } catch (err) {
@@ -82,15 +82,17 @@ const Login = () => {
                         {(showPassword) ? "Hide" : "Show"}
                     </button>
                 </div>
-                <div className="flex flex-col gap-2 my-2">
-                    <span className="text-gray-700">Session</span>
-                    <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
-                        <option hidden>Select session</option>
-                        {schoolYears?.map(sy => (
-                            <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
-                        ))}
-                    </select>
-                </div>
+                { schoolYears.length > 0 && (
+                    <div className="flex flex-col gap-2 my-2">
+                        <span className="text-gray-700">Session</span>
+                        <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
+                            <option hidden>Select session</option>
+                            {schoolYears?.map(sy => (
+                                <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
+                            ))}
+                        </select>
+                    </div>
+                ) }
                 <button className="bg-green-500 w-full p-1 rounded-md text-gray-200 cursor-pointer my-3">Login</button>
             </form>
             <ToastContainer />

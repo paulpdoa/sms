@@ -198,7 +198,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear 
-    ? `${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
+    ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
     : 'Loading...';    
     const [menus] = useState(initialMenus);
     const [openDropdown, setOpenDropdown] = useState(null);
@@ -219,10 +219,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <div>
                 <div className="bg-green-600 p-3 flex items-center justify-between gap-2">
                     <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
-                    <span className="font-normal text-sm text-gray-100">{currentSy}</span>
-                    <button onClick={toggleSidebar} className="text-gray-100">
-                        <MdClose size={24} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <span className="font-normal text-sm text-gray-100">{currentSy}</span>
+                        <button onClick={toggleSidebar} className="text-gray-100 hover:scale-110 hover:transition">
+                            <MdClose size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 <div onClick={() => navigate(`/profile/${currentUserId}`)} className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg cursor-pointer hover:bg-sky-800">

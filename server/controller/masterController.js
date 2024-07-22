@@ -783,6 +783,7 @@ module.exports.user_login = async (req,res) => {
     const { username,password,session } = req.body;
 
     try {
+
         const login = await User.login(username,password,session);
         const token = createToken(login._id);
         const roleDetail = await Role.find({ _id: login.role });

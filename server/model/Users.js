@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
+const SchoolYear = require('../model/SchoolYear');
 
 const requiredString = {
     type: String,
@@ -43,7 +44,11 @@ userSchema.pre('save', async function(next) {
 userSchema.statics.login = async function(username,password,session) {
     const user = await this.findOne({ username });
 
-    if(!session) {
+    // This will check if the school year table is still empty, meaning it's a new system
+    const schoolYears = await SchoolYear.find();
+
+    if(schoolYears.length > 0 && !session) { // meaning no records yet
+        // allow user to login wihout having to request for session
         throw Error('Session must not be empty');
     }
 

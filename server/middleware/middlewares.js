@@ -20,7 +20,7 @@ const allowUserAction = (roles) => {
         const session = req.body.session;
 
         const currentSessionYear = await Session.findOne({ _id: session });
-        console.log(currentSessionYear);
+      
         // If false = ongoing, if true = done
         const isYearDone = currentSessionYear.isYearDone;
 
