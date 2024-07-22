@@ -24,7 +24,7 @@ const SchoolYear = () => {
         { accessorKey: 'startYear', header: 'Start Year', editable: true, type: "date" },
         { accessorKey: 'endYear', header: 'End Year', editable: true, type: "date" },
         { accessorKey: 'schoolTheme', header: 'School Theme', editable: true, type: "text" },
-        { accessorKey: 'isYearDone', header: 'S.Y Status', editable: true, selectOptions: ['Ongoing', 'Done'].map(isReq => ({ value: `${isReq === 'Ongoing' ? false : true }`, label: isReq }))}
+        { accessorKey: 'isYearDone', header: 'S.Y Status', editable: true, selectOptions: ['Ongoing', 'Closed'].map(isReq => ({ value: `${isReq === 'Ongoing' ? false : true }`, label: isReq }))}
     ];
 
     const updateNewStartYear = async (id, updatedData) => {
