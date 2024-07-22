@@ -7,7 +7,7 @@ const requiredString = {
 }
 
 const studentPaymentSchema = new mongoose.Schema({
-    sy_id: {
+    sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },

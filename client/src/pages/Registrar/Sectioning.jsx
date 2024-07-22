@@ -18,28 +18,20 @@ const Sectioning = () =>{
         { accessorKey: 'firstName', header: 'First Name' },
         { accessorKey: 'lastName', header: 'Last Name' },
         { accessorKey: 'studentNo', header: 'Student No' },
-        { accessorKey: 'academicId.gradeLevelId.gradeLevel', header: 'Grade Level' },
-        { accessorKey: 'academicId.strandId.strand', header: 'Strand' },
-        { accessorKey: 'academicId.sectionId.section', header: 'Section' },
-        {
-            accessorKey: 'academicId.sectionId.adviser',
-            header: 'Adviser',
-            cell: (adviser) => `${adviser?.firstName} ${adviser?.lastName}` || 'Not assigned',
-        },
+        { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        { accessorKey: 'strand', header: 'Strand' },
+        { accessorKey: 'section', header: 'Section' },
+        { accessorKey: 'adviser', header: 'Adviser' }
     ];
 
     const navigate = useNavigate();
 
-    const { searchQuery,showForm,currentUserId } = useContext(MainContext);
+    const { searchQuery,showForm,currentUserId, setShowForm, session: currentSession } = useContext(MainContext);
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
     const [sectionId,setSectionId] = useState('');
     const [adviser,setAdviser] = useState('');
-
-    const currentSession = localStorage.getItem('session');
-
-    const studentLists = students.filter(student => student.isRegistered && student.isAdmitted);
 
     const [studentRecord,setStudentRecord] = useState(null);
 
@@ -52,6 +44,16 @@ const Sectioning = () =>{
     const handleSectionChange = (e) => {
         setSectionId(e.target.value);
     }
+
+    const studentLists = students?.filter(student => student.isRegistered && student.isAdmitted).map(student => ({
+        ...student,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
+        strand: student?.academicId?.strandId?.strand || 'Not Assigned',
+        section: student?.academicId?.sectionId?.section || 'Not Assigned',
+        adviser: student?.acedemicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
+    }))
 
     const submitSectioning = async (e) => {
         e.preventDefault();
@@ -80,7 +82,6 @@ const Sectioning = () =>{
                 progress: undefined,
                 theme: "colored"
             });
-
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
@@ -90,25 +91,31 @@ const Sectioning = () =>{
     }
 
     return (
-        <main className="p-2">
+        <main className="p-2 relative">
             {/* <DateTime /> */}
-            <TabActions title="Sectioning" />
-            <div className={`${showForm ? 'grid grid-cols-2' : ''} gap-2 mt-5`}>
+            <TabActions title="Sectioning" noView={true} />
+            <div className={`gap-2 mt-5`}>
                 { showForm && 
                     (
                         studentRecord ? 
-                        <form onSubmit={submitSectioning} className="p-4 col-span-1 bg-white shadow-md rounded-md h-fit border border-gray-300 mt-5">
-                            <h1 className="font-semibold text-xl text-green-600">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
-                            <div className="grid grid-cols-2 gap-5 mt-4">
-                                {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
-                                {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
-                                {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
-                                {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
-                                {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : adviser,'Adviser')}
-                            </div>
+                        <div className="absolute w-full top-0 z-50 left-0 flex justify-center">
+                            <form onSubmit={submitSectioning} className="p-4 col-span-1 bg-white shadow-md rounded-md h-fit border border-gray-300 mt-5">
+                                <h1 className="font-semibold text-xl text-green-600">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
+                                <div className="grid grid-cols-2 gap-5 mt-4">
+                                    {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
+                                    {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
+                                    {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
+                                    {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
+                                    {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned','Adviser')}
+                                </div>
 
-                            <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
-                        </form>
+                                <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
+                                <button className="text-gray-100 bg-red-500 p-2 text-sm mt-5 ml-2 rounded-md hover:dark:bg-red-600" type="button" onClick={() => {
+                                    setShowForm(false)
+                                    setStudentRecord(null)
+                                }}>Cancel</button>
+                            </form>
+                        </div>
                         :
                         studentLists?.length < 1 ? (
                             <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
@@ -119,26 +126,20 @@ const Sectioning = () =>{
                         ) : (
                             <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
                                 <h1 className="text-red-500 text-sm font-semibold">
-                                    Please select view on table to view student record
+                                    Please select view on table to give section to students
                                 </h1>
                             </div>
                         )
                     )
                 }
                 <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
-                    <ReusableTable 
-                        records={studentLists} 
-                        columns={columns}
-                        searchQuery={searchQuery}
-                        viewRecord={setStudentRecord}
-                    />
-
-                    {/* <MasterTable 
+                    <MasterTable 
                         data={studentLists}
                         columns={columns}
                         searchQuery={searchQuery}
                         viewRecord={setStudentRecord}
-                    /> */}
+                        onShow={setShowForm}
+                    />
                 </div>
             </div>
             <ToastContainer />

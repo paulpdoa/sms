@@ -6,7 +6,7 @@ const requiredString = {
 }
 
 const admissionSchema = new mongoose.Schema({
-    schoolYear: {
+    sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
     },

@@ -21,7 +21,7 @@ const Login = () => {
         try {
             const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
             
-            setCookie('userToken', data.data.token, { maxAge: 3600 }); // Set cookie with token
+            setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
             localStorage.setItem('role', data.data.role);
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);

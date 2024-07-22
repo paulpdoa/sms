@@ -177,8 +177,11 @@ const EditParent = () => {
                     {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
                 </section>
 
-                <button className="bg-green-500 text-white text-sm p-3 mt-6 rounded-md">
+                <button className="bg-green-500 hover:bg-green-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
+                </button>
+                <button onClick={() => navigate('/parents')} className="bg-red-500 hover:bg-red-600 ml-2 text-white text-sm p-3 mt-6 rounded-md">
+                    Cancel
                 </button>
             </form>
             <ToastContainer />

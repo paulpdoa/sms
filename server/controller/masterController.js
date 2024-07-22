@@ -624,7 +624,7 @@ module.exports.edit_role = async (req,res) => {
 
 module.exports.get_school_years = async (req,res) => {
     try {
-        const schoolYears = await SchoolYear.find({ isYearDone: false });
+        const schoolYears = await SchoolYear.find();
         res.status(200).json(schoolYears);
     } catch(err) {
         console.log(err);
@@ -659,7 +659,7 @@ module.exports.get_school_year_detail = async (req,res) => {
     const { id } = req.params;
     
     try {
-        const schoolYearFind = await SchoolYear.findOne({ _id: id, isYearDone: false });
+        const schoolYearFind = await SchoolYear.findOne({ _id: id });
         res.status(200).json(schoolYearFind);
     } catch(err) {
         console.log(err);

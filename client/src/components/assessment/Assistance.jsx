@@ -11,13 +11,13 @@ const Assistance = ({ record }) => {
     }, [fetchLoading]);
 
     const gradeLevel = record?.academicId?.gradeLevelId?._id;
-    const natlCode = record?.nationality?.nationalityCodeId?._id;
+    const natlCode = record?.nationality.toLowerCase();
     const strandId = record?.academicId?.strandId?._id;
 
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationalityCodeId?._id === natlCode &&
+            fee?.studentId?.nationality?.nationality.toLowerCase() === natlCode &&
             fee?.studentId?.academicId?.strandId === strandId &&
             fee?.studentDiscountId !== undefined
         );

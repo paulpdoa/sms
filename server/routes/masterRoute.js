@@ -92,10 +92,10 @@ route.patch('/user-role/:id',edit_role);
 
 // Religion
 route.get('/religions',allowUserView(userRoles),get_religions);
-route.post('/religions', add_religion);
+route.post('/religions',allowUserAction(userRoles),add_religion);
 route.delete('/religion/:id', delete_religion);
 route.get('/religion/:id',allowUserView(userRoles), get_religion_detail);
-route.patch('/religion/:id',edit_religion);
+route.patch('/religion/:id',allowUserAction(userRoles),edit_religion);
 
 // Nationality
 route.get('/nationalities',allowUserView(userRoles),get_nationalities);

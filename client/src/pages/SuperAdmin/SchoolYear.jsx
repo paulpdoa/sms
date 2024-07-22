@@ -24,7 +24,7 @@ const SchoolYear = () => {
         { accessorKey: 'startYear', header: 'Start Year', editable: true, type: "date" },
         { accessorKey: 'endYear', header: 'End Year', editable: true, type: "date" },
         { accessorKey: 'schoolTheme', header: 'School Theme', editable: true, type: "text" },
-        { accessorKey: 'isYearDone', header: 'S.Y Status', editable: true, selectOptions: ['Yes', 'No'].map(isReq => ({ value: `${isReq === 'No' ? false : true }`, label: isReq }))}
+        { accessorKey: 'isYearDone', header: 'S.Y Status', editable: true, selectOptions: ['Ongoing', 'Done'].map(isReq => ({ value: `${isReq === 'Ongoing' ? false : true }`, label: isReq }))}
     ];
 
     const updateNewStartYear = async (id, updatedData) => {
@@ -35,12 +35,12 @@ const SchoolYear = () => {
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -50,12 +50,12 @@ const SchoolYear = () => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };
@@ -71,7 +71,7 @@ const SchoolYear = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -94,7 +94,7 @@ const SchoolYear = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {

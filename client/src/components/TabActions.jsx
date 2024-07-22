@@ -3,7 +3,9 @@ import AddNewData from '../components/buttons/AddNewData';
 import { MainContext } from '../helpers/MainContext';
 import { useContext } from 'react';
 
-const TabActions = ({ title }) => {
+
+
+const TabActions = ({ title,noView }) => {
 
     const { setSearchQuery,setShowForm } = useContext(MainContext);
 
@@ -12,7 +14,7 @@ const TabActions = ({ title }) => {
             <h1 className="text-2xl text-green-600 font-semibold">{title}</h1>
             <div className="flex mt-3 w-full gap-2 justify-between">
                 <Searchbar onSearch={setSearchQuery} />
-                <AddNewData label={title} onShow={setShowForm}  />
+                { !noView && <AddNewData label={title} onShow={setShowForm}  />  }
             </div>
         </div>
     )

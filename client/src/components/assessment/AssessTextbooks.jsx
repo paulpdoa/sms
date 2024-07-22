@@ -11,17 +11,19 @@ const AssessTextbooks = ({ record }) => {
     }, [fetchLoading]);
 
     const gradeLevel = record?.academicId?.gradeLevelId?._id;
-    const natlCode = record?.nationality?.nationalityCodeId?._id;
+    const natlCode = record?.nationality.toLowerCase();
     const strandId = record?.academicId?.strandId?._id;
 
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationalityCodeId?._id === natlCode &&
+            fee?.studentId?.nationality?.nationality.toLowerCase() === natlCode &&
             fee?.studentId?.academicId?.strandId === strandId &&
             fee?.textBookId !== undefined
         );
     });
+
+    console.log(studentPayments);
 
     const totalAmount = filteredFeeLists?.reduce((sum, fee) => sum + (fee?.textBookId?.bookAmount || 0), 0);
 

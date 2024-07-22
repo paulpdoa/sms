@@ -140,7 +140,7 @@ module.exports.submit_student_requirements = async (req,res) => {
 
 module.exports.get_admission = async (req,res) => {
     try {
-        const admissions = await Admission.find().populate('schoolYear requirementId studentId');
+        const admissions = await Admission.find().populate('sessionId requirementId studentId');
         res.status(200).json(admissions);
     } catch(err) {
         console.log(err);
@@ -151,55 +151,66 @@ module.exports.get_admission = async (req,res) => {
 
 module.exports.add_admission = async (req, res) => {
     const { schoolYear, studentId, requirements } = req.body;
+    console.log('Submitted requirements:', requirements);
     
     try {
         // Fetch all required documents
-        const requiredDocs = await Requirement.find({});
+        const requiredDocs = await Requirement.find({ sessionId: schoolYear, isRequired: true });
         const requiredDocIds = requiredDocs.map(doc => doc._id.toString());
+        console.log('Required Documents:', requiredDocIds);
 
         // Check if the student already submitted the required documents
-        const existingAdmissions = await Admission.find({ studentId });
+        const existingAdmissions = await Admission.find({ studentId, sessionId: schoolYear });
         const existingDocIds = existingAdmissions.map(admission => admission.requirementId.toString());
+        console.log('Existing Admissions:', existingDocIds);
 
         // Remove existing admissions that are no longer in the submitted requirements
         const toRemove = existingDocIds.filter(id => !requirements.includes(id));
+        console.log('To Remove:', toRemove);
         for (let i = 0; i < toRemove.length; i++) {
             await Admission.findOneAndDelete({ studentId, requirementId: toRemove[i] });
         }
 
         // Add new requirements
         const toAdd = requirements.filter(id => !existingDocIds.includes(id));
+        console.log('To Add:', toAdd);
         for (let i = 0; i < toAdd.length; i++) {
-            await Admission.create({ schoolYear, studentId, requirementId: toAdd[i] });
+            await Admission.create({ sessionId: schoolYear, studentId, requirementId: toAdd[i] });
         }
 
         // Combine existing and new submissions
         const allSubmittedDocs = [...new Set([...existingDocIds, ...requirements])];
+        console.log('All Submitted Documents:', allSubmittedDocs);
 
         // Check if the student has submitted all required documents
         const allRequirementsMet = requiredDocIds.every(docId => allSubmittedDocs.includes(docId));
+        console.log('All Requirements Met:', allRequirementsMet);
 
         if (allRequirementsMet) {
             // Admit the student
-            await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date() });
+            const result = await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date() });
+            console.log('Student admitted:', result);
         } else {
             // Set isAdmitted to false if any requirement is unchecked
-            await Student.findByIdAndUpdate(studentId, { isAdmitted: false });
+            const result = await Student.findByIdAndUpdate(studentId, { isAdmitted: false });
+            console.log('Student not admitted:', result);
         }
 
         res.status(200).json({ mssg: 'Student requirement has been updated' });
     } catch (err) {
-        console.log(err);
+        console.log('Error:', err);
         res.status(500).json({ mssg: 'Server error' });
     }
 };
 
 
+
 module.exports.get_admission_student = async (req,res) => {
     const { student } = req.params;
+    const { session } = req.query;
 
     try {
-        const admission = await Admission.find({ studentId: student });
+        const admission = await Admission.find({ studentId: student,sessionId: session });
         res.status(200).json(admission);
     } catch(err) {
         console.log(err);
@@ -233,8 +244,6 @@ module.exports.update_student_info = async (req, res) => {
         session,
         isRegistered,
     } = req.body;
-
-    console.log(isRegistered);
 
     if(completedClearance && passedReportCard && settledArrears) {
         isRegistered = true
@@ -742,14 +751,14 @@ module.exports.generate_fees = async (req, res) => {
             .populate('gradeLevel');
 
         // Fetch tables to be assigned to students fees
-        const manageFees = await ManageFee.find()
+        const manageFees = await ManageFee.find({ sessionId: currentYear })
             .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
-            .populate('sy_id gradeLevelId strandId');
+            .populate('sessionId gradeLevelId strandId');
         
-        const textbooks = await Textbook.find().populate('inputter gradeLevel strand schoolYear');
+        const textbooks = await Textbook.find({ sessionId: currentYear }).populate('inputter gradeLevel strand schoolYear');
 
-        const paymentSchedules = await PaymentSchedule.find().populate('sy_id paymentTermId');
-        const studentDiscounts = await StudentDiscount.find().populate('studentId sessionId discountId');
+        const paymentSchedules = await PaymentSchedule.find({ sessionId: currentYear }).populate('sessionId paymentTermId');
+        const studentDiscounts = await StudentDiscount.find({ sessionId: currentYear }).populate('studentId sessionId discountId');
 
         // Fetch the current school year
         const currYear = await SchoolYear.findById(currentYear);
@@ -758,11 +767,9 @@ module.exports.generate_fees = async (req, res) => {
             if (currYear) {
                 for (const student of students) {
                     let totalPaymentAmount = 0; // Initialize total amount for each student
-    
                     for (const fee of manageFees) {
                         // Check if the fee matches the current year, student's grade level, and nationality code
-
-                        const matchesSchoolYear = fee.sy_id?._id.equals(currYear._id);
+                        const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                         const matchesGradeLevel = fee.gradeLevelId?._id.equals(student.academicId.gradeLevelId._id);
                         const matchesNationality = !fee.nationality || fee.nationality === student.nationality.nationalityCodeId?.nationality
 
@@ -775,7 +782,7 @@ module.exports.generate_fees = async (req, res) => {
                         if(matchesSchoolYear && matchesGradeLevel && matchesNationality) {
                             console.log('Matching Fee:', {
                                 studentName: student.firstName,
-                                feeSyId: fee.sy_id._id,
+                                feeSyId: fee.sessionId._id,
                                 currYearId: currYear._id,
                                 feeGradeLevelId: fee.gradeLevelId._id,
                                 studentGradeLevelId: student.academicId.gradeLevelId._id,
@@ -786,7 +793,7 @@ module.exports.generate_fees = async (req, res) => {
                             });
     
                             const paymentInfo = {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 feeCodeId: fee.feeDescription._id,
@@ -817,7 +824,7 @@ module.exports.generate_fees = async (req, res) => {
     
                         if (matchesSchoolYear && matchesGradeLevel && matchesStrand) {
                             console.log('Student Textbooks:', {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 textBookId: textbook._id,
@@ -825,7 +832,7 @@ module.exports.generate_fees = async (req, res) => {
                             });
     
                             const studentTextbook = {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 textBookId: textbook._id,
@@ -838,17 +845,17 @@ module.exports.generate_fees = async (req, res) => {
                                 await StudentPayment.create(studentTextbook);
                                 totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
                                 console.log(`Added book amount: ${textbook.bookAmount}, Total Payment Amount: ${totalPaymentAmount}`);
-                            }
+                            }   
                         }
                     }
     
                     for (const paymentSchedule of paymentSchedules) {
-                        const matchesSchoolYear = paymentSchedule.sy_id._id.equals(currYear._id);
+                        const matchesSchoolYear = paymentSchedule.sessionId._id.equals(currYear._id);
                         const matchesPaymentTerm = paymentSchedule.paymentTermId.equals(student.academicId.paymentTermId);
                         console.log(matchesSchoolYear,matchesPaymentTerm);
                         if (matchesSchoolYear && matchesPaymentTerm) {
                             console.log('Student Payment Schedule', {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 paymentScheduleId: paymentSchedule._id,
@@ -857,7 +864,7 @@ module.exports.generate_fees = async (req, res) => {
                             });
     
                             const paymentScheduleInfo = {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 paymentScheduleId: paymentSchedule._id,
@@ -894,14 +901,14 @@ module.exports.generate_fees = async (req, res) => {
 
                         if(matchingStudent) {
                             console.log('Student Discount:', {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 studentDiscountId: studentDiscount._id,
                             });
     
                             const studentDiscountInfo = {
-                                sy_id: currYear._id,
+                                sessionId: currYear._id,
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 studentDiscountId: studentDiscount._id,
@@ -949,9 +956,11 @@ module.exports.delete_generated_fees = async (req,res) => {
 // For Student Payment
 
 module.exports.get_student_payments = async (req,res) => {
+
+    const { session } = req.query;
     
     try {
-        const studPayments = await StudentPayment.find()
+        const studPayments = await StudentPayment.find({ sessionId: session })
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },
@@ -968,7 +977,7 @@ module.exports.get_student_payments = async (req,res) => {
                 { path: 'discountId' }
             ]
         })
-        .populate('sy_id gradeLevelId feeCodeId manageFeeId paymentScheduleId');
+        .populate('sessionId gradeLevelId feeCodeId manageFeeId paymentScheduleId');
         res.status(200).json(studPayments);
     } catch(err) {
         console.log(err);
@@ -978,8 +987,10 @@ module.exports.get_student_payments = async (req,res) => {
 module.exports.get_student_payment_detail = async (req,res) => {
     const { id } = req.params;
     
+    const { session } = req.query;
+   
     try {
-        const studentPayments = await StudentPayment.find({studentId: id})
+        const studentPayments = await StudentPayment.find({ studentId: id })
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },
@@ -996,7 +1007,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
                 { path: 'discountId' }
             ]
         })
-        .populate('sy_id gradeLevelId feeCodeId manageFeeId paymentScheduleId');
+        .populate('sessionId gradeLevelId feeCodeId manageFeeId paymentScheduleId');
         res.status(200).json(studentPayments);
     } catch(err) {
         console.log(err);

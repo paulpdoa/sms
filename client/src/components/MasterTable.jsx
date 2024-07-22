@@ -1,12 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { MainContext } from '../helpers/MainContext';
+import { baseUrl } from '../baseUrl';
+import { useFetch } from '../hooks/useFetch';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions, onShow }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage,setRowsPerPage] = useState(10); // Set the number of rows per page
+
+    // For disabling currentSchoolyear logged in session
+    const { session } = useContext(MainContext);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear?.isYearDone;
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -227,11 +235,18 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <button onClick={() => goToEdit ? goToEdit(record._id) : handleEditClick(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Edit</button>
-                                                            <button onClick={() => handleDeleteClick(record._id)} className="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
+                                                            <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
+                                                            <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
                                                         </>
                                                     ) : 
-                                                    <button onClick={() => viewRecord(record)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
+                                                    <button onClick={() => {
+                                                        if(onShow) {
+                                                            onShow(true)
+                                                            viewRecord(record)
+                                                        } else {
+                                                            viewRecord(record)
+                                                        }
+                                                    }} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
                                                 ) : 
                                                     actions(record)
                                                 }
@@ -256,7 +271,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    className="px-3 py-1 rounded-md focus:outline-none text-sm hover:underline text-blue-500 disabled:cursor-not-allowed"
                 >
                     Previous
                 </button>
@@ -265,15 +280,14 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                         <li className="mx-1">
                             <button
                                 onClick={() => paginate(currentPage - 1)}
-                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-sm text-gray-900 bg-white border border-gray-400 rounded-md"
-                            >
+                                className="px-3 py-1 focus:outline-none text-blue-500 rounded-md text-sm"                            >
                                 {currentPage - 1}
                             </button>
                         </li>
                     )}
                     <li className="mx-1">
                         <button
-                            className="px-3 py-1 focus:outline-none text-gray-200 rounded-md bg-gray-500 text-sm"
+                            className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-sm text-blue-500 bg-white border border-gray-400 rounded-md"
                         >
                             {currentPage}
                         </button>
@@ -282,8 +296,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                         <li className="mx-1">
                             <button
                                 onClick={() => paginate(currentPage + 1)}
-                                className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-gray-900 text-sm bg-white border border-gray-400 rounded-md"
-                            >
+                                className="px-3 py-1 focus:outline-none text-blue-500 rounded-md text-sm"                            >
                                 {currentPage + 1}
                             </button>
                         </li>
@@ -292,7 +305,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages < 1}
-                    className="px-3 py-1 rounded-md focus:outline-none text-sm bg-gray-600 text-gray-300 hover:bg-gray-500 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    className="px-3 py-1 rounded-md focus:outline-none text-sm hover:underline text-blue-500 disabled:cursor-not-allowed"
                 >
                     Next
                 </button>

@@ -13,7 +13,7 @@ import MasterDataForm from '../../components/MasterDataForm';
 const Religion = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
     const [religion, setReligion] = useState('');
-    const { role,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext);
+    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
 
     const columns = [
         { accessorKey: 'religion', header: 'Religion',editable: true }
@@ -22,39 +22,50 @@ const Religion = () => {
     const addReligion = async (e) => {
         e.preventDefault();
         try {
-            const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role });
+            const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role,session });
             toast.success(newReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light",
+                theme: "colored",
             });
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            });
+            setShowForm(false);
         }
     };
 
     const updateReligion = async (id, updatedData) => {
         console.log(id,updatedData);
         try {
-            const response = await axios.patch(`${baseUrl()}/religion/${id}`, { newReligion: updatedData.religion, currentUserId, role });
+            const response = await axios.patch(`${baseUrl()}/religion/${id}`, { newReligion: updatedData.religion, currentUserId, role,session });
             console.log(response);
             toast.success(response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light",
+                theme: "colored",
             });
             setTimeout(() => {
                 window.location.reload();
@@ -63,16 +74,13 @@ const Religion = () => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light",
+                theme: "colored",
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         }
     };
 
@@ -82,7 +90,7 @@ const Religion = () => {
             toast.success(removeReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -106,7 +114,7 @@ const Religion = () => {
             <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="religion">Religion</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
+                <input required className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
             </div>
         </>
     ) 

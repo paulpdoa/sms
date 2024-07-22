@@ -19,27 +19,37 @@ const SubmittedReq = ({ id }) => {
     }, [admission]);
 
     const handleRequirementSelection = (recordId) => {
-        if (selectedRequirements.includes(recordId)) {
-            setSelectedRequirements(selectedRequirements.filter(id => id !== recordId));
-        } else {
-            setSelectedRequirements([...selectedRequirements, recordId]);
-        }
+        setSelectedRequirements(prevSelectedRequirements => {
+            if (prevSelectedRequirements.includes(recordId)) {
+                return prevSelectedRequirements.filter(id => id !== recordId);
+            } else {
+                return [...prevSelectedRequirements, recordId];
+            }
+        });
     };
+
+    useEffect(() => {
+        console.log('Updated selectedRequirements:', selectedRequirements);
+    }, [selectedRequirements]);
 
     const submitStudentRequirement = async (e) => {
         e.preventDefault();
+        
+        console.log('Selected requirements:', selectedRequirements); // Log the selected requirements
 
         try {
-            const data = await axios.post(`${baseUrl()}/admission`, {
+            const response = await axios.post(`${baseUrl()}/admission`, {
                 studentId: id,
                 schoolYear,
                 requirements: selectedRequirements
             });
 
-            toast.success(data.data.mssg, {
+            console.log('Backend response:', response.data); // Log the backend response
+
+            toast.success(response.data.mssg, {
                 position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
+                autoClose: 1000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -47,15 +57,15 @@ const SubmittedReq = ({ id }) => {
                 theme: "colored"
             });
 
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // setTimeout(() => {
+            //     window.location.reload();
+            // }, 2000);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.mssg || 'An error occurred', {
                 position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
+                autoClose: 1000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -71,7 +81,7 @@ const SubmittedReq = ({ id }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {requirements?.map((record) => (
                     <div key={record._id} className="flex items-center justify-between gap-4 border-b border-gray-300 py-2">
-                        <span className="text-sm text-green-600 font-semibold">{record.requirement}</span>
+                        <span className="text-sm text-green-600 font-semibold">{record.requirement} { !record.isRequired && '(Optional)' } </span>
                         <input
                             className="cursor-pointer h-4 w-4 text-green-500 focus:ring-0"
                             type="checkbox"
