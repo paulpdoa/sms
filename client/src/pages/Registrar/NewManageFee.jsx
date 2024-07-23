@@ -137,7 +137,7 @@ const NewManageFee = () => {
     return (
         <main className="p-8 bg-gray-100 flex items-center justify-center">
             <form onSubmit={addManagedFees} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Add New Fees</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Add New Fees</h1>
 
                 <section>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -164,7 +164,7 @@ const NewManageFee = () => {
                                 <div className="border border-gray-300 rounded-md p-2 mt-2 bg-white relative">
                                     <button
                                         type="button"
-                                        className="text-green-600 text-sm p-2 mb-2 rounded-md hover:underline transition duration-300"
+                                        className="text-gray-700 text-sm p-2 mb-2 rounded-md hover:underline transition duration-300"
                                         onClick={handleSelectAll}
                                     >
                                         {selectedGradeLevels.length === gradeLevels.length ? "Deselect All" : "Select All"}
@@ -191,10 +191,10 @@ const NewManageFee = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
+                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-600 ml-2 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-700 transition duration-300">
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 ml-2 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-600 transition duration-300">
                     Cancel
                 </button>
             </form>

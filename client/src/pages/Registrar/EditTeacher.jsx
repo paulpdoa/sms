@@ -129,9 +129,9 @@ const EditTeacher = () => {
     return (
         <main className="p-4 bg-gray-100">
             <form onSubmit={editTeacher} className="bg-white p-6 rounded-lg shadow-lg">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-4">Edit Teacher</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-4">Edit Teacher</h1>
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Basic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {renderInput("first-name", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middle-name", "Middle Name", middleName, setMiddleName, "text")}
@@ -194,7 +194,7 @@ const EditTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Contact Details</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {renderInput("email", "Active Email", email, setEmail, "email")}
                         {renderInput("contact-number", "Contact Number", contactNumber, setContactNumber, "text")}
@@ -202,7 +202,7 @@ const EditTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Academic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Academic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {renderInput("education", "Education", education, setEducation, "text")}
                         {renderInput("school-graduated", "School Graduated", schoolGraduated, setSchoolGraduated, "text")}
@@ -212,7 +212,7 @@ const EditTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">School Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">School Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {renderInput("joining-date", "Joining Date", joiningDate, setJoiningDate, "date")}
                         {/* {renderSelect("department", "Department", department, setDepartment, departments, "Department")}
@@ -222,7 +222,7 @@ const EditTeacher = () => {
                 </section>
 
                 {/* <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Credentials</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Credentials</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {renderInput("username", "Username", username, setUsername, "text")}
                         {renderInput("password", "Password", password, setPassword, "password")}
@@ -231,7 +231,7 @@ const EditTeacher = () => {
                 </section> */}
 
                 <div className="flex items-center justify-end gap-2">
-                    <button type="submit" className="bg-green-500 hover:bg-green-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
                     <button type="button" onClick={() => navigate('/teachers')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>

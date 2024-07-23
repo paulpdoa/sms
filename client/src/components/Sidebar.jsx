@@ -9,6 +9,7 @@ import { MainContext } from "../helpers/MainContext";
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const initialMenus = [
     {
@@ -40,7 +41,6 @@ const initialMenus = [
                     { name: 'Textbooks', link: '/master/text-books' },
                     { name: 'Payment Terms', link: '/master/payment-terms' },
                     { name: 'Payment Schedule', link: '/master/payment-schedule' },
-                    // { name: 'Late Payment Penalty', link: '/master/payment-penalty' },
                     { name: 'Fee Category', link: '/master/fee-category' },
                     { name: 'Fee Code', link: '/master/fee-code' },
                     { name: 'Manage Fees', link: '/master/manage-fees' },
@@ -160,7 +160,6 @@ const initialMenus = [
                     { name: 'Textbooks', link: '/master/text-books' },
                     { name: 'Payment Terms', link: '/master/payment-terms' },
                     { name: 'Payment Schedule', link: '/master/payment-schedule' },
-                    // { name: 'Late Payment Penalty', link: '/master/payment-penalty' },
                     { name: 'Fee Category', link: '/master/fee-category' },
                     { name: 'Fee Code', link: '/master/fee-code' },
                     { name: 'Manage Fees', link: '/master/manage-fees' },
@@ -192,14 +191,14 @@ const initialMenus = [
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-    const { role: currentRole, currentUser, currentUserId , session: sessionId,setShowForm } = useContext(MainContext);
+    const { role: currentRole, currentUser, currentUserId, session: sessionId, setShowForm } = useContext(MainContext);
 
     const navigate = useNavigate();
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear 
-    ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
-    : 'Loading...';    
+        ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
+        : 'Loading...';    
     const [menus] = useState(initialMenus);
     const [openDropdown, setOpenDropdown] = useState(null);
     const [openSubDropdown, setOpenSubDropdown] = useState(null);
@@ -214,98 +213,139 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         setOpenSubDropdown(openSubDropdown === index ? null : index);
     };
 
+    const sidebarVariants = {
+        open: { x: 0 },
+        closed: { x: '-100%' }
+    };
+
+    const dropdownVariants = {
+        open: { height: 'auto', opacity: 1 },
+        closed: { height: 0, opacity: 0 }
+    };
+
     return (
-        <nav className={`transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 w-full bg-sky-950 h-full relative`}>
-            <div>
-                <div className="bg-green-600 p-3 flex items-center justify-between gap-2">
-                    <h1 className="font-semibold text-3xl text-gray-100">SMS</h1>
-                    <div className="flex items-center gap-2">
-                        <span className="font-normal text-sm text-gray-100">{currentSy}</span>
-                        <button onClick={toggleSidebar} className="text-gray-100 hover:scale-110 hover:transition">
-                            <MdClose size={24} />
-                        </button>
-                    </div>
-                </div>
-
-                <div onClick={() => navigate(`/profile/${currentUserId}`)} className="flex items-stretch gap-2 justify-start p-2 m-2 bg-sky-900 rounded-lg cursor-pointer hover:bg-sky-800">
-                    <FaRegUserCircle className="text-5xl" />
-                    <div className="text-gray-100 flex flex-col">
-                        <h2 className="text-lg">{currentUser}</h2>
-                        <span className="text-xs">{currentRole}</span>
-                    </div>
-                </div>
-
-                <ul className="max-h-[calc(100%-4rem)] overflow-auto pb-20"> {/* Add padding at the bottom */}
-                    {userMenus.map((menu, id) => (
-                        <div key={id}>
-                            <li className="px-7 py-3 my-3 flex flex-col gap-2 cursor-pointer">
-                                {menu.link ? (
-                                    <Link to={menu.link} className="flex items-center gap-2 hover:bg-sky-900 p-1">
-                                        <span className="text-green-500">{menu.icon}</span>
-                                        <span className="text-gray-100">{menu.name}</span>
-                                        {menu.subMenus && (
-                                            <MdOutlineKeyboardArrowUp
-                                                className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
-                                            />
-                                        )}
-                                    </Link>
-                                ) : (
-                                    <button
-                                        className="flex items-center gap-2 p-1 hover:bg-sky-900"
-                                        onClick={() => handleToggleDropdown(id)}
-                                    >
-                                        <span className="text-green-500">{menu.icon}</span>
-                                        <span className="text-gray-100">{menu.name}</span>
-                                        {menu.subMenus && (
-                                            <MdOutlineKeyboardArrowUp
-                                                className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
-                                            />
-                                        )}
-                                    </button>
-                                )}
-                                {menu.subMenus && (
-                                    <ul className={`transition-all duration-300 ${openDropdown === id ? 'block' : 'hidden'}`}>
-                                        {menu.subMenus.map((subMenu, subId) => (
-                                            <div key={subId}>
-                                                {subMenu.link ? (
-                                                    <Link onClick={() => setShowForm(false)} to={subMenu.link}>
-                                                        <li className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{subMenu.name}</li>
-                                                    </Link>
-                                                ) : (
-                                                    <>
-                                                        <button
-                                                            className="text-sm py-3 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900 w-full text-left flex gap-2 items-center"
-                                                            onClick={() => handleToggleSubDropdown(subId)}
-                                                        >
-                                                            {subMenu.name}
-                                                            <MdOutlineKeyboardArrowUp
-                                                                className={`transition-transform duration-300 text-white ${openSubDropdown === subId ? 'rotate-0' : 'rotate-180'}`}
-                                                            />
-                                                        </button>
-                                                        <ul className={`transition-all duration-300 ${openSubDropdown === subId ? 'block' : 'hidden'}`}>
-                                                            {subMenu.subMenus?.map((sb, key) => (
-                                                                <Link onClick={() => setShowForm(false)} key={key} to={sb.link}>
-                                                                    <li className="text-sm py-3 ml-9 text-white hover:bg-sky-900 p-2 border-b-2 border-sky-900">{sb.name}</li>
-                                                                </Link>
-                                                            ))}
-                                                        </ul>
-                                                    </>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </ul>
-                                )}
-                            </li>
+        <AnimatePresence>
+            <motion.div
+                initial="closed"
+                animate={isOpen ? "open" : "closed"}
+                exit="closed"
+                variants={sidebarVariants}
+                transition={{ type: 'tween', duration: 0.3 }}
+                className={`inset-0 z-50 w-full max-w-xs h-full bg-gradient-to-r from-gray-100 to-gray-200 border-r border-gray-300 shadow-lg ${isOpen ? 'block' : 'hidden'}`}
+            >
+                <div>
+                    <div className="bg-gray-200 shadow-sm border-b border-gray-300 p-3 flex items-center justify-between gap-2">
+                        <h1 className="font-semibold text-3xl text-gray-700">SMS</h1>
+                        <div className="flex items-center gap-2">
+                            <span className="font-normal text-sm text-gray-700">{currentSy}</span>
+                            <button onClick={toggleSidebar} className="text-gray-700 hover:scale-110 hover:transition">
+                                <MdClose size={24} />
+                            </button>
                         </div>
-                    ))}
-                </ul>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center bg-sky-950"> {/* Ensure background color matches */}
-                <span className="text-gray-100 text-sm break-words">
-                    {`${schoolYear?.schoolTheme ?? 'No school theme yet'}`}
-                </span>
-            </div>
-        </nav>
+                    </div>
+    
+                    <div onClick={() => navigate(`/profile/${currentUserId}`)} className="border border-gray-300 shadow-lg flex items-stretch gap-2 justify-start p-2 m-2 bg-gray-200 rounded-lg cursor-pointer hover:bg-gray-300">
+                        <FaRegUserCircle className="text-5xl" />
+                        <div className="text-gray-700 flex flex-col">
+                            <h2 className="text-lg">{currentUser}</h2>
+                            <span className="text-xs">{currentRole}</span>
+                        </div>
+                    </div>
+    
+                    <ul className="max-h-[calc(100%-4rem)] overflow-auto pb-20">
+                        {userMenus.map((menu, id) => (
+                            <div key={id}>
+                                <li className="px-7 py-3 my-3 flex flex-col gap-2 cursor-pointer">
+                                    {menu.link ? (
+                                        <Link to={menu.link} className="flex items-center gap-2 hover:bg-gray-200 p-1">
+                                            <span className="text-gray-700">{menu.icon}</span>
+                                            <span className="text-gray-700">{menu.name}</span>
+                                            {menu.subMenus && (
+                                                <MdOutlineKeyboardArrowUp
+                                                    className={`transition-transform duration-300 text-gray-700 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                />
+                                            )}
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            className="flex items-center gap-2 p-1 hover:bg-gray-200"
+                                            onClick={() => handleToggleDropdown(id)}
+                                        >
+                                            <span className="text-gray-700">{menu.icon}</span>
+                                            <span className="text-gray-700">{menu.name}</span>
+                                            {menu.subMenus && (
+                                                <MdOutlineKeyboardArrowUp
+                                                    className={`transition-transform duration-300 text-gray-700 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                />
+                                            )}
+                                        </button>
+                                    )}
+                                    {menu.subMenus && (
+                                        <AnimatePresence initial={false}>
+                                            {openDropdown === id && (
+                                                <motion.ul
+                                                    initial="closed"
+                                                    animate="open"
+                                                    exit="closed"
+                                                    variants={dropdownVariants}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    {menu.subMenus.map((subMenu, subId) => (
+                                                        <div key={subId}>
+                                                            {subMenu.link ? (
+                                                                <Link onClick={() => setShowForm(false)} to={subMenu.link}>
+                                                                    <li className="text-sm py-3 text-gray-700 shadow-sm hover:bg-gray-200 p-2 border-b border-gray-300">{subMenu.name}</li>
+                                                                </Link>
+                                                            ) : (
+                                                                <>
+                                                                    <button
+                                                                        className="text-sm py-3 text-gray-700 shadow-sm hover:bg-gray-200 p-2 border-b border-gray-300 w-full text-left flex gap-2 items-center"
+                                                                        onClick={() => handleToggleSubDropdown(subId)}
+                                                                    >
+                                                                        {subMenu.name}
+                                                                        <MdOutlineKeyboardArrowUp
+                                                                            className={`transition-transform duration-300 text-gray-700 ${openSubDropdown === subId ? 'rotate-0' : 'rotate-180'}`}
+                                                                        />
+                                                                    </button>
+                                                                    <AnimatePresence initial={false}>
+                                                                        {openSubDropdown === subId && (
+                                                                            <motion.ul
+                                                                                initial="closed"
+                                                                                animate="open"
+                                                                                exit="closed"
+                                                                                variants={dropdownVariants}
+                                                                                transition={{ duration: 0.3 }}
+                                                                                className="overflow-hidden ml-4"
+                                                                            >
+                                                                                {subMenu.subMenus?.map((sb, key) => (
+                                                                                    <Link onClick={() => setShowForm(false)} key={key} to={sb.link}>
+                                                                                        <li className="text-sm py-3 text-gray-700 shadow-sm hover:bg-gray-200 p-2 border-b border-gray-300">{sb.name}</li>
+                                                                                    </Link>
+                                                                                ))}
+                                                                            </motion.ul>
+                                                                        )}
+                                                                    </AnimatePresence>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </motion.ul>
+                                            )}
+                                        </AnimatePresence>
+                                    )}
+                                </li>
+                            </div>
+                        ))}
+                    </ul>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center">
+                    <span className="text-gray-700 text-sm break-words">
+                        {`${schoolYear?.schoolTheme ?? 'No school theme yet'}`}
+                    </span>
+                </div>
+            </motion.div>
+        </AnimatePresence>
     );
 };
 

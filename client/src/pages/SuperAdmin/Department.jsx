@@ -112,7 +112,7 @@ const Department = () => {
 
     const form = () => (
         <>
-            <h1 className="font-semibold text-xl text-green-500">Add New Department</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New Department</h1>
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="department">Department</label>

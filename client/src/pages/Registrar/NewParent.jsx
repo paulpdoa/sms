@@ -81,9 +81,9 @@ const NewParent = () => {
         <main className="p-4">
             
             <form onSubmit={addParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
-                <h1 className="font-bold text-start text-green-600 text-3xl">Add New Parent</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl">Add New Parent</h1>
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Mother's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         <div className="flex flex-col">
                             <label className="text-sm" htmlFor="motherName">Mother's Name</label>
@@ -136,7 +136,7 @@ const NewParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Father's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Father's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         <div className="flex flex-col">
                             <label className="text-sm" htmlFor="fatherName">Father's Name</label>
@@ -189,7 +189,7 @@ const NewParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Guardian's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Guardian's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         <div className="flex flex-col">
                             <label className="text-sm" htmlFor="guardianName">Guardian's Name</label>
@@ -240,7 +240,7 @@ const NewParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Parent Of:</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
                     <div className="flex flex-col mt-4">
                         <label className="text-sm" htmlFor="student">Student Name</label>
                         <select
@@ -258,10 +258,10 @@ const NewParent = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-500 text-white text-sm p-3 mt-6 rounded-md">
+                <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>

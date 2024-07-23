@@ -26,10 +26,10 @@ const Assistance = ({ record }) => {
     return (
         <div className="mt-6 p-4 bg-white rounded-lg overflow-hidden">
             {loading ? (
-                <div className="text-center text-green-700">Loading...</div>
+                <div className="text-center text-gray-700">Loading...</div>
             ) : (
                 <>
-                <h2 className="text-2xl font-semibold text-green-700 mb-6">Student Discounts</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Student Discounts</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-sm text-left text-gray-700">
                         <thead className="border-b bg-gray-100">

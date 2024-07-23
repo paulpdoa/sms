@@ -93,7 +93,7 @@ const Textbook = () => {
         <main className="p-2">
             {/* <DateTime /> */}
             <div className="flex flex-col mx-4 my-2 gap-2">
-                <h1 className="text-2xl text-green-600 font-bold">Text book</h1>
+                <h1 className="text-2xl text-gray-700 font-bold">Text book</h1>
                 <div className="flex justify-between w-full gap-2">
                     <Searchbar onSearch={setSearchQuery} />
                     <AddTextbookBtn />

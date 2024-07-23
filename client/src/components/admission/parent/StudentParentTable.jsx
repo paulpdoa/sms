@@ -16,7 +16,6 @@ const StudentParentTable = ({ setViewRecord, searchQuery }) => {
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
-        { accessorKey: 'action', header: 'Action' }
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);

@@ -68,10 +68,10 @@ const NewSibling = () => {
     return (
         <main className="p-8 bg-gray-100 flex items-center justify-center">
             <form onSubmit={addSibling} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Add New Sibling</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Add New Sibling</h1>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Basic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="firstName">First Name</label>
@@ -110,7 +110,7 @@ const NewSibling = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Contact Details</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="email">Active Email</label>
@@ -143,10 +143,10 @@ const NewSibling = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
+                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>

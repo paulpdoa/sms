@@ -22,27 +22,27 @@ const StudentParent = ({ id }) => {
 
 const renderInformation = (label,name,occupation,office,contact,email) => (
         <>
-        <h2 className="text-xl text-green-600 font-bold mt-3">{label}'s Information</h2>
+        <h2 className="text-xl text-gray-700 font-bold mt-3">{label}'s Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
-                <label className="font-semibold text-sm text-green-600">Name:</label>
-                <span className="text-sm truncate">{name}</span>
+                <label className="font-semibold text-sm text-gray-700">Name:</label>
+                <span className="text-sm truncate">{name ?? 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
-                <label className="font-semibold text-sm text-green-600">Occupation:</label>
-                <span className="text-sm truncate">{occupation}</span>
+                <label className="font-semibold text-sm text-gray-700">Occupation:</label>
+                <span className="text-sm truncate">{occupation ?? 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
-                <label className="font-semibold text-sm text-green-600">Office:</label>
-                <span className="text-sm truncate">{office}</span>
+                <label className="font-semibold text-sm text-gray-700">Office:</label>
+                <span className="text-sm truncate">{office ?? 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
-                <label className="font-semibold text-sm text-green-600">Contact:</label>
-                <span className="text-sm truncate">{contact}</span>
+                <label className="font-semibold text-sm text-gray-700">Contact:</label>
+                <span className="text-sm truncate">{contact ?? 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
-                <label className="font-semibold text-sm text-green-600">Email:</label>
-                <span className="text-sm truncate">{email}</span>
+                <label className="font-semibold text-sm text-gray-700">Email:</label>
+                <span className="text-sm truncate">{email ?? 'Not Assigned'}</span>
             </div>
         </div>
         </>

@@ -36,7 +36,7 @@ const Admission = () => {
         <main className="p-4">
             {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-2xl text-green-500 font-bold">Admission</h1>
+                <h1 className="text-2xl text-gray-700 font-bold">Admission</h1>
                 <Searchbar onSearch={handleSearch} />
             </div>
 
@@ -50,7 +50,7 @@ const Admission = () => {
                 </div>
                 
                 <div className="p-4 bg-white rounded-lg border border-gray-300 h-fit">
-                    <h1 className="font-semibold text-xl text-green-500 mb-4">
+                    <h1 className="font-semibold text-xl text-gray-700 mb-4">
                         {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
                     </h1>
 
@@ -60,7 +60,7 @@ const Admission = () => {
                                 key={page}
                                 className={`text-sm font-semibold px-3 py-1 rounded-lg ${
                                     currentPage === page
-                                        ? 'bg-green-500 text-white'
+                                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
                                         : 'border border-gray-300 text-gray-700'
                                 }`}
                                 onClick={() => {

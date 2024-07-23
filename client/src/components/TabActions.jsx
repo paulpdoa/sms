@@ -11,7 +11,7 @@ const TabActions = ({ title,noView }) => {
 
     return (
         <div className="mx-4 my-2">
-            <h1 className="text-2xl text-green-600 font-semibold">{title}</h1>
+            <h1 className="text-2xl text-gray-700 font-semibold">{title}</h1>
             <div className="flex mt-3 w-full gap-2 justify-between">
                 <Searchbar onSearch={setSearchQuery} />
                 { !noView && <AddNewData label={title} onShow={setShowForm}  />  }

@@ -162,7 +162,7 @@ const StudentAcademic = ({ id }) => {
                     </div>
                 </div>
 
-                <button className="bg-green-500 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4">Submit</button>
+                <button className="bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4">Submit</button>
             </form>
             <ToastContainer />
         </div>

@@ -214,7 +214,7 @@ const Discount = () => {
 
     const form = () => (
         <>
-            <h1 className="font-semibold text-xl text-green-500">Add New Discount</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New Discount</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {renderInput('discount type',discountType,'Discount Type', setDiscountType, 'text')}

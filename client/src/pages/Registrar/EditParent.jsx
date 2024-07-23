@@ -138,9 +138,9 @@ const EditParent = () => {
     return (
         <main className="p-4">
             <form onSubmit={editParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
-                <h1 className="font-bold text-start text-green-600 text-3xl">Edit Parent</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl">Edit Parent</h1>
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Mother's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {renderInput('motherName', "Mother's Name", motherName, setMotherName)}
                         {renderInput('motherOccupation', "Mother's Occupation", motherOccupation, setMotherOccupation)}
@@ -151,7 +151,7 @@ const EditParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Father's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Father's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {renderInput('fatherName', "Father's Name", fatherName, setFatherName)}
                         {renderInput('fatherOccupation', "Father's Occupation", fatherOccupation, setFatherOccupation)}
@@ -162,7 +162,7 @@ const EditParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Guardian's Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Guardian's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {renderInput('guardianName', "Guardian's Name", guardianName, setGuardianName)}
                         {renderInput('guardianOccupation', "Guardian's Occupation", guardianOccupation, setGuardianOccupation)}
@@ -173,11 +173,11 @@ const EditParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl">Parent Of:</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
                     {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
                 </section>
 
-                <button className="bg-green-500 hover:bg-green-600 text-white text-sm p-3 mt-6 rounded-md">
+                <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
                 </button>
                 <button onClick={() => navigate('/parents')} className="bg-red-500 hover:bg-red-600 ml-2 text-white text-sm p-3 mt-6 rounded-md">

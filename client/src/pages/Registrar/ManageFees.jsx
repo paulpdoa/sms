@@ -133,11 +133,11 @@ const ManageFees = () => {
                 <Searchbar onSearch={setSearchQuery} />
                 <div className="flex items-center gap-2">
                     { recordsWithoutInputter.length < 1 ? 
-                    <button onClick={() => automateFees(false)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
+                    <button onClick={() => automateFees(false)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600">
                         Generate Fees
                     </button>
                     :
-                    <button onClick={() => setOpenPopup(true)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-green-600 text-gray-100 p-2 rounded-md hover:bg-green-700">
+                    <button onClick={() => setOpenPopup(true)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600">
                         Re-generate Fees
                     </button>
                     }

@@ -8,6 +8,8 @@ import { useFetch } from '../../hooks/useFetch';
 import { MainContext} from '../../helpers/MainContext';
 
 const EditManageFee = () => {
+    const { id } = useParams();
+    const { session:sessionId } = useContext(MainContext);
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
@@ -15,10 +17,10 @@ const EditManageFee = () => {
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
     const { records: manageFee } = useFetch(`${baseUrl()}/manage-fee/${id}`);
 
-    const { id } = useParams();
+    
     const navigate = useNavigate();
 
-    const { session } = useContext(MainContext);
+    
 
     const [isLoading, setIsLoading] = useState(false);
     const [feeDescription, setFeeDescription] = useState('');
@@ -89,7 +91,7 @@ const EditManageFee = () => {
     return (
         <main className="p-8 bg-gray-100 flex items-center justify-center">
             <form onSubmit={editManagedFees} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Edit Fee</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Edit Fee</h1>
 
                 <section>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -118,10 +120,10 @@ const EditManageFee = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300" disabled={isLoading}>
+                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300" disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Submit'}
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="ml-2 bg-red-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-700 transition duration-300" disabled={isLoading}>
+                <button type="button" onClick={() => navigate(-1)} className="ml-2 bg-red-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-600 transition duration-300" disabled={isLoading}>
                     Cancel
                 </button>
             </form>

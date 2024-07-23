@@ -78,10 +78,10 @@ const EditSibling = () => {
     return (
         <main className="p-8 bg-gray-100 flex items-center justify-center">
             <form onSubmit={editSibling} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Edit Sibling</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Edit Sibling</h1>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Basic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
@@ -90,7 +90,7 @@ const EditSibling = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Contact Details</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("email", "Email", email, setEmail, "email")}
                         {renderSelect("studentId", "Student Sibling", studentId, setStudentId ,students, "Select student")}

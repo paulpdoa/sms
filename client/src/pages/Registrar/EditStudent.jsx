@@ -125,10 +125,10 @@ const EditStudent = () => {
     return (
         <main className="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
             <form onSubmit={editStudent} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-6">Edit Student</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Edit Student</h1>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Basic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
@@ -145,7 +145,7 @@ const EditStudent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Contact Details</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("email", "Active Email", email, setEmail, "email")}
                         <div className="flex flex-col">
@@ -165,7 +165,7 @@ const EditStudent = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
+                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
                 <button type="button" onClick={() => navigate('/students')} className="bg-red-600 text-white text-sm p-3 mt-5 ml-2 rounded-md hover:bg-red-700 transition duration-300">

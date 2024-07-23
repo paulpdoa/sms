@@ -10,7 +10,7 @@ const AddNewData = ({ label,onShow }) => {
     const isYearDone = schoolYear?.isYearDone
     
     return (
-        <button disabled={isYearDone ? true : false} onClick={() => onShow(prevVal => !prevVal)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-green-600 hover:bg-green-700 text-gray-100 p-2 rounded-md`}>
+        <button disabled={isYearDone ? true : false} onClick={() => onShow(prevVal => !prevVal)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md`}>
             { `Add New ${label}` }
         </button>
     )

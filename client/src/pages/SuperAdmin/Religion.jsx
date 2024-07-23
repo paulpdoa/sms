@@ -111,7 +111,7 @@ const Religion = () => {
 
     const form = () => (
         <>
-            <h1 className="font-semibold text-xl text-green-500">Add New Religion</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New Religion</h1>
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="religion">Religion</label>
                 <input required className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />

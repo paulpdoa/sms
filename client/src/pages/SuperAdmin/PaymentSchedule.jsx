@@ -68,17 +68,17 @@ const PaymentSchedule = () => {
     return (
         <main className="p-2">
             <div className="flex flex-col mx-4 my-2 gap-2">
-                <h1 className="text-2xl text-green-600 font-bold">Payment Schedule</h1>
+                <h1 className="text-2xl text-gray-700 font-bold">Payment Schedule</h1>
                 <div className="flex items- w-full justify-between gap-2">
                     <Searchbar onSearch={setSearchQuery} />
 
                     {records.length < 1 ?
-                        <button onClick={() => generatePaymentSchedule(false)} className="items-end text-sm bg-green-500 hover:bg-green-600 cursor-pointer text-white p-2 rounded-md">
+                        <button onClick={() => generatePaymentSchedule(false)} className="items-end text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer text-white p-2 rounded-md">
                             {isLoading ? 'Loading...' : 'Generate Payment Schedule'}
                         </button>
                         :
                         // If the user tried to re-generate payment schedule, create a function where it will delete the contents of PaymentSchedule table and generate new schedule
-                        <button onClick={() => setOpenPopup(true)} className="items-end text-sm bg-green-500 hover:bg-green-600 cursor-pointer text-white p-2 rounded-md">
+                        <button onClick={() => setOpenPopup(true)} className="items-end text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer text-white p-2 rounded-md">
                             {isLoading ? 'Loading...' : 'Re-generate Payment Schedule'}
                         </button>
                     }

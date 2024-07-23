@@ -112,7 +112,7 @@ const SchoolYear = () => {
 
     const form = () => (
         <>
-            <h1 className="font-semibold text-xl text-green-500">Add New School Year</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New School Year</h1>
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="school year">School Year Start</label>

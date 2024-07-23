@@ -139,10 +139,10 @@ const NewTeacher = () => {
     return (
         <main className="p-4 bg-gray-100">
             <form onSubmit={addTeacher} className="bg-white p-6 rounded-lg shadow-lg">
-                <h1 className="font-bold text-start text-green-600 text-3xl mb-4">Add New Teacher</h1>
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-4">Add New Teacher</h1>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mb-4">Basic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <Input label="First Name" type="text" name="firstName" value={firstName} onChange={setFirstName} />
                         <Input label="Middle Name" type="text" name="middleName" value={middleName} onChange={setMiddleName} />
@@ -179,7 +179,7 @@ const NewTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Contact Details</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Input label="Active Email" type="email" name="email" value={email} onChange={setEmail} />
                         <div className="flex flex-col">
@@ -200,7 +200,7 @@ const NewTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">Academic Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Academic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Input label="Education" type="text" name="education" value={education} onChange={setEducation} />
                         <Input label="School Graduated" type="text" name="schoolGraduated" value={schoolGraduated} onChange={setSchoolGraduated} />
@@ -210,7 +210,7 @@ const NewTeacher = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-green-600 font-bold text-xl mt-6 mb-4">School Information</h2>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">School Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Input label="Joining Date" type="date" name="joiningDate" value={joiningDate} onChange={setJoiningDate} />
                         {/* <Select label="Department" name="department" value={department} options={departments} onChange={handleChange} />
@@ -222,7 +222,7 @@ const NewTeacher = () => {
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         type="submit"
-                        className="bg-green-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-green-700 transition duration-200"
+                        className="bg-blue-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-600 transition duration-200"
                     >
                         Add Teacher
                     </button>

@@ -88,7 +88,7 @@ const EditTextbook = () => {
     return (
         <main className="min-h-screen flex justify-center items-center">
             <form onSubmit={handleSubmit} className="space-y-8 bg-white w-3/4 shadow-lg p-8 rounded-lg mx-auto border border-gray-200">
-                <h1 className="font-bold text-green-600 text-2xl mb-4">Edit Textbook: {textbook?.bookTitle}</h1>
+                <h1 className="font-bold text-gray-700 text-2xl mb-4">Edit Textbook: {textbook?.bookTitle}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                     {renderInput('bookTitle', 'Book Title', bookTitle, setBookTitle, 'text')}
@@ -98,10 +98,10 @@ const EditTextbook = () => {
                     { isGrade11Or12 && renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', true) }
                 </div>
 
-                <button type="submit" className="bg-green-600 text-white text-sm p-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400">
+                <button type="submit" className="bg-blue-500 text-white text-sm p-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     Update Textbook
                 </button>
-                <button onClick={() => navigate(-1)} type="button" className="bg-red-600 text-white text-sm p-3 ml-3 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
+                <button onClick={() => navigate(-1)} type="button" className="bg-red-500 text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
             </form>
             <ToastContainer />
         </main>
