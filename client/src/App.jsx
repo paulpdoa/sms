@@ -64,6 +64,8 @@ function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
   const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
+  const isFreshYear = localStorage.getItem('session') === 'fresh-year';
+  console.log(isFreshYear);
 
   const router = createBrowserRouter(
     createRoutesFromElements(

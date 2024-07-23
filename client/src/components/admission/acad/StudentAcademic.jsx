@@ -1,9 +1,10 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { MainContext } from '../../../helpers/MainContext';
 
 const StudentAcademic = ({ id }) => {
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
@@ -13,6 +14,11 @@ const StudentAcademic = ({ id }) => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
+    
+    const { session: syId } = useContext(MainContext);
+
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${syId}`);
+    const isYearDone = schoolYear.isYearDone ? true : false;
 
     const [gradeLevel, setGradeLevel] = useState('');
     const [strand, setStrand] = useState('');
@@ -162,7 +168,7 @@ const StudentAcademic = ({ id }) => {
                     </div>
                 </div>
 
-                <button className="bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4">Submit</button>
+                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4`}>Submit</button>
             </form>
             <ToastContainer />
         </div>

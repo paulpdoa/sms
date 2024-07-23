@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import DateTime from '../../components/DateTime';
 import Searchbar from '../../components/Searchbar';
 import TotalFees from '../../components/assessment/TotalFees'
-import AssessmentTable from '../../components/assessment/AssessmentTable';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import PaymentTerm from '../../components/assessment/PaymentTerm';
@@ -12,6 +10,7 @@ import AssessTextbooks from '../../components/assessment/AssessTextbooks';
 import Assistance from '../../components/assessment/Assistance';
 import MasterTable from '../../components/MasterTable';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext';
 
 const Assessment = () => {
 
@@ -23,6 +22,10 @@ const Assessment = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading,setIsLoading] = useState(false);
 
+    const { session,currentUserId,role } = useContext(MainContext);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone ? true : false;
+
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'studentNo', header: 'Student No.' },
@@ -30,7 +33,7 @@ const Assessment = () => {
         { accessorKey: 'dateRegistered', header: 'Date Registered' },
         { accessorKey: 'status', header: 'Status' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
-        { accessorKey: 'nationality', header: 'Nationality' },
+        { accessorKey: 'nationality', header: 'Nationality' }
     ];
 
     const enableViewStudentRecord = (record) => {
@@ -42,16 +45,13 @@ const Assessment = () => {
         setSearchQuery(query);
     };
 
-    const currentUserId = localStorage.getItem('id');
-    const session = localStorage.getItem('session');
-
     const generateFees = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         const toastId = toast.loading('Creating fees, please wait...');
 
         try {
-            const { data } = await axios.get(`${baseUrl()}/generate-fees/${session}`);
+            const { data } = await axios.post(`${baseUrl()}/generate-fees`,{ session,role });
             setIsLoading(false);
             toast.update(toastId, {
                 render: data.mssg,
@@ -70,8 +70,9 @@ const Assessment = () => {
                 window.location.reload();
             }, 2000)
         } catch(err) {
+            console.log(err.response.data.mssg);
             toast.update(toastId, {
-                render: err.response.data.error,
+                render: err.response.data.mssg,
                 type: "error",
                 isLoading: false,
                 autoClose: 2000,
@@ -89,22 +90,32 @@ const Assessment = () => {
 
     const deleteGeneratedFees = async () => {
         try {
-            const { data } = await axios.delete(`${baseUrl()}/delete-student-payments`);
+            const { data } = await axios.delete(`${baseUrl()}/delete-student-payments`,{ data: { session,role } });
             toast.success(data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             setTimeout(() => {
                 window.location.reload();
             }, 2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.data.response.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     };
 
@@ -128,8 +139,8 @@ const Assessment = () => {
                 <h1 className="text-2xl text-gray-700 font-bold">Assessment</h1>
                 <div className="flex items-center gap-2">
                     <Searchbar onSearch={handleSearch} />
-                    <button className="items-end text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white p-2 rounded-md" onClick={deleteGeneratedFees}>Delete Fees</button>
-                    <button onClick={generateFees} className="items-end text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer text-white p-2 rounded-md">{ isLoading ? 'Loading' : 'Generate Fees'}</button>
+                    <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-red-500 hover:bg-red-600 text-white p-2 rounded-md`}>Delete Fees</button>
+                    <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>{ isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
 

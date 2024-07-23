@@ -583,6 +583,7 @@ module.exports.add_sectioning = async (req,res) => {
         res.status(200).json({ mssg: `${updateStudentRec.firstName} has been added new section successfully` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'There is an error in creating sectioning, please contact admin' })
     }
 }
 
@@ -928,10 +929,10 @@ module.exports.generate_fees = async (req, res) => {
     
                 res.status(200).json({ mssg: 'Fees for students have been generated successfully' });
             } else {
-                res.status(404).json({ error: 'Current school year not found' });
+                res.status(404).json({ mssg: 'Current school year not found' });
             }
         } else {
-            res.status(400).json({error: 'Please generate a payment schedule before creating fees'})
+            res.status(400).json({mssg: 'Please generate a payment schedule before creating fees'})
         }
     } catch (err) {
         console.log(err);
@@ -944,11 +945,14 @@ module.exports.generate_fees = async (req, res) => {
 
 module.exports.delete_generated_fees = async (req,res) => {
 
+    const { session } = req.body;
+    console.log('here');
     try {
-        const payments = await StudentPayment.deleteMany();
-        res.status(200).json({mssg: 'All fees has been removed'});
-    } catch(err) {
+        await StudentPayment.deleteMany({ sessionId: session });
+        res.status(200).json({ mssg: 'All fees has been removed' });
+    } catch (err) {
         console.log(err);
+        res.status(500).json({ mssg: 'Server error' });
     }
 }
 

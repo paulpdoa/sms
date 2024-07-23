@@ -16,6 +16,8 @@ const ManageFees = () => {
     const { searchQuery, setSearchQuery, role,session } = useContext(MainContext);
     const navigate = useNavigate();
     const [openPopup,setOpenPopup] = useState(false);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone;
 
     const columns = [
         {
@@ -133,11 +135,11 @@ const ManageFees = () => {
                 <Searchbar onSearch={setSearchQuery} />
                 <div className="flex items-center gap-2">
                     { recordsWithoutInputter.length < 1 ? 
-                    <button onClick={() => automateFees(false)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600">
+                    <button disabled={(isYearDone && !isLoading) ? true : false} onClick={() => automateFees(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600`}>
                         Generate Fees
                     </button>
                     :
-                    <button onClick={() => setOpenPopup(true)} disabled={isLoading ? true : false} className="flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600">
+                    <button disabled={(isYearDone && !isLoading) ? true : false} onClick={() => setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600`}>
                         Re-generate Fees
                     </button>
                     }

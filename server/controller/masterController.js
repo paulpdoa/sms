@@ -659,10 +659,13 @@ module.exports.get_school_year_detail = async (req,res) => {
     const { id } = req.params;
     
     try {
-        const schoolYearFind = await SchoolYear.findOne({ _id: id });
-        res.status(200).json(schoolYearFind);
+        if(typeof id !== String) {
+            const schoolYearFind = await SchoolYear.findOne({ _id: id });
+            res.status(200).json(schoolYearFind);
+        }
     } catch(err) {
         console.log(err);
+        res.status(500).json({mssg: 'Server error'});
     }
 }
 
@@ -693,6 +696,16 @@ module.exports.edit_school_year = async (req, res) => {
     }
 };
 
+module.exports.close_school_year = async (req,res) => {
+    const { sessionId } = req.body
+
+    try { 
+        await SchoolYear.findByIdAndUpdate({ _id: sessionId },{ isYearDone: true });
+        res.status(200).json({ mssg: 'School year has been closed' });
+    } catch(err) {
+        console.log(err);
+    }
+}
 
 // For Users
 
@@ -790,7 +803,7 @@ module.exports.user_login = async (req,res) => {
 
         res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail[0].userRole,redirect:'/' });
     } catch(err) {
-        console.log(err.message);
+        console.log(err);
         res.status(400).json({ mssg: err.message });
     }
 }

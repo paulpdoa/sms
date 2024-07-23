@@ -9,6 +9,7 @@ import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 import ConfirmationPopup from '../../components/ConfirmationPopup';
+import { useCookies } from 'react-cookie';
 
 const SchoolYear = () => {
 
@@ -17,14 +18,17 @@ const SchoolYear = () => {
     const [yearEnd, setYearEnd] = useState('');
     const [syTheme, setSyTheme] = useState('');
     const [openPopup, setOpenPopup] = useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
 
-    const { role, currentUserId, showForm, searchQuery, setShowForm } = useContext(MainContext);
+    const { role, currentUserId, showForm, searchQuery, setShowForm,session } = useContext(MainContext);
+    const { records:schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone;
 
     const columns = [
         { accessorKey: 'startYear', header: 'Start Year', editable: true, type: "date" },
         { accessorKey: 'endYear', header: 'End Year', editable: true, type: "date" },
         { accessorKey: 'schoolTheme', header: 'School Theme', editable: true, type: "text" },
-        { accessorKey: 'isYearDone', header: 'S.Y Status', editable: true, selectOptions: ['Ongoing', 'Closed'].map(isReq => ({ value: `${isReq === 'Ongoing' ? false : true }`, label: isReq }))}
+        { accessorKey: 'isYearDone', header: 'S.Y Status', selectOptions: ['Ongoing', 'Closed'].map(isReq => ({ value: `${isReq === 'Ongoing' ? false : true }`, label: isReq }))}
     ];
 
     const updateNewStartYear = async (id, updatedData) => {
@@ -66,7 +70,7 @@ const SchoolYear = () => {
             toast.success(removeSchoolYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -89,7 +93,7 @@ const SchoolYear = () => {
             toast.success(newStartYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -104,6 +108,30 @@ const SchoolYear = () => {
             console.log(err);
         }
     };
+
+    const closeSchoolYear = async () => {
+        try {
+            const data = await axios.patch(`${baseUrl()}/close-school-year`,{ sessionId: session });
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                // Remove userToken cookie
+                removeCookie('userToken',{ path: '/login' });
+                navigate('/login');
+            }, 2000);
+        } catch(err) {
+            console.log(err);
+        }
+    }
 
     const recordsWithoutInputter = records.map(record => ({
         ...record,
@@ -133,7 +161,10 @@ const SchoolYear = () => {
         <main className="p-2 relative">
 
             <TabActions title="School Year" />
-
+            {/* Show this button when the school year viewed is still ongoing */}
+            <div className="flex justify-end px-4">
+                { !isYearDone && <button onClick={closeSchoolYear} className={`bg-red-500 hover:bg-red-600 text-gray-100 p-2 rounded-md`}>Close School Year</button>}
+            </div>
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form, addSchoolYear, setShowForm) }
 

@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { baseUrl } from '../../../baseUrl';
 import { useFetch } from '../../../hooks/useFetch';
+import { MainContext } from '../../../helpers/MainContext';
 
 const SubmittedReq = ({ id }) => {
     const { records: requirements } = useFetch(`${baseUrl()}/requirements`);
     const { records: admission } = useFetch(`${baseUrl()}/admission/${id}`);
-    const schoolYear = localStorage.getItem('session');
-    
+    const { session: schoolYear } = useContext(MainContext);
+    const { records: sy } = useFetch(`${baseUrl()}/school-year/${schoolYear}`);
+    const isYearDone = sy.isYearDone;
+
     const [selectedRequirements, setSelectedRequirements] = useState([]);
 
     useEffect(() => {
@@ -87,14 +90,16 @@ const SubmittedReq = ({ id }) => {
                             type="checkbox"
                             checked={selectedRequirements.includes(record._id)}
                             onChange={() => handleRequirementSelection(record._id)}
+                            disabled={isYearDone ? true : false}
                         />
                     </div>
                 ))}
             </div>
             
             <button 
-                className="bg-blue-500 text-white text-sm py-2 px-4 mt-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 text-white text-sm py-2 px-4 mt-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-500`}
                 onClick={submitStudentRequirement}
+                disabled={isYearDone ? true : false}
             >
                 Submit
             </button>

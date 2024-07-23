@@ -19,6 +19,7 @@ export const MainProvider = ({ children }) => {
   const currentUser = localStorage.getItem('username');
   const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
+  const isFreshYear = localStorage.getItem('session') === 'fresh-year';
 
   return (
     <MainContext.Provider value={{ 
@@ -30,7 +31,8 @@ export const MainProvider = ({ children }) => {
       currentUser,
       userToken,
       showForm,
-      setShowForm 
+      setShowForm,
+      isFreshYear
     }}>
       {children}
     </MainContext.Provider>

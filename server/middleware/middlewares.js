@@ -18,12 +18,11 @@ const allowUserAction = (roles) => {
     return async (req,res,next) => {
         const role = req.body.role;
         const session = req.body.session;
-
         const currentSessionYear = await Session.findOne({ _id: session });
       
         // If false = ongoing, if true = done
         const isYearDone = currentSessionYear.isYearDone;
-
+        
         if(!isYearDone) {
             if(roles.includes(role)) {
                 next();

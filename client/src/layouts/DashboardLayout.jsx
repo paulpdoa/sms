@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import { MdOutlineMenu } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
 const DashboardLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -11,7 +12,14 @@ const DashboardLayout = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    // const navigate = useNavigate();
+    // const isFreshYear = localStorage.getItem('session') === 'fresh-year';
 
+    // useEffect(() => {
+    //     if (isFreshYear) {
+    //     navigate('/master/school-year');
+    //     }
+    // }, [isFreshYear, navigate]);
 
     return (
         <main className="grid grid-cols-10 bg-gray-100 h-screen">

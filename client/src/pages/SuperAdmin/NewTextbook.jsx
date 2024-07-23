@@ -138,6 +138,9 @@ const renderSelect = (id, label, value, onChange, options, placeholder, required
                     {option[id]}
                 </option>
             ))}
+            { label === 'Strand' && (
+                <option value=''>Not applicable</option>
+            ) }
         </select>
     </div>
 );

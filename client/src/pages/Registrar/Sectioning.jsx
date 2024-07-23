@@ -26,10 +26,12 @@ const Sectioning = () =>{
 
     const navigate = useNavigate();
 
-    const { searchQuery,showForm,currentUserId, setShowForm, session: currentSession } = useContext(MainContext);
+    const { searchQuery,showForm,currentUserId, setShowForm, session: currentSession,role } = useContext(MainContext);
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
+    const isYearDone = schoolYear.isYearDone;
     const [sectionId,setSectionId] = useState('');
     const [adviser,setAdviser] = useState('');
 
@@ -66,9 +68,9 @@ const Sectioning = () =>{
             gradeLevelId: studentRecord?.academicId?.gradeLevelId?._id,
             strandId: studentRecord?.academicId?.strandId?._id,
             lastSchoolAttended: studentRecord?.academicId?.lastSchoolAttended,
+            role,
+            session: currentSession // Passed this to be used by middleware
         }
-
-        console.log(sectioningInfo)
 
         try {
             const data = await axios.post(`${baseUrl()}/sectioning`,sectioningInfo);
@@ -87,6 +89,16 @@ const Sectioning = () =>{
             }, 2000);
         } catch(err) {
             console.log(err);  
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
@@ -100,7 +112,7 @@ const Sectioning = () =>{
                         studentRecord ? 
                         <div className="absolute w-full top-0 z-50 left-0 flex justify-center">
                             <form onSubmit={submitSectioning} className="p-4 col-span-1 bg-white shadow-md rounded-md h-fit border border-gray-300 mt-5">
-                                <h1 className="font-semibold text-xl text-green-600">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
+                                <h1 className="font-semibold text-xl text-gray-700">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
                                 <div className="grid grid-cols-2 gap-5 mt-4">
                                     {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
                                     {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
@@ -109,7 +121,7 @@ const Sectioning = () =>{
                                     {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned','Adviser')}
                                 </div>
 
-                                <button className="text-gray-100 bg-green-500 p-2 text-sm mt-5 rounded-md hover:dark:bg-green-600">Add Section</button>
+                                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} text-gray-100 bg-blue-500 p-2 text-sm mt-5 rounded-md hover:bg-blue-600`}>Add Section</button>
                                 <button className="text-gray-100 bg-red-500 p-2 text-sm mt-5 ml-2 rounded-md hover:dark:bg-red-600" type="button" onClick={() => {
                                     setShowForm(false)
                                     setStudentRecord(null)
@@ -151,7 +163,7 @@ export default Sectioning;
 
 const renderStudentInfo = (label,value,placeholder,options,onChange) => (
     <div className="flex flex-col">
-        <label className="text-sm mb-1 font-semibold text-green-600" htmlFor={label}>{placeholder}</label>
+        <label className="text-sm mb-1 font-semibold text-gray-700" htmlFor={label}>{placeholder}</label>
         { label === 'section' ? 
         <select className="text-sm p-2 outline-none rounded-md border border-gray-200" onChange={onChange}>
             <option hidden>{ value ? value : 'Select Section' }</option>

@@ -3,8 +3,9 @@ import { baseUrl } from "../../../baseUrl";
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import AdmissionTable from '../AdmissionTable';
 import MasterTable from "../../MasterTable";
+import { useContext } from 'react';
+import { MainContext } from '../../../helpers/MainContext';
 
 const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
 
@@ -22,6 +23,9 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
+    const { session } = useContext(MainContext);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone ? true : false;
 
     const deleteAcadRecord = async (id) => {
         try {
@@ -57,12 +61,12 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
         <>
         <div className="flex gap-2 items-center">
             <button onClick={() => setViewRecord(student)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
-            <button onClick={() => deleteAcadRecord(student.academicId._id)} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Delete</button>
+            <button onClick={() => !isYearDone && deleteAcadRecord(student.academicId._id)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-red-500 text-white px-4 py-2 rounded-md mr-2`}>Delete</button>
         </div>
         </>
     );
     const formattedStudents = students?.filter(student => student.isAdmitted && student.isRegistered).map(student => ({
-        ...student,
+        ...student, 
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',
         registered: student.isRegistered ? 'Yes' : 'No',
@@ -78,7 +82,6 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
     return (
         <>  
             <MasterTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
-            {/* <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} /> */}
             <ToastContainer /> 
         </> 
     )

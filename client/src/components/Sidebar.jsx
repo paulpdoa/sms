@@ -225,7 +225,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <AnimatePresence>
-            <motion.div
+            { isOpen && (
+                <motion.div
+                key={isOpen}
                 initial="closed"
                 animate={isOpen ? "open" : "closed"}
                 exit="closed"
@@ -345,6 +347,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </span>
                 </div>
             </motion.div>
+            ) }
         </AnimatePresence>
     );
 };

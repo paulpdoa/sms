@@ -38,10 +38,14 @@ const Login = () => {
             });
             setTimeout(() => {
                 setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
-                navigate(data.data.redirect);
+                if(localStorage.getItem('session') === 'fresh-year') {
+                    navigate('/master/school-year')
+                } else {
+                    navigate(data.data.redirect);
+                }
             }, 2000);
         } catch (err) {
-            console.log(err.response.data.mssg);
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -56,7 +60,7 @@ const Login = () => {
     };
 
     return (
-        <main className="bg-green-300 h-screen flex items-center justify-center">
+        <main className="bg-gray-200 h-screen flex items-center justify-center">
             <img className="absolute right-0 top-0" src="/loginImage/Vector.png" alt="Vector" />
             <img className="absolute left-0 bottom-0 z-50" src='/loginImage/Ellipse.png' alt="Ellipse" />
             <img className="absolute left-0 bottom-0 z-40" src='/loginImage/Ellipse-1.png' alt="Ellipse 1" />
@@ -88,12 +92,13 @@ const Login = () => {
                         <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
                             <option hidden>Select session</option>
                             {schoolYears?.map(sy => (
-                                <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]}</option>
+                                <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]} {sy.isYearDone && 'Done'}</option>
                             ))}
+                            <option value="fresh-year">Create new school year</option>
                         </select>
                     </div>
                 ) }
-                <button className="bg-green-500 w-full p-1 rounded-md text-gray-200 cursor-pointer my-3">Login</button>
+                <button className="bg-blue-500 hover:bg-blue-600 w-full p-2 rounded-md text-gray-200 cursor-pointer my-3">Login</button>
             </form>
             <ToastContainer />
         </main>

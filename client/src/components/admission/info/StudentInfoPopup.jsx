@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
 import { RiCloseLargeFill } from "react-icons/ri";
-
+import { MainContext } from '../../../helpers/MainContext';
 
 const StudentInfoPopup = ({ id, closeModal }) => {
 
@@ -32,7 +32,11 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
 
-    const session = localStorage.getItem('session');
+    const { session } = useContext(MainContext);
+
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone ? true : false;
+
 
     const submitInfo = async (e) => {
         e.preventDefault();
@@ -57,8 +61,6 @@ const StudentInfoPopup = ({ id, closeModal }) => {
             session,
             isRegistered
         }
-
-        
 
         try {
             const data = await axios.patch(`${baseUrl()}/student/${id?._id}`,studentInfo);
@@ -252,10 +254,10 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                 </div>
 
                 <div className="flex gap-2 items-center justify-end mt-4">
-                    <button onClick={submitInfo} className="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-opacity-50">
+                    <button onClick={!isYearDone && submitInfo} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-opacity-50`}>
                         Submit
                     </button>
-                    <button className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onClick={() => closeModal(false)}>
+                    <button className="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onClick={() => closeModal(false)}>
                         Close
                     </button>
                     

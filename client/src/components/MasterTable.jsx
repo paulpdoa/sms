@@ -40,7 +40,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const handleEditClick = (record) => {
         navigate(`${location.pathname}?page=${currentPage}`);
         onOpenPopup && onOpenPopup(true)
-        setEditId(record._id);       
+        setEditId(record._id); 
     };
 
     useEffect(() => {
@@ -234,8 +234,10 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                             <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
                                                         </>
                                                     ) : (
-                                                        <>
-                                                            <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
+                                                        <>  
+                                                            { onUpdate !== undefined && 
+                                                                <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
+                                                            }                                                            
                                                             <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
                                                         </>
                                                     ) : 
@@ -256,7 +258,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                 ))
                             ) : (
                                 <tr className="border-b hover:bg-gray-100 w-full">
-                                    <td className="px-6 py-4 text-xl animate-pulse">Nothing to display</td>
+                                    <td className="px-6 py-4 text-xl animate-pulse text-nowrap">Nothing to display</td>
                                 </tr>
                             )
                         ) : (

@@ -48,7 +48,7 @@ route.post('/manage-fee',add_manage_fees);
 route.get('/manage-fee/:id',allowUserView(userRoles),get_manage_fee_detail);
 route.delete('/manage-fee/:id',delete_manage_fee);
 route.patch('/manage-fee/:id',edit_manage_fee);
-route.get('/generate-fees/:currentYear',allowUserView(userRoles),generate_fees);
+route.post('/generate-fees',allowUserAction(userRoles),generate_fees);
 route.post('/automate-fees',automate_fees);
 
 // Student Payment

@@ -74,7 +74,8 @@ get_nationality_codes,
 add_nationality_code,
 get_nationality_code_detail,
 edit_nationality_code,
-delete_nationality_code} = require('../controller/masterController');
+delete_nationality_code,
+close_school_year} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction } = require('../middleware/middlewares');
@@ -152,6 +153,7 @@ route.post('/school-year', add_school_year);
 route.put('/school-year/:id', delete_school_year);
 route.get('/school-year/:id', get_school_year_detail);
 route.patch('/school-year/:id',edit_school_year);
+route.patch('/close-school-year',close_school_year);
 
 // User
 route.get('/users',allowUserView(userRoles), get_users);
