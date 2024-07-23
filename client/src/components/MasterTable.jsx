@@ -235,9 +235,9 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                         </>
                                                     ) : (
                                                         <>  
-                                                            { onUpdate !== undefined && 
+                                                            {/* { onUpdate !== undefined &&  */}
                                                                 <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
-                                                            }                                                            
+                                                            {/* }                                                             */}
                                                             <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
                                                         </>
                                                     ) : 

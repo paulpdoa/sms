@@ -75,7 +75,7 @@ function App() {
         <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
           <Route path='/' element={<Dashboard />} />
 
-          <Route path='/students' element={<Students />} />
+          <Route path='/students' element={ isFreshYear ? <Navigate to='/master/school-year' /> : <Students />} />
           <Route path='/admission' element={<Admission />} />
           <Route path='/registrar' element={<Registrar />}>
             <Route path='new-student' element={<NewStudent />} />
