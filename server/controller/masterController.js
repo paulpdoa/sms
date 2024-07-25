@@ -642,53 +642,68 @@ module.exports.add_school_year = async (req, res) => {
     try {
         // Create the new school year
         const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear: yearEnd, startYear: yearStart, isYearDone, sessionName });
+        console.log('New school year created:', newSy);
 
         // Get the previous school year
         const previousSy = await SchoolYear.findOne({ isYearDone: false }).sort({ startYear: -1 });
+        console.log('Previous school year found:', previousSy);
 
         const gradeLevels = await GradeLevel.find();
+        console.log('Grade levels found:', gradeLevels);
 
         if (previousSy) {
             const previousSyId = previousSy._id;
 
             // Copy Student Academic records
             const academics = await Academic.find({ sessionId: previousSyId });
-            for(const academic of academics) {
+            console.log('Academics found:', academics);
+
+            for (const academic of academics) {
                 const { sessionId, sectionId, paymentTermId, gradeLevelId, departmentId, ...rest } = academic.toObject();
                 await Academic.create({ 
                     ...rest,
                     sessionId: newSy._id,
                 });
+                console.log('Academic record copied:', rest);
             }
 
             // Copy Sections records
             const sections = await Section.find({ sessionId: previousSyId });
-            for(const section of sections) {
+            console.log('Sections found:', sections);
+
+            for (const section of sections) {
                 const { sessionId, ...rest } = section.toObject();
                 await Section.create({
                     ...rest,
                     sessionId: newSy._id,
                 });
+                console.log('Section record copied:', rest);
             }
 
             // Copy Requirements records
             const requirements = await Requirement.find({ sessionId: previousSyId });
-            for(const requirement of requirements) {
+            console.log('Requirements found:', requirements);
+
+            for (const requirement of requirements) {
                 const { sessionId, ...rest } = requirement.toObject();
                 await Requirement.create({ 
                     ...rest,
                     sessionId: newSy._id 
                 });
+                console.log('Requirement record copied:', rest);
             }
 
             // Copy Discounts records
             const discounts = await Discount.find({ sessionId: previousSyId });
-            for(const discount of discounts) {
+            console.log('Discounts found:', discounts);
+
+            for (const discount of discounts) {
                 const { sessionId, ...rest } = discount.toObject();
                 await Discount.create({ 
                     ...rest,
                     sessionId: newSy._id 
                 });
+                console.log('Discount record copied:', rest);
             }
 
             // Add empty sections for each grade level
@@ -698,15 +713,17 @@ module.exports.add_school_year = async (req, res) => {
                     { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true },
                     { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true }
                 ]);
+                console.log('Empty sections added for grade level:', gradeLevel);
             }
         }
 
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
     } catch (err) {
-        console.error(err);
+        console.error('Error occurred:', err);
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
 }
+
 
 
 // module.exports.add_school_year = async (req,res) => {

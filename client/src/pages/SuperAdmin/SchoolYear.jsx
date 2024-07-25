@@ -104,7 +104,7 @@ const SchoolYear = () => {
 
             setTimeout(() => {
                 ['session','username','role','id','isFreshYear'].forEach(lclstg => localStorage.removeItem(lclstg))
-                removeCookie('userToken',{ path: '/login' });
+                removeCookie('userToken',{ path: '/' });
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -130,7 +130,7 @@ const SchoolYear = () => {
             setTimeout(() => {
                 // Remove userToken cookie
                 ['session','username','role','id','isFreshYear'].forEach(lclstg => localStorage.removeItem(lclstg))
-                removeCookie('userToken',{ path: '/login' });
+                removeCookie('userToken',{ path: '/' });
                 navigate('/login');
             }, 2000);
         } catch(err) {
