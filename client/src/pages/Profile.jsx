@@ -91,7 +91,7 @@ const Profile = () => {
                 <form onSubmit={(e) => { e.preventDefault(); handleProfileUpdate(); }} className="space-y-4">
                     <div className="flex justify-center mb-4">
                         <img
-                            src={`${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                            src={profilePictureUrl ? `${baseUrl()}${profilePictureUrl}` : '/avatar/avatar.png'}
                             alt="Profile"
                             className="w-24 h-24 rounded-full object-cover"
                         />

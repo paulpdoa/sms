@@ -637,7 +637,7 @@ module.exports.get_school_years = async (req,res) => {
 module.exports.add_school_year = async (req, res) => {
     const { syTheme, yearEnd, yearStart } = req.body;
     const isYearDone = false;
-    const sessionName = yearStart.split('-')[0] + '-' + yearEnd.split('-')[0]; 
+    const sessionName = `${yearStart.split('-')[0]}-${yearEnd.split('-')[0]}`; 
 
     try {
         // Create the new school year
@@ -654,67 +654,49 @@ module.exports.add_school_year = async (req, res) => {
             // Copy Student Academic records
             const academics = await Academic.find({ sessionId: previousSyId });
             for(const academic of academics) {
+                const { sessionId, sectionId, paymentTermId, gradeLevelId, departmentId, ...rest } = academic.toObject();
                 await Academic.create({ 
-                    ...academic,
-                    _id: undefined, 
-                    sessionId: newSy._id ,
-                    sectionId: undefined,
-                    paymentTermId: undefined,
-                    gradeLevelId: undefined,
-                    departmentId: undefined
+                    ...rest,
+                    sessionId: newSy._id,
                 });
             }
-            // const academicsCopy = academics.map(academic => ({
-            //     ...academic.toObject(),
-            //     _id: undefined, // Remove _id to create new records
-            //     sessionId: newSy._id,
-            //     sectionId: undefined,
-            //     paymentTermId: undefined,
-            //     gradeLevelId: undefined,
-            //     departmentId: undefined
-            // }));
-            // await Academic.insertMany(academicsCopy);
 
             // Copy Sections records
-            // const sections = await Section.find({ sessionId: previousSyId });
-            // const sectionsCopy = sections.map(section => ({
-            //     ...section.toObject(),
-            //     _id: undefined, // Remove _id to create new records
-            //     sessionId: newSy._id
-            // }));
-            // await Section.insertMany(sectionsCopy);
+            const sections = await Section.find({ sessionId: previousSyId });
+            for(const section of sections) {
+                const { sessionId, ...rest } = section.toObject();
+                await Section.create({
+                    ...rest,
+                    sessionId: newSy._id,
+                });
+            }
 
             // Copy Requirements records
             const requirements = await Requirement.find({ sessionId: previousSyId });
             for(const requirement of requirements) {
-                await Requirement.create({ ...requirement,_id: undefined, sessionId: newSy._id });
+                const { sessionId, ...rest } = requirement.toObject();
+                await Requirement.create({ 
+                    ...rest,
+                    sessionId: newSy._id 
+                });
             }
-            // const requirementsCopy = requirements.map(requirement => ({
-            //     ...requirement.toObject(),
-            //     _id: undefined, // Remove _id to create new records
-            //     sessionId: newSy._id
-            // }));
-            // await Requirement.insertMany(requirementsCopy);
 
             // Copy Discounts records
             const discounts = await Discount.find({ sessionId: previousSyId });
             for(const discount of discounts) {
-                await Discount.create({ ...discount,_id: undefined, sessionId: newSy._id });
+                const { sessionId, ...rest } = discount.toObject();
+                await Discount.create({ 
+                    ...rest,
+                    sessionId: newSy._id 
+                });
             }
-            // const discountsCopy = discounts.map(discount => ({
-            //     ...discount.toObject(),
-            //     _id: undefined, // Remove _id to create new records
-            //     sessionId: newSy._id
-            // }));
-            // await Discount.insertMany(discountsCopy);
 
             // Add empty sections for each grade level
-            // const gradeLevels = gradeLevels.map(gl => gl.gradeLevel) // Update this list based on your needs
             for (const gradeLevel of gradeLevels) {
                 await Section.insertMany([
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true  },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true  }
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true }
                 ]);
             }
         }
@@ -725,6 +707,7 @@ module.exports.add_school_year = async (req, res) => {
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
 }
+
 
 // module.exports.add_school_year = async (req,res) => {
 

@@ -36,7 +36,7 @@ const Navbar = () => {
 
         setTimeout(() => {
             // Remove userToken cookie
-            removeCookie('userToken',{ path: '/login' });
+            removeCookie('userToken',{ path: '/' });
             navigate('/login');
         }, 2000);
     };
