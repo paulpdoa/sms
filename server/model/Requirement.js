@@ -9,7 +9,6 @@ const requirementSchema = new mongoose.Schema({
     requirement: {
         type:String,
         required:true,
-        unique:true
     },
     isRequired: {
         type: Boolean,

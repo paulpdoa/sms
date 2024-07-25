@@ -8,7 +8,6 @@ import { MainContext } from '../helpers/MainContext';
 const DashboardLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const { isFreshYear } = useContext(MainContext);
-    console.log(isFreshYear);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);

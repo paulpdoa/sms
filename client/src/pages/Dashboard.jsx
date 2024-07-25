@@ -53,8 +53,8 @@ const Dashboard = () => {
 
     if (academics) {
       const gradeCounts = {};
-      gradeLevels.forEach(gl => {
-        gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.gradeLevelId.gradeLevel.toLowerCase() === gl.gradeLevel.toLowerCase()).length;
+      gradeLevels?.forEach(gl => {
+        gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
       });
       setGradeLevelCounts(gradeCounts);
     }

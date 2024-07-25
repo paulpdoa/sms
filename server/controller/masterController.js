@@ -637,16 +637,21 @@ module.exports.get_school_years = async (req,res) => {
 module.exports.add_school_year = async (req, res) => {
     const { syTheme, yearEnd, yearStart } = req.body;
     const isYearDone = false;
-    const sessionName = `${yearStart.split('-')[0]}-${yearEnd.split('-')[0]}`; 
-
+    const sessionName = `${yearStart.split('-')[0]}-${yearEnd.split('-')[0]}`;
+    
     try {
+
+        if(syTheme === '' || yearEnd === '' || yearStart === '') {
+            res.status(500).json({ mssg: 'All fields must be filled, please try again' });
+            return
+        }
+        // Get the previous school year
+        const previousSy = await SchoolYear.findOne({ isYearDone: true }).sort({ startYear: -1 });
+        console.log('Previous school year found:', previousSy);
+
         // Create the new school year
         const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear: yearEnd, startYear: yearStart, isYearDone, sessionName });
         console.log('New school year created:', newSy);
-
-        // Get the previous school year
-        const previousSy = await SchoolYear.findOne({ isYearDone: false }).sort({ startYear: -1 });
-        console.log('Previous school year found:', previousSy);
 
         const gradeLevels = await GradeLevel.find();
         console.log('Grade levels found:', gradeLevels);
@@ -660,25 +665,27 @@ module.exports.add_school_year = async (req, res) => {
 
             for (const academic of academics) {
                 const { sessionId, sectionId, paymentTermId, gradeLevelId, departmentId, ...rest } = academic.toObject();
-                await Academic.create({ 
+                await Academic.create({
                     ...rest,
+                    _id: undefined,
                     sessionId: newSy._id,
                 });
                 console.log('Academic record copied:', rest);
             }
 
-            // Copy Sections records
-            const sections = await Section.find({ sessionId: previousSyId });
-            console.log('Sections found:', sections);
+            // // Copy Sections records
+            // const sections = await Section.find({ sessionId: previousSyId });
+            // console.log('Sections found:', sections);
 
-            for (const section of sections) {
-                const { sessionId, ...rest } = section.toObject();
-                await Section.create({
-                    ...rest,
-                    sessionId: newSy._id,
-                });
-                console.log('Section record copied:', rest);
-            }
+            // for (const section of sections) {
+            //     const { sessionId, ...rest } = section.toObject();
+            //     await Section.create({
+            //         ...rest,
+            //         _id: undefined,
+            //         sessionId: newSy._id,
+            //     });
+            //     console.log('Section record copied:', rest);
+            // }
 
             // Copy Requirements records
             const requirements = await Requirement.find({ sessionId: previousSyId });
@@ -686,9 +693,10 @@ module.exports.add_school_year = async (req, res) => {
 
             for (const requirement of requirements) {
                 const { sessionId, ...rest } = requirement.toObject();
-                await Requirement.create({ 
+                await Requirement.create({
                     ...rest,
-                    sessionId: newSy._id 
+                    _id: undefined,
+                    sessionId: newSy._id
                 });
                 console.log('Requirement record copied:', rest);
             }
@@ -699,9 +707,10 @@ module.exports.add_school_year = async (req, res) => {
 
             for (const discount of discounts) {
                 const { sessionId, ...rest } = discount.toObject();
-                await Discount.create({ 
+                await Discount.create({
                     ...rest,
-                    sessionId: newSy._id 
+                    _id: undefined,
+                    sessionId: newSy._id
                 });
                 console.log('Discount record copied:', rest);
             }
@@ -720,9 +729,10 @@ module.exports.add_school_year = async (req, res) => {
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
     } catch (err) {
         console.error('Error occurred:', err);
-        res.status(500).json({ error: 'An unexpected error occurred' });
+        res.status(500).json({ mssg: 'An unexpected error occurred' });
     }
 }
+
 
 
 

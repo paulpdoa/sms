@@ -196,7 +196,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const { records: user } = useFetch(`${baseUrl()}/user/${currentUserId}`);
-    console.log(user);
     const currentSy = schoolYear 
         ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
         : 'Loading...';    

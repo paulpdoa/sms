@@ -22,7 +22,6 @@ const discountSchema = new mongoose.Schema({
     discountType: {
         type: String,
         unique:true,
-        required: true
     },
     discountPercent: requiredNumber,
     amount: {

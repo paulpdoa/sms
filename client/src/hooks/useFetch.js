@@ -36,9 +36,7 @@ export const useFetch = (url) => {
             setIsLoading(false);
             setRecords(data.data);
          } catch(err) {
-            console.log(err);
             const data = err.response?.data;
-            console.log(data);
             setError(data.mssg);
             navigate(data.redirect);
          }

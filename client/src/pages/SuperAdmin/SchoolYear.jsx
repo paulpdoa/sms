@@ -108,6 +108,16 @@ const SchoolYear = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     };
 
