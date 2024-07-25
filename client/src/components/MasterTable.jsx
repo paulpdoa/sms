@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MainContext } from '../helpers/MainContext';
 import { baseUrl } from '../baseUrl';
 import { useFetch } from '../hooks/useFetch';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions, onShow }) => {
     const [editId, setEditId] = useState(null);
@@ -178,99 +179,143 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                             {(!disableAction && isFreshYear === null) && <th className="py-3 px-6">Actions</th>}
                         </tr>
                     </thead>
-                    <tbody>
-                        { !isLoading ? (
-                            currentRows.length > 0 ? (
-                                currentRows.map((record) => (
-                                    <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
-                                        {columns.map(column => (
-                                            <td key={column.accessorKey} className="px-6 py-4">
-                                                {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
-                                                    column.editable ? (
-                                                        column.selectOptions ? (
-                                                            <select
-                                                                name={column.accessorKey}
-                                                                value={editValues[column.accessorKey] || ''}
-                                                                onChange={(e) => handleInputChange(e, column)}
-                                                                className="outline-none p-1 rounded-md border border-gray-300"
-                                                            >   
-                                                                <option value={record._id || ''} hidden>
-                                                                    { 
-                                                                        column.header === 'Adviser' ? record.adviser.name : 
-                                                                        column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
-                                                                        column.header === 'Department' ? record.department.department : 
-                                                                        column.header === 'Fee Category' ? record.feeCateg.feeCateg : 
-                                                                        column.header
-                                                                    }
-                                                                   
-                                                                </option>
-                                                                {column.selectOptions.map(option => (
-                                                                    <option key={option.value} value={option.value}>{option.label}</option>
-                                                                ))}
-                                                            </select>
+                    <AnimatePresence mode="wait">
+                        <motion.tbody
+                            key={currentPage} // use currentPage as key to trigger re-render on page change
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            { !isLoading ? (
+                                currentRows.length > 0 ? (
+                                    currentRows.map((record) => (
+                                        <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
+                                            {columns.map(column => (
+                                                <td key={column.accessorKey} className="px-6 py-4">
+                                                    {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                                        column.editable ? (
+                                                            column.selectOptions ? (
+                                                                <select
+                                                                    name={column.accessorKey}
+                                                                    value={editValues[column.accessorKey] || ''}
+                                                                    onChange={(e) => handleInputChange(e, column)}
+                                                                    className="outline-none p-1 rounded-md border border-gray-300"
+                                                                >   
+                                                                    <option value={record._id || ''} hidden>
+                                                                        { 
+                                                                            column.header === 'Adviser' ? record.adviser.name : 
+                                                                            column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
+                                                                            column.header === 'Department' ? record.department.department : 
+                                                                            column.header === 'Fee Category' ? record.feeCateg.feeCateg : 
+                                                                            column.header
+                                                                        }
+                                                                    
+                                                                    </option>
+                                                                    {column.selectOptions.map(option => (
+                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                    ))}
+                                                                </select>
+                                                            ) : (
+                                                                <input
+                                                                    name={column.accessorKey}
+                                                                    value={editValues[column.accessorKey] || ''}
+                                                                    onChange={(e) => handleInputChange(e, column)}
+                                                                    className="outline-none p-1 rounded-md border border-gray-300"
+                                                                    type={column.type || ''}
+                                                                />
+                                                            )
                                                         ) : (
-                                                            <input
-                                                                name={column.accessorKey}
-                                                                value={editValues[column.accessorKey] || ''}
-                                                                onChange={(e) => handleInputChange(e, column)}
-                                                                className="outline-none p-1 rounded-md border border-gray-300"
-                                                                type={column.type || ''}
-                                                            />
+                                                            column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
                                                         )
                                                     ) : (
                                                         column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                                    )
-                                                ) : (
-                                                    column.accessorKey.split('.').reduce((obj, key) => obj[key], record)
-                                                )}
-                                            </td>
-                                        ))}
-                                        { (isFreshYear === null) && (
-                                        !disableAction &&
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                { !actions ? (
-                                                    !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
-                                                        <>
-                                                            <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
-                                                            <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>  
-                                                            {/* { onUpdate !== undefined &&  */}
-                                                                <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
-                                                            {/* }                                                             */}
-                                                            <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
-                                                        </>
+                                                    )}
+                                                </td>
+                                            ))}
+                                            { (isFreshYear === null) && (
+                                            !disableAction &&
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    { !actions ? (
+                                                        !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
+                                                            <>
+                                                                <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
+                                                                <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                                                            </>
+                                                        ) : (
+                                                            <>  
+                                                                {/* { onUpdate !== undefined &&  */}
+                                                                    <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
+                                                                {/* }                                                             */}
+                                                                <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
+                                                            </>
+                                                        ) : 
+                                                        <button onClick={() => {
+                                                            if(onShow) {
+                                                                onShow(true)
+                                                                viewRecord(record)
+                                                            } else {
+                                                                viewRecord(record)
+                                                            }
+                                                        }} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
                                                     ) : 
-                                                    <button onClick={() => {
-                                                        if(onShow) {
-                                                            onShow(true)
-                                                            viewRecord(record)
-                                                        } else {
-                                                            viewRecord(record)
-                                                        }
-                                                    }} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
-                                                ) : 
-                                                    actions(record)
-                                                }
-                                            </td>
-                                        ) }
+                                                        actions(record)
+                                                    }
+                                                </td>
+                                            ) }
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={columns.length + 1} className="py-4 px-6 text-center text-gray-500">
+                                            No data found
+                                        </td>
                                     </tr>
-                                ))
+                                )
                             ) : (
-                                <tr className="border-b hover:bg-gray-100 w-full">
-                                    <td className="px-6 py-4 text-xl animate-pulse text-nowrap">Nothing to display</td>
+                                <tr>
+                                    <td colSpan={columns.length + 1} className="py-4 px-6 text-center text-gray-500">
+                                        Loading...
+                                    </td>
                                 </tr>
-                            )
-                        ) : (
-                            <tr className="border-b hover:bg-gray-100 w-full">
-                                <td className="px-6 py-4 text-xl animate-pulse">Loading please wait...</td>
-                            </tr>
-                        ) }
-                    </tbody>
+                            ) }
+                        </motion.tbody>
+                    </AnimatePresence>
                 </table>
             </div>
-            <div className="pagination mt-4 flex justify-center items-center">
+            {filteredData.length > rowsPerPage && (
+                <div className="flex justify-between items-center py-3 px-6 bg-white border-t border-gray-200">
+                    <div className="text-sm text-gray-700">
+                        Showing {indexOfFirstRow + 1} to {indexOfLastRow > filteredData.length ? filteredData.length : indexOfLastRow} of {filteredData.length} results
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                        >
+                            Previous
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => paginate(page)}
+                                className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
+            {/* <div className="pagination mt-4 flex justify-center items-center">
                 <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -312,7 +357,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 >
                     Next
                 </button>
-            </div>
+            </div> */}
         </>
     );
 };

@@ -14,7 +14,6 @@ const AddNewData = ({ label,onShow }) => {
 
     const location = useLocation();
     const isSchoolYearPage = location.pathname.includes('school-year');
-    console.log(isFreshYear,isYearDone,isSchoolYearPage);
 
     return (
         <>

@@ -17,6 +17,9 @@ const Sibling = require('../model/Sibling');
 const NationalityCode = require('../model/NationalityCode');
 const PaymentSchedule = require('../model/PaymentSchedule');
 const StudentPayment = require('../model/StudentPayment');
+const Academic = require('../model/Academic');
+const Discount = require('../model/Discount');
+
 const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
@@ -631,20 +634,97 @@ module.exports.get_school_years = async (req,res) => {
     }
 }
 
-module.exports.add_school_year = async (req,res) => {
-
-    const { syTheme,yearEnd,yearStart } = req.body;
+module.exports.add_school_year = async (req, res) => {
+    const { syTheme, yearEnd, yearStart } = req.body;
     const isYearDone = false;
-
     const sessionName = yearStart.split('-')[0] + '-' + yearEnd.split('-')[0]; 
 
     try {
-        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart,isYearDone, sessionName });
+        // Create the new school year
+        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear: yearEnd, startYear: yearStart, isYearDone, sessionName });
+
+        // Get the previous school year
+        const previousSy = await SchoolYear.findOne({ isYearDone: false }).sort({ startYear: -1 });
+
+        const gradeLevels = await GradeLevel.find();
+
+        if (previousSy) {
+            const previousSyId = previousSy._id;
+
+            // Copy Student Academic records
+            const academics = await Academic.find({ sessionId: previousSyId });
+            const academicsCopy = academics.map(academic => ({
+                ...academic.toObject(),
+                _id: undefined, // Remove _id to create new records
+                sessionId: newSy._id
+            }));
+            await Academic.insertMany(academicsCopy);
+
+            // Copy Sections records
+            const sections = await Section.find({ sessionId: previousSyId });
+            const sectionsCopy = sections.map(section => ({
+                ...section.toObject(),
+                _id: undefined, // Remove _id to create new records
+                sessionId: newSy._id
+            }));
+            await Section.insertMany(sectionsCopy);
+
+            // Copy Requirements records
+            const requirements = await Requirement.find({ sessionId: previousSyId });
+            const requirementsCopy = requirements.map(requirement => ({
+                ...requirement.toObject(),
+                _id: undefined, // Remove _id to create new records
+                sessionId: newSy._id
+            }));
+            await Requirement.insertMany(requirementsCopy);
+
+            // Copy Discounts records
+            const discounts = await Discount.find({ sessionId: previousSyId });
+            const discountsCopy = discounts.map(discount => ({
+                ...discount.toObject(),
+                _id: undefined, // Remove _id to create new records
+                sessionId: newSy._id
+            }));
+            await Discount.insertMany(discountsCopy);
+
+            // Add empty sections for each grade level
+            // const gradeLevels = gradeLevels.map(gl => gl.gradeLevel) // Update this list based on your needs
+            for (const gradeLevel of gradeLevels) {
+                await Section.insertMany([
+                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true  },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true  }
+                ]);
+            }
+        }
+
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
-    } catch(err) {
-        console.log(err);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'An unexpected error occurred' });
     }
 }
+
+// module.exports.add_school_year = async (req,res) => {
+
+//     const { syTheme,yearEnd,yearStart } = req.body;
+//     const isYearDone = false;
+//     const sessionName = yearStart.split('-')[0] + '-' + yearEnd.split('-')[0]; 
+
+//     // Create a function for copying records in previous schoolYear
+//     // Siguro pwede i-automate ang paglagay ng data pag nagcreate ng bagong school year: 
+//     // Student Academic table (copy previous SY students and paste)
+//     // Sections table (append 3 rows every gradlevel with blank section name)
+//     // Requirements table (copy previous requirements and paste)
+//     // Discount table (copy previous discount and paste)
+
+//     try {
+//         const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart,isYearDone, sessionName });
+//         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
+//     } catch(err) {
+//         console.log(err);
+//     }
+// }
 
 module.exports.delete_school_year = async (req,res) => {
     const { id } = req.params;

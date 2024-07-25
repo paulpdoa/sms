@@ -103,7 +103,7 @@ const SchoolYear = () => {
             });
 
             setTimeout(() => {
-                ['session','username','role','id'].forEach(lclstg => localStorage.removeItem(lclstg))
+                ['session','username','role','id','isFreshYear'].forEach(lclstg => localStorage.removeItem(lclstg))
                 removeCookie('userToken',{ path: '/login' });
             }, 2000);
         } catch (err) {
@@ -129,7 +129,7 @@ const SchoolYear = () => {
 
             setTimeout(() => {
                 // Remove userToken cookie
-                ['session','username','role','id'].forEach(lclstg => localStorage.removeItem(lclstg))
+                ['session','username','role','id','isFreshYear'].forEach(lclstg => localStorage.removeItem(lclstg))
                 removeCookie('userToken',{ path: '/login' });
                 navigate('/login');
             }, 2000);
