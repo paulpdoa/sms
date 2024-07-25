@@ -14,9 +14,11 @@ const AddTextbookBtn = () => {
     
     return (
         <div>
-            <Link to='/new-textbook' onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                <GiBookshelf /> Add New Textbook
-            </Link>                
+            {!isYearDone && (
+                <Link to='/new-textbook' onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <GiBookshelf /> Add New Textbook
+                </Link>
+            )}                
         </div>
     )
 }

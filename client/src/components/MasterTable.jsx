@@ -12,7 +12,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const [rowsPerPage,setRowsPerPage] = useState(10); // Set the number of rows per page
 
     // For disabling currentSchoolyear logged in session
-    const { session } = useContext(MainContext);
+    const { session,isFreshYear } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear?.isYearDone;
 
@@ -175,7 +175,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                     </div>
                                 </th>
                             ))}
-                            {!disableAction && <th className="py-3 px-6">Actions</th>}
+                            {(!disableAction && isFreshYear === null) && <th className="py-3 px-6">Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -225,7 +225,8 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                 )}
                                             </td>
                                         ))}
-                                        {!disableAction &&
+                                        { (isFreshYear === null) && (
+                                        !disableAction &&
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 { !actions ? (
                                                     !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
@@ -253,7 +254,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                     actions(record)
                                                 }
                                             </td>
-                                        }
+                                        ) }
                                     </tr>
                                 ))
                             ) : (

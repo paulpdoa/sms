@@ -5,7 +5,6 @@ import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useState, useContext } from 'react';
-import ReusableTable from "../../components/ReusableTable";
 import { MainContext } from '../../helpers/MainContext';
 import ConfirmationPopup from "../../components/ConfirmationPopup";
 import MasterTable from "../../components/MasterTable";
@@ -23,6 +22,8 @@ const PaymentSchedule = () => {
     const [openPopup, setOpenPopup] = useState(false);
 
     const { session, role } = useContext(MainContext);
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear.isYearDone;
 
     const generatePaymentSchedule = async (isReset) => {
         setIsLoading(true);
@@ -73,12 +74,12 @@ const PaymentSchedule = () => {
                     <Searchbar onSearch={setSearchQuery} />
 
                     {records.length < 1 ?
-                        <button onClick={() => generatePaymentSchedule(false)} className="items-end text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer text-white p-2 rounded-md">
+                        <button onClick={() => !isYearDone && generatePaymentSchedule(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>
                             {isLoading ? 'Loading...' : 'Generate Payment Schedule'}
                         </button>
                         :
                         // If the user tried to re-generate payment schedule, create a function where it will delete the contents of PaymentSchedule table and generate new schedule
-                        <button onClick={() => setOpenPopup(true)} className="items-end text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer text-white p-2 rounded-md">
+                        <button onClick={() => !isYearDone && setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>
                             {isLoading ? 'Loading...' : 'Re-generate Payment Schedule'}
                         </button>
                     }

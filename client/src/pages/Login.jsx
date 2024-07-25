@@ -24,7 +24,12 @@ const Login = () => {
             localStorage.setItem('role', data.data.role);
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
-            localStorage.setItem('session', schoolYear);
+            
+            if(schoolYear === 'true') {
+                localStorage.setItem('isFreshYear',schoolYear);
+            } else {
+                localStorage.setItem('session', schoolYear);
+            }
 
             toast.success(data.data.mssg, {
                 position: "top-center",
@@ -38,11 +43,7 @@ const Login = () => {
             });
             setTimeout(() => {
                 setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
-                if(localStorage.getItem('session') === 'fresh-year') {
-                    navigate('/master/school-year')
-                } else {
-                    navigate(data.data.redirect);
-                }
+                navigate(data.data.redirect);
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -94,7 +95,7 @@ const Login = () => {
                             {schoolYears?.map(sy => (
                                 <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]} {sy.isYearDone && 'Done'}</option>
                             ))}
-                            <option value="fresh-year">Create new school year</option>
+                            <option value={true}>Create new school year</option>
                         </select>
                     </div>
                 ) }

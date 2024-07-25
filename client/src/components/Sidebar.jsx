@@ -191,10 +191,9 @@ const initialMenus = [
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-    const { role: currentRole, currentUser, currentUserId, session: sessionId, setShowForm } = useContext(MainContext);
+    const { role: currentRole, currentUser, currentUserId, session: sessionId, setShowForm,isFreshYear} = useContext(MainContext);
 
     const navigate = useNavigate();
-
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const currentSy = schoolYear 
         ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
@@ -239,7 +238,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <div className="bg-gray-200 shadow-sm border-b border-gray-300 p-3 flex items-center justify-between gap-2">
                         <h1 className="font-semibold text-3xl text-gray-700">SMS</h1>
                         <div className="flex items-center gap-2">
-                            <span className="font-normal text-sm text-gray-700">{currentSy}</span>
+                            <span className="font-normal text-xs text-gray-700">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
                             <button onClick={toggleSidebar} className="text-gray-700 hover:scale-110 hover:transition">
                                 <MdClose size={24} />
                             </button>

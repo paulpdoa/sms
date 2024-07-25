@@ -12,14 +12,13 @@ export const MainProvider = ({ children }) => {
   const [showForm,setShowForm] = useState(false);
 
   const [cookies, setCookie] = useCookies(['userToken']);
-
   
   const session = localStorage.getItem('session');
   const currentUserId = localStorage.getItem('id');
   const currentUser = localStorage.getItem('username');
   const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
-  const isFreshYear = localStorage.getItem('session') === 'fresh-year';
+  const isFreshYear = localStorage.getItem('isFreshYear');
 
   return (
     <MainContext.Provider value={{ 

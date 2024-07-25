@@ -11,9 +11,11 @@ const AddUserBtn = () => {
     const isYearDone = schoolYear.isYearDone;
     return (
         <div>
-            <Link onClick={(e) => isYearDone && e.preventDefault() } to='/new-user' className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                <PiStudentFill /> Add New User
-            </Link>                
+            { !isYearDone && (
+                <Link onClick={(e) => isYearDone && e.preventDefault() } to='/new-user' className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <PiStudentFill /> Add New User
+                </Link>
+            )}                
         </div>
     )
 }

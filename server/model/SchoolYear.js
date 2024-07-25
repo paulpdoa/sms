@@ -15,6 +15,9 @@ const schoolYearSchema = new mongoose.Schema({
     isYearDone: {
         type: Boolean,
         required: true
+    },
+    sessionName: {
+        type: String
     }
 }, { timestamps: true });
 

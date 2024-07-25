@@ -18,9 +18,10 @@ const SchoolYear = () => {
     const [yearEnd, setYearEnd] = useState('');
     const [syTheme, setSyTheme] = useState('');
     const [openPopup, setOpenPopup] = useState(false);
+    const [closeYear,setCloseYear] = useState(false);
     const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
 
-    const { role, currentUserId, showForm, searchQuery, setShowForm,session } = useContext(MainContext);
+    const { role, currentUserId, showForm, searchQuery, setShowForm,session,isFreshYear } = useContext(MainContext);
     const { records:schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
 
@@ -102,7 +103,8 @@ const SchoolYear = () => {
             });
 
             setTimeout(() => {
-                window.location.reload();
+                ['session','username','role','id'].forEach(lclstg => localStorage.removeItem(lclstg))
+                removeCookie('userToken',{ path: '/login' });
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -110,6 +112,8 @@ const SchoolYear = () => {
     };
 
     const closeSchoolYear = async () => {
+        setCloseYear(true);
+
         try {
             const data = await axios.patch(`${baseUrl()}/close-school-year`,{ sessionId: session });
             toast.success(data.data.mssg, {
@@ -125,6 +129,7 @@ const SchoolYear = () => {
 
             setTimeout(() => {
                 // Remove userToken cookie
+                ['session','username','role','id'].forEach(lclstg => localStorage.removeItem(lclstg))
                 removeCookie('userToken',{ path: '/login' });
                 navigate('/login');
             }, 2000);
@@ -159,11 +164,14 @@ const SchoolYear = () => {
 
     return (
         <main className="p-2 relative">
-
             <TabActions title="School Year" />
             {/* Show this button when the school year viewed is still ongoing */}
             <div className="flex justify-end px-4">
-                { !isYearDone && <button onClick={closeSchoolYear} className={`bg-red-500 hover:bg-red-600 text-gray-100 p-2 rounded-md`}>Close School Year</button>}
+                { (!isYearDone && !isFreshYear) && 
+                <button onClick={() => setCloseYear(true)} className={`bg-red-500 hover:bg-red-600 text-gray-100 p-2 rounded-md`}>
+                    Close School Year
+                </button>
+                }
             </div>
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form, addSchoolYear, setShowForm) }
@@ -194,6 +202,14 @@ const SchoolYear = () => {
                         localStorage.removeItem('isConfirmedEdit');
                         setOpenPopup(false);
                     }}
+                /> 
+            }
+
+            { closeYear && 
+                <ConfirmationPopup 
+                    message="Are you sure you want to close this school year?"
+                    onConfirm={() => closeSchoolYear()}
+                    onClose={() => setCloseYear(false)}
                 /> 
             }
         </main>

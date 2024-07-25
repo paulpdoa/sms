@@ -13,7 +13,11 @@ const AddSiblingBtn = () => {
 
     return (
         <div>
-            <Link to='/registrar/new-sibling' onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}><PiStudentFill /> Add New Sibling</Link>                
+            { !isYearDone && (
+                <Link to='/registrar/new-sibling' onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <PiStudentFill /> Add New Sibling
+                </Link>                
+            ) }
         </div>
     )
 }

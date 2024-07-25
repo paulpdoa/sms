@@ -45,7 +45,7 @@ import EditSibling from "./pages/Registrar/EditSibling";
 import EditTeacher from "./pages/Registrar/EditTeacher";
 import EditParent from "./pages/Registrar/EditParent";
 import Discount from "./pages/Discount";
-import Assessment from './pages/Registrar/Assessment'
+import Assessment from './pages/Registrar/Assessment';
 import Sectioning from "./pages/Registrar/Sectioning";
 import ManageFees from "./pages/Registrar/ManageFees";
 import NewManageFee from "./pages/Registrar/NewManageFee";
@@ -60,12 +60,14 @@ import { useCookies } from 'react-cookie';
 import Profile from "./pages/Profile";
 
 function App() {
-
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
   const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
-  const isFreshYear = localStorage.getItem('session') === 'fresh-year';
-  console.log(isFreshYear);
+
+  const checkFreshYear = () => {
+    const isFreshYear = localStorage.getItem('isFreshYear');
+    return isFreshYear === 'true';
+  };
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -73,11 +75,10 @@ function App() {
         <Route path='/login' element={userToken ? <Navigate to='/' /> : <Login />} />
 
         <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
-          <Route path='/' element={<Dashboard />} />
-
-          <Route path='/students' element={ isFreshYear ? <Navigate to='/master/school-year' /> : <Students />} />
-          <Route path='/admission' element={<Admission />} />
-          <Route path='/registrar' element={<Registrar />}>
+          <Route path='/' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Dashboard />} />
+          <Route path='/students' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Students />} />
+          <Route path='/admission' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Admission />} />
+          <Route path='/registrar' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Registrar />}>
             <Route path='new-student' element={<NewStudent />} />
             <Route path='new-teacher' element={<NewTeacher />} />
             <Route path='edit-student/:id' element={<EditStudent />} />  
@@ -101,8 +102,8 @@ function App() {
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
             <Route path='nationality' element={<Nationality />} />
-              {/* <Route path='nationality-code' element={<NationalityCode />} />
-              <Route path='gender' element={<Gender />} /> */}
+            <Route path='nationality-code' element={<NationalityCode />} />
+            <Route path='gender' element={<Gender />} />
             <Route path='departments' element={<Department />} />
             <Route path='sections' element={<Section />} />
             <Route path='grade-levels' element={<GradeLevel />} />
@@ -134,28 +135,27 @@ function App() {
 
           <Route path='/profile/:id' element={<Profile />} />
 
-
           <Route path='/new-textbook' element={<NewTextbook />} />
-          <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin')  ? <SchoolAdmin /> : <Navigate to='/' /> }>
+          <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin') ? <SchoolAdmin /> : <Navigate to='/' />}>
             <Route path='new-teacher' element={<NewTeacher />} />
           </Route>
-        
+
           <Route path='/siblings' element={<Sibling />} />
           <Route path='/parents' element={<Parents />} />
           <Route path='/library' element={<Library />} />
           <Route path='/account' element={<Account />} />
           <Route path='/users' element={<Users />} />
-          <Route path='/settings' element={<Settings/>} />
+          <Route path='/settings' element={<Settings />} />
         </Route>
       </Route>
     )
-  )
+  );
 
   return (
     <MainProvider>
       <RouterProvider router={router} />
     </MainProvider>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -14,9 +14,11 @@ const AddParentBtn = () => {
 
     return (
         <div>
-            <Link onClick={(e) => isYearDone && e.preventDefault() } to='/registrar/new-parent' className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                <RiParentLine /> Add New Parent
-            </Link>                
+            { !isYearDone && (
+                <Link onClick={(e) => isYearDone && e.preventDefault() } to='/registrar/new-parent' className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <RiParentLine /> Add New Parent
+                </Link> 
+            ) }               
         </div>
     )
 }

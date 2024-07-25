@@ -636,8 +636,10 @@ module.exports.add_school_year = async (req,res) => {
     const { syTheme,yearEnd,yearStart } = req.body;
     const isYearDone = false;
 
+    const sessionName = yearStart.split('-')[0] + '-' + yearEnd.split('-')[0]; 
+
     try {
-        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart,isYearDone });
+        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear:yearEnd, startYear:yearStart,isYearDone, sessionName });
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
     } catch(err) {
         console.log(err);

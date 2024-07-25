@@ -21,7 +21,7 @@ const Navbar = () => {
         const message = 'Logout successful';
 
         // Clear user data from localStorage
-        ['userToken', 'username', 'role', 'id', 'session', 'user'].forEach(item => localStorage.removeItem(item));
+        ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
 
         toast.success(message, {
             position: "top-center",
