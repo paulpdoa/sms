@@ -78,7 +78,7 @@ delete_nationality_code,
 close_school_year} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
-const { allowUserView,allowUserAction } = require('../middleware/middlewares');
+const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
 
 const userRoles = ['School Admin', 'Super Admin'];
 
@@ -160,7 +160,7 @@ route.get('/users',allowUserView(userRoles), get_users);
 route.post('/user', add_user);
 route.put('/user/:id', delete_user);
 route.get('/user/:id',allowUserView(userRoles), get_user_detail);
-route.patch('/user/:id',edit_user);
+route.patch('/user/:id',upload.single('profilePicture'),edit_user);
 
 // Payment Term
 route.get('/payment-terms',allowUserView(userRoles), get_payment_terms);

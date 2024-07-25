@@ -1,4 +1,6 @@
 const Session = require('../model/SchoolYear');
+const multer = require('multer');
+
 
 const allowUserView = (roles) => {
     return (req,res,next) => {
@@ -36,5 +38,16 @@ const allowUserAction = (roles) => {
     }
 }
 
+// Set up multer for file storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+const upload = multer({ storage });
 
-module.exports = { allowUserView,allowUserAction };
+
+module.exports = { allowUserView,allowUserAction,upload };

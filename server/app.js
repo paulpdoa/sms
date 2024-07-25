@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const registrarRoute = require('./routes/registrarRoute');
 const masterRoute = require('./routes/masterRoute');
@@ -14,6 +15,8 @@ const uri = process.env.DB_URI;
 
 
 const port = process.env.PORT;
+
+
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 // const client = new MongoClient(uri, {
@@ -53,7 +56,7 @@ app.listen(port, async () => {
 // Use
 app.use(cors());
 app.use(express.json());
-
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 // Use routes
 app.use('/api/',registrarRoute);
 app.use('/api/',masterRoute);

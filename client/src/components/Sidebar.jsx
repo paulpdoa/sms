@@ -195,6 +195,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     const navigate = useNavigate();
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
+    const { records: user } = useFetch(`${baseUrl()}/user/${currentUserId}`);
+    console.log(user);
     const currentSy = schoolYear 
         ? `S.Y ${schoolYear.startYear?.split('-')[0] ?? ''}-${schoolYear.endYear?.split('-')[0] ?? ''}`
         : 'Loading...';    
@@ -246,7 +248,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </div>
     
                     <div onClick={() => navigate(`/profile/${currentUserId}`)} className="border border-gray-300 shadow-lg flex items-stretch gap-2 justify-start p-2 m-2 bg-gray-200 rounded-lg cursor-pointer hover:bg-gray-300">
-                        <FaRegUserCircle className="text-5xl" />
+                        <img className="w-16 h-16 rounded-full object-cover" src={ `${baseUrl()}${user.profilePictureUrl}` || '/avatar/avatar.png'} alt="Profile Picture" />
                         <div className="text-gray-700 flex flex-col">
                             <h2 className="text-lg">{currentUser}</h2>
                             <span className="text-xs">{currentRole}</span>

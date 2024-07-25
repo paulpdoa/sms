@@ -24,7 +24,7 @@ const DashboardLayout = () => {
             <div className={`transition-all duration-300 ${(isFreshYear === null && isSidebarOpen) ? 'col-span-8' : 'col-span-10'} h-full bg-gray-100`}>
                 <Navbar />
                 {!isSidebarOpen && isFreshYear === null && (    
-                    <button onClick={toggleSidebar} className="absolute top-4 left-4 text-gray-800">
+                    <button onClick={toggleSidebar} className="absolute top-6 left-4 text-gray-800">
                         <MdOutlineMenu size={24} />
                     </button>
                 )}

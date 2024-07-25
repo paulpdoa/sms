@@ -8,7 +8,7 @@ const requiredString = {
 const sectionSchema = new mongoose.Schema({
     section: {
         type:String,
-        required:true
+        // required:true
     },
     gradeLevel: {
         type: mongoose.Schema.Types.ObjectId, 

@@ -25,7 +25,10 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean
     },
-    password: requiredString
+    password: requiredString,
+    profilePictureUrl: {
+        type: String
+    }
 
 }, { timestamps: true });
 
@@ -50,6 +53,10 @@ userSchema.statics.login = async function(username,password,session) {
     if(schoolYears.length > 0 && !session) { // meaning no records yet
         // allow user to login wihout having to request for session
         throw Error('Session must not be empty');
+    }
+
+    if(!user.isActive) {
+        throw Error('Your user is not active, please contact your administrator for recovery');
     }
 
     if(user) {

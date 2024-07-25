@@ -653,47 +653,68 @@ module.exports.add_school_year = async (req, res) => {
 
             // Copy Student Academic records
             const academics = await Academic.find({ sessionId: previousSyId });
-            const academicsCopy = academics.map(academic => ({
-                ...academic.toObject(),
-                _id: undefined, // Remove _id to create new records
-                sessionId: newSy._id
-            }));
-            await Academic.insertMany(academicsCopy);
+            for(const academic of academics) {
+                await Academic.create({ 
+                    ...academic,
+                    _id: undefined, 
+                    sessionId: newSy._id ,
+                    sectionId: undefined,
+                    paymentTermId: undefined,
+                    gradeLevelId: undefined,
+                    departmentId: undefined
+                });
+            }
+            // const academicsCopy = academics.map(academic => ({
+            //     ...academic.toObject(),
+            //     _id: undefined, // Remove _id to create new records
+            //     sessionId: newSy._id,
+            //     sectionId: undefined,
+            //     paymentTermId: undefined,
+            //     gradeLevelId: undefined,
+            //     departmentId: undefined
+            // }));
+            // await Academic.insertMany(academicsCopy);
 
             // Copy Sections records
-            const sections = await Section.find({ sessionId: previousSyId });
-            const sectionsCopy = sections.map(section => ({
-                ...section.toObject(),
-                _id: undefined, // Remove _id to create new records
-                sessionId: newSy._id
-            }));
-            await Section.insertMany(sectionsCopy);
+            // const sections = await Section.find({ sessionId: previousSyId });
+            // const sectionsCopy = sections.map(section => ({
+            //     ...section.toObject(),
+            //     _id: undefined, // Remove _id to create new records
+            //     sessionId: newSy._id
+            // }));
+            // await Section.insertMany(sectionsCopy);
 
             // Copy Requirements records
             const requirements = await Requirement.find({ sessionId: previousSyId });
-            const requirementsCopy = requirements.map(requirement => ({
-                ...requirement.toObject(),
-                _id: undefined, // Remove _id to create new records
-                sessionId: newSy._id
-            }));
-            await Requirement.insertMany(requirementsCopy);
+            for(const requirement of requirements) {
+                await Requirement.create({ ...requirement,_id: undefined, sessionId: newSy._id });
+            }
+            // const requirementsCopy = requirements.map(requirement => ({
+            //     ...requirement.toObject(),
+            //     _id: undefined, // Remove _id to create new records
+            //     sessionId: newSy._id
+            // }));
+            // await Requirement.insertMany(requirementsCopy);
 
             // Copy Discounts records
             const discounts = await Discount.find({ sessionId: previousSyId });
-            const discountsCopy = discounts.map(discount => ({
-                ...discount.toObject(),
-                _id: undefined, // Remove _id to create new records
-                sessionId: newSy._id
-            }));
-            await Discount.insertMany(discountsCopy);
+            for(const discount of discounts) {
+                await Discount.create({ ...discount,_id: undefined, sessionId: newSy._id });
+            }
+            // const discountsCopy = discounts.map(discount => ({
+            //     ...discount.toObject(),
+            //     _id: undefined, // Remove _id to create new records
+            //     sessionId: newSy._id
+            // }));
+            // await Discount.insertMany(discountsCopy);
 
             // Add empty sections for each grade level
             // const gradeLevels = gradeLevels.map(gl => gl.gradeLevel) // Update this list based on your needs
             for (const gradeLevel of gradeLevels) {
                 await Section.insertMany([
-                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true  },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel.gradeLevel, sectionName: '',status: true  }
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true  },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: undefined,status: true  }
                 ]);
             }
         }
@@ -846,28 +867,31 @@ module.exports.edit_user = async (req, res) => {
     const { id } = req.params;
     const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword } = req.body;
 
-    
+    let updatedData = { firstName, middleName, lastName, role, username, isActive };
+    console.log(req.body);
+    if (req.file) {
+        updatedData.profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
 
     try {
         const currUser = await User.findById(id);
-        
+
         if (!currUser) {
             return res.status(404).json({ mssg: 'User not found' });
         }
 
-        if(password === '' && confirmPassword === '') {
-            await User.findByIdAndUpdate({_id: id}, {firstName, middleName, lastName, role, username, isActive});
-        } else {
-            if (password && password !== confirmPassword) {
+        if (password && password !== '') {
+            if (password !== confirmPassword) {
                 return res.status(400).json({ mssg: 'Passwords do not match' });
             }
-            
-            await User.updateUser(id, firstName, middleName, lastName, role, username, password, isActive);
-        } 
+            updatedData.password = password;
+        }
 
-        res.status(200).json({ mssg: `${firstName} has been edited successfully!`, redirect: '/users' });
+        await User.findByIdAndUpdate(id, updatedData);
+
+        res.status(200).json({ mssg: `${firstName} has been edited successfully!`, redirect: '/users', profilePictureUrl: updatedData.profilePictureUrl });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ mssg: 'An error occurred while updating the user', error: err.message });
     }
 };

@@ -284,37 +284,43 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 </table>
             </div>
             {filteredData.length > rowsPerPage && (
-                <div className="flex justify-between items-center py-3 px-6 bg-white border-t border-gray-200">
-                    <div className="text-sm text-gray-700">
-                        Showing {indexOfFirstRow + 1} to {indexOfLastRow > filteredData.length ? filteredData.length : indexOfLastRow} of {filteredData.length} results
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <button
-                            onClick={() => paginate(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                        >
-                            Previous
-                        </button>
+            <div className="flex justify-between items-center py-3 px-6 bg-white border-t border-gray-200">
+                <div className="text-sm text-gray-700">
+                    Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
+                </div>
+                <div className="flex items-center space-x-2">
+                    <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                    >
+                        Previous
+                    </button>
+                    <AnimatePresence mode="wait">
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <button
+                            <motion.button
                                 key={page}
                                 onClick={() => paginate(page)}
+                                initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
+                                transition={{ duration: 0.3 }}
                                 className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
                             >
                                 {page}
-                            </button>
+                            </motion.button>
                         ))}
-                        <button
-                            onClick={() => paginate(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                        >
-                            Next
-                        </button>
-                    </div>
+                    </AnimatePresence>
+                    <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                    >
+                        Next
+                    </button>
                 </div>
-            )}
+            </div>
+        )}
             {/* <div className="pagination mt-4 flex justify-center items-center">
                 <button
                     onClick={() => paginate(currentPage - 1)}
