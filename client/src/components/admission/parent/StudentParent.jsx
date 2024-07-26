@@ -1,7 +1,12 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
+import { MainContext } from '../../../helpers/MainContext';
+import { useContext } from 'react';
 
-const StudentParent = ({ id }) => {
+const StudentParent = () => {
+
+    const { currStudRec } = useContext(MainContext);
+    const id = currStudRec._id;
 
     const { records: parent } = useFetch(`${baseUrl()}/student/parent/${id}`);
 
@@ -26,23 +31,23 @@ const renderInformation = (label,name,occupation,office,contact,email) => (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
                 <label className="font-semibold text-sm text-gray-700">Name:</label>
-                <span className="text-sm truncate">{name ?? 'Not Assigned'}</span>
+                <span className="text-sm truncate">{name ? name : 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
                 <label className="font-semibold text-sm text-gray-700">Occupation:</label>
-                <span className="text-sm truncate">{occupation ?? 'Not Assigned'}</span>
+                <span className="text-sm truncate">{occupation ? occupation : 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
                 <label className="font-semibold text-sm text-gray-700">Office:</label>
-                <span className="text-sm truncate">{office ?? 'Not Assigned'}</span>
+                <span className="text-sm truncate">{office ? office : 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
                 <label className="font-semibold text-sm text-gray-700">Contact:</label>
-                <span className="text-sm truncate">{contact ?? 'Not Assigned'}</span>
+                <span className="text-sm truncate">{contact ? contact : 'Not Assigned'}</span>
             </div>
             <div className="flex flex-col">
                 <label className="font-semibold text-sm text-gray-700">Email:</label>
-                <span className="text-sm truncate">{email ?? 'Not Assigned'}</span>
+                <span className="text-sm truncate">{email ? email : 'Not Assigned'}</span>
             </div>
         </div>
         </>

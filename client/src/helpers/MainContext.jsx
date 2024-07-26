@@ -12,6 +12,9 @@ export const MainProvider = ({ children }) => {
   const [showForm,setShowForm] = useState(false);
 
   const [cookies, setCookie] = useCookies(['userToken']);
+
+  // Modification on Admission, Assessment page
+  const [currStudRec, setCurrStudRec] = useState(null);
   
   const session = localStorage.getItem('session');
   const currentUserId = localStorage.getItem('id');
@@ -31,7 +34,9 @@ export const MainProvider = ({ children }) => {
       userToken,
       showForm,
       setShowForm,
-      isFreshYear
+      isFreshYear,
+      currStudRec,
+      setCurrStudRec
     }}>
       {children}
     </MainContext.Provider>

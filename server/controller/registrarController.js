@@ -722,7 +722,7 @@ module.exports.edit_manage_fee = async (req,res) => {
 }
 
 module.exports.generate_fees = async (req, res) => {
-    const { currentYear } = req.params;
+    const { session: currentYear } = req.body;
 
     try {
         // Fetch students who are registered and admitted
@@ -760,7 +760,9 @@ module.exports.generate_fees = async (req, res) => {
 
         const paymentSchedules = await PaymentSchedule.find({ sessionId: currentYear }).populate('sessionId paymentTermId');
         const studentDiscounts = await StudentDiscount.find({ sessionId: currentYear }).populate('studentId sessionId discountId');
-
+        console.log('Payment Schedules Lists: ' + paymentSchedules);
+        console.log('Current School Year Id: ' + currentYear);
+        console.log(studentDiscounts);
         // Fetch the current school year
         const currYear = await SchoolYear.findById(currentYear);
 
@@ -946,7 +948,6 @@ module.exports.generate_fees = async (req, res) => {
 module.exports.delete_generated_fees = async (req,res) => {
 
     const { session } = req.body;
-    console.log('here');
     try {
         await StudentPayment.deleteMany({ sessionId: session });
         res.status(200).json({ mssg: 'All fees has been removed' });
@@ -994,7 +995,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
     const { session } = req.query;
    
     try {
-        const studentPayments = await StudentPayment.find({ studentId: id })
+        const studentPayments = await StudentPayment.find({ studentId: id,sessionId: session })
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },

@@ -2,8 +2,12 @@ import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import AdmissionTable from "../AdmissionTable";
 import MasterTable from "../../MasterTable";
+import { useContext } from 'react';
+import { MainContext } from "../../../helpers/MainContext";
 
-const StudentReqTable = ({ setViewRecord, searchQuery }) => {
+const StudentReqTable = ({ searchQuery }) => {
+
+    const { setCurrStudRec: setViewRecord } = useContext(MainContext);
 
     // This student will display all students that are not admitted yet
 

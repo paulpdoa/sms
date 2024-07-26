@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const SchoolYear = require('../model/SchoolYear');
+const UserRole = require('../model/Roles');
 
 const requiredString = {
     type: String,
@@ -49,6 +50,18 @@ userSchema.statics.login = async function(username,password,session) {
 
     // This will check if the school year table is still empty, meaning it's a new system
     const schoolYears = await SchoolYear.find();
+
+    // const { userRole } = await UserRole.findOne({ _id: user.role });
+
+    const userRole = 'Super Adsmin';
+
+    const allowedAddSyUsers = ['Super Admin','School Admin'];
+
+    if(session === 'true') {
+        if(!allowedAddSyUsers.includes(userRole)) {
+            throw Error('You cannot create new school year with this user');
+        }
+    }
 
     if(schoolYears.length > 0 && !session) { // meaning no records yet
         // allow user to login wihout having to request for session

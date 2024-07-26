@@ -6,12 +6,16 @@ import { baseUrl } from '../../../baseUrl';
 import { useFetch } from '../../../hooks/useFetch';
 import { MainContext } from '../../../helpers/MainContext';
 
-const SubmittedReq = ({ id }) => {
+const SubmittedReq = () => {
     const { records: requirements } = useFetch(`${baseUrl()}/requirements`);
+    const { session: schoolYear,currStudRec } = useContext(MainContext);
+
+    const id = currStudRec._id;
     const { records: admission } = useFetch(`${baseUrl()}/admission/${id}`);
-    const { session: schoolYear } = useContext(MainContext);
     const { records: sy } = useFetch(`${baseUrl()}/school-year/${schoolYear}`);
     const isYearDone = sy.isYearDone;
+
+    console.log(currStudRec);
 
     const [selectedRequirements, setSelectedRequirements] = useState([]);
 
@@ -31,14 +35,14 @@ const SubmittedReq = ({ id }) => {
         });
     };
 
-    useEffect(() => {
-        console.log('Updated selectedRequirements:', selectedRequirements);
-    }, [selectedRequirements]);
+    // useEffect(() => {
+    //     console.log('Updated selectedRequirements:', selectedRequirements);
+    // }, [selectedRequirements]);
 
     const submitStudentRequirement = async (e) => {
         e.preventDefault();
         
-        console.log('Selected requirements:', selectedRequirements); // Log the selected requirements
+        // console.log('Selected requirements:', selectedRequirements); // Log the selected requirements
 
         try {
             const response = await axios.post(`${baseUrl()}/admission`, {
@@ -47,7 +51,7 @@ const SubmittedReq = ({ id }) => {
                 requirements: selectedRequirements
             });
 
-            console.log('Backend response:', response.data); // Log the backend response
+            // console.log('Backend response:', response.data); // Log the backend response
 
             toast.success(response.data.mssg, {
                 position: "top-center",
@@ -64,7 +68,6 @@ const SubmittedReq = ({ id }) => {
             //     window.location.reload();
             // }, 2000);
         } catch (err) {
-            console.error(err);
             toast.error(err.response?.data?.mssg || 'An error occurred', {
                 position: "top-center",
                 autoClose: 1000,

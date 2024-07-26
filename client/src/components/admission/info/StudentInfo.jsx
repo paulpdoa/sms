@@ -1,9 +1,14 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import StudentAssistance from "./StudentAssistance";
+import { MainContext } from '../../../helpers/MainContext';
 
-const StudentInfo = ({ id }) => {
+const StudentInfo = () => {
+
+    const { currStudRec } = useContext(MainContext);
+
+    const id = currStudRec._id;
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
     const [studentAssistance,setStudentAssistance] = useState(false);
@@ -79,7 +84,7 @@ const StudentInfo = ({ id }) => {
     return (
         <div className="mt-3 p-6 bg-white shadow-md rounded-md">
             <h1 className="text-red-500 text-lg font-semibold">
-                {student.firstName} {student.lastName} is still not admitted yet, please complete requirements first.
+                Selected student is still not admitted yet, please complete requirements first.
             </h1>
         </div>
     );

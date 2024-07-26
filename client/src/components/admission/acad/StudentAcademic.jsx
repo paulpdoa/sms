@@ -6,8 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MainContext } from '../../../helpers/MainContext';
 
-const StudentAcademic = ({ id }) => {
-    const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
+const StudentAcademic = () => {
+    
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     // const { records: departments } = useFetch(`${baseUrl()}/departments`);
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
@@ -15,7 +15,9 @@ const StudentAcademic = ({ id }) => {
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
     
-    const { session: syId } = useContext(MainContext);
+    const { session: syId,currStudRec } = useContext(MainContext);
+    const id = currStudRec._id;
+    const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${syId}`);
     const isYearDone = schoolYear.isYearDone ? true : false;

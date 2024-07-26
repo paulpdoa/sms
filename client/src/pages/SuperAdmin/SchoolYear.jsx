@@ -33,7 +33,7 @@ const SchoolYear = () => {
     ];
 
     const updateNewStartYear = async (id, updatedData) => {
-        let isYearDone = updatedData.isYearDone 
+        let isYearDone = updatedData.isYearDone;
     
         try {
             const newData = await axios.patch(`${baseUrl()}/school-year/${id}`, { newStartYear: updatedData.startYear, newEndYear: updatedData.endYear, newSchoolTheme: updatedData.schoolTheme, isYearDone, role });
@@ -89,11 +89,15 @@ const SchoolYear = () => {
 
     const addSchoolYear = async (e) => {
         e.preventDefault();
+
+        const toastId = toast.loading('Please wait while adding new school year');
         try {
             const newStartYear = await axios.post(`${baseUrl()}/school-year`, { yearStart, yearEnd, syTheme, role });
-            toast.success(newStartYear.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
+            toast.update(toastId, {
+                render: newStartYear.data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -108,9 +112,11 @@ const SchoolYear = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
+            toast.update(toastId, {
+                render: err.response.data.mssg,
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

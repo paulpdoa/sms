@@ -50,6 +50,8 @@ const Assessment = () => {
         setIsLoading(true);
         const toastId = toast.loading('Creating fees, please wait...');
 
+        console.log(session);
+
         try {
             const { data } = await axios.post(`${baseUrl()}/generate-fees`,{ session,role });
             setIsLoading(false);
@@ -166,7 +168,7 @@ const Assessment = () => {
                                 }`}
                                 onClick={() => {
                                     setCurrentPage(page);
-                                    setCurrStudRec(null);
+                                    // setCurrStudRec(null);
                                     setEnableView(false);
                                 }}
                             >
@@ -175,7 +177,7 @@ const Assessment = () => {
                         ))}
                     </div>
 
-                    {enableView && currStudRec?._id ? (
+                    {currStudRec?._id ? (
                         <>
                             {currentPage === 'Total Fees' && <TotalFees record={currStudRec}/> }
                             {currentPage === 'Textbooks' && <AssessTextbooks record={currStudRec}/> }

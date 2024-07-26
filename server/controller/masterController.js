@@ -784,17 +784,17 @@ module.exports.get_school_year_detail = async (req,res) => {
 
 module.exports.edit_school_year = async (req, res) => {
     const { id } = req.params;
-    const { newSchoolTheme: schoolTheme, newEndYear: endYear, newStartYear: startYear, isYearDone } = req.body;
+    const { newSchoolTheme: schoolTheme, newEndYear: endYear, newStartYear: startYear} = req.body;
 
     try {
         const currSchoolYear = await SchoolYear.findById(id);
-        const newSchoolYear = await SchoolYear.findByIdAndUpdate(id, { schoolTheme, startYear, endYear, isYearDone }, { new: true });
+        const newSchoolYear = await SchoolYear.findByIdAndUpdate(id, { schoolTheme, startYear, endYear }, { new: true });
 
         const existPaymentSchedule = await PaymentSchedule.find();
 
         if (existPaymentSchedule.length > 0) {
             // Delete all records in PaymentSchedule
-            await PaymentSchedule.deleteMany();
+            await PaymentSchedule.deleteMany({ sessionId: id });
 
             // Delete related records in StudentPayment
             await StudentPayment.deleteMany({ paymentScheduleId: { $in: existPaymentSchedule.map(ps => ps._id) } });

@@ -1,9 +1,17 @@
 import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
+import { useContext } from 'react';
+import { MainContext } from '../../../helpers/MainContext';
 
-const StudentSibling = ({ id }) => {
+const StudentSibling = () => {
+
+    const { currStudRec } = useContext(MainContext);
+
+    const id = currStudRec; 
     
     const { records: sibling } = useFetch(`${baseUrl()}/sibling/student/${id._id}`);
+
+    console.log(id);
 
     if(sibling) {
         return (

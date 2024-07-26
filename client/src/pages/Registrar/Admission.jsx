@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DateTime from '../../components/DateTime';
@@ -13,13 +13,15 @@ import StudentAcadTable from '../../components/admission/acad/StudentAcadTable';
 import StudentParentTable from '../../components/admission/parent/StudentParentTable';
 import StudentSibling from '../../components/admission/sibling/StudentSibling';
 import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
+import { MainContext } from '../../helpers/MainContext';
 
 const Admission = () => {
     const admissionPages = ['Requirements', 'Information', 'Parents', 'Sibling', 'Academic'];
     const [currentPage, setCurrentPage] = useState('Requirements');
-    const [currStudRec, setCurrStudRec] = useState(null);
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const { currStudRec, setCurrStudRec } = useContext(MainContext);
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
@@ -65,16 +67,17 @@ const Admission = () => {
                                 }`}
                                 onClick={() => {
                                     setCurrentPage(page);
-                                    setCurrStudRec(null);
+                                    // setCurrStudRec(null);
                                     setEnableView(false);
                                 }}
                             >
                                 {page}
                             </button>
                         ))}
-                    </div>
+                    </div> 
+                    {console.log(enableView, currStudRec?._id)}
 
-                    {enableView && currStudRec?._id ? (
+                    {(currStudRec?._id) ? (
                         <>
                             {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
                             {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
