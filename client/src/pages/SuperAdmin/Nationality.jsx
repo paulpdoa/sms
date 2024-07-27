@@ -50,9 +50,9 @@ const Nationality = () => {
                 theme: "colored"
             });
 
-            // setTimeout(() => {
-            //     window.location.reload();
-            // },2000)
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
         } catch(err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
