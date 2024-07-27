@@ -74,7 +74,8 @@ const Section = () => {
                 window.location.reload();
             }, 2000)
         } catch (err) {
-            toast.error('Error has occurred while updating section record', {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: true,
