@@ -304,7 +304,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                             { currentPage > 1 && currentPage - 1 }
                         </button>
                         <button
-                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                            className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
                         >
                             { currentPage }
                         </button>
