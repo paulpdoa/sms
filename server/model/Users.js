@@ -53,7 +53,7 @@ userSchema.statics.login = async function(username,password,session) {
 
     // const { userRole } = await UserRole.findOne({ _id: user.role });
 
-    const userRole = 'Super Adsmin';
+    const userRole = 'Super Admin';
 
     const allowedAddSyUsers = ['Super Admin','School Admin'];
 

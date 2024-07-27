@@ -296,7 +296,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     >
                         Previous
                     </button>
-                    <AnimatePresence mode="wait">
+                    {/* <AnimatePresence mode="wait">
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                             <motion.button
                                 key={page}
@@ -310,7 +310,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                 {page}
                             </motion.button>
                         ))}
-                    </AnimatePresence>
+                    </AnimatePresence> */}
                     <button
                         onClick={() => paginate(currentPage + 1)}
                         disabled={currentPage === totalPages}

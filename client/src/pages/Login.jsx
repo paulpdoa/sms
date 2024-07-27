@@ -99,7 +99,7 @@ const Login = () => {
                         </select>
                     </div>
                 ) }
-                <button className="bg-blue-500 hover:bg-blue-600 w-full p-2 rounded-md text-gray-200 cursor-pointer my-3">Login</button>
+                <button className="bg-blue-500 hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer my-3">Login</button>
             </form>
             <ToastContainer />
         </main>
