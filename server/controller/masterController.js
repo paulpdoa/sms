@@ -109,6 +109,8 @@ module.exports.add_nationality = async (req,res) => {
 
     const { nationality,nationalityCodeId,currentUserId: inputter } = req.body
 
+    console.log(req.body);
+
     try {
         const newNationality = await Nationality.create({ nationality,nationalityCodeId,inputter });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });

@@ -15,7 +15,7 @@ const Nationality = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
-    const { role,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext)
+    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext)
 
     const columns = [
         {
@@ -92,7 +92,7 @@ const Nationality = () => {
     const addNationality = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role });
+            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role,session });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -108,6 +108,7 @@ const Nationality = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -118,7 +119,6 @@ const Nationality = () => {
                 progress: undefined,
                 theme: "light"
             });
-            console.log(err);
         }
     }
 

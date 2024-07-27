@@ -82,14 +82,22 @@ const Dashboard = () => {
     labels: gradeLevels.map(gl => gl.gradeLevel),
     datasets: [{
       label: 'Student Grade Levels',
-      data: Object.entries(gradeLevelCounts).map(([, count]) => count),
-      backgroundColor: ['#4BC0C0', '#FF9F40','#9966FF'],
+      data: Object.entries(gradeLevelCounts).map(([, count]) => count * 10), // Scale counts by 10
+      backgroundColor: ['#4BC0C0', '#FF9F40', '#9966FF'],
     }],
   };
 
   const chartOptions = {
     maintainAspectRatio: false,
     responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 10, // Adjust step size for better visualization
+        },
+      },
+    },
   };
 
   return (
@@ -123,13 +131,6 @@ const Dashboard = () => {
             </div>
             <PiChalkboardTeacherFill className="text-5xl text-purple-600" />
           </div>
-          {/* <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
-            <div>
-              <h2 className="text-gray-600 text-lg">Sessions</h2>
-              <CountUp className="text-3xl font-bold text-red-600" end={sessionId ? 1 : 0} duration={2} />
-            </div>
-            <i className="fas fa-calendar-alt text-5xl text-red-600"></i>
-          </div> */}
         </section>
 
         <section className="grid lg:grid-cols-2 gap-6 mb-6">

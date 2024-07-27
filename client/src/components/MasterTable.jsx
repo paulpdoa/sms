@@ -296,6 +296,24 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     >
                         Previous
                     </button>
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                        >
+                            { currentPage > 1 && currentPage - 1 }
+                        </button>
+                        <button
+                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                        >
+                            { currentPage }
+                        </button>
+                        <button
+                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                        >
+                            { currentPage > 1 && currentPage + 1 }
+                        </button>
+                    </div>
                     {/* <AnimatePresence mode="wait">
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                             <motion.button
