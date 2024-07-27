@@ -16,6 +16,9 @@ const Login = () => {
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['userToken']);
 
+    const schoolName = 'Christian School International';
+    const logoPath = '/schoolLogo/CAPSCI-Logo.png';
+
     const loginUser = async (e) => {
         e.preventDefault();
         try {
@@ -67,13 +70,14 @@ const Login = () => {
             <img className="absolute left-0 bottom-0 z-40" src='/loginImage/Ellipse-1.png' alt="Ellipse 1" />
             <img className="absolute left-0 bottom-0" src='/loginImage/Ellipse-2.png' alt="Ellipse 2" />
             <form onSubmit={loginUser} className="z-50 bg-white p-10 rounded-lg">
-                <h1 className="text-xl font-semibold text-gray-700">School Management System</h1>
+                <img className="mx-auto mb-4 w-24 h-24" src={logoPath} alt="School Logo" />
+                <h1 className="text-xl font-semibold text-gray-700">{schoolName}</h1>
                 <div className="flex flex-col gap-1 mt-5">
-                    <span className="text-gray-700">Username</span>
+                    <span className="text-gray-700 text-sm">Username</span>
                     <input onChange={(e) => setUsername(e.target.value)} className="border border-gray-300 outline-none p-2 bg-transparent rounded-md" type="text" />
                 </div>
                 <div className="flex flex-col gap-2 my-2 relative">
-                    <span className="text-gray-700">Password</span>
+                    <span className="text-gray-700 text-sm">Password</span>
                     <input
                         onChange={(e) => setPassword(e.target.value)}
                         className="border outline-none border-gray-300 p-2 bg-transparent rounded-md"
@@ -89,7 +93,7 @@ const Login = () => {
                 </div>
                 { schoolYears.length > 0 && (
                     <div className="flex flex-col gap-2 my-2">
-                        <span className="text-gray-700">Session</span>
+                        <span className="text-gray-700 text-sm">Session</span>
                         <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
                             <option hidden>Select session</option>
                             {schoolYears?.map(sy => (
