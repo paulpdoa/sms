@@ -90,7 +90,7 @@ const EditStudent = () => {
             isRegistered,
             passedReportCard,
             settledArrears,
-            completedClearance
+            completedClearance,
         };
 
         try {

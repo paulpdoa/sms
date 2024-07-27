@@ -41,13 +41,13 @@ const columns = [
 
 const Students = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,session } = useContext(MainContext);
     
     const navigate = useNavigate();
     
     const deleteStudent = async (id) => {
         try {
-            const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`, { data: { role } });
+            const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`, { data: { role,session } });
             toast.success(removeStudent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

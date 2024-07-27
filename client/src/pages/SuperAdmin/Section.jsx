@@ -56,7 +56,8 @@ const Section = () => {
                 newGradeLevel: updatedData.gradeLevel._id,
                 newAdviser: updatedData.adviser._id,
                 role,
-                sessionId: session
+                sessionId: session,
+                session
             });
             toast.success(newData.data.mssg, {
                 position: "top-center",
@@ -88,16 +89,16 @@ const Section = () => {
 
     const deleteSection = async (id) => {
         try {
-            const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { data: { role } });
+            const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { data: { role,session } });
             toast.success(removeSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -112,7 +113,7 @@ const Section = () => {
         e.preventDefault();
 
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session });
+            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session,session });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

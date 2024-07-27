@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,10 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
+import { MainContext } from '../../helpers/MainContext';
 
 const NewStudent = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
+
+    const { session } = useContext(MainContext);
 
     const navigate = useNavigate();
 
@@ -55,6 +58,7 @@ const NewStudent = () => {
             email,
             contactNumber,
             address,
+            session
         };
 
         try {

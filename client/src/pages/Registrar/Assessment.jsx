@@ -50,8 +50,6 @@ const Assessment = () => {
         setIsLoading(true);
         const toastId = toast.loading('Creating fees, please wait...');
 
-        console.log(session);
-
         try {
             const { data } = await axios.post(`${baseUrl()}/generate-fees`,{ session,role });
             setIsLoading(false);
