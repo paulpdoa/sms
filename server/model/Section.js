@@ -30,19 +30,20 @@ const sectionSchema = new mongoose.Schema({
     
 }, { timestamps: true })
 
-sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,status,sessionId) {
-    const exist = await this.findOne({ section });
-    if(exist) {
-        throw Error(`${section} is already existing, please create another section name`);
+sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId) {
+    const exist = await this.findOne({ section, sessionId });
+
+    if (exist && exist.status) {
+        throw new Error(`${section} is already existing for the current session, please create another section name`);
     }
 
-    if(!gradeLevel) {
-        throw Error('Grade level must not be empty')
+    if (!gradeLevel) {
+        throw new Error('Grade level must not be empty');
     }
-    
-    const newSection = await this.create({ section,gradeLevel,adviser,status,sessionId });
+
+    const newSection = await this.create({ section, gradeLevel, adviser, status, sessionId });
     return newSection;
-}
+};
 
 const SectionModel = mongoose.model('section',sectionSchema);
 module.exports = SectionModel;

@@ -381,7 +381,7 @@ module.exports.delete_section = async (req,res) => {
     const status = false;
 
     try {
-        const sectionFind = await Section.findByIdAndDelete({ _id: id });
+        const sectionFind = await Section.findByIdAndUpdate({ _id: id },{ status: status });
         res.status(200).json({ mssg: `${sectionFind.section} section record has been deleted` });
     } catch(err) {
         console.log(err)
