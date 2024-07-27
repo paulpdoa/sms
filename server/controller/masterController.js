@@ -412,9 +412,9 @@ module.exports.edit_section = async (req,res) => {
     const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser,sessionId } = req.body;
    
     try {   
-        const currSection = await Section.findOne({ section: section });
+        const currSection = await Section.findOne({ section: section,sessionId: sessionId });
 
-        if(currSection.section === section) {
+        if(currSection.section === section && currSection.sessionId === sessionId) {
             res.status(400).json({ mssg: `${section} is already existing, please create another section name` });
         }
         // if(currSection.section !== section) {
