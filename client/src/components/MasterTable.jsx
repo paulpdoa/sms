@@ -76,9 +76,11 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
             updatedValues.strand = { _id: editValues['strand.strand'] }
         }
 
-        if (editValues['feeCateg.feeCateg']) {
-            updatedValues.feeCateg = { _id: editValues['feeCateg.feeCateg'] }
+        if (editValues['nationalityCodeId']) {
+            updatedValues.nationalityCodeId = { _id: editValues['nationalityCodeId'] }
         }
+
+        console.log(editValues);
 
         onUpdate(id, updatedValues);
         setEditId(null);
@@ -208,6 +210,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                             column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
                                                                             column.header === 'Department' ? record.department.department : 
                                                                             column.header === 'Fee Category' ? record.feeCateg.feeCateg : 
+                                                                            column.header === 'Nationality Code' ? record.nationalityCodeId :
                                                                             column.header
                                                                         }
                                                                     

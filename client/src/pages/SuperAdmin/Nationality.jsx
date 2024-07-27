@@ -38,47 +38,47 @@ const Nationality = () => {
     const updateNewNationality = async (id,updatedData) => {
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role,session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
+            // setTimeout(() => {
+            //     window.location.reload();
+            // },2000)
         } catch(err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }        
 
     const deleteNationality = async (id) => {
         try {
-            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`,{ data: { role } });
+            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`,{ data: { role,session } });
             toast.success(removeNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {

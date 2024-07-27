@@ -28,7 +28,7 @@ const Department = () => {
 
     const updateNewDepartment = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role,session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -63,7 +63,7 @@ const Department = () => {
 
     const deleteDepartment = async (id) => {
         try {
-            const removeDepartment = await axios.delete(`${baseUrl()}/department/${id}`,{ data: { role  } });
+            const removeDepartment = await axios.delete(`${baseUrl()}/department/${id}`,{ data: { role,session } });
             toast.success(removeDepartment.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
