@@ -302,6 +302,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
 
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={() => currentPage > 1 && paginate(currentPage - 1)}
                             className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
                         >
                             { currentPage > 1 && currentPage - 1 }
@@ -312,7 +313,8 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                             { currentPage }
                         </button>
                         <button
-                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                            onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
                         >
                             { currentPage > 1 && currentPage + 1 }
                         </button>

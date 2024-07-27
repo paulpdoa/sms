@@ -372,7 +372,7 @@ module.exports.add_sections = async (req,res) => {
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: `Cannot add ${section} in the record, please try again` });
+        res.status(400).json({ mssg: err.message });
     }
 }
 
