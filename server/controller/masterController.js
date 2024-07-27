@@ -413,18 +413,12 @@ module.exports.edit_section = async (req,res) => {
    
     try {   
         const currSection = await Section.findOne({ section: section,sessionId: sessionId });
-
-        if(currSection.section === section && currSection.sessionId === sessionId) {
+        if(currSection.section === section && currSection.sessionId.toString() === sessionId) {
             res.status(400).json({ mssg: `${section} is already existing, please create another section name` });
-        }
-        // if(currSection.section !== section) {
-           else {
+        } else {
             const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser,sessionId });
             res.status(200).json({ mssg: `${newSection.section} has been changed to ${section} successfully!` });
-        // } else {
-           }
-        //     res.status(400).json({ mssg: `Cannot update ${section}, still the same with old value` })
-        // }
+        }
         
     } catch(err) {
         console.log(err);
