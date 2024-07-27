@@ -32,8 +32,8 @@ const sectionSchema = new mongoose.Schema({
 
 sectionSchema.statics.addSection = async function(section,gradeLevel,adviser,status,sessionId) {
     const exist = await this.findOne({ section });
-    if(exist && exist.status) {
-        throw Error('This section is already existing');
+    if(exist) {
+        throw Error(`${section} is already existing, please create another section name`);
     }
 
     if(!gradeLevel) {
