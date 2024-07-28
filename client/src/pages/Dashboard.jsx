@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { Pie, Bar } from 'react-chartjs-2';
+import { Pie, Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -8,6 +8,8 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  LineElement,
+  PointElement,
 } from 'chart.js';
 import CountUp from 'react-countup';
 import { PiStudentDuotone, PiChalkboardTeacherFill } from 'react-icons/pi';
@@ -21,25 +23,26 @@ ChartJS.register(
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  LineElement,
+  PointElement
 );
 
 const Dashboard = () => {
-
   const { session } = useContext(MainContext);
   const { records: students } = useFetch(`${baseUrl()}/students`);
   const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
   const { records: academics } = useFetch(`${baseUrl()}/academics`);
   const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
   const { records: enrolledStudents } = useFetch(`${baseUrl()}/enrolled/students/${session}`);
-  const {records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
+  const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
   const [studentRegistered, setStudentRegistered] = useState(0);
   const [studentAdmitted, setStudentAdmitted] = useState(0);
   const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0 });
   const [gradeLevelCounts, setGradeLevelCounts] = useState({});
   const [nationalityCounts, setNationalityCounts] = useState({});
-  const [enrolledStudentsCount,setEnrolledStudentsCount] = useState(0);
+  const [enrolledStudentsCount, setEnrolledStudentsCount] = useState(0);
 
   useEffect(() => {
     if (students) {
@@ -64,7 +67,7 @@ const Dashboard = () => {
       setGradeLevelCounts(gradeCounts);
     }
 
-    if(enrolledStudents) {
+    if (enrolledStudents) {
       const enrolledCount = enrolledStudents.length;
       setEnrolledStudentsCount(enrolledCount);
     }
@@ -100,11 +103,19 @@ const Dashboard = () => {
   const enrolleesLineData = {
     labels: schoolYears.map(sy => sy.sessionName),
     datasets: [{
-      label: 'Academic Year',
-      data: Object.entries(enrolledStudents).map(([, count]) => count * 10), // Scale counts by 10
-      backgroundColor: ['#4BC0C0', '#FF9F40', '#9966FF'],
+      label: 'Enrollees',
+      data: schoolYears.map(sy => {
+        const enrolledCount = enrolledStudents.filter(es => es.sessionId === sy._id).length;
+        return enrolledCount;
+      }),
+      borderColor: '#4BC0C0',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      pointBackgroundColor: '#4BC0C0',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: '#4BC0C0',
     }],
-  }
+  };
 
   const chartOptions = {
     maintainAspectRatio: false,
@@ -181,10 +192,10 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-lg font-semibold mb-4">Enrollees</h2>
+        <section className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Enrolled Students Over the Years</h2>
           <div style={{ width: '100%', height: '400px' }}>
-            <Bar data={enrolleesLineData} options={chartOptions} />
+            <Line data={enrolleesLineData} options={chartOptions} />
           </div>
         </section>
       </div>
