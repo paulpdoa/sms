@@ -406,25 +406,42 @@ module.exports.get_section_detail = async (req, res) => {
     }
 }
 
-module.exports.edit_section = async (req,res) => {
+module.exports.edit_section = async (req, res) => {
     const { id } = req.params;
+    const { newSection: section, newGradeLevel: gradeLevel, newAdviser: adviser, sessionId } = req.body;
 
-    const { newSection: section,newGradeLevel: gradeLevel,newAdviser: adviser,sessionId } = req.body;
-   
-    try {   
-        const currSection = await Section.findOne({ section: section,sessionId: sessionId });
-        if(currSection.section === section && currSection.sessionId.toString() === sessionId) {
-            res.status(400).json({ mssg: `${section} is already existing, please create another section name` });
-        } else {
-            const newSection = await Section.findByIdAndUpdate({ _id: id }, { section,gradeLevel,adviser,sessionId });
-            res.status(200).json({ mssg: `${newSection.section} has been changed to ${section} successfully!` });
+    try {
+        // Find all sections in the given session
+        const currSections = await Section.find({ sessionId });
+
+        // Convert sections to plain JavaScript objects and map section names to lowercase
+        const convertSections = currSections.map(currSec => ({
+            ...currSec.toObject(),
+            section: currSec.section.toLowerCase()
+        }));
+
+        // Check if the new section name already exists in the session
+        const existingSection = convertSections.find(currSec => currSec.section === section.toLowerCase());
+
+        if (existingSection) {
+            return res.status(400).json({ mssg: `${section} is already existing, please create another section name` });
         }
-        
-    } catch(err) {
+
+        // Update the section
+        const updatedSection = await Section.findByIdAndUpdate(
+            id,
+            { section, gradeLevel, adviser, sessionId },
+            { new: true }
+        );
+
+        res.status(200).json({ mssg: `${updatedSection.section} has been changed to ${section} successfully!` });
+    } catch (err) {
         console.log(err);
         res.status(400).json({ mssg: 'An error has occurred, please try again' });
     }
-}
+};
+
+
 
 // For Grade Level
 
