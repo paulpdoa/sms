@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
+import { MainContext } from '../../helpers/MainContext';
 
 const EditTeacher = () => {
     
@@ -36,6 +37,9 @@ const EditTeacher = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    const { session,currentUserId } = useContext(MainContext);
+
 
     useEffect(() => {
         if(records) {
@@ -91,7 +95,9 @@ const EditTeacher = () => {
             joiningDate,
             username,
             password,
-            confirmPassword
+            confirmPassword,
+            session,
+            currentUserId
         };
 
         try {

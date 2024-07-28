@@ -145,7 +145,7 @@ const StudentAcademic = () => {
                     )}
 
                     <div className="flex flex-col gap-2">
-                        <label className="font-semibold" htmlFor="session">Session</label>
+                        <label className="font-semibold" htmlFor="session">Academic Year</label>
                         <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setSession(e.target.value)}>
                             <option hidden>{student?.academicId?.sessionId ? `${student?.academicId?.sessionId?.startYear.split('-')[0]}-${student?.academicId?.sessionId?.endYear.split('-')[0]}` : 'Not Assigned'}</option>
                             {schoolYears?.map(schoolYear => (

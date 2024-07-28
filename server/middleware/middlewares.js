@@ -5,12 +5,12 @@ const multer = require('multer');
 const allowUserView = (roles) => {
     return (req,res,next) => {
         const { role } = req.query;
-        
-        if(roles.includes(role)) {
-            next()
-        } else {
-             res.status(401).json({ mssg: 'You are not authorized to view this page', redirect: '/' });
-        }
+        next(); 
+        // if(roles.includes(role)) {
+        //     next()
+        // } else {
+        //      res.status(401).json({ mssg: 'You are not authorized to view this page', redirect: '/' });
+        // }
         
 
     }

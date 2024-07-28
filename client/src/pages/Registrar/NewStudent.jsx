@@ -12,7 +12,9 @@ const NewStudent = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session } = useContext(MainContext);
+    const { session,currentUserId } = useContext(MainContext);
+
+    console.log(currentUserId);
 
     const navigate = useNavigate();
 

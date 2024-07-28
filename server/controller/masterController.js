@@ -422,6 +422,7 @@ module.exports.edit_section = async (req,res) => {
         
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error has occurred, please try again' });
     }
 }
 

@@ -14,6 +14,7 @@ const PaymentSchedule = require('../model/PaymentSchedule');
 const PaymentTerm = require('../model/PaymentTerm');
 const FeeCode = require('../model/FeeCode');
 const Strand = require('../model/Strand');
+
 const moment = require('moment');
 
 module.exports.get_students = async (req,res) => {
@@ -46,15 +47,42 @@ module.exports.get_students = async (req,res) => {
         res.status(200).json(students);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while fetching students records' });
     }
 }
+
+
+// This is to get enrolled students
+module.exports.get_enrolled_students = async (req, res) => {
+    const { id } = req.params; // Id of session to get current students who have fees
+
+    try {
+        const enrolledStudents = await StudentPayment.find({ sessionId: id });
+
+        const uniqueStudentIds = new Set();
+        const filteredEnrolledStudents = [];
+
+        for (const enrolledStudent of enrolledStudents) {
+            if (!uniqueStudentIds.has(enrolledStudent.studentId.toString())) {
+                uniqueStudentIds.add(enrolledStudent.studentId.toString());
+                filteredEnrolledStudents.push(enrolledStudent);
+            }
+        }
+
+        console.log(filteredEnrolledStudents);
+        res.status(200).json(filteredEnrolledStudents);
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while getting enrolled students' });
+    }
+};
+
 
 module.exports.add_student = async (req,res) => {
     const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address } = req.body;
     const isAdmitted = false;
     const status = 'New'
 
-   
     try {
         const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,status,email,contactNumber,address,isAdmitted });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
@@ -986,6 +1014,7 @@ module.exports.get_student_payments = async (req,res) => {
         res.status(200).json(studPayments);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg:'An error occured while fetching student payments' });
     }
 }
 
@@ -1016,6 +1045,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
         res.status(200).json(studentPayments);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg:'An error occured while fetching student payments' });
     }
 }
 
@@ -1031,9 +1061,9 @@ module.exports.get_payment_schedule = async (req,res) => {
         res.status(200).json(paymentSchedules);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while fetching payment schedules' });
     }
 }
-
 
 
 module.exports.add_payment_schedule = async (req, res) => {

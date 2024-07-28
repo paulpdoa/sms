@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { baseUrl } from '../baseUrl';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -28,12 +28,12 @@ const Login = () => {
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
             
-            if(schoolYear === 'true') {
-                localStorage.setItem('isFreshYear',schoolYear);
+            if (schoolYear === 'true') {
+                localStorage.setItem('isFreshYear', schoolYear);
             } else {
                 localStorage.setItem('session', schoolYear);
             }
-
+    
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -44,9 +44,13 @@ const Login = () => {
                 progress: undefined,
                 theme: "colored"
             });
+    
             setTimeout(() => {
                 setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
                 navigate(data.data.redirect);
+                // setTimeout(() => {
+                //     startCookieCheck();
+                // },3000)
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -62,6 +66,29 @@ const Login = () => {
             });
         }
     };
+
+    // const checkCookie = () => {
+    //     const token = cookies.userToken;
+    //     if (!token) {
+    //         // Cookie is not present, clear localStorage
+    //         localStorage.removeItem('role');
+    //         localStorage.removeItem('username');
+    //         localStorage.removeItem('id');
+    //         localStorage.removeItem('isFreshYear');
+    //         localStorage.removeItem('session');
+    //     }
+    // };
+    
+    // // Function to start the interval check
+    // const startCookieCheck = () => {
+    //     setInterval(checkCookie, 1000); // Check every second (adjust as needed)
+    // };
+    
+    // // Optional: If you want to clear the interval when the component unmounts
+    // useEffect(() => {
+    //     const interval = setInterval(checkCookie, 1000); // Check every second (adjust as needed)
+    //     return () => clearInterval(interval);
+    // }, []);
 
     return (
         <main className="bg-gray-200 h-screen flex items-center justify-center">

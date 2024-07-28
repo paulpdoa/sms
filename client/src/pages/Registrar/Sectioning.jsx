@@ -41,7 +41,10 @@ const Sectioning = () =>{
         if(studentRecord) {
             setSectionId(studentRecord?.academicId?.sectionId?._id);
         }
-    },[studentRecord])
+    },[studentRecord]);
+
+    // To get sections based on grade level of student
+    const filteredSections = sections.filter(section => section.gradeLevel?.gradeLevel === studentRecord?.academicId?.gradeLevelId?.gradeLevel);
 
     const handleSectionChange = (e) => {
         setSectionId(e.target.value);
@@ -54,7 +57,7 @@ const Sectioning = () =>{
         gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student?.academicId?.strandId?.strand || 'Not Assigned',
         section: student?.academicId?.sectionId?.section || 'Not Assigned',
-        adviser: student?.acedemicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
+        adviser: student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
     }))
 
     const submitSectioning = async (e) => {
@@ -117,11 +120,11 @@ const Sectioning = () =>{
                                     {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
                                     {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
                                     {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
-                                    {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',sections,handleSectionChange)}
+                                    {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',filteredSections,handleSectionChange)}
                                     {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned','Adviser')}
                                 </div>
 
-                                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} text-gray-100 bg-blue-500 p-2 text-sm mt-5 rounded-md hover:bg-blue-600`}>Add Section</button>
+                                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} text-gray-100 bg-blue-500 p-2 text-sm mt-5 rounded-md hover:bg-blue-600`}>Assign Section</button>
                                 <button className="text-gray-100 bg-red-500 p-2 text-sm mt-5 ml-2 rounded-md hover:dark:bg-red-600" type="button" onClick={() => {
                                     setShowForm(false)
                                     setStudentRecord(null)

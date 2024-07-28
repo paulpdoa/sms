@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
+import { MainContext } from '../../helpers/MainContext';
 
 const Input = ({ label, type, name, value, onChange,disabled = false, required }) => (
     <div className="flex flex-col">
@@ -53,6 +54,8 @@ const NewTeacher = () => {
     const { records: religions, isLoading: religionsLoading } = useFetch(`${baseUrl()}/religions`);
     const { records: genders, isLoading: gendersLoading } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
+
+    const { session,currentUserId } = useContext(MainContext);
 
     const [firstName,setFirstName] = useState('');
     const [middleName,setMiddleName] = useState('');
@@ -102,7 +105,9 @@ const NewTeacher = () => {
             yearGraduated,
             yearsOfExperience,
             joiningDate,
-            age: getAge 
+            age: getAge,
+            session,
+            currentUserId
         };
 
         try {
