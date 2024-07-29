@@ -75,7 +75,9 @@ add_nationality_code,
 get_nationality_code_detail,
 edit_nationality_code,
 delete_nationality_code,
-close_school_year} = require('../controller/masterController');
+close_school_year,
+generate_academic_students,
+get_dashboard_details} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -198,6 +200,10 @@ route.post('/sibling',add_sibling);
 route.delete('/sibling/:id',delete_sibling);
 route.patch('/sibling/:id',edit_sibling);
 
+// Dashboard
+route.get('/dashboard/:sessionId',get_dashboard_details);
 
+//For test data
+route.get('/generate-academic-data',generate_academic_students);
 
 module.exports = route;

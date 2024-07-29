@@ -59,7 +59,7 @@ const Parents = () => {
 
     const goToEdit = (id) => navigate(`/registrar/edit-parent/${id}`)
 
-    const recordsWithoutInputter = records.map(record => ({
+    const recordsWithoutInputter = records.filter(record => record.studentId !== null).map(record => ({
         ...record,
         studentId: {
             fullname: record?.studentId?.firstName + ' ' + record?.studentId?.middleName + ' ' + record?.studentId?.lastName

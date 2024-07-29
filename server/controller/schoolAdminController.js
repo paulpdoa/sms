@@ -44,6 +44,8 @@ module.exports.add_teacher = async (req,res) => {
         yearGraduated,
         yearsOfExperience,
         joiningDate,
+        currentUserId: inputter,
+        session
         // department,
         // gradeLevel,
         // section,
@@ -59,7 +61,8 @@ module.exports.add_teacher = async (req,res) => {
 
     try {
            
-        const addTeacher = await Teacher.create({firstName,
+        await Teacher.create({
+            firstName,
             middleName,
             lastName,
             dateOfBirth,
@@ -78,6 +81,7 @@ module.exports.add_teacher = async (req,res) => {
             yearGraduated,
             yearsOfExperience,
             joiningDate,
+            inputter
             });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {

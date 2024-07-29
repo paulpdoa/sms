@@ -1343,10 +1343,39 @@ module.exports.edit_sibling = async (req,res) => {
 // Dashboard details 
 
 module.exports.get_dashboard_details = async (req,res) => {
+
+    const { sessionId } = req.params;
+
     try {
+
+        
          
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.' })
+    }
+}
+
+module.exports.generate_academic_students = async (req,res) => {
+
+    try {
+
+        // Get student lists
+        const studentLists = await Student.find();
+
+        for(student of studentLists) {
+            
+            await Academic.findOneAndDelete({ studentId: student._id });
+            
+            const academic = await Academic.create({ studentId: student._id, lastSchoolAttended: 'Test School Attended' });
+            
+            await Student.findByIdAndUpdate({ _id: student._id} ,{ academicId: academic._id })
+        }
+
+        res.status(200).json({ mssg: 'Academic has been created successfully'});
+
+    } catch(err) {
+        console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while generating academic details'});
     }
 }

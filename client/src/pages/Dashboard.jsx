@@ -29,6 +29,7 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+
   const { session } = useContext(MainContext);
   const { records: students } = useFetch(`${baseUrl()}/students`);
   const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
@@ -36,6 +37,9 @@ const Dashboard = () => {
   const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
   const { records: enrolledStudents } = useFetch(`${baseUrl()}/enrolled/students/${session}`);
   const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
+
+  const { records: dashboard } = useFetch(`${baseUrl()}/dashboard/${session}`);
+  console.log(dashboard);
 
   const [studentRegistered, setStudentRegistered] = useState(0);
   const [studentAdmitted, setStudentAdmitted] = useState(0);

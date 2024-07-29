@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
+import { MainContext } from '../../helpers/MainContext';
 
 const NewParent = () => {
     // Fetch records for religions, genders, students, and nationalities
@@ -12,6 +13,8 @@ const NewParent = () => {
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
+
+    const { session,currentUserId } = useContext(MainContext);
 
     const navigate = useNavigate();
 
@@ -53,7 +56,9 @@ const NewParent = () => {
             motherOffice,
             fatherOffice,
             guardianOffice,
-            studentId
+            studentId,
+            session,
+            currentUserId
         }
 
         try {

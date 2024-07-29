@@ -265,12 +265,14 @@ module.exports.update_student_info = async (req, res) => {
         contactNumber,
         email,
         status,
+        suffix,
         lrn,
         passedReportCard,
         settledArrears,
         completedClearance,
         session,
         isRegistered,
+        currentUserId: inputter
     } = req.body;
 
     if(completedClearance && passedReportCard && settledArrears) {
@@ -310,11 +312,13 @@ module.exports.update_student_info = async (req, res) => {
                 contactNumber,
                 email,
                 status,
+                suffix,
                 lrn,
                 passedReportCard,
                 settledArrears,
                 completedClearance,
-                isRegistered
+                isRegistered,
+                inputter
             },
             { new: true }
         );
@@ -394,7 +398,6 @@ module.exports.add_academic = async (req,res) => {
 
     let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId } = req.body;
     // This will also update students info upon posting
-    
 
     if(strandId === '') {
         strandId = undefined;

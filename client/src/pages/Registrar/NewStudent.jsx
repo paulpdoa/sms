@@ -14,7 +14,13 @@ const NewStudent = () => {
 
     const { session,currentUserId } = useContext(MainContext);
 
-    console.log(currentUserId);
+    const suffixes = [
+        { value: 'Jr',placeholder: 'Jr' },
+        { value: 'Sr',placeholder: 'Sr' },
+        { value: 'I',placeholder:'I', },
+        {  value: 'II',placeholder:'II' },
+        { value: 'III',placeholder:'III' }
+    ]
 
     const navigate = useNavigate();
 
@@ -106,7 +112,7 @@ const NewStudent = () => {
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
                         {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
-                        {renderInput("suffix", "Ext/Suffix", suffix, setSuffix, "text")}
+                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix")}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
                         {renderSelect("sex", "Gender", sex, setSex, genderSelections, "Gender")}

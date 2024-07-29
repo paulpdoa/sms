@@ -16,7 +16,16 @@ const EditStudent = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session } = useContext(MainContext);
+    const { session,currentUserId,role } = useContext(MainContext);
+
+    const suffixes = [
+        { _id: 'Jr',suffix: 'Jr' },
+        { _id: 'Sr',suffix: 'Sr' },
+        { _id: 'I',suffix:'I', },
+        {  _id: 'II',suffix:'II' },
+        { _id: 'III',suffix:'III' }
+    ]
+
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -58,6 +67,8 @@ const EditStudent = () => {
         }
     }, [records]);
 
+    console.log(suffix);
+
     const calculateAge = (dob) => {
         const age = Math.floor((new Date() - new Date(dob).getTime()) / 3.15576e+10);
         return age >= 0 ? age : 0;
@@ -91,6 +102,8 @@ const EditStudent = () => {
             passedReportCard,
             settledArrears,
             completedClearance,
+            currentUserId,
+            role
         };
 
         try {
@@ -133,7 +146,7 @@ const EditStudent = () => {
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
                         {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
-                        {renderInput("suffix", "Ext/Suffix", suffix, setSuffix, "text")}
+                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix")}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
                         {renderSelect("sex", "Sex", sex, setSex, genderSelections, "Gender")}
@@ -208,6 +221,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
                     { label === 'Religion' && option.religion }
                     { label === 'Nationality' && option.nationality }
                     { label === 'Sex' && option.name }
+                    { id === 'suffix' && option.suffix }
                 </option>
             ))}
         </select>

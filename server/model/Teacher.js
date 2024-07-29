@@ -58,6 +58,10 @@ const teacherSchema = new mongoose.Schema({
     email: requiredString,
     socMedAcct: {
         type: String
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'user'
     }
 
 }, { timestamps: true });

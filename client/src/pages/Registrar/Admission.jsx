@@ -33,7 +33,7 @@ const Admission = () => {
     };
 
     return (
-        <main className="p-4 relative h-screen overflow-hidden">
+        <main className="p-4 relative overflow-hidden">
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-gray-700 font-bold">Admission</h1>
                 <Searchbar onSearch={handleSearch} />

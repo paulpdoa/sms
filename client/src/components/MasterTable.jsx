@@ -143,10 +143,70 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     return (
         <>
             <div className="sm:rounded-lg">
-                <div className="flex items-center gap-2 pb-2 px-4">
-                    <span className="text-gray-500 text-sm">Display</span>
-                    <input className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300" value={rowsPerPage} type="number" onChange={(e) => setRowsPerPage(e.target.value)} />
-                    <span className="text-gray-500 text-sm">result/s</span>
+                <div className="flex flex-col justify-between">
+                    <div className="flex items-center gap-2 pb-2 px-4">
+                        <span className="text-gray-500 text-sm">Display</span>
+                        <input className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300" value={rowsPerPage} type="number" onChange={(e) => setRowsPerPage(e.target.value)} />
+                        <span className="text-gray-500 text-sm">result/s</span>
+                    </div>
+                    {filteredData?.length > rowsPerPage && (
+                        <div className="flex justify-between items-center w-full py-3 px-6 bg-white border-t border-gray-200">
+                            <div className="text-sm text-gray-700">
+                                Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                >
+                                    Previous
+                                </button>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+                                        className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                    >
+                                        { currentPage > 1 && currentPage - 1 }
+                                    </button>
+                                    <button
+                                        className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
+                                    >
+                                        { currentPage }
+                                    </button>
+                                    <button
+                                        onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                                        className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                    >
+                                        { currentPage > 1 && currentPage + 1 }
+                                    </button>
+                                </div>
+                                {/* <AnimatePresence mode="wait">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <motion.button
+                                            key={page}
+                                            onClick={() => paginate(page)}
+                                            initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
+                                            transition={{ duration: 0.3 }}
+                                            className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
+                                        >
+                                            {page}
+                                        </motion.button>
+                                    ))}
+                                </AnimatePresence> */}
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <table className="w-full text-sm text-left text-gray-500 shadow-md">
@@ -286,64 +346,66 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     </AnimatePresence>
                 </table>
             </div>
-            {filteredData.length > rowsPerPage && (
-            <div className="flex justify-between items-center py-3 px-6 bg-white border-t border-gray-200">
-                <div className="text-sm text-gray-700">
-                    Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
-                </div>
-                <div className="flex items-center space-x-2">
-                    <button
-                        onClick={() => paginate(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                    >
-                        Previous
-                    </button>
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => currentPage > 1 && paginate(currentPage - 1)}
-                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                        >
-                            { currentPage > 1 && currentPage - 1 }
-                        </button>
-                        <button
-                            className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
-                        >
-                            { currentPage }
-                        </button>
-                        <button
-                            onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
-                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                        >
-                            { currentPage > 1 && currentPage + 1 }
-                        </button>
-                    </div>
-                    {/* <AnimatePresence mode="wait">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <motion.button
-                                key={page}
-                                onClick={() => paginate(page)}
-                                initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
-                                transition={{ duration: 0.3 }}
-                                className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
-                            >
-                                {page}
-                            </motion.button>
-                        ))}
-                    </AnimatePresence> */}
-                    <button
-                        onClick={() => paginate(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-        )}
+            {filteredData?.length > rowsPerPage && (
+                        <div className="flex justify-between items-center w-full py-3 px-6 bg-white border-t border-gray-200">
+                            <div className="text-sm text-gray-700">
+                                Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                >
+                                    Previous
+                                </button>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+                                        className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                    >
+                                        { currentPage > 1 && currentPage - 1 }
+                                    </button>
+                                    <button
+                                        className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
+                                    >
+                                        { currentPage }
+                                    </button>
+                                    <button
+                                        onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                                        className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                    >
+                                        { currentPage > 1 && currentPage + 1 }
+                                    </button>
+                                </div>
+                                {/* <AnimatePresence mode="wait">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <motion.button
+                                            key={page}
+                                            onClick={() => paginate(page)}
+                                            initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
+                                            transition={{ duration: 0.3 }}
+                                            className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
+                                        >
+                                            {page}
+                                        </motion.button>
+                                    ))}
+                                </AnimatePresence> */}
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
+            
             {/* <div className="pagination mt-4 flex justify-center items-center">
                 <button
                     onClick={() => paginate(currentPage - 1)}
