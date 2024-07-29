@@ -44,24 +44,38 @@ const Dashboard = () => {
   const [studentRegistered, setStudentRegistered] = useState(0);
   const [studentAdmitted, setStudentAdmitted] = useState(0);
   const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0 });
+  const [teachersCount,setTeachersCount] = useState(0);
   const [gradeLevelCounts, setGradeLevelCounts] = useState({});
-  const [nationalityCounts, setNationalityCounts] = useState({});
+  const [nationalityCounts, setNationalityCounts] = useState({ local: 0, foreign: 0 });
   const [enrolledStudentsCount, setEnrolledStudentsCount] = useState(0);
 
   useEffect(() => {
-    if (students) {
-      const studentRegisteredCount = students.filter(student => student.isRegistered).length;
-      const studentAdmittedCount = students.filter(student => student.isAdmitted).length;
-      const maleCount = students.filter(student => student.sex.toLowerCase() === 'male').length;
-      const femaleCount = students.filter(student => student.sex.toLowerCase() === 'female').length;
-      const localCount = students.filter(student => student.nationality.nationalityCodeId.nationalityCode === 'L').length;
-      const foreignCount = students.filter(student => student.nationality.nationalityCodeId.nationalityCode === 'F').length;
-
-      setStudentRegistered(studentRegisteredCount);
-      setStudentAdmitted(studentAdmittedCount);
-      setGenderCounts({ male: maleCount, female: femaleCount });
-      setNationalityCounts({ local: localCount, foreign: foreignCount });
+    if(dashboard) {
+      console.log(dashboard);
+      setStudentRegistered(dashboard.studentsRegistered);
+      setStudentAdmitted(dashboard.studentsAdmitted);
+      setGenderCounts({ male: dashboard.studentsGender?.male, female: dashboard.studentsGender?.female });
+      setTeachersCount(dashboard.teachersCount);
+      setNationalityCounts({ local: dashboard.studentsNationality?.local, foreign: dashboard.studentsNationality?.foreign });
+      // setGradeLevelCounts(dashboard.gradeCounts);
+      setEnrolledStudentsCount(dashboard.enrolledStudents);
     }
+  })
+
+  useEffect(() => {
+    // if (students) {
+    //   const studentRegisteredCount = students.filter(student => student.isRegistered).length;
+    //   const studentAdmittedCount = students.filter(student => student.isAdmitted).length;
+    //   const maleCount = students.filter(student => student.sex.toLowerCase() === 'male').length;
+    //   const femaleCount = students.filter(student => student.sex.toLowerCase() === 'female').length;
+    //   const localCount = students.filter(student => student.nationality.nationalityCodeId.nationalityCode === 'L').length;
+    //   const foreignCount = students.filter(student => student.nationality.nationalityCodeId.nationalityCode === 'F').length;
+
+    //   setStudentRegistered(studentRegisteredCount);
+    //   setStudentAdmitted(studentAdmittedCount);
+    //   setGenderCounts({ male: maleCount, female: femaleCount });
+    //   setNationalityCounts({ local: localCount, foreign: foreignCount });
+    // }
 
     if (academics) {
       const gradeCounts = {};
@@ -69,13 +83,14 @@ const Dashboard = () => {
         gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
       });
       setGradeLevelCounts(gradeCounts);
+      console.log(gradeCounts);
     }
 
-    if (enrolledStudents) {
-      const enrolledCount = enrolledStudents.length;
-      setEnrolledStudentsCount(enrolledCount);
-    }
-  }, [students, academics, enrolledStudents]);
+    // if (enrolledStudents) {
+    //   const enrolledCount = enrolledStudents.length;
+    //   setEnrolledStudentsCount(enrolledCount);
+    // }
+   }, [students, academics, enrolledStudents]);
 
   const genderData = {
     labels: ['Male', 'Female'],

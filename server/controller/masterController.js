@@ -19,6 +19,7 @@ const PaymentSchedule = require('../model/PaymentSchedule');
 const StudentPayment = require('../model/StudentPayment');
 const Academic = require('../model/Academic');
 const Discount = require('../model/Discount');
+const Teacher = require('../model/Teacher');
 
 const bcrypt = require('bcrypt');
 
@@ -1344,18 +1345,101 @@ module.exports.edit_sibling = async (req,res) => {
 
 module.exports.get_dashboard_details = async (req,res) => {
 
-    const { sessionId } = req.params;
+    const { session } = req.params;
 
     try {
+        let studentsRegistered = 0;
+        let studentsAdmitted = 0;
+        let studentsGender = { male: 0, female: 0 };
+        let studentsNationality = { local: 0, foreign: 0 };
+        let enrolledStudents = 0;
+        const gradeCounts = {};
+        let teachersCount = 0;
 
+        // Get all Academic record as this will be the basis for students 
+        const academics = await Academic.find({ sessionId: session })
+        .populate({
+            path: 'studentId',
+            populate: {
+                path: 'nationality',
+            },
+        })
+        .populate({
+            path: 'studentId',
+            populate: {
+                path: 'academicId',
+                populate: {
+                    path: 'gradeLevelId',
+                },
+            },
+        })
+        .populate('gradeLevelId departmentId strandId sectionId paymentTermId');
+
+        const studentsEnrolled = await StudentPayment.find({ sessionId: session });
+
+        const gradeLevels = await GradeLevel.find();
+
+        const teachers = await Teacher.find();
         
+        if(teachers) {
+            teachersCount = teachers.length;
+        }
+
+        const recordsCheck = !academics && !studentsEnrolled && !gradeLevels && !teachersCount;
+
+        if(recordsCheck) {
+            return res.status(404).json({ mssg: 'Error on getting records for dashboard' });
+        }
+
+//-----------------------For getting enrollees counts--------------------------------- 
+        const uniqueStudentIds = new Set();
+        const filteredEnrolledStudents = [];
+
+        for (const enrolledStudent of studentsEnrolled) {
+            if (!uniqueStudentIds.has(enrolledStudent.studentId.toString())) {
+                uniqueStudentIds.add(enrolledStudent.studentId.toString());
+                filteredEnrolledStudents.push(enrolledStudent);
+            }
+        }
+        enrolledStudents = filteredEnrolledStudents.length;
+// ------------------------------------------------------
+        for(const academic of academics) {
+            if(academic.studentId.isRegistered) {
+                studentsRegistered += 1;
+            }
+
+            if(academic.studentId.isAdmitted) {
+                studentsAdmitted += 1;
+            }
+
+            if(academic.studentId.sex === 'Male') {
+                studentsGender.male += 1;
+            } else {
+                studentsGender.female += 1;
+            }
+
+            if(academic.studentId.nationality.nationality === 'Filipino') {
+                studentsNationality.local += 1;
+            } else {
+                studentsNationality.foreign += 1;
+            }
+        }
+
+        gradeLevels?.forEach(gl => {
+            gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.studentId.academicId.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
+        });
+
+
+        res.status(200).json({ studentsRegistered, studentsAdmitted, studentsGender, studentsNationality, enrolledStudents, gradeCounts, teachersCount, academics });
          
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.' })
+        res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.',error: err.message })
     }
 }
 
+
+// For generating test data for academic table
 module.exports.generate_academic_students = async (req,res) => {
 
     try {
