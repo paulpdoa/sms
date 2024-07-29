@@ -60,7 +60,8 @@ const NewStudent = () => {
             email,
             contactNumber,
             address,
-            session
+            session,
+            currentUserId
         };
 
         try {

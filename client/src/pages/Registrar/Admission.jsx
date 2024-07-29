@@ -21,7 +21,7 @@ const Admission = () => {
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { currStudRec, setCurrStudRec } = useContext(MainContext);
+    const { currStudRec, setCurrStudRec, currentUserId } = useContext(MainContext);
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
@@ -32,11 +32,8 @@ const Admission = () => {
         setSearchQuery(query);
     };
 
-    const currentUserId = localStorage.getItem('id');
-
     return (
-        <main className="p-4">
-            {/* <DateTime /> */}
+        <main className="p-4 relative h-screen overflow-hidden">
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-gray-700 font-bold">Admission</h1>
                 <Searchbar onSearch={handleSearch} />
@@ -50,47 +47,47 @@ const Admission = () => {
                     {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                 </div>
-                
-                <div className="p-4 bg-white rounded-lg border border-gray-300 h-fit">
-                    <h1 className="font-semibold text-xl text-gray-700 mb-4">
-                        {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
-                    </h1>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {admissionPages.map((page) => (
-                            <button
-                                key={page}
-                                className={`text-sm font-semibold px-3 py-1 rounded-lg ${
-                                    currentPage === page
-                                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                                        : 'border border-gray-300 text-gray-700'
-                                }`}
-                                onClick={() => {
-                                    setCurrentPage(page);
-                                    // setCurrStudRec(null);
-                                    setEnableView(false);
-                                }}
-                            >
-                                {page}
-                            </button>
-                        ))}
-                    </div> 
-                    {console.log(enableView, currStudRec?._id)}
+                {currStudRec?._id && (
+                    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 mt-20 p-4 bg-white rounded-lg border border-gray-300 max-h-[80vh] overflow-y-auto shadow-lg z-50 w-3/4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h1 className="font-semibold text-xl text-gray-700 mb-4">
+                                {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
+                            </h1>
+                            <button onClick={() => {
+                                setCurrStudRec(null);
+                                setEnableView(false);
+                            }} className="bg-red-500 text-sm hover:bg-red-600 p-2 text-white rounded-md transition">Cancel</button>
+                        </div>
 
-                    {(currStudRec?._id) ? (
-                        <>
-                            {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
-                            {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
-                            {currentPage === 'Information' && <StudentInfo id={currStudRec._id} />}
-                            {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} />}
-                            {currentPage === 'Sibling' && <StudentSibling id={currStudRec} />}
-                        </>
-                    ) : (
-                        <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
-                    )}
-                </div>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {admissionPages.map((page) => (
+                                <button
+                                    key={page}
+                                    className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+                                    onClick={() => {
+                                        setCurrentPage(page);
+                                        setEnableView(false);
+                                    }}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                        </div>
 
-                
+                        {currStudRec?._id ? (
+                            <>
+                                {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
+                                {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
+                                {currentPage === 'Information' && <StudentInfo id={currStudRec._id} />}
+                                {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} />}
+                                {currentPage === 'Sibling' && <StudentSibling id={currStudRec} />}
+                            </>
+                        ) : (
+                            <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
+                        )}
+                    </div>
+                )}
             </div>
 
             <ToastContainer />

@@ -30,7 +30,7 @@ const sectionSchema = new mongoose.Schema({
     
 }, { timestamps: true })
 
-sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId) {
+sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId,inputter) {
     const exists = await this.find({ sessionId,status: true });
 
     const filteredSections = exists.map(exist => ({

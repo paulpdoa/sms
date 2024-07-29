@@ -22,7 +22,7 @@ const Section = () => {
     const [adviser, setAdviser] = useState('');
     // const [department, setDepartment] = useState('');
 
-    const { role,searchQuery,setSearchQuery,showForm,setShowForm,session } = useContext(MainContext);
+    const { role,searchQuery,showForm,setShowForm,session,currentUserId } = useContext(MainContext);
 
     const columns = [
         {
@@ -57,7 +57,8 @@ const Section = () => {
                 newAdviser: updatedData.adviser._id,
                 role,
                 sessionId: session,
-                session
+                session,
+                currentUserId
             });
             toast.success(newData.data.mssg, {
                 position: "top-center",
@@ -114,7 +115,7 @@ const Section = () => {
         e.preventDefault();
 
         try {
-            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session,session });
+            const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session,session,currentUserId });
             toast.success(newSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

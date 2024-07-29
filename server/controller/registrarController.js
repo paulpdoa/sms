@@ -79,12 +79,12 @@ module.exports.get_enrolled_students = async (req, res) => {
 
 
 module.exports.add_student = async (req,res) => {
-    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address } = req.body;
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter } = req.body;
     const isAdmitted = false;
     const status = 'New'
 
     try {
-        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,status,email,contactNumber,address,isAdmitted });
+        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,status,email,contactNumber,address,isAdmitted,inputter });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);

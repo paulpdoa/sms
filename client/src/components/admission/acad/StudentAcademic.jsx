@@ -14,6 +14,8 @@ const StudentAcademic = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
+
+    console.log(academic);
     
     const { session: syId,currStudRec } = useContext(MainContext);
     const id = currStudRec._id;

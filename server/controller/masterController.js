@@ -50,6 +50,7 @@ module.exports.add_religion = async (req,res) => {
         res.status(200).json({ mssg: `${religion} has been added to the record` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error has occurred while adding religion, please try again' })
     }
 }
 
@@ -360,7 +361,7 @@ module.exports.get_sections = async (req,res) => {
 
 module.exports.add_sections = async (req,res) => {
 
-    let { section,gradeLevel,adviser,sessionId } = req.body;
+    let { section,gradeLevel,adviser,sessionId,currentUserId: inputter } = req.body;
     const status = true;
 
     if(adviser === '') {
@@ -368,7 +369,7 @@ module.exports.add_sections = async (req,res) => {
     }
 
     try {
-        const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId);
+        const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId,inputter);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -408,7 +409,7 @@ module.exports.get_section_detail = async (req, res) => {
 
 module.exports.edit_section = async (req, res) => {
     const { id } = req.params;
-    const { newSection: section, newGradeLevel: gradeLevel, newAdviser: adviser, sessionId } = req.body;
+    const { newSection: section, newGradeLevel: gradeLevel, newAdviser: adviser, sessionId,currentUserId:inputter } = req.body;
 
     try {
         // Find the section being updated
@@ -428,7 +429,6 @@ module.exports.edit_section = async (req, res) => {
             status: currSec.status
         }));
 
-        console.log(convertSections)
 
         // Check if the new section name already exists in the session
         const existingSection = convertSections.find(currSec => currSec.section === section.toLowerCase());
@@ -442,7 +442,7 @@ module.exports.edit_section = async (req, res) => {
         // Update the section
         const updatedSection = await Section.findByIdAndUpdate(
             id,
-            { section, gradeLevel, adviser, sessionId },
+            { section, gradeLevel, adviser, sessionId, inputter },
             { new: true }
         );
 
@@ -1336,5 +1336,17 @@ module.exports.edit_sibling = async (req,res) => {
         res.status(200).json({ mssg: `${sibling.firstName}'s record has been updated successfully!` });
     } catch(err) {
         console.log(err);
+    }
+}
+
+
+// Dashboard details 
+
+module.exports.get_dashboard_details = async (req,res) => {
+    try {
+         
+    } catch(err) {
+        console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.' })
     }
 }

@@ -80,6 +80,10 @@ const studentSchema = new mongoose.Schema({
     },
     bloodType: {
         type: String
+    },
+    inputter:{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'user' 
     }
 },{ timestamps: true })
 

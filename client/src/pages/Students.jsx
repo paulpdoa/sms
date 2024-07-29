@@ -41,7 +41,7 @@ const columns = [
 
 const Students = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
-    const { searchQuery,setSearchQuery,session } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,session,role } = useContext(MainContext);
     
     const navigate = useNavigate();
     
