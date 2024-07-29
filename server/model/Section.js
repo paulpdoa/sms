@@ -40,9 +40,9 @@ sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, 
     }))
 
     const existingSection = filteredSections.find(exist => exist.section.toLowerCase() === section.toLowerCase());
+
     
-    
-    if (existingSection && !existingSection.status) {
+    if (existingSection) {
         throw new Error(`${section} is already existing for the current session, please create another section name`);
     }
 
