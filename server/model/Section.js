@@ -31,9 +31,18 @@ const sectionSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId) {
-    const exist = await this.findOne({ section, sessionId });
+    const exists = await this.find({ sessionId,status: true });
 
-    if (exist && exist.status) {
+    const filteredSections = exists.map(exist => ({
+        ...exist,
+        section: exist.section.toLowerCase(),
+        status: exist.status
+    }))
+
+    const existingSection = filteredSections.find(exist => exist.section.toLowerCase() === section.toLowerCase());
+    
+    
+    if (existingSection && !existingSection.status) {
         throw new Error(`${section} is already existing for the current session, please create another section name`);
     }
 

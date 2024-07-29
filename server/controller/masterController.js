@@ -411,18 +411,30 @@ module.exports.edit_section = async (req, res) => {
     const { newSection: section, newGradeLevel: gradeLevel, newAdviser: adviser, sessionId } = req.body;
 
     try {
-        // Find all sections in the given session
-        const currSections = await Section.find({ sessionId });
+        // Find the section being updated
+        const currentSection = await Section.findById(id);
 
+        if (!currentSection) {
+            return res.status(404).json({ mssg: 'Section not found' });
+        }
+
+        // Find all sections in the given session excluding the current one
+        const currSections = await Section.find({ sessionId, _id: { $ne: id },status: true });
+        
         // Convert sections to plain JavaScript objects and map section names to lowercase
         const convertSections = currSections.map(currSec => ({
             ...currSec.toObject(),
-            section: currSec.section.toLowerCase()
+            section: currSec.section.toLowerCase(),
+            status: currSec.status
         }));
+
+        console.log(convertSections)
 
         // Check if the new section name already exists in the session
         const existingSection = convertSections.find(currSec => currSec.section === section.toLowerCase());
+        console.log(existingSection)
 
+        // Removed checking of status since all status will be true
         if (existingSection) {
             return res.status(400).json({ mssg: `${section} is already existing, please create another section name` });
         }
@@ -434,12 +446,13 @@ module.exports.edit_section = async (req, res) => {
             { new: true }
         );
 
-        res.status(200).json({ mssg: `${updatedSection.section} has been changed to ${section} successfully!` });
+        res.status(200).json({ mssg: `${updatedSection.section} has been assigned new section successfully!` });
     } catch (err) {
         console.log(err);
         res.status(400).json({ mssg: 'An error has occurred, please try again' });
     }
 };
+
 
 
 
