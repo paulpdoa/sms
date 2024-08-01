@@ -61,7 +61,9 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
         <>
         <div className="flex gap-2 items-center">
             <button onClick={() => setViewRecord(student)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
-            <button onClick={() => !isYearDone && deleteAcadRecord(student.academicId._id)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-red-500 text-white px-4 py-2 rounded-md mr-2`}>Delete</button>
+            <button onClick={() => {
+                !isYearDone && deleteAcadRecord(student.academicId._id)
+            }} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-red-500 text-white px-4 py-2 rounded-md mr-2`}>Delete</button>
         </div>
         </>
     );
@@ -69,7 +71,7 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
         ...student, 
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',
-        registered: student.isRegistered ? 'Yes' : 'No',
+        registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
         dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',

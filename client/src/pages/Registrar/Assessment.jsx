@@ -119,18 +119,20 @@ const Assessment = () => {
         }
     };
 
-    const formattedStudents = students?.filter(student => student.isAdmitted && student.isRegistered).map(student => ({
+    const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered).map(student => ({
         ...student,
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',
-        registered: student.isRegistered ? 'Yes' : 'No',
-        admitted: student.isAdmitted ? 'Yes' : 'No',
+        registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
+        admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
         dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
     }));
+
+    console.log(formattedStudents)
 
     return (
         <main className="p-4 relative h-screen overflow-hidden">
@@ -142,6 +144,22 @@ const Assessment = () => {
                     <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+                {admissionPages.map((page) => (
+                    <button
+                        key={page}
+                        className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 text-white' : 'border border-gray-300 text-gray-700'}`}
+                        onClick={() => {
+                            setCurrentPage(page);
+                            setEnableView(false);
+                        }}
+                    >
+                        {page}
+                    </button>
+                ))}
+            </div>
+
 
             <div className="grid grid-cols-1 gap-4 mt-5">
 

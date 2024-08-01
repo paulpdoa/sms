@@ -26,12 +26,12 @@ const AssessmentTable = ({ setViewRecord,searchQuery }) => {
         </div>
     );
 
-    const formattedStudents = students?.filter(student => student.isAdmitted && student.isRegistered).map(student => ({
+    const formattedStudents = students?.filter(student => student.academicId.isAdmitted && student.academicId.isRegistered).map(student => ({
         ...student,
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',
-        registered: student.isRegistered ? 'Yes' : 'No',
-        admitted: student.isAdmitted ? 'Yes' : 'No',
+        registered: student.academicId.isRegistered ? 'Yes' : 'No',
+        admitted: student.academicId.isAdmitted ? 'Yes' : 'No',
         dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
@@ -39,6 +39,9 @@ const AssessmentTable = ({ setViewRecord,searchQuery }) => {
         status: student.status,
         action: actions(student)
     }));
+    
+
+    console.log(formattedStudents)
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
@@ -83,9 +86,6 @@ const AssessmentTable = ({ setViewRecord,searchQuery }) => {
     };
 
     const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-
-
-    
 
     return (
         <>

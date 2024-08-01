@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { useEffect } from 'react';
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
@@ -67,7 +68,17 @@ function App() {
   const checkFreshYear = () => {
     const isFreshYear = localStorage.getItem('isFreshYear');
     return isFreshYear === 'true';
-  };
+  }; 
+
+
+  // This will check if the userToken in cookies has been removed, it will also remove localStorage as well
+  useEffect(() => {
+    if(!userToken) {
+      ['id','currentUserId','session','role','username'].forEach(lclstg => localStorage.removeItem(lclstg));
+    }
+  },[cookies])
+
+
 
   const router = createBrowserRouter(
     createRoutesFromElements(

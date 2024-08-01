@@ -60,7 +60,7 @@ const Dashboard = () => {
       // setGradeLevelCounts(dashboard.gradeCounts);
       setEnrolledStudentsCount(dashboard.enrolledStudents);
     }
-  })
+  },[dashboard])
 
   useEffect(() => {
     // if (students) {

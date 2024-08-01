@@ -38,6 +38,20 @@ const Admission = () => {
                 <h1 className="text-2xl text-gray-700 font-bold">Admission</h1>
                 <Searchbar onSearch={handleSearch} />
             </div>
+            <div className="flex flex-wrap gap-2 mb-4">
+                {admissionPages.map((page) => (
+                    <button
+                        key={page}
+                        className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+                        onClick={() => {
+                            setCurrentPage(page);
+                            setEnableView(false);
+                        }}
+                    >
+                        {page}
+                    </button>
+                ))}
+            </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
                 <div className="rounded-md h-fit">

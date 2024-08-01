@@ -22,10 +22,10 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [email, setEmail] = useState(id?.email);
     const [status, setStatus] = useState(id?.status);
     const [lrn, setLrn] = useState(id?.lrn);
-    const [passedReportCard, setPassedReportCard] = useState(id?.passedReportCard);
-    const [settledArrears, setSettledArrears] = useState(id?.settledArrears);
-    const [completedClearance, setCompletedClearance] = useState(id?.completedClearance);
-    const [isRegistered,setIsRegistered] = useState(id?.isRegistered);
+    const [passedReportCard, setPassedReportCard] = useState(id?.academicId?.passedReportCard);
+    const [settledArrears, setSettledArrears] = useState(id?.academicId?.settledArrears);
+    const [completedClearance, setCompletedClearance] = useState(id?.academicId?.completedClearance);
+    const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
 
 
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
@@ -63,10 +63,10 @@ const StudentInfoPopup = ({ id, closeModal }) => {
         }
 
         try {
-            const data = await axios.patch(`${baseUrl()}/student/${id?._id}`,studentInfo);
+            const data = await axios.patch(`${baseUrl()}/student/info/${id?._id}`,studentInfo);
             toast.success(data.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -79,6 +79,16 @@ const StudentInfoPopup = ({ id, closeModal }) => {
             }, 2000);
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

@@ -81,10 +81,9 @@ module.exports.get_enrolled_students = async (req, res) => {
 module.exports.add_student = async (req,res) => {
     const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter } = req.body;
     const isAdmitted = false;
-    const status = 'New'
 
     try {
-        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,status,email,contactNumber,address,isAdmitted,inputter });
+        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
@@ -99,6 +98,27 @@ module.exports.delete_student = async (req,res) => {
         res.status(200).json({ mssg: `${studentFind.firstName}'s record has been deleted`});
     } catch(err) {
         console.log(err)
+    }
+}
+
+module.exports.edit_student = async(req,res) => {
+    const { id } = req.params;
+
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter } = req.body;
+
+    try {   
+
+        const student = await Student.findById(id);
+        if(!student) {
+            return res.status(404).json({ mssg: 'Sorry, this student is not in the record, please try again', redirect: '/students' });
+        }
+
+        await Student.findByIdAndUpdate({ _id: id },{ firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,inputter });
+        res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been updated successfully`, redirect: '/students' });
+
+    } catch(err) {
+        console.log(err);
+        res.status(400).json({ mssg: err.message });
     }
 }
 
@@ -182,6 +202,9 @@ module.exports.add_admission = async (req, res) => {
     console.log('Submitted requirements:', requirements);
     
     try {
+        // Check for Academic Record of student if existing
+        const studentAcademicExist = await Academic.findOne({ studentId });
+        
         // Fetch all required documents
         const requiredDocs = await Requirement.find({ sessionId: schoolYear, isRequired: true });
         const requiredDocIds = requiredDocs.map(doc => doc._id.toString());
@@ -215,10 +238,29 @@ module.exports.add_admission = async (req, res) => {
         console.log('All Requirements Met:', allRequirementsMet);
 
         if (allRequirementsMet) {
+            if (studentAcademicExist) {
+                const foundAcademic = await Academic.findByIdAndUpdate(studentAcademicExist._id, { isAdmitted: true, sessionId: schoolYear });
+                console.log('Found Academic Record:', foundAcademic);
+                await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: foundAcademic._id });
+            } else { // if student academic not existing, create new record
+                const academic = await Academic.create({ studentId, isAdmitted: true, sessionId: schoolYear });
+                await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: academic._id });
+                console.log('Creating academic')
+            }
             // Admit the student
-            const result = await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date() });
-            console.log('Student admitted:', result);
+            // const result = await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date() });
+            // console.log('Student admitted:', result);
         } else {
+            if (studentAcademicExist) {
+                const foundAcademic = await Academic.findByIdAndUpdate(studentAcademicExist._id, { isAdmitted: false,sessionId: schoolYear });
+                await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: foundAcademic._id });
+                console.log('Found Academic Record:', foundAcademic);
+            } else { // if student academic not existing, create new record
+                await Academic.create({ studentId, isAdmitted: false, sessionId: schoolYear });
+                await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: academic._id });
+                console.log('Creating academic')
+            }
+
             // Set isAdmitted to false if any requirement is unchecked
             const result = await Student.findByIdAndUpdate(studentId, { isAdmitted: false });
             console.log('Student not admitted:', result);
@@ -242,6 +284,7 @@ module.exports.get_admission_student = async (req,res) => {
         res.status(200).json(admission);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while getting admission records'});
     }
 }
 
@@ -275,27 +318,25 @@ module.exports.update_student_info = async (req, res) => {
         currentUserId: inputter
     } = req.body;
 
-    if(completedClearance && passedReportCard && settledArrears) {
-        isRegistered = true
-        console.log('go here true')
+    if (completedClearance && passedReportCard && settledArrears) {
+        isRegistered = true;
     } else {
         isRegistered = false;
-        console.log('go here false');
     }
 
     try {
-        // Fetch the latest registered student sorted by creation date
-        const latestStudent = await Student.findOne({ isRegistered: true }).sort({ _id: -1 });
-        console.log("Latest student:", latestStudent);
+        const studentAcademic = await Academic.findOne({ studentId: id, sessionId: session });
+        console.log('student Academic', studentAcademic);
 
-        const isStudentRegistered = await Student.findById(id);
-        const currentSession = await SchoolYear.findById(session);
-
-        if (currentSession) {
-            currentYear = currentSession.startYear.split('-')[0];
-        } else {
-            return res.status(400).json({ mssg: 'Session not found' });
+        if (!studentAcademic?.isAdmitted) {
+            return res.status(404).json({ mssg: 'Please complete students requirements first before adding academic record' });
         }
+
+        const latestStudent = await Student.findOne({ studentNo: { $exists: true } }).sort({ _id: -1 });
+        console.log('Latest Student: ', latestStudent);
+
+        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance });
+        console.log('New Record: ', studentAcademicNewRecord);
 
         const student = await Student.findByIdAndUpdate(
             id,
@@ -314,19 +355,24 @@ module.exports.update_student_info = async (req, res) => {
                 status,
                 suffix,
                 lrn,
-                passedReportCard,
-                settledArrears,
-                completedClearance,
-                isRegistered,
+                academicId: studentAcademicNewRecord._id,
                 inputter
             },
             { new: true }
         );
 
+        const isStudentRegistered = await Student.findById(id);
+        const currentSession = await SchoolYear.findById(session);
+
+        if (currentSession) {
+            currentYear = currentSession.startYear.split('-')[0];
+        } else {
+            return res.status(400).json({ mssg: 'Session not found' });
+        }
+
         if (isRegistered) {
             dateRegistered = new Date();
 
-            // Ensure student number is only assigned if the student is newly registered
             if (!student.studentNo) {
                 if (latestStudent?.studentNo?.slice(0, 4) == currentYear) {
                     const plusOne = parseInt(latestStudent.studentNo.slice(-4)) + 1;
@@ -348,14 +394,11 @@ module.exports.update_student_info = async (req, res) => {
         await student.save();
 
         res.status(200).json({ mssg: `${studentName}'s record has been updated successfully!` });
-
     } catch (err) {
         console.log(err);
         res.status(500).json({ mssg: 'Server error' });
     }
 };
-
-
 
 // For Academic
 
@@ -369,6 +412,7 @@ module.exports.get_academics = async (req,res) => {
         res.status(200).json(academics);
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while fetching academic record'});
     }
 }
 
@@ -388,6 +432,7 @@ module.exports.get_student_academic_detail = async (req,res) => {
     
     try {
         const studentAcademic = await Academic.find({ studentId, sessionId: session },{ sort: { 'createdAt': -1 } });
+        console.log(studentAcademic)
         res.status(200).json(studentAcademic);
     } catch(err) {
         console.log(err);
@@ -396,7 +441,7 @@ module.exports.get_student_academic_detail = async (req,res) => {
 
 module.exports.add_academic = async (req,res) => {
 
-    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId } = req.body;
+    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus } = req.body;
     // This will also update students info upon posting
 
     if(strandId === '') {
@@ -409,11 +454,26 @@ module.exports.add_academic = async (req,res) => {
 
     try {
 
-        await Academic.findOneAndDelete({ studentId: studentId });
+        //await Academic.findOneAndDelete({ studentId: studentId });
+        const studentAcademic = await Academic.findOne({ studentId,sessionId });
 
-        const academic = await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId });
-        const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
-        res.status(200).json({ mssg: `${student.firstName} ${student.lastName}'s academic record has been created successfully` });
+        if(!studentAcademic.isRegistered || !studentAcademic.isAdmitted) {
+            return res.status(400).json({ mssg: 'Please admit or register the student first before creating academic record' });
+        }
+
+        if(!lastSchoolAttended) {
+            return res.status(404).json({ mssg: 'Please enter last school attended by student' });
+        }
+
+        if(studentAcademic) {
+            const academic = await Academic.findOneAndUpdate({ studentId: studentId, sessionId: sessionId },{strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus})
+            await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
+        }
+
+        // Student will be updated and academic table will be appended many times by 1 student
+        // const academic =  await Academic.create({ strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus });
+        // const student = await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
+        res.status(200).json({ mssg: `Students academic record has been created successfully` });
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: 'Error on creating academic record, please ensure all fields were entered' });

@@ -175,6 +175,7 @@ const Section = () => {
                 {gradeLevels?.map(gradeLevel => (
                     <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
                 ))}
+                <option value="">Leave as blank</option>
             </select>
         </div>
         <div className="flex flex-col mt-1">
@@ -187,6 +188,7 @@ const Section = () => {
                 {teachers?.map(teacher => (
                     <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
                 ))}
+                <option value="">Leave as blank</option>
             </select>
         </div>
         </>

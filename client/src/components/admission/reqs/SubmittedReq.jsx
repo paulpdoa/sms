@@ -64,13 +64,13 @@ const SubmittedReq = () => {
                 theme: "colored"
             });
 
-            // setTimeout(() => {
-            //     window.location.reload();
-            // }, 2000);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } catch (err) {
             toast.error(err.response?.data?.mssg || 'An error occurred', {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

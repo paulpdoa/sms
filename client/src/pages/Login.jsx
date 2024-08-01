@@ -16,8 +16,8 @@ const Login = () => {
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['userToken']);
 
-    const schoolName = 'Christian School International';
-    const logoPath = '/schoolLogo/CAPSCI-Logo.png';
+    const schoolName = 'School Management System';
+    const logoPath = '/schoolLogo/school-logo-filler.png';
 
     const loginUser = async (e) => {
         e.preventDefault();

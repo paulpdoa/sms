@@ -369,6 +369,10 @@ module.exports.add_sections = async (req,res) => {
         adviser = undefined;
     }
 
+    if(gradeLevel === '') {
+        adviser = undefined;
+    }
+
     try {
         const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId,inputter);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
@@ -1343,9 +1347,9 @@ module.exports.edit_sibling = async (req,res) => {
 
 // Dashboard details 
 
-module.exports.get_dashboard_details = async (req,res) => {
+module.exports.get_dashboard_details = async (req, res) => {
 
-    const { session } = req.params;
+    const { sessionId: session } = req.params;
 
     try {
         let studentsRegistered = 0;
@@ -1353,45 +1357,49 @@ module.exports.get_dashboard_details = async (req,res) => {
         let studentsGender = { male: 0, female: 0 };
         let studentsNationality = { local: 0, foreign: 0 };
         let enrolledStudents = 0;
+        let academicStatusOfStudents = { new: 0, old: 0, transferred: 0, graduated: 0, admittedButDidNotContinue: 0 };
+
         const gradeCounts = {};
         let teachersCount = 0;
 
-        // Get all Academic record as this will be the basis for students 
-        const academics = await Academic.find({ sessionId: session })
-        .populate({
-            path: 'studentId',
-            populate: {
-                path: 'nationality',
-            },
-        })
-        .populate({
-            path: 'studentId',
-            populate: {
-                path: 'academicId',
+        // Get all Academic records
+        const academics = await Academic.find()
+            .populate({
+                path: 'studentId',
                 populate: {
-                    path: 'gradeLevelId',
+                    path: 'nationality',
                 },
-            },
-        })
-        .populate('gradeLevelId departmentId strandId sectionId paymentTermId');
+            })
+            .populate({
+                path: 'studentId',
+                populate: {
+                    path: 'academicId',
+                    populate: {
+                        path: 'gradeLevelId',
+                    },
+                },
+            })
+            .populate('gradeLevelId departmentId strandId sectionId paymentTermId');
 
         const studentsEnrolled = await StudentPayment.find({ sessionId: session });
 
         const gradeLevels = await GradeLevel.find();
 
         const teachers = await Teacher.find();
-        
-        if(teachers) {
+
+        if (teachers) {
             teachersCount = teachers.length;
         }
 
-        const recordsCheck = !academics && !studentsEnrolled && !gradeLevels && !teachersCount;
+        const recordsCheck = !academics.length && !studentsEnrolled.length && !gradeLevels.length && !teachersCount;
 
-        if(recordsCheck) {
-            return res.status(404).json({ mssg: 'Error on getting records for dashboard' });
+        console.log('Records Check:', recordsCheck);
+
+        if (recordsCheck) {
+            return res.status(404).json({ mssg: 'Error on getting records for dashboard', academics, studentsEnrolled, gradeLevels, teachersCount });
         }
 
-//-----------------------For getting enrollees counts--------------------------------- 
+        //-----------------------For getting enrollees counts--------------------------------- 
         const uniqueStudentIds = new Set();
         const filteredEnrolledStudents = [];
 
@@ -1402,41 +1410,43 @@ module.exports.get_dashboard_details = async (req,res) => {
             }
         }
         enrolledStudents = filteredEnrolledStudents.length;
-// ------------------------------------------------------
-        for(const academic of academics) {
-            if(academic.studentId.isRegistered) {
+        // ------------------------------------------------------
+        for (const academic of academics) {
+            if (academic.isRegistered) {
                 studentsRegistered += 1;
             }
 
-            if(academic.studentId.isAdmitted) {
+            if (academic.studentId.isAdmitted) {
                 studentsAdmitted += 1;
             }
 
-            if(academic.studentId.sex === 'Male') {
+            if (academic.studentId.sex === 'Male') {
                 studentsGender.male += 1;
             } else {
                 studentsGender.female += 1;
             }
 
-            if(academic.studentId.nationality.nationality === 'Filipino') {
+            if (academic.studentId.nationality.nationality === 'Filipino') {
                 studentsNationality.local += 1;
             } else {
                 studentsNationality.foreign += 1;
             }
+
+            // console.log(academic.studentId.academicId.academicStatus, academic.studentId.academicId.firstName);
         }
 
         gradeLevels?.forEach(gl => {
             gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.studentId.academicId.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
         });
 
-
         res.status(200).json({ studentsRegistered, studentsAdmitted, studentsGender, studentsNationality, enrolledStudents, gradeCounts, teachersCount, academics });
-         
-    } catch(err) {
+
+    } catch (err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.',error: err.message })
+        res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.', error: err.message });
     }
 }
+
 
 
 // For generating test data for academic table
@@ -1446,14 +1456,17 @@ module.exports.generate_academic_students = async (req,res) => {
 
         // Get student lists
         const studentLists = await Student.find();
+        const academicLists = await Academic.find();
 
         for(student of studentLists) {
             
-            await Academic.findOneAndDelete({ studentId: student._id });
+            await Academic.deleteMany();
             
-            const academic = await Academic.create({ studentId: student._id, lastSchoolAttended: 'Test School Attended' });
-            
-            await Student.findByIdAndUpdate({ _id: student._id} ,{ academicId: academic._id })
+
+            for(const academic of academicLists) {
+                await Student.findByIdAndDelete({ _id: student._id} ,{ academicId: academic._id })
+
+            }
         }
 
         res.status(200).json({ mssg: 'Academic has been created successfully'});

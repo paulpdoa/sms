@@ -31,7 +31,9 @@ const studentSchema = new mongoose.Schema({
     },
     firstName:requiredString,
     lastName: requiredString,
-    middleName: requiredString,
+    middleName: {
+        type: String
+    },
     email: {
         required: true,
         type: String,
@@ -56,7 +58,6 @@ const studentSchema = new mongoose.Schema({
     },
     contactNumber: requiredString,
     address: requiredString,
-    status: requiredString,
     isAdmitted: {
         type: Boolean
     },

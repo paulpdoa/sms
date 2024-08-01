@@ -1,0 +1,9 @@
+{
+    "academicStatus": [
+        { "id": 1, "name": "New"},
+        { "id": 2, "name": "Old" },
+        { "id": 3, "name": "Transferred" },
+        { "id": 4, "name": "Graduated" },
+        { "id": 5, "name": "Admitted but did not continue"}
+    ]
+}

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MainContext } from '../../../helpers/MainContext';
+import { academicStatus as status } from '../../../data/academicStatus.json';
 
 const StudentAcademic = () => {
     
@@ -14,8 +15,6 @@ const StudentAcademic = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
-
-    console.log(academic);
     
     const { session: syId,currStudRec } = useContext(MainContext);
     const id = currStudRec._id;
@@ -29,6 +28,9 @@ const StudentAcademic = () => {
     const [session, setSession] = useState('');
     const [lastSchool, setLastSchool] = useState('');
     const [paymentTermId,setPaymentTermId] = useState('');
+    const [academicStatus,setAcademicStatus] = useState('New');
+
+    console.log(status);
 
     const [grade11Id, setGrade11Id] = useState('');
     const [grade12Id, setGrade12Id] = useState('');
@@ -71,16 +73,17 @@ const StudentAcademic = () => {
             sessionId: session,
             lastSchoolAttended: lastSchool,
             studentId: id,
-            paymentTermId
+            paymentTermId,
+            academicStatus
         }
-
+        
 
         try {
             const { data } = await axios.post(`${baseUrl()}/academic`, academicInfo);
             toast.success(data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+                autoClose: 2000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -93,8 +96,8 @@ const StudentAcademic = () => {
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+                autoClose: 2000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -121,6 +124,7 @@ const StudentAcademic = () => {
                             {gradeLevels?.map(gradeLevel => (
                                 <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
                             ))}
+                            <option value="">Leave as blank</option>
                         </select>
                     </div>
 
@@ -142,6 +146,7 @@ const StudentAcademic = () => {
                                 {strands?.map(strand => (
                                     <option key={strand._id} value={strand._id}>{strand.strand}</option>
                                 ))}
+                                <option value="">Leave as blank</option>
                             </select>
                         </div>
                     )}
@@ -169,6 +174,19 @@ const StudentAcademic = () => {
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="school last attended">School Last Attended</label>
                         <input className="p-2 rounded-md outline-none border border-gray-400" type="text" onChange={(e) => setLastSchool(e.target.value)} value={lastSchool ? lastSchool : ''} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold" htmlFor="academic status">Academic Status</label>
+                        <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setAcademicStatus(e.target.value)} required>
+                            <option hidden>{student?.academicId?.academicStatus ? student?.academicId?.academicStatus : 'Not Assigned'}</option>
+                            {status?.map(stat => (
+                                <option key={stat._id} value={stat.name}>
+                                    {stat.name}
+                                </option>
+                            ))}
+                            <option value="">Leave as blank</option>
+                        </select>
                     </div>
                 </div>
 

@@ -98,10 +98,6 @@ const EditStudent = () => {
             contactNumber,
             address,
             session,
-            isRegistered,
-            passedReportCard,
-            settledArrears,
-            completedClearance,
             currentUserId,
             role
         };
@@ -119,11 +115,11 @@ const EditStudent = () => {
             });
 
             setTimeout(() => {
-                navigate('/students');
+                navigate(data.data.redirect);
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error("Error editing student. Please try again.", {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 2000,
                 hideProgressBar: true,

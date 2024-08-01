@@ -33,11 +33,11 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         </div>
     );
 
-    const formattedStudents = students?.filter(student => student.isAdmitted).map(student => ({
+    const formattedStudents = students?.map(student => ({
         ...student,
         fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
         studentNo: student.studentNo || 'Not assigned',
-        registered: student.isRegistered ? 'Yes' : 'No',
+        registered: student.academicId?.isRegistered ? 'Yes' : 'No',
         dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',

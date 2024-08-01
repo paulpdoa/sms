@@ -54,7 +54,7 @@ const Profile = () => {
 
             toast.success(response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -73,7 +73,7 @@ const Profile = () => {
             console.error('Error updating profile:', error);
             toast.error(error.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

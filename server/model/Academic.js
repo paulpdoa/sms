@@ -26,7 +26,9 @@ const academicSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
     },
-    lastSchoolAttended: requiredString,
+    lastSchoolAttended: {
+        type: String
+    },
     sectionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'section'
@@ -34,6 +36,27 @@ const academicSchema = new mongoose.Schema({
     paymentTermId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'paymentTerm'
+    },
+    academicStatus: { // Academic status values New, Old, Transferred, or Graduated
+        type: String,
+    },
+    passedReportCard: {
+        type: Boolean
+    },
+    settledArrears: {
+        type: Boolean
+    },
+    completedClearance: {
+        type: Boolean
+    },
+    isRegistered: {
+        type: Boolean,
+    },
+    isAdmitted: {
+        type: Boolean
+    },
+    isEnrolled: {
+        type: Boolean
     }
 }, { timestamps: true })
 
