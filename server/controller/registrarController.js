@@ -308,6 +308,7 @@ module.exports.update_student_info = async (req, res) => {
         contactNumber,
         email,
         status,
+        academicStatus,
         suffix,
         lrn,
         passedReportCard,
@@ -335,7 +336,7 @@ module.exports.update_student_info = async (req, res) => {
         const latestStudent = await Student.findOne({ studentNo: { $exists: true } }).sort({ _id: -1 });
         console.log('Latest Student: ', latestStudent);
 
-        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance });
+        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus });
         console.log('New Record: ', studentAcademicNewRecord);
 
         const student = await Student.findByIdAndUpdate(

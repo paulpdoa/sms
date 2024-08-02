@@ -129,24 +129,22 @@ const Nationality = () => {
 
     const form = () => (
         <>
-        <h1 className="font-semibold text-xl text-gray-700">Add New Nationality</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New Nationality</h1>
 
-        <div className="flex flex-col mt-1">
-            <label className="text-sm" htmlFor="nationality">Nationality</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setNationality(e.target.value)} />
-        </div>
+            <div className="flex flex-col mt-1">
+                <label className="text-sm" htmlFor="nationality">Nationality</label>
+                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setNationality(e.target.value)} />
+            </div>
 
-        <div className="flex flex-col mt-1">
-            <label className="text-sm" htmlFor="nationality">Nationality Code</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCodeId(e.target.value)}>
-                <option hidden>Select nationality code</option>
-                { nationalityCodes?.map(nc => (
-                    <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
-                )) }
-            </select>
-        </div>
-
-        
+            <div className="flex flex-col mt-1">
+                <label className="text-sm" htmlFor="nationality">Nationality Code</label>
+                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCodeId(e.target.value)}>
+                    <option hidden>Select nationality code</option>
+                    { nationalityCodes?.map(nc => (
+                        <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
+                    )) }
+                </select>
+            </div>
         </>
     )
 

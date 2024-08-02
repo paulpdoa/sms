@@ -207,7 +207,6 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     onChange={(e) => handleInputChange(e, column)}
                                                                     className="outline-none p-1 rounded-md border border-gray-300"
                                                                 >   
-                                                                    <option value="">Leave as blank</option>
                                                                     <option value={record._id || ''} hidden>
                                                                         { 
                                                                             column.header === 'Adviser' ? record.adviser.name : 

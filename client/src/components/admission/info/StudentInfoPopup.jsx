@@ -6,6 +6,8 @@ import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
 import { RiCloseLargeFill } from "react-icons/ri";
 import { MainContext } from '../../../helpers/MainContext';
+import { academicStatus as academicStatuses } from '../../../data/academicStatus.json';
+
 
 const StudentInfoPopup = ({ id, closeModal }) => {
 
@@ -26,6 +28,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [settledArrears, setSettledArrears] = useState(id?.academicId?.settledArrears);
     const [completedClearance, setCompletedClearance] = useState(id?.academicId?.completedClearance);
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
+    const [academicStatus,setAcademicStatus] = useState(id?.academicId?.academicStatus);
 
 
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
@@ -58,6 +61,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
             passedReportCard,
             settledArrears,
             completedClearance,
+            academicStatus,
             session,
             isRegistered
         }
@@ -210,11 +214,18 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     </div>
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="status">Status</label>
-                        <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            type="text"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        />
+                        <select className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            onChange={(e) => setAcademicStatus(e.target.value)}
+                        >
+                            <option hidden>{id?.academicId?.academicStatus ? id?.academicId?.academicStatus : 'Select academic status'}</option>
+                            { academicStatuses?.map(acad => (
+                               <>
+                                <option key={acad._id} value={acad.name}>
+                                    { acad.name}
+                                </option>
+                               </>
+                            )) }
+                        </select>
                     </div>
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="lrn">LRN</label>

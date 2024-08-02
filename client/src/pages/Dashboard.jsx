@@ -48,6 +48,7 @@ const Dashboard = () => {
   const [gradeLevelCounts, setGradeLevelCounts] = useState({});
   const [nationalityCounts, setNationalityCounts] = useState({ local: 0, foreign: 0 });
   const [enrolledStudentsCount, setEnrolledStudentsCount] = useState(0);
+  const [academicStatusOfStudents,setAcademicStatusOfStudents] = useState({ new: 0, transferred: 0,old: 0, graduated: 0, admittedButDidNotContinue: 0 });
 
   useEffect(() => {
     if(dashboard) {
@@ -59,6 +60,14 @@ const Dashboard = () => {
       setNationalityCounts({ local: dashboard.studentsNationality?.local, foreign: dashboard.studentsNationality?.foreign });
       // setGradeLevelCounts(dashboard.gradeCounts);
       setEnrolledStudentsCount(dashboard.enrolledStudents);
+      setAcademicStatusOfStudents({ 
+        new: dashboard.academicStatusOfStudents?.new, 
+        transferred: dashboard.academicStatusOfStudents?.transferred, 
+        old: dashboard.academicStatusOfStudents?.old,
+        graduated: dashboard.academicStatusOfStudents?.graduated,
+        admittedButDidNotContinue: dashboard.academicStatusOfStudents?.admittedButDidNotContinue
+
+      })
     }
   },[dashboard])
 
@@ -92,17 +101,17 @@ const Dashboard = () => {
     // }
    }, [students, academics, enrolledStudents]);
 
-  const genderData = {
-    labels: ['Male', 'Female'],
+  const academicStatusData = {
+    labels: ['New', 'Old', 'Transferred', 'Graduated', 'Admitted but did not continue'],
     datasets: [{
-      data: [genderCounts.male, genderCounts.female],
-      backgroundColor: ['#36A2EB', '#FF6384'],
-      hoverBackgroundColor: ['#36A2EB', '#FF6384'],
+      data: [academicStatusOfStudents.new, academicStatusOfStudents.old, academicStatusOfStudents.transferred, academicStatusOfStudents.graduated, academicStatusOfStudents.admittedButDidNotContinue],
+      backgroundColor: ['#36A2EB', '#FF6384','#4BC0C0','#FF9F40','#DC2626'],
+      hoverBackgroundColor: ['#36A2EB', '#FF6384','#4BC0C0','#FF9F40','#DC2626'],
     }],
   };
 
   const nationalityData = {
-    labels: ['Local', 'Foreign'],
+    labels: ['Local', 'International'],
     datasets: [{
       data: [nationalityCounts.local, nationalityCounts.foreign],
       backgroundColor: ['#4BC0C0', '#FF9F40'],
@@ -161,13 +170,6 @@ const Dashboard = () => {
         <section className="grid md:grid-cols-4 gap-6 mb-6">
           <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
             <div>
-              <h2 className="text-gray-600 text-lg">Registered Students</h2>
-              <CountUp className="text-3xl font-bold text-blue-600" end={studentRegistered} duration={2} />
-            </div>
-            <PiStudentDuotone className="text-5xl text-blue-600" />
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
-            <div>
               <h2 className="text-gray-600 text-lg">Admitted Students</h2>
               <CountUp className="text-3xl font-bold text-green-600" end={studentAdmitted} duration={2} />
             </div>
@@ -175,10 +177,10 @@ const Dashboard = () => {
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
             <div>
-              <h2 className="text-gray-600 text-lg">Teachers</h2>
-              <CountUp className="text-3xl font-bold text-purple-600" end={teachers?.length || 0} duration={2} />
+              <h2 className="text-gray-600 text-lg">Registered Students</h2>
+              <CountUp className="text-3xl font-bold text-blue-600" end={studentRegistered} duration={2} />
             </div>
-            <PiChalkboardTeacherFill className="text-5xl text-purple-600" />
+            <PiStudentDuotone className="text-5xl text-blue-600" />
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
             <div>
@@ -187,13 +189,21 @@ const Dashboard = () => {
             </div>
             <PiStudentDuotone className="text-5xl text-red-600" />
           </div>
+          <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+            <div>
+              <h2 className="text-gray-600 text-lg">Teachers</h2>
+              <CountUp className="text-3xl font-bold text-purple-600" end={teachers?.length || 0} duration={2} />
+            </div>
+            <PiChalkboardTeacherFill className="text-5xl text-purple-600" />
+          </div>
+         
         </section>
 
         <section className="grid lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Gender Distribution</h2>
+            <h2 className="text-lg font-semibold mb-4">Academic Status Data Distribution</h2>
             <div style={{ height: '300px' }}>
-              <Pie data={genderData} options={chartOptions} />
+              <Pie data={academicStatusData} options={chartOptions} />
             </div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">

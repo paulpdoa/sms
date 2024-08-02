@@ -913,7 +913,6 @@ module.exports.edit_user = async (req, res) => {
     const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword } = req.body;
 
     let updatedData = { firstName, middleName, lastName, role, username, isActive };
-    console.log(req.body);
     if (req.file) {
         updatedData.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
@@ -929,7 +928,16 @@ module.exports.edit_user = async (req, res) => {
             if (password !== confirmPassword) {
                 return res.status(400).json({ mssg: 'Passwords do not match' });
             }
-            updatedData.password = password;
+
+            if(password === '' || confirmPassword === '') {
+                return res.status(400).json({ mssg: 'Password cannot be empty' });
+            }
+
+            const salt = await bcrypt.genSalt();
+
+            const newPassword = await bcrypt.hash(password,salt);
+
+            updatedData.password = newPassword;
         }
 
         await User.findByIdAndUpdate(id, updatedData);
@@ -1363,7 +1371,7 @@ module.exports.get_dashboard_details = async (req, res) => {
         let teachersCount = 0;
 
         // Get all Academic records
-        const academics = await Academic.find()
+        const academics = await Academic.find({sessionId: session})
             .populate({
                 path: 'studentId',
                 populate: {
@@ -1432,6 +1440,26 @@ module.exports.get_dashboard_details = async (req, res) => {
                 studentsNationality.foreign += 1;
             }
 
+            if(academic.academicStatus === 'New') {
+                academicStatusOfStudents.new += 1;
+            }
+
+            if(academic.academicStatus === 'Transferred') {
+                academicStatusOfStudents.transferred += 1;
+            }
+
+            if(academic.academicStatus === 'Graduated') {
+                academicStatusOfStudents.graduated += 1;
+            }
+
+            if(academic.academicStatus === 'Old') {
+                academicStatusOfStudents.old += 1;
+            }
+
+            if(academic.academicStatus === 'Admitted but did not continue') {
+                academicStatusOfStudents.admittedButDidNotContinue += 1;
+            }
+
             // console.log(academic.studentId.academicId.academicStatus, academic.studentId.academicId.firstName);
         }
 
@@ -1439,7 +1467,7 @@ module.exports.get_dashboard_details = async (req, res) => {
             gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.studentId.academicId.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
         });
 
-        res.status(200).json({ studentsRegistered, studentsAdmitted, studentsGender, studentsNationality, enrolledStudents, gradeCounts, teachersCount, academics });
+        res.status(200).json({ studentsRegistered, studentsAdmitted, studentsGender, studentsNationality, enrolledStudents, gradeCounts, teachersCount, academicStatusOfStudents, academics });
 
     } catch (err) {
         console.log(err);
@@ -1460,9 +1488,6 @@ module.exports.generate_academic_students = async (req,res) => {
 
         for(student of studentLists) {
             
-            await Academic.deleteMany();
-            
-
             for(const academic of academicLists) {
                 await Student.findByIdAndDelete({ _id: student._id} ,{ academicId: academic._id })
 

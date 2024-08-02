@@ -110,9 +110,9 @@ const NewStudent = () => {
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
-                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
+                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text",true)}
                         {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
-                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix")}
+                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix",false)}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
                         {renderSelect("sex", "Gender", sex, setSex, genderSelections, "Gender")}
@@ -171,7 +171,7 @@ const renderInput = (id, label, value, onChange, type, disabled = false, fullSpa
     </div>
 );
 
-const renderSelect = (id, label, value, onChange, options, placeholder) => (
+const renderSelect = (id, label, value, onChange, options, placeholder,required = false) => (
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
@@ -179,7 +179,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required
+            required={required}
         >
             <option value="" hidden>{placeholder}</option>
             {options?.map(option => (
