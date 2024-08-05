@@ -14,32 +14,41 @@ import { useNavigate } from 'react-router-dom';
 
 const columns = [
     {
-        accessorKey: 'firstName',
-        header: 'First Name',
+        accessorKey: 'fullName',
+        header: 'Full Name'
     },
     {
-        accessorKey: 'lastName',
-        header: 'Last Name',
+        accessorKey: 'studentNo',
+        header: 'Student No.'
     },
     {
-        accessorKey: 'middleName',
-        header: 'Middle Name',
+        accessorKey: 'gradeLevel',
+        header: 'Grade Level'
     },
     {
-        accessorKey: 'dateOfBirth',
-        header: 'Date Of Birth',
+        accessorKey: 'nationality',
+        header: 'Nationality'
     },
     {
-        accessorKey: 'sex',
-        header: 'Gender',
+        accessorKey: 'strand',
+        header: 'Strand'
     },
     {
-        accessorKey: 'nationality.nationality',
-        header: 'Nationality',
+        accessorKey: 'section',
+        header: 'Section'
+    },
+    {
+        accessorKey: 'adviser',
+        header: 'Adviser'
+    },
+    {
+        accessorKey: 'paymentTerm',
+        header: 'Payment Term'
     }
 ];
 
 const Students = () => {
+
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
     const { searchQuery,setSearchQuery,session,role } = useContext(MainContext);
     
@@ -69,6 +78,19 @@ const Students = () => {
 
     const goToEdit = (id) => navigate(`/registrar/edit-student/${id}`);
 
+    const formattedStudents = records?.map(student => ({
+        ...student,
+        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        studentNo: student?.studentNo ?? 'Not Registered yet',
+        gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel ?? 'Not assigned yet',
+        nationality: student?.nationality?.nationality ?? 'Not assigned yet',
+        strand: student?.academicId?.strandId?.strand ?? 'Not Assigned yet',
+        section: student?.academicId?.sectionId?.section ?? 'Not Assigned yet',
+        adviser: `${student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser.firstName} ${student?.academicId?.sectionId?.adviser.lastName}` : 'Not Assigned'}`,
+        paymentTerm: student?.academicId?.paymentTermId?.term ?? 'Not Assigned'
+    }))
+
+
     return (
         <main className="p-2">
             <div className="flex justify-between items-center">
@@ -79,7 +101,7 @@ const Students = () => {
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
-                    data={records}
+                    data={formattedStudents}
                     onDelete={deleteStudent}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}

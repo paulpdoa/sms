@@ -39,7 +39,6 @@ const Dashboard = () => {
   const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
   const { records: dashboard } = useFetch(`${baseUrl()}/dashboard/${session}`);
-  console.log(dashboard);
 
   const [studentRegistered, setStudentRegistered] = useState(0);
   const [studentAdmitted, setStudentAdmitted] = useState(0);
@@ -52,7 +51,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     if(dashboard) {
-      console.log(dashboard);
       setStudentRegistered(dashboard.studentsRegistered);
       setStudentAdmitted(dashboard.studentsAdmitted);
       setGenderCounts({ male: dashboard.studentsGender?.male, female: dashboard.studentsGender?.female });
@@ -92,7 +90,6 @@ const Dashboard = () => {
         gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
       });
       setGradeLevelCounts(gradeCounts);
-      console.log(gradeCounts);
     }
 
     // if (enrolledStudents) {

@@ -12,6 +12,8 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage,setRowsPerPage] = useState(10); // Set the number of rows per page
 
+    console.log(data);
+
     // For disabling currentSchoolyear logged in session
     const { session,isFreshYear } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
@@ -206,8 +208,8 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
                                                                     className="outline-none p-1 rounded-md border border-gray-300"
-                                                                >   
-                                                                    <option value={record._id || ''} hidden>
+                                                                >
+                                                                    <option value={record._id || ''} disabled hidden>
                                                                         { 
                                                                             column.header === 'Adviser' ? record.adviser.name : 
                                                                             column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
@@ -220,7 +222,6 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     {column.selectOptions.map(option => (
                                                                         <option key={option.value} value={option.value}>{option.label}</option>
                                                                     ))}
-                                                                    {/* I need to be able to select a blank here, this should not be displayed initially */}
                                                                 </select>
                                                             ) : (
                                                                 <input
@@ -316,12 +317,14 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                     >
                                         { currentPage }
                                     </button>
-                                    <button
-                                        onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
-                                        className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                                    >
-                                        { currentPage > 1 && currentPage + 1 }
-                                    </button>
+                                    { currentPage !== totalPages && (
+                                        <button
+                                            onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                        >
+                                            { currentPage > 1 && currentPage + 1 }
+                                        </button>
+                                    ) }
                                 </div>
                                 {/* <AnimatePresence mode="wait">
                                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (

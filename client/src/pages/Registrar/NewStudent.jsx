@@ -18,7 +18,7 @@ const NewStudent = () => {
         { value: 'Jr',placeholder: 'Jr' },
         { value: 'Sr',placeholder: 'Sr' },
         { value: 'I',placeholder:'I', },
-        {  value: 'II',placeholder:'II' },
+        { value: 'II',placeholder:'II' },
         { value: 'III',placeholder:'III' }
     ]
 
@@ -185,6 +185,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder,required 
             {options?.map(option => (
                 <option key={option._id} value={id === 'sex' ? option.name : option._id}>{option[Object.keys(option)[1]]}</option>
             ))}
+            <option value="">N/A</option>
         </select>
     </div>
 );

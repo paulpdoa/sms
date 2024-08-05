@@ -26,7 +26,6 @@ const EditStudent = () => {
         { _id: 'III',suffix:'III' }
     ]
 
-
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -142,7 +141,7 @@ const EditStudent = () => {
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
                         {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
                         {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
-                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix")}
+                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix",false) }
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("age", "Age", age, () => {}, "number", true)}
                         {renderSelect("sex", "Sex", sex, setSex, genderSelections, "Gender")}
@@ -201,7 +200,7 @@ const renderInput = (id, label, value, onChange, type, disabled = false, fullSpa
     </div>
 );
 
-const renderSelect = (id, label, value, onChange, options, placeholder) => (
+const renderSelect = (id, label, value, onChange, options, placeholder,required = false) => (
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
@@ -209,7 +208,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required
+            required={required}
         >
             <option value="" hidden>{value ?? placeholder}</option>
             {options?.map(option => (
@@ -220,6 +219,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder) => (
                     { id === 'suffix' && option.suffix }
                 </option>
             ))}
+            <option value="">N/A</option>
         </select>
     </div>
 );

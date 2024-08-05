@@ -336,7 +336,7 @@ module.exports.update_student_info = async (req, res) => {
         const latestStudent = await Student.findOne({ studentNo: { $exists: true } }).sort({ _id: -1 });
         console.log('Latest Student: ', latestStudent);
 
-        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus });
+        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus, inputter });
         console.log('New Record: ', studentAcademicNewRecord);
 
         const student = await Student.findByIdAndUpdate(
@@ -442,7 +442,7 @@ module.exports.get_student_academic_detail = async (req,res) => {
 
 module.exports.add_academic = async (req,res) => {
 
-    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus } = req.body;
+    let { strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus,inputter } = req.body;
     // This will also update students info upon posting
 
     if(strandId === '') {
@@ -467,7 +467,7 @@ module.exports.add_academic = async (req,res) => {
         }
 
         if(studentAcademic) {
-            const academic = await Academic.findOneAndUpdate({ studentId: studentId, sessionId: sessionId },{strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus})
+            const academic = await Academic.findOneAndUpdate({ studentId: studentId, sessionId: sessionId },{strandId,gradeLevelId,sessionId,studentId,lastSchoolAttended,paymentTermId,academicStatus, inputter})
             await Student.findByIdAndUpdate({ _id: studentId }, { academicId: academic._id });
         }
 
@@ -664,15 +664,26 @@ module.exports.add_sectioning = async (req,res) => {
     
     try {   
         // insert record in Academic table 
-        const addAcadRec = await Academic.create({ sessionId,studentId,sectionId,inputter,gradeLevelId,strandId,lastSchoolAttended });
-        console.log('addAcadRec',addAcadRec);
-        // update student table to update academic record of the student
-        const updateStudentRec = await Student.findByIdAndUpdate({_id: studentId},{ academicId: addAcadRec._id });
-        console.log('updateStudentRec',updateStudentRec);
+
+        // check if student already has academic record
+        const academicFound = await Academic.findOne({ studentId });
+
+        if(!academicFound.gradeLevelId || !academicFound.strandId) {
+            return res.status(404).json({ mssg: 'Student does not have grade level or strand record yet, please go to admission page' });
+        }
+
+        
+        if(academicFound) {
+            const academicNewRecord = await Academic.findOneAndUpdate({ _id: academicFound._id, sessionId }, { sessionId,studentId,sectionId,inputter,gradeLevelId,strandId,lastSchoolAttended,inputter });
+            await Student.findByIdAndUpdate({_id: studentId},{ academicId: academicNewRecord._id, inputter });
+        } else {
+            return res.status(404).json({ mssg: 'Please make sure the student is already admitted or registered.' });
+        }
+        
         // insert in sectioning table
         const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter });
         console.log('addSectioning',addSectioning);
-        res.status(200).json({ mssg: `${updateStudentRec.firstName} has been added new section successfully` });
+        res.status(200).json({ mssg: `Student has been added new section successfully` });
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'There is an error in creating sectioning, please contact admin' })

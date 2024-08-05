@@ -17,6 +17,10 @@ const admissionSchema = new mongoose.Schema({
     requirementId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'requirement'
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 }, { timestamps: true })
 

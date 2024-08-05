@@ -1356,7 +1356,6 @@ module.exports.edit_sibling = async (req,res) => {
 // Dashboard details 
 
 module.exports.get_dashboard_details = async (req, res) => {
-
     const { sessionId: session } = req.params;
 
     try {
@@ -1371,7 +1370,7 @@ module.exports.get_dashboard_details = async (req, res) => {
         let teachersCount = 0;
 
         // Get all Academic records
-        const academics = await Academic.find({sessionId: session})
+        const academics = await Academic.find({ sessionId: session })
             .populate({
                 path: 'studentId',
                 populate: {
@@ -1390,90 +1389,56 @@ module.exports.get_dashboard_details = async (req, res) => {
             .populate('gradeLevelId departmentId strandId sectionId paymentTermId');
 
         const studentsEnrolled = await StudentPayment.find({ sessionId: session });
-
         const gradeLevels = await GradeLevel.find();
-
         const teachers = await Teacher.find();
-
-        if (teachers) {
-            teachersCount = teachers.length;
-        }
+        
+        teachersCount = teachers ? teachers.length : 0;
 
         const recordsCheck = !academics.length && !studentsEnrolled.length && !gradeLevels.length && !teachersCount;
-
-        console.log('Records Check:', recordsCheck);
 
         if (recordsCheck) {
             return res.status(404).json({ mssg: 'Error on getting records for dashboard', academics, studentsEnrolled, gradeLevels, teachersCount });
         }
 
-        //-----------------------For getting enrollees counts--------------------------------- 
-        const uniqueStudentIds = new Set();
-        const filteredEnrolledStudents = [];
+        // For getting enrollees counts
+        const uniqueStudentIds = new Set(studentsEnrolled.map(student => student.studentId.toString()));
+        enrolledStudents = uniqueStudentIds.size;
 
-        for (const enrolledStudent of studentsEnrolled) {
-            if (!uniqueStudentIds.has(enrolledStudent.studentId.toString())) {
-                uniqueStudentIds.add(enrolledStudent.studentId.toString());
-                filteredEnrolledStudents.push(enrolledStudent);
-            }
-        }
-        enrolledStudents = filteredEnrolledStudents.length;
-        // ------------------------------------------------------
         for (const academic of academics) {
-            if (academic.isRegistered) {
-                studentsRegistered += 1;
-            }
+            studentsRegistered += academic.isRegistered ? 1 : 0;
+            studentsAdmitted += academic.studentId.isAdmitted ? 1 : 0;
+            studentsGender.male += academic.studentId.sex === 'Male' ? 1 : 0;
+            studentsGender.female += academic.studentId.sex === 'Female' ? 1 : 0;
+            studentsNationality.local += academic.studentId.nationality.nationality === 'Filipino' ? 1 : 0;
+            studentsNationality.foreign += academic.studentId.nationality.nationality !== 'Filipino' ? 1 : 0;
 
-            if (academic.studentId.isAdmitted) {
-                studentsAdmitted += 1;
-            }
-
-            if (academic.studentId.sex === 'Male') {
-                studentsGender.male += 1;
-            } else {
-                studentsGender.female += 1;
-            }
-
-            if (academic.studentId.nationality.nationality === 'Filipino') {
-                studentsNationality.local += 1;
-            } else {
-                studentsNationality.foreign += 1;
-            }
-
-            if(academic.academicStatus === 'New') {
+            const status = academic.academicStatus;
+            if(status === 'New') {
                 academicStatusOfStudents.new += 1;
-            }
-
-            if(academic.academicStatus === 'Transferred') {
+            } else if(status === 'Transferred') {
                 academicStatusOfStudents.transferred += 1;
-            }
-
-            if(academic.academicStatus === 'Graduated') {
+            } else if(status === 'Graduated') {
                 academicStatusOfStudents.graduated += 1;
-            }
-
-            if(academic.academicStatus === 'Old') {
+            } else if(status === 'Old') {
                 academicStatusOfStudents.old += 1;
-            }
-
-            if(academic.academicStatus === 'Admitted but did not continue') {
+            } else if(status === 'Admitted but did not continue') {
                 academicStatusOfStudents.admittedButDidNotContinue += 1;
             }
-
-            // console.log(academic.studentId.academicId.academicStatus, academic.studentId.academicId.firstName);
         }
 
-        gradeLevels?.forEach(gl => {
-            gradeCounts[gl.gradeLevel] = academics.filter(acad => acad.studentId.academicId.gradeLevelId?.gradeLevel.toLowerCase() === gl?.gradeLevel.toLowerCase()).length;
+        gradeLevels.forEach(gl => {
+            gradeCounts[gl.gradeLevel] = academics.filter(acad => 
+                acad.studentId.academicId.gradeLevelId?.gradeLevel.toLowerCase() === gl.gradeLevel.toLowerCase()
+            ).length;
         });
 
         res.status(200).json({ studentsRegistered, studentsAdmitted, studentsGender, studentsNationality, enrolledStudents, gradeCounts, teachersCount, academicStatusOfStudents, academics });
-
     } catch (err) {
         console.log(err);
         res.status(400).json({ mssg: 'An error occurred while fetching dashboard details, please try again.', error: err.message });
     }
 }
+
 
 
 

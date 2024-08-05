@@ -50,7 +50,7 @@ const Sectioning = () =>{
         setSectionId(e.target.value);
     }
 
-    const studentLists = students?.filter(student => student.isRegistered && student.isAdmitted).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted).map(student => ({
         ...student,
         firstName: student.firstName,
         lastName: student.lastName,
@@ -94,7 +94,7 @@ const Sectioning = () =>{
             console.log(err);  
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -118,7 +118,7 @@ const Sectioning = () =>{
                                 <h1 className="font-semibold text-xl text-gray-700">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
                                 <div className="grid grid-cols-2 gap-5 mt-4">
                                     {renderStudentInfo('student name',`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`,'Student Name:')}
-                                    {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId?.gradeLevel}`,'Grade Level')}
+                                    {renderStudentInfo('grade level',`${studentRecord?.academicId?.gradeLevelId ? studentRecord?.academicId?.gradeLevelId?.gradeLevel : 'Not Assigned'} `,'Grade Level')}
                                     {renderStudentInfo('strand',studentRecord?.academicId?.strandId?.strand,'Strand:')}
                                     {renderStudentInfo('section',studentRecord?.academicId?.sectionId?.section,'Section:',filteredSections,handleSectionChange)}
                                     {renderStudentInfo('adviser',studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned','Adviser')}

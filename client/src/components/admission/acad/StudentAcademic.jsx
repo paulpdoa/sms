@@ -16,7 +16,7 @@ const StudentAcademic = () => {
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
     
-    const { session: syId,currStudRec } = useContext(MainContext);
+    const { session: syId,currStudRec,currentUserId: inputter } = useContext(MainContext);
     const id = currStudRec._id;
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
@@ -74,7 +74,8 @@ const StudentAcademic = () => {
             lastSchoolAttended: lastSchool,
             studentId: id,
             paymentTermId,
-            academicStatus
+            academicStatus,
+            inputter
         }
         
 

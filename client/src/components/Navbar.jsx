@@ -10,7 +10,7 @@ import { useCookies } from 'react-cookie';
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const pathName = 'Christian School International';
+    const pathName = 'School Management System';
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -45,7 +45,7 @@ const Navbar = () => {
         <>
             <nav className="w-full bg-gradient-to-r border-b border-gray-300 from-gray-100 to-gray-200 p-4 flex items-center justify-between shadow-md">
                 <h1 className="font-semibold flex items-center gap-2 text-xl text-gray-700 ml-6">
-                    <img className="w-10" src="/schoolLogo/CAPSCI-Logo.png" alt={pathName} />
+                    <img className="w-10" src="/schoolLogo/school-logo-filler.png" alt={pathName} />
                     {pathName}
                 </h1>
                 <div className="relative">

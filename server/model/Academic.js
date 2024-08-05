@@ -57,6 +57,10 @@ const academicSchema = new mongoose.Schema({
     },
     isEnrolled: {
         type: Boolean
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 }, { timestamps: true })
 
