@@ -51,6 +51,10 @@ userSchema.statics.login = async function(username,password,session) {
     // This will check if the school year table is still empty, meaning it's a new system
     const schoolYears = await SchoolYear.find();
 
+    if(!user) {
+        throw Error(`${username} does not exist`);
+    }
+
     const { userRole } = await UserRole.findOne({ _id: user.role });
 
     const allowedAddSyUsers = ['Super Admin','School Admin'];

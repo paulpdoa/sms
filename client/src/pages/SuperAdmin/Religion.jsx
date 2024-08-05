@@ -95,7 +95,7 @@ const Religion = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light",
+                theme: "colored",
             });
             setTimeout(() => {
                 window.location.reload();

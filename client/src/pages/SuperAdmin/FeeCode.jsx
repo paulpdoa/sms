@@ -20,7 +20,7 @@ const FeeCode = () => {
     const [code,setCode] = useState('');
     const [feeCategory,setFeeCategory] = useState('');
 
-    const { currentUserId,role,searchQuery,showForm,setShowForm } = useContext(MainContext);
+    const { currentUserId,role,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
 
     const columns = [
         {
@@ -45,7 +45,7 @@ const FeeCode = () => {
     const updateNewFeeCode = async (id,updatedData) => {
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/fee-code/${id}`,{ description: updatedData.description,feeCateg:updatedData.feeCateg._id,code: updatedData.code, inputter: currentUserId, role});
+            const newData = await axios.patch(`${baseUrl()}/fee-code/${id}`,{ description: updatedData.description,feeCateg:updatedData.feeCateg._id,code: updatedData.code, inputter: currentUserId, role,sessionId: session});
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -54,7 +54,7 @@ const FeeCode = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -70,7 +70,7 @@ const FeeCode = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
            
@@ -88,7 +88,7 @@ const FeeCode = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -102,7 +102,7 @@ const FeeCode = () => {
     const addFeeCode = async (e) => {
         e.preventDefault();
         try {
-            const newFeeCateg = await axios.post(`${baseUrl()}/fee-code`,{ description,feeCategory,code,inputter: currentUserId,role });
+            const newFeeCateg = await axios.post(`${baseUrl()}/fee-code`,{ description,feeCategory,code,inputter: currentUserId,role,sessionId });
             toast.success(newFeeCateg.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -111,7 +111,7 @@ const FeeCode = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -164,8 +164,6 @@ const FeeCode = () => {
                
                { showForm && MasterDataForm(form,addFeeCode,setShowForm) }
                 
-               
-
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable
                         columns={columns}

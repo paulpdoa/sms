@@ -698,6 +698,7 @@ module.exports.add_school_year = async (req, res) => {
             const academics = await Academic.find({ sessionId: previousSyId });
             console.log('Academics found:', academics);
 
+            // Copying student academic record then promoting it's gradeLevel
             for (const academic of academics) {
                 const { sessionId, sectionId, paymentTermId, gradeLevelId, departmentId, ...rest } = academic.toObject();
                 await Academic.create({
@@ -759,6 +760,31 @@ module.exports.add_school_year = async (req, res) => {
                 ]);
                 console.log('Empty sections added for grade level:', gradeLevel);
             }
+
+            const feeCodes = await FeeCode.find({ sessionId: previousSyId });
+            console.log('Fees found:', feeCodes);
+
+            for(const feeCode of feeCodes) {
+                const { sessionId,...rest } = feeCode.toObject();
+                await FeeCode.create({
+                    ...rest,
+                    _id: undefined,
+                    sessionId: newSy._id
+                });
+            }
+
+            const feeCategs = await FeeCategory.find({ sessionId: previousSyId });
+            console.log('Fee categories found:', feeCategs);
+
+            for(const feeCateg of feeCategs) {
+                const { sessionId,...rest } = feeCateg.toObject();
+                await FeeCateg.create({
+                    ...rest,
+                    _id: undefined,
+                    sessionId: newSy._id
+                }) 
+            }
+            
         }
 
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
@@ -1032,8 +1058,10 @@ module.exports.edit_payment_term = async (req,res) => {
 
 module.exports.get_fee_categories = async (req,res) => {
 
+    const { session } = req.query;
+
     try {
-        const feeCategs = await FeeCategory.find().populate('inputter');
+        const feeCategs = await FeeCategory.find({sessionId: session}).populate('inputter');
         res.status(200).json(feeCategs);
     } catch(err) {
         console.log(err)
@@ -1044,9 +1072,10 @@ module.exports.get_fee_categories = async (req,res) => {
 module.exports.get_fee_category_detail = async (req,res) => {
 
     const { id } = req.params;
+    const { session } = req.query;
 
     try {
-        const feeCategs = await FeeCategory.find({ _id:id }).populate('inputter');
+        const feeCategs = await FeeCategory.find({ _id:id,sessionId: session }).populate('inputter');
         res.status(200).json(feeCategs);
     } catch(err) {
         console.log(err)
@@ -1056,13 +1085,14 @@ module.exports.get_fee_category_detail = async (req,res) => {
 
 module.exports.add_fee_category = async (req,res) => {
 
-    const { category,code,inputter } = req.body;
+    const { category,code,inputter,sessionId } = req.body;
 
     try {
-        const feeCateg = await FeeCategory.create({ category,code,inputter });
+        await FeeCategory.create({ category,code,inputter,sessionId });
         res.status(200).json({ mssg:`${category} has been added to the record` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while adding fee category' });
     }
 
 }
@@ -1081,14 +1111,15 @@ module.exports.delete_fee_category = async (req,res) => {
 module.exports.edit_fee_category = async (req,res) => {
     const { id } = req.params;
 
-    const { category,code } = req.body;
+    const { category,code,sessionId } = req.body;
     
 
     try {
-        const newCategory = await FeeCategory.findByIdAndUpdate({ _id:id },{ category,code });
+        const newCategory = await FeeCategory.findByIdAndUpdate({ _id:id },{ category,code,sessionId });
         res.status(200).json({ mssg: `${newCategory.category} has been updated successfully` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: err.message })
     }
 }
 
@@ -1096,8 +1127,10 @@ module.exports.edit_fee_category = async (req,res) => {
 
 module.exports.get_fee_codes = async (req,res) => {
 
+    const { session } = req.query;
+
     try {
-        const feeCodes = await FeeCode.find().populate('inputter feeCateg');
+        const feeCodes = await FeeCode.find({ sessionId: session }).populate('inputter feeCateg');
         res.status(200).json(feeCodes);
     } catch(err) {
         console.log(err)
@@ -1105,11 +1138,11 @@ module.exports.get_fee_codes = async (req,res) => {
 }
 
 module.exports.add_fee_code = async (req,res) => {
-    const { description,code,inputter,feeCategory } = req.body;
+    const { description,code,inputter,feeCategory,sessionId } = req.body;
     console.log(feeCategory)
 
     try {
-        const newFeeCode = await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory });
+        const newFeeCode = await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory, sessionId });
         res.status(200).json({ mssg: `${description} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -1131,10 +1164,10 @@ module.exports.delete_fee_code = async (req,res) => {
 module.exports.edit_fee_code = async (req,res) => {
     const { id } = req.params;
 
-    const { inputter,description,feeCateg,code} = req.body;
+    const { inputter,description,feeCateg,code,sessionId } = req.body;
 
     try {
-        const newCode = await FeeCode.findByIdAndUpdate({ _id:id },{ feeCateg,code: code.toUpperCase(),description,inputter });
+        const newCode = await FeeCode.findByIdAndUpdate({ _id:id },{ feeCateg,code: code.toUpperCase(),description,inputter, sessionId });
         res.status(200).json({ mssg: `${newCode.description} has been updated successfully` });
     } catch(err) {
         console.log(err);

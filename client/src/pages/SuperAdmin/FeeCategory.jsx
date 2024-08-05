@@ -14,7 +14,7 @@ import MasterDataForm from "../../components/MasterDataForm";
 const FeeCategory = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/fee-categories`);
-    const { currentUserId,role,searchQuery,setShowForm,showForm } = useContext(MainContext);
+    const { currentUserId,role,searchQuery,setShowForm,showForm,session } = useContext(MainContext);
 
     const [category,setCategory] = useState('');
     const [feeCode,setFeeCode] = useState('');
@@ -35,7 +35,7 @@ const FeeCategory = () => {
 
     const updateNewFeeCategory = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/fee-category/${id}`,{ category:updateData.category,code:updatedData.code,role });
+            const newData = await axios.patch(`${baseUrl()}/fee-category/${id}`,{ category:updatedData.category,code:updatedData.code,role,sessionId:session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -44,22 +44,23 @@ const FeeCategory = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -79,7 +80,7 @@ const FeeCategory = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -93,7 +94,7 @@ const FeeCategory = () => {
     const addFeeCategory = async (e) => {
         e.preventDefault();
         try {
-            const newFeeCateg = await axios.post(`${baseUrl()}/fee-category`,{ category,code: feeCode,inputter: currentUserId,role });
+            const newFeeCateg = await axios.post(`${baseUrl()}/fee-category`,{ category,code: feeCode,inputter: currentUserId,role,sessionId: session });
             toast.success(newFeeCateg.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -102,7 +103,7 @@ const FeeCategory = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -110,6 +111,16 @@ const FeeCategory = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

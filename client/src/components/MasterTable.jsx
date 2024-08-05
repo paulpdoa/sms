@@ -4,6 +4,7 @@ import { MainContext } from '../helpers/MainContext';
 import { baseUrl } from '../baseUrl';
 import { useFetch } from '../hooks/useFetch';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmationPopup from './ConfirmationPopup';
 
 const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions, onShow }) => {
     const [editId, setEditId] = useState(null);
@@ -12,8 +13,8 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage,setRowsPerPage] = useState(10); // Set the number of rows per page
 
-    console.log(data);
-
+    const [isForDelete,setIsForDelete] = useState(false);
+    const [deleteRecId,setDeleteRecId] = useState('');
     // For disabling currentSchoolyear logged in session
     const { session,isFreshYear } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
@@ -95,6 +96,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
     };
 
     const handleDeleteClick = (id) => {
+        // ask user first before deletion
         onDelete(id);
     };
 
@@ -207,7 +209,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     name={column.accessorKey}
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
-                                                                    className="outline-none p-1 rounded-md border border-gray-300"
+                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit"
                                                                 >
                                                                     <option value={record._id || ''} disabled hidden>
                                                                         { 
@@ -220,15 +222,19 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                         }
                                                                     </option>
                                                                     {column.selectOptions.map(option => (
-                                                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                                                        <>
+                                                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                                                        </>
                                                                     ))}
                                                                 </select>
+
+
                                                             ) : (
                                                                 <input
                                                                     name={column.accessorKey}
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
-                                                                    className="outline-none p-1 rounded-md border border-gray-300"
+                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit"
                                                                     type={column.type || ''}
                                                                 />
                                                             )
@@ -254,7 +260,14 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                 {/* { onUpdate !== undefined &&  */}
                                                                     <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
                                                                 {/* }                                                             */}
-                                                                <button onClick={() => !isYearDone && handleDeleteClick(record._id)} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
+                                                                <button onClick={() => {
+                                                                    // !isYearDone && handleDeleteClick(record._id)
+                                                                    !isYearDone && setIsForDelete(true)
+                                                                    if(!isYearDone) {
+                                                                        setDeleteRecId(record._id);
+                                                                        setIsForDelete(true)
+                                                                    }
+                                                                }} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
                                                             </>
                                                         ) : 
                                                         <button onClick={() => {
@@ -395,6 +408,11 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     Next
                 </button>
             </div> */}
+            { isForDelete && <ConfirmationPopup
+                message={'Are you sure you want to delete this record?'}
+                onClose={() => setIsForDelete(false)}
+                onConfirm={() => handleDeleteClick(deleteRecId)}
+            /> }
         </>
     );
 };

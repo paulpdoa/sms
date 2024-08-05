@@ -25,6 +25,12 @@ const Discount = () => {
     const [discountCode, setDiscountCode] = useState('');
     const [gradeLevel, setGradeLevel] = useState('');
 
+    const categories = [
+        { _id: 1, discountCode: 'GA' },
+        { _id: 2, discountCode: 'PT' },
+        { _id: 3, discountCode: 'SA' }
+    ];
+
     const columns = [
         {
             accessorKey: 'discountType',
@@ -44,7 +50,8 @@ const Discount = () => {
         {
             accessorKey: 'discountCode',
             header: 'Discount Category',
-            editable: true
+            editable: true,
+            selectOptions: ['GA','SA','PT'].map(dc => ({ value: dc, label: dc }))
         },
         {
             accessorKey: 'gradeLevel.gradeLevel',
@@ -85,7 +92,7 @@ const Discount = () => {
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -130,18 +137,7 @@ const Discount = () => {
             role
         } 
 
-        if(discountPercentage === 0) {
-            toast.error("Discount percentage cannot be zero", {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
-            });
-            return;
-        }
+        
         if (discountType === '') {
             toast.error("Discount type is not provided", {
                 position: "top-center",
@@ -209,7 +205,7 @@ const Discount = () => {
             session: record?.sessionId?.startYear,
             _id: record?.sessionId?._id
         },
-        amount: record.amount ?? 'Not Assigned'
+        amount: record.amount ?? 0
     }));
 
     const form = () => (
@@ -221,7 +217,8 @@ const Discount = () => {
                 {renderInput('discount percentage',discountPercentage,'Discount Percentage', setDiscountPercentage, 'number', { step: "0.000001" })}
                 {/* Not required */}
                 {renderInput('discount amount',amount,'Discount Amount', setAmount, 'number', { step: "0.000001" },'Leave this empty if n/a')}
-                {renderInput('discount code',discountCode,'Discount Category', setDiscountCode, 'text')}
+                {renderSelect('discountCode','Discount Category', setDiscountCode, categories, 'Leave this empty if n/a', false)}
+                {/* {renderInput('discount code',discountCode,'Discount Category', setDiscountCode, 'text')} */}
                 {/* Not Required */}
                 {renderSelect('gradeLevel', 'Grade Level', setGradeLevel, gradeLevels, 'Leave this empty if n/a', false)}
                 {/* {renderSelect('session', 'School Year', setSchoolYear, schoolYears, 'school year')} */}
@@ -280,6 +277,7 @@ const renderSelect = (label, value, onChange, options, placeholder, required = f
                     {label === 'session' ? `${option.startYear.split('-')[0]}-${option.endYear.split('-')[0]}` : option[label]}
                 </option>
             ))}
+            <option value="">N/A</option>
         </select>
     </div>
 );
