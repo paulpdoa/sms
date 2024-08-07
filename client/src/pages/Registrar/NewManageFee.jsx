@@ -10,7 +10,7 @@ import { MainContext } from '../../helpers/MainContext';
 const NewManageFee = () => {
 
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
-    const { session } = useContext(MainContext);
+    const { session, currentUserId } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
@@ -45,6 +45,7 @@ const NewManageFee = () => {
             strandId,
             amount,
             nationality,
+            inputter: currentUserId
         };
 
         if(amount === 0) {

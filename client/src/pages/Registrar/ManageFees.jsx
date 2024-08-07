@@ -13,7 +13,7 @@ import ConfirmationPopup from '../../components/ConfirmationPopup';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
-    const { searchQuery, setSearchQuery, role,session } = useContext(MainContext);
+    const { searchQuery, setSearchQuery, role,session,currentUserId } = useContext(MainContext);
     const navigate = useNavigate();
     const [openPopup,setOpenPopup] = useState(false);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
@@ -92,7 +92,7 @@ const ManageFees = () => {
         const toastId = toast.loading("Generating fees, please do not leave the page...");
 
         try {
-            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset });
+            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset,inputter: currentUserId });
             toast.update(toastId, {
                 render: data.mssg,
                 type: "success",

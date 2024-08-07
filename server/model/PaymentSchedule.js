@@ -14,7 +14,11 @@ const paymentScheduleSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'paymentTerm'
     },
-    dateSchedule: requiredString
+    dateSchedule: requiredString,
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }
 }, { timestamps: true })
 
 

@@ -72,7 +72,8 @@ const EditUser = () => {
                 password,
                 confirmPassword,
                 role,
-                isActive
+                isActive,
+                inputter: currentUserId
             });
             toast.success(newData.data.mssg, {
                 position: "top-center",
@@ -104,7 +105,7 @@ const EditUser = () => {
             console.log(err);
             toast.error(err.response.data.error, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

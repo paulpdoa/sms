@@ -18,7 +18,7 @@ const UserRoles = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/user-roles`);
     const [userRole,setUserRole] = useState('');
     
-    const { role,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext);
+    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
 
     const columns = [
         {
@@ -30,7 +30,7 @@ const UserRoles = () => {
 
     const updateNewUserRole = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole:updatedData.userRole,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole:updatedData.userRole,currentUserId,role,sessionId: session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -39,7 +39,7 @@ const UserRoles = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -48,17 +48,14 @@ const UserRoles = () => {
         } catch(err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }
 
@@ -74,20 +71,30 @@ const UserRoles = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
     const addUserRoles = async (e) => {
         e.preventDefault();
         try {
-            const newUserRoles = await axios.post(`${baseUrl()}/user-roles`,{ userRole,currentUserId,role });
+            const newUserRoles = await axios.post(`${baseUrl()}/user-roles`,{ userRole,currentUserId,role,sessionId: session });
             toast.success(newUserRoles.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -96,22 +103,22 @@ const UserRoles = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
-            toast.success(err.response.data.mssg, {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }

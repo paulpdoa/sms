@@ -1,15 +1,17 @@
 import { useParams } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { MainContext } from '../helpers/MainContext';
 
 const Profile = () => {
     const { id } = useParams();
     const { records: user } = useFetch(`${baseUrl()}/user/${id}`);
+    const { currentUserId } = useContext(MainContext);
 
     const navigate = useNavigate();
     
@@ -45,6 +47,7 @@ const Profile = () => {
         formData.append('lastName', lastName);
         formData.append('username', username);
         formData.append('confirmPassword',confirmPassword);
+        formData.append('inputter', currentUserId);
 
         if (password === confirmPassword && password !== '') {
             formData.append('password', password);

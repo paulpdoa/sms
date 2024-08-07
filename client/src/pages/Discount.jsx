@@ -66,6 +66,47 @@ const Discount = () => {
     ];
 
     const updateNewDiscount = async (id, updatedData) => {
+
+        // Also add validation here to not accept incorrect values
+        if (updatedData.discountType === '') {
+            toast.error("Discount type is not provided", {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
+            return;
+        }
+
+        if (updatedData.amount !== null && updatedData.amount < 0) {
+            toast.error("Discount amount cannot be negative", {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
+            return;
+        }
+
+        if (updatedData.discountPercent < 0) {
+            toast.error("Discount percentage cannot be negative", {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
+            return;
+        }
+
         try {
             const newData = await axios.patch(`${baseUrl()}/discount/${id}`, {
                 gradeLevelId: updatedData.gradeLevel._id,
@@ -141,7 +182,7 @@ const Discount = () => {
         if (discountType === '') {
             toast.error("Discount type is not provided", {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -154,7 +195,20 @@ const Discount = () => {
         if (amount !== null && amount < 0) {
             toast.error("Discount amount cannot be negative", {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
+            return;
+        }
+
+        if (discountPercentage < 0) {
+            toast.error("Discount percentage cannot be negative", {
+                position: "top-center",
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -184,7 +238,7 @@ const Discount = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

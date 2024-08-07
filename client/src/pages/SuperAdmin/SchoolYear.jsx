@@ -36,7 +36,7 @@ const SchoolYear = () => {
         let isYearDone = updatedData.isYearDone;
     
         try {
-            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`, { newStartYear: updatedData.startYear, newEndYear: updatedData.endYear, newSchoolTheme: updatedData.schoolTheme, isYearDone, role });
+            const newData = await axios.patch(`${baseUrl()}/school-year/${id}`, { newStartYear: updatedData.startYear, newEndYear: updatedData.endYear, newSchoolTheme: updatedData.schoolTheme, isYearDone, role, inputter:currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -92,7 +92,7 @@ const SchoolYear = () => {
 
         const toastId = toast.loading('Please wait while adding new school year');
         try {
-            const newStartYear = await axios.post(`${baseUrl()}/school-year`, { yearStart, yearEnd, syTheme, role });
+            const newStartYear = await axios.post(`${baseUrl()}/school-year`, { yearStart, yearEnd, syTheme, role, inputter:currentUserId });
             toast.update(toastId, {
                 render: newStartYear.data.mssg,
                 type: "success",
@@ -131,7 +131,7 @@ const SchoolYear = () => {
         setCloseYear(true);
 
         try {
-            const data = await axios.patch(`${baseUrl()}/close-school-year`,{ sessionId: session });
+            const data = await axios.patch(`${baseUrl()}/close-school-year`,{ sessionId: session,inputter: currentUserId });
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

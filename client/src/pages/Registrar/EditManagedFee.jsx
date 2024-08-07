@@ -9,18 +9,15 @@ import { MainContext} from '../../helpers/MainContext';
 
 const EditManageFee = () => {
     const { id } = useParams();
-    const { session:sessionId } = useContext(MainContext);
+    const { session:sessionId,currentUserId } = useContext(MainContext);
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
     const { records: manageFee } = useFetch(`${baseUrl()}/manage-fee/${id}`);
-
     
     const navigate = useNavigate();
-
-    
 
     const [isLoading, setIsLoading] = useState(false);
     const [feeDescription, setFeeDescription] = useState('');
@@ -51,11 +48,11 @@ const EditManageFee = () => {
             strandId,
             amount,
             nationality,
+            inputter: currentUserId
         };
 
         setIsLoading(true);
        
-
         try {
             const { data } = await axios.patch(`${baseUrl()}/manage-fee/${id}`, feeInformation);
             setIsLoading(false);
@@ -77,7 +74,7 @@ const EditManageFee = () => {
             setIsLoading(false);
             toast.error("Error updating fee. Please try again.", {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

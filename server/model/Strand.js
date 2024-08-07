@@ -17,6 +17,10 @@ const strandSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         required: true
+    },
+    sessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'schoolYear'
     }
 }, { timestamps: true })
 

@@ -52,7 +52,8 @@ const EditTextbook = () => {
             newInputter: currentUserId,
             newSession: session,
             newSchoolYear: schoolYear,
-            role
+            role,
+            sessionId: session
         }
 
         try {
@@ -74,7 +75,7 @@ const EditTextbook = () => {
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

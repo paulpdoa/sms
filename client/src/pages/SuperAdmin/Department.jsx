@@ -28,7 +28,7 @@ const Department = () => {
 
     const updateNewDepartment = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role,session });
+            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role,sessionId: session, session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -37,22 +37,23 @@ const Department = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -72,7 +73,7 @@ const Department = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -80,13 +81,23 @@ const Department = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
     const addDepartment = async (e) => {
         e.preventDefault();
         try {
-            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session,role });
+            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session,role, sessionId: session });
             toast.success(newDepartment.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -95,7 +106,7 @@ const Department = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -103,6 +114,16 @@ const Department = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

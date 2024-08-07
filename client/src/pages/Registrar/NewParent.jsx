@@ -58,7 +58,8 @@ const NewParent = () => {
             guardianOffice,
             studentId,
             session,
-            currentUserId
+            inputter: currentUserId,
+            sessionId: session
         }
 
         try {
@@ -66,12 +67,12 @@ const NewParent = () => {
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -79,6 +80,16 @@ const NewParent = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

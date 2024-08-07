@@ -45,7 +45,8 @@ module.exports.add_teacher = async (req,res) => {
         yearsOfExperience,
         joiningDate,
         currentUserId: inputter,
-        session
+        session,
+        session: sessionId
         // department,
         // gradeLevel,
         // section,
@@ -81,7 +82,8 @@ module.exports.add_teacher = async (req,res) => {
             yearGraduated,
             yearsOfExperience,
             joiningDate,
-            inputter
+            inputter,
+            sessionId
             });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {
@@ -97,7 +99,8 @@ module.exports.delete_teacher = async (req,res) => {
         const teacherFind = await Teacher.findByIdAndDelete(id);
         res.status(200).json({ mssg: `${teacherFind.firstName}'s record has been deleted`});
     } catch(err) {
-        console.log(err)
+        console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while deleting teacher record' });
     }
 }
 
@@ -116,13 +119,14 @@ module.exports.get_teacher_detail = async (req,res) => {
 module.exports.edit_teacher = async (req,res) => {
 
     const { id } = req.params;
-    const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate } = req.body;
+    const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,session: sessionId } = req.body;
 
     try {
-        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate });
+        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,sessionId });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while updating teacher record' });
     }
 }
 
@@ -138,11 +142,11 @@ module.exports.get_strands = async (req,res) => {
 
 module.exports.add_strand = async (req,res) => {
 
-    const { strand,inputter } = req.body;
+    const { strand,inputter,sessionId } = req.body;
     const status = true;
 
     try {
-        const newStrand = await Strand.addStrand(strand,inputter,status);
+        const newStrand = await Strand.addStrand(strand,inputter,status,sessionId);
         res.status(200).json({ mssg: `${strand} has been added to the record` });
     } catch(err) {
         console.log(err.message);
@@ -159,6 +163,7 @@ module.exports.delete_strand = async (req,res) => {
         res.status(200).json({ mssg: `${strandFind.strand} record has been deleted` });
     } catch(err) {
         console.log(err)
+        res.status(400).json({ mssg: 'An error occurred while deleting strand'});
     }
 }
 
@@ -176,10 +181,10 @@ module.exports.get_strand_detail = async (req,res) => {
 module.exports.edit_strand = async (req,res) => {
     const { id } = req.params;
 
-    const { newStrand: strand, inputter } = req.body;
+    const { newStrand: strand, inputter,sessionId } = req.body;
 
     try {   
-        const newStrand = await Strand.findByIdAndUpdate({ _id: id }, { strand, inputter });
+        const newStrand = await Strand.findByIdAndUpdate({ _id: id }, { strand, inputter,sessionId });
         res.status(200).json({ mssg: `${newStrand.strand} has been edited successfully!` });
     } catch(err) {
         console.log(err);
@@ -203,14 +208,14 @@ module.exports.get_textbooks = async (req,res) => {
 module.exports.add_textbook = async (req,res) => {
 
     const status = true;
-    let { schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session } = req.body;
+    let { bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,session } = req.body;
     
     if(strand === '') {
         strand = undefined;
     }
 
     try {
-        await Textbook.create({ schoolYear,bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status });
+        await Textbook.create({ bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status });
         res.status(200).json({ mssg: `${bookTitle} has been added to the record` });
     } catch(err) {
         if(err.code === 11000) {

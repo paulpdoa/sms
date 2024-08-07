@@ -1,13 +1,32 @@
+import React from 'react';
 
-
-const MasterDataForm = (form,onAdd,onClose) => (
-    <div className="absolute w-full top-0 z-50 left-0 flex justify-center">
-        <form onSubmit={onAdd} className="p-4 col-span-1 h-fit rounded-lg border my-10 shadow-3xl border-gray-300 bg-gray-100 w-1/2">
-            { form() }
-            <button className="bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md">Submit</button>
-            <button type="button" onClick={() => onClose(false)} className="bg-red-500 hover:bg-red-600 ml-2 text-gray-100 text-sm p-2 mt-5 rounded-md">Cancel</button>
-        </form>
+const MasterDataForm = (form, onAdd, onClose,formTitle) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-lg">
+      <form onSubmit={onAdd} className="p-6 space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-800">{formTitle}</h2>
+          <p className="text-gray-600">Please fill out the form below</p>
+        </div>
+        {form()}
+        <div className="flex justify-end space-x-3">
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            onClick={() => onClose(false)}
+            className="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring focus:ring-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
-)
+  </div>
+);
 
-export default MasterDataForm
+export default MasterDataForm;

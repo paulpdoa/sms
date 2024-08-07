@@ -19,7 +19,7 @@ const GradeLevel = () => {
     const [gradeLevel,setGradeLevel] = useState('');
     const [department,setDepartment] = useState('');
 
-    const { currentUserId, searchQuery,setSearchQuery, role,showForm,setShowForm } = useContext(MainContext);
+    const { currentUserId, searchQuery,session: sessionId, role,showForm,setShowForm } = useContext(MainContext);
 
     const columns = [
         {
@@ -39,7 +39,7 @@ const GradeLevel = () => {
 
     const updateNewGradeLevel = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel: updatedData.gradeLevel,inputter: currentUserId,department: updatedData.department._id,role });
+            const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel: updatedData.gradeLevel,inputter: currentUserId,department: updatedData.department._id,role,sessionId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -48,27 +48,24 @@ const GradeLevel = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }      
 
@@ -83,7 +80,7 @@ const GradeLevel = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -91,13 +88,23 @@ const GradeLevel = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
     const addGradeLevel = async (e) => {
         e.preventDefault();
         try {
-            const newGradeLevel = await axios.post(`${baseUrl()}/grade-levels`,{ gradeLevel,inputter: currentUserId,department,role });
+            const newGradeLevel = await axios.post(`${baseUrl()}/grade-levels`,{ gradeLevel,inputter: currentUserId,department,role, sessionId });
             toast.success(newGradeLevel.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -106,7 +113,7 @@ const GradeLevel = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {

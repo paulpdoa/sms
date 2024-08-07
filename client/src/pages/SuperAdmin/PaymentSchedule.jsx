@@ -21,7 +21,7 @@ const PaymentSchedule = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);
 
-    const { session, role } = useContext(MainContext);
+    const { session, role,currentUserId } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
 
@@ -30,7 +30,7 @@ const PaymentSchedule = () => {
         const toastId = toast.loading('Creating payment schedule, please wait...');
 
         try {
-            const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { session, role, isReset });
+            const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { session, role, isReset, currentUserId });
             setIsLoading(false);
             toast.update(toastId, {
                 render: data.mssg,

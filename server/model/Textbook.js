@@ -6,10 +6,6 @@ const requiredString = {
 }
 
 const textbookSchema = new mongoose.Schema({
-    schoolYear: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'schoolYear' 
-    },
     bookCode: {
         type:String,
         required:true,

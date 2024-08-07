@@ -33,8 +33,9 @@ const columns = [
 const Parents = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/parents`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,currentUserId } = useContext(MainContext);
     const navigate = useNavigate();
+
     const deleteParent = async (id) => {
         try {
             const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ data: { role } });
@@ -46,7 +47,7 @@ const Parents = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -54,6 +55,17 @@ const Parents = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+            
         }
     }
 
@@ -69,9 +81,12 @@ const Parents = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex justify-between items-center">
-                <Searchbar onSearch={setSearchQuery} />
-                <AddParentBtn />
+            <div className="mx-4 my-2">
+                <h1 className="text-2xl text-gray-700 font-semibold">Parents</h1>
+                <div className="flex items-center justify-between mt-3">
+                    <Searchbar onSearch={setSearchQuery} />
+                    <AddParentBtn />
+                </div>
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">

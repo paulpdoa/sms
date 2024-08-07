@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const NewUser = () => {
 
     const navigate = useNavigate();
-    const { role: userRole } = useContext(MainContext);
+    const { role: userRole, currentUserId } = useContext(MainContext);
     const { records: roles } = useFetch(`${baseUrl()}/user-roles`);
 
     const [firstName,setFirstName] = useState('');
@@ -24,7 +24,7 @@ const NewUser = () => {
     const addUser = async (e) => {
         e.preventDefault();
         try {
-            const newUser = await axios.post(`${baseUrl()}/user`,{ firstName,middleName,lastName,username,role,password,confirmPassword,userRole });
+            const newUser = await axios.post(`${baseUrl()}/user`,{ firstName,middleName,lastName,username,role,password,confirmPassword,userRole,inputter: currentUserId });
             localStorage.setItem('user',newUser.data.token);
             toast.success(newUser.data.mssg, {
                 position: "top-center",
@@ -38,12 +38,12 @@ const NewUser = () => {
             });
 
             setTimeout(() => {
-                navigate(-1)
+                navigate('/users')
             },2000)
         } catch(err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,

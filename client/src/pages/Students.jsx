@@ -73,6 +73,16 @@ const Students = () => {
             }, 2000)
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
@@ -93,9 +103,12 @@ const Students = () => {
 
     return (
         <main className="p-2">
-            <div className="flex justify-between items-center">
-                <Searchbar onSearch={setSearchQuery} />
-                <AddStudentBtn />
+            <div className="mx-4 my-2">
+                <h1 className="text-2xl text-gray-700 font-semibold">Students</h1>
+                <div className="flex items-center justify-between mt-3">
+                    <Searchbar onSearch={setSearchQuery} />
+                    <AddStudentBtn />
+                </div>
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">

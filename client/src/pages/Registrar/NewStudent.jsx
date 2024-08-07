@@ -67,7 +67,8 @@ const NewStudent = () => {
             contactNumber,
             address,
             session,
-            currentUserId
+            currentUserId,
+            sessionId:session
         };
 
         try {
@@ -88,9 +89,9 @@ const NewStudent = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error("Error adding student. Please try again.", {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,

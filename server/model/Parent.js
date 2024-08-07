@@ -60,6 +60,10 @@ const parentSchema = new mongoose.Schema({
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'
+    },
+    sessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'schoolYear'
     }
 }, { timestamps: true })
 

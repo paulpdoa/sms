@@ -17,6 +17,10 @@ const roleSchema = new mongoose.Schema({
     },
     status: {
         type: Boolean
+    },
+    sessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'schoolYear'
     }
 }, { timestamps: true })
 

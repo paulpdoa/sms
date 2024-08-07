@@ -38,7 +38,7 @@ const Nationality = () => {
     const updateNewNationality = async (id,updatedData) => {
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role,session });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role,session,sessionId: session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -92,7 +92,7 @@ const Nationality = () => {
     const addNationality = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role,session });
+            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role,session,sessionId: session });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

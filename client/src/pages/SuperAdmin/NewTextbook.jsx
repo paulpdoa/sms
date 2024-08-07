@@ -27,15 +27,15 @@ const NewTextbook = () => {
         e.preventDefault();
 
         if (!gradeLevel) {
-            toast.error("Please fill in all required fields.", {
+            toast.error("Grade level cannot be blank", {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
             return;
         }
@@ -49,7 +49,8 @@ const NewTextbook = () => {
             strand,
             inputter: currentUserId,
             session: schoolYear,
-            role
+            role,
+            sessionId: session
         }
 
         try {
@@ -71,7 +72,7 @@ const NewTextbook = () => {
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

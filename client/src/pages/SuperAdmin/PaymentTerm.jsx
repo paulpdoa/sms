@@ -39,13 +39,13 @@ const PaymentTerm = () => {
         }
     ]
 
-    const { currentUserId, role, searchQuery, setShowForm,showForm } = useContext(MainContext);
+    const { currentUserId, role, searchQuery, setShowForm,showForm,session } = useContext(MainContext);
 
 
     const updateNewPaymentTerm = async (id,updatedData) => {
 
         try {
-            const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm: updatedData.term,newPayEvery: updatedData.payEvery,newInstallmentBy: updatedData.installmentBy,currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm: updatedData.term,newPayEvery: updatedData.payEvery,newInstallmentBy: updatedData.installmentBy,currentUserId,role,sessionId: session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -54,27 +54,24 @@ const PaymentTerm = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }
 
@@ -90,7 +87,7 @@ const PaymentTerm = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -98,13 +95,23 @@ const PaymentTerm = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
     const addPaymentTerm = async (e) => {
         e.preventDefault();
         try {
-            const newPaymentTerm = await axios.post(`${baseUrl()}/payment-term`,{ term,payEvery,installmentBy,inputter: currentUserId,role });
+            const newPaymentTerm = await axios.post(`${baseUrl()}/payment-term`,{ term,payEvery,installmentBy,inputter: currentUserId,role,sessionId: session });
             toast.success(newPaymentTerm.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -113,7 +120,7 @@ const PaymentTerm = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -121,6 +128,16 @@ const PaymentTerm = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

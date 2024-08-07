@@ -409,7 +409,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                 </button>
             </div> */}
             { isForDelete && <ConfirmationPopup
-                message={'Are you sure you want to delete this record?'}
+                message={'Are you sure you want to delete this record? Deleting this record will remove it from the list'}
                 onClose={() => setIsForDelete(false)}
                 onConfirm={() => handleDeleteClick(deleteRecId)}
             /> }

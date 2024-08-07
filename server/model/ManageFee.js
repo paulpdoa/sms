@@ -31,6 +31,10 @@ const manageFeeSchema = new mongoose.Schema({
     },
     isApplied: {
         type: Boolean
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 }, { timestamps: true })
 

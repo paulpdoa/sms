@@ -18,6 +18,10 @@ const schoolYearSchema = new mongoose.Schema({
     },
     sessionName: {
         type: String
+    },
+    inputter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 }, { timestamps: true });
 

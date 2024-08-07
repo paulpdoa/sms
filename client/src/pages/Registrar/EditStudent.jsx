@@ -66,7 +66,6 @@ const EditStudent = () => {
         }
     }, [records]);
 
-    console.log(suffix);
 
     const calculateAge = (dob) => {
         const age = Math.floor((new Date() - new Date(dob).getTime()) / 3.15576e+10);
@@ -98,7 +97,8 @@ const EditStudent = () => {
             address,
             session,
             currentUserId,
-            role
+            role,
+            sessionId: session
         };
 
         try {
@@ -120,7 +120,7 @@ const EditStudent = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

@@ -52,9 +52,9 @@ const NewSibling = () => {
            }
         } catch (err) {
             console.error(err);
-            toast.error("Error adding sibling. Please try again.", {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

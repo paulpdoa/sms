@@ -2,13 +2,13 @@ import React, { useState,useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
+import { usePost } from '../../hooks/usePost';
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from '../../components/MasterDataForm';
-
 
 const Religion = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
@@ -22,7 +22,7 @@ const Religion = () => {
     const addReligion = async (e) => {
         e.preventDefault();
         try {
-            const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role,session });
+            const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role,session,sessionId: session });
             toast.success(newReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -53,9 +53,8 @@ const Religion = () => {
     };
 
     const updateReligion = async (id, updatedData) => {
-        console.log(id,updatedData);
         try {
-            const response = await axios.patch(`${baseUrl()}/religion/${id}`, { newReligion: updatedData.religion, currentUserId, role,session });
+            const response = await axios.patch(`${baseUrl()}/religion/${id}`, { newReligion: updatedData.religion, currentUserId, role,session,sessionId: session });
             console.log(response);
             toast.success(response.data.mssg, {
                 position: "top-center",
@@ -71,6 +70,7 @@ const Religion = () => {
                 window.location.reload();
             }, 2000);
         } catch (err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -102,6 +102,16 @@ const Religion = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
+            toast.error('An error occurred while deleting religion record', {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            });
         }
     };
 

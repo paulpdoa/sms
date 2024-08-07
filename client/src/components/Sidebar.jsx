@@ -78,11 +78,11 @@ const initialMenus = [
                     }
                 ]
             },
-            {
-                name: 'Settings',
-                icon: <IoSettings />,
-                link: '/settings'
-            }
+            // {
+            //     name: 'Settings',
+            //     icon: <IoSettings />,
+            //     link: '/settings'
+            // }
         ]
     },
     {
@@ -124,11 +124,11 @@ const initialMenus = [
                     }
                 ]
             },
-            {
-                name: 'Settings',
-                icon: <IoSettings />,
-                link: '/settings'
-            }
+            // {
+            //     name: 'Settings',
+            //     icon: <IoSettings />,
+            //     link: '/settings'
+            // }
         ]
     },
     {
@@ -181,11 +181,11 @@ const initialMenus = [
                     }
                 ]
             },
-            {
-                name: 'Settings',
-                icon: <IoSettings />,
-                link: '/settings'
-            }
+            // {
+            //     name: 'Settings',
+            //     icon: <IoSettings />,
+            //     link: '/settings'
+            // }
         ]
     }
 ];

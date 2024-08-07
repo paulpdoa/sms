@@ -7,7 +7,7 @@ const requiredString = {
 }
 
 const studentBookSchema = new mongoose.Schema({
-    sy_id: {
+    sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },

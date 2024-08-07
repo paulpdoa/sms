@@ -79,14 +79,15 @@ module.exports.get_enrolled_students = async (req, res) => {
 
 
 module.exports.add_student = async (req,res) => {
-    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter } = req.body;
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId } = req.body;
     const isAdmitted = false;
 
     try {
-        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter });
+        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,session });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while adding student record'});
     }
 } 
 
@@ -98,13 +99,14 @@ module.exports.delete_student = async (req,res) => {
         res.status(200).json({ mssg: `${studentFind.firstName}'s record has been deleted`});
     } catch(err) {
         console.log(err)
+        res.status(400).json({ mssg: 'An error occurred while deleting records for student record' });
     }
 }
 
 module.exports.edit_student = async(req,res) => {
     const { id } = req.params;
 
-    const { firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter } = req.body;
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId } = req.body;
 
     try {   
 
@@ -113,7 +115,7 @@ module.exports.edit_student = async(req,res) => {
             return res.status(404).json({ mssg: 'Sorry, this student is not in the record, please try again', redirect: '/students' });
         }
 
-        await Student.findByIdAndUpdate({ _id: id },{ firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,inputter });
+        await Student.findByIdAndUpdate({ _id: id },{ firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,inputter,sessionId });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been updated successfully`, redirect: '/students' });
 
     } catch(err) {
@@ -666,14 +668,21 @@ module.exports.add_sectioning = async (req,res) => {
         // insert record in Academic table 
 
         // check if student already has academic record
-        const academicFound = await Academic.findOne({ studentId });
+        const academicFound = await Academic.findOne({ studentId }).populate('gradeLevelId studentId');
+        console.log('academic found: ', academicFound);
 
-        if(!academicFound.gradeLevelId || !academicFound.strandId) {
+        const withStrands = ['11','12'];
+
+        // This block of code will only check if the student is grade 11 or 12, then will not allow if there is no strand selected yet for student
+        if(academicFound.gradeLevelId.gradeLevel.includes(withStrands) && !academicFound.strandId) {
+            // if the academicFound is grade 11 or 12, do not ask user to input academic strand
             return res.status(404).json({ mssg: 'Student does not have grade level or strand record yet, please go to admission page' });
         }
-
         
         if(academicFound) {
+            if(!sectionId) {
+                return res.status(404).json({ mssg: `Section cannot be blank, please select one section for ${academicFound.studentId.firstName} ${academicFound.studentId.lastName}` });
+            }
             const academicNewRecord = await Academic.findOneAndUpdate({ _id: academicFound._id, sessionId }, { sessionId,studentId,sectionId,inputter,gradeLevelId,strandId,lastSchoolAttended,inputter });
             await Student.findByIdAndUpdate({_id: studentId},{ academicId: academicNewRecord._id, inputter });
         } else {
@@ -722,7 +731,7 @@ module.exports.get_manage_fee_detail = async(req,res) => {
 }
 
 module.exports.add_manage_fees = async (req,res) => {
-    let { sessionId, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality } = req.body;
+    let { sessionId, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality,inputter } = req.body;
 
     // Fee Code > fee code + grade level + nationality Code
     // Fee description > fee description + grade level + nationality Code
@@ -736,9 +745,9 @@ module.exports.add_manage_fees = async (req,res) => {
             const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
 
             if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied});
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied, inputter});
             } else {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied});
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied, inputter });
             }
 
         }
@@ -752,12 +761,12 @@ module.exports.add_manage_fees = async (req,res) => {
 // This function will automate the creation of fees for grade levels and assign them fees
 module.exports.automate_fees = async (req, res) => {
 
-    const { isReset,session } = req.body
+    const { isReset,session,inputter } = req.body
 
     try {
 
         if(isReset) {
-            await ManageFee.deleteMany();
+            await ManageFee.deleteMany({ sessionId: session });
         }
         // Fetch all grade levels, fees, and strands
         const [gradeLevels, fees, strands] = await Promise.all([
@@ -774,7 +783,8 @@ module.exports.automate_fees = async (req, res) => {
                 feeDescription: fee._id,
                 amount: 0,
                 nationality: 'Local',
-                sessionId: session
+                sessionId: session,
+                inputter 
             });
 
             if (isSenior) {
@@ -809,19 +819,22 @@ module.exports.delete_manage_fee = async(req,res) => {
         res.status(200).json({ mssg: `Fee has been deleted successfully` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while deleting managed fee record' });
     }
 }
 
 module.exports.edit_manage_fee = async (req,res) => {
     const { id } = req.params;
-    let { sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality } = req.body;
+    let { sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality,inputter } = req.body;
 
     try {
-        await ManageFee.findByIdAndUpdate({ _id: id },{ sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality });
+        await ManageFee.findByIdAndUpdate({ _id: id },{ sessionId, gradeLevelId, strandId, feeDescription, amount, isApplied,nationality,inputter });
         res.status(200).json({ mssg: `Fee has been updated successfully` });
     } catch(err) {
         console.log(err);
+        res.status(400).json({ mssg: 'An error occurred while updating managed fee record' });
     }
+    
 }
 
 module.exports.generate_fees = async (req, res) => {
@@ -1142,9 +1155,7 @@ module.exports.get_payment_schedule = async (req,res) => {
 
 
 module.exports.add_payment_schedule = async (req, res) => {
-    const { session, isReset } = req.body;
-
-    console.log(req.body)
+    const { session, isReset, currentUserId: inputter } = req.body;
 
     // Create logic here if isReset = true, then delete PaymentSchedule
 
@@ -1158,7 +1169,7 @@ module.exports.add_payment_schedule = async (req, res) => {
         const initialStartDate = moment(yearStart);
 
         if(isReset) {
-            await PaymentSchedule.deleteMany();
+            await PaymentSchedule.deleteMany({ sessionId:session });
         }
 
         // Create a program that will create a schedule depending on the month iteration 
@@ -1174,6 +1185,7 @@ module.exports.add_payment_schedule = async (req, res) => {
                     sessionId: currentSchoolYear._id,
                     paymentTermId: paymentTermId,
                     dateSchedule: startDate.format('YYYY-MM-DD'),
+                    inputter
                 });
 
                 startDate.add(payEvery, 'months'); // Increment the date by one month for the next installment

@@ -97,7 +97,7 @@ const EditTeacher = () => {
             password,
             confirmPassword,
             session,
-            currentUserId
+            inputter: currentUserId
         };
 
         try {
@@ -118,9 +118,9 @@ const EditTeacher = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error("Error editing teacher. Please try again.", {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

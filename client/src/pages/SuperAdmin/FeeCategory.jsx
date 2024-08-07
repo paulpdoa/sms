@@ -35,7 +35,7 @@ const FeeCategory = () => {
 
     const updateNewFeeCategory = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/fee-category/${id}`,{ category:updatedData.category,code:updatedData.code,role,sessionId:session });
+            const newData = await axios.patch(`${baseUrl()}/fee-category/${id}`,{ category:updatedData.category,code:updatedData.code,role,sessionId:session, inputter: currentUserId });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -62,10 +62,6 @@ const FeeCategory = () => {
                 progress: undefined,
                 theme: "colored"
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }      
 
@@ -88,6 +84,16 @@ const FeeCategory = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

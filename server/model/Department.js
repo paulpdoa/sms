@@ -15,7 +15,7 @@ const departmentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'
     },
-    session: {
+    sessionId: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'schoolYear'
     }

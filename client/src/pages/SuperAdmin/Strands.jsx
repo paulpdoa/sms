@@ -14,7 +14,7 @@ import MasterDataForm from "../../components/MasterDataForm";
 const Strands = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/strands`);
-    const { role,currentUserId,showForm, searchQuery,setShowForm } = useContext(MainContext);
+    const { role,session,currentUserId,showForm, searchQuery,setShowForm } = useContext(MainContext);
 
     const [strand,setStrand] = useState('');
 
@@ -28,11 +28,11 @@ const Strands = () => {
 
     const updateNewStrand = async (id,updatedData) => {
         try {
-            const newData = await axios.patch(`${baseUrl()}/strand/${id}`,{ newStrand:updatedData.strand,inputter: currentUserId,role });
+            const newData = await axios.patch(`${baseUrl()}/strand/${id}`,{ newStrand:updatedData.strand,inputter: currentUserId,role,sessionId: session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -47,8 +47,25 @@ const Strands = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+        }
+    }      
+
+    const deleteStrand = async (id) => {
+        try {
+            const removeStrand = await axios.put(`${baseUrl()}/strand/${id}`,{ data: { role }});
+            toast.success(removeStrand.data.mssg, {
+                position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -59,44 +76,34 @@ const Strands = () => {
             setTimeout(() => {
                 window.location.reload();
             },2000)
-        }
-    }      
-
-    const deleteStrand = async (id) => {
-        try {
-            const removeStrand = await axios.put(`${baseUrl()}/strand/${id}`,{ data: { role }});
-            toast.success(removeStrand.data.mssg, {
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+                autoClose: 3000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        } catch(err) {
-            console.log(err);
         }
     }
 
     const addStrand = async (e) => {
         e.preventDefault();
         try {   
-            const newStrand = await axios.post(`${baseUrl()}/strand`,{ strand,inputter: currentUserId,role });
+            const newStrand = await axios.post(`${baseUrl()}/strand`,{ strand,inputter: currentUserId,role,sessionId: session });
             toast.success(newStrand.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -104,6 +111,16 @@ const Strands = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

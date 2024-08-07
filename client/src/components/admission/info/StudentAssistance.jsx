@@ -72,9 +72,6 @@ const StudentAssistance = ({ id, closeModal }) => {
             discountId,
             inputter: currentUserId
         };
-
-      
-
         
         try {
             const response = await axios.post(`${baseUrl()}/student-discount`, studentDiscount);
