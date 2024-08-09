@@ -198,7 +198,7 @@ module.exports.get_textbooks = async (req,res) => {
     try {
         // Will return active statuses
         const textbooks = await Textbook.find({ status: true,sessionId: session })
-        .populate('inputter gradeLevel strand sessionId schoolYear');
+        .populate('inputter gradeLevel strand sessionId sessionId');
         res.status(200).json(textbooks);
     } catch(err) {
         console.log(err);

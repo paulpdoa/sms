@@ -284,7 +284,7 @@ module.exports.edit_gender = async (req,res) => {
 
 module.exports.get_departments = async (req,res) => {
     try {
-        const departments = await Department.find().populate('inputter session');
+        const departments = await Department.find().populate('inputter sessionId');
         res.status(200).json(departments);
     } catch(err) {
         console.log(err);
