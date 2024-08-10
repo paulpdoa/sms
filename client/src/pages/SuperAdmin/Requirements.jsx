@@ -1,5 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
@@ -41,32 +39,29 @@ const Requirements = () => {
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+                autoClose: 3000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }      
 
@@ -76,12 +71,12 @@ const Requirements = () => {
             toast.success(removeRequirement.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -89,6 +84,17 @@ const Requirements = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(newRequirement.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
         }
     }
 
@@ -99,12 +105,12 @@ const Requirements = () => {
             toast.success(newRequirement.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -112,6 +118,17 @@ const Requirements = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
         }
     }
 

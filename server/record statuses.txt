@@ -1,0 +1,3 @@
+recordStatus field in tables:
+1. Live - means that the record will be displayed in the list
+2. Deleted - means that the record has been tagged as deleted and will not be available in listings

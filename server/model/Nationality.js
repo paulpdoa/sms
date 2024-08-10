@@ -11,10 +11,7 @@ const nationalitySchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    nationalityCodeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'nationalityCode'
-    },
+    nationalityCode: requiredString,
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'

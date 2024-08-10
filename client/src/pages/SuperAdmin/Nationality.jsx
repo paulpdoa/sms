@@ -1,5 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
@@ -10,11 +8,12 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { nationalityCodes } from '../../data/nationalityCodes.json';
 
 const Nationality = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
-    const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
+    // const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
     const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext)
 
     const columns = [
@@ -24,21 +23,20 @@ const Nationality = () => {
             editable: true,
         },
         {
-            accessorKey: 'nationalityCodeId',
+            accessorKey: 'nationalityCode',
             header: 'Nationality Code',
             editable: true,
-            selectOptions: nationalityCodes.map(nc => ({ value: nc._id, label: nc.nationalityCode })),
-        },
-       
+            selectOptions: nationalityCodes.map(nc => ({ value: nc._name, label: nc.name })),
+        }
     ];
 
     const [nationality,setNationality] = useState('');
-    const [nationalityCodeId,setNationalityCodeId] = useState('');
+    const [nationalityCode,setNationalityCode] = useState('');
 
     const updateNewNationality = async (id,updatedData) => {
         
         try {
-            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCodeId:updatedData.nationalityCodeId,currentUserId,role,session,sessionId: session });
+            const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCode:updatedData.nationalityCode,currentUserId,role,session,sessionId: session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -54,6 +52,7 @@ const Nationality = () => {
                 window.location.reload();
             },2000)
         } catch(err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -86,22 +85,32 @@ const Nationality = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 
     const addNationality = async (e) => {
         e.preventDefault();
         try {
-            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCodeId,currentUserId,role,session,sessionId: session });
+            const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCode,currentUserId,role,session,sessionId: session });
             toast.success(newNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
@@ -111,13 +120,13 @@ const Nationality = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
+                autoClose: 3000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     }
@@ -138,10 +147,10 @@ const Nationality = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="nationality">Nationality Code</label>
-                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCodeId(e.target.value)}>
+                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCode(e.target.value)}>
                     <option hidden>Select nationality code</option>
                     { nationalityCodes?.map(nc => (
-                        <option key={nc._id} value={nc._id}>{nc.nationalityCode}</option>
+                        <option key={nc._id} value={nc.name}>{nc.name}</option>
                     )) }
                 </select>
             </div>

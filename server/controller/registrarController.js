@@ -36,11 +36,7 @@ module.exports.get_students = async (req,res) => {
                 }
             ]
         })
-        .populate({ path: 'nationality',
-            populate: [
-                { path: 'nationalityCodeId' }
-            ]
-         })
+        .populate('nationality')
         .populate('religion')
         .populate('sy_id')
         .populate('gradeLevel')
@@ -759,6 +755,7 @@ module.exports.add_manage_fees = async (req,res) => {
 }
 
 // This function will automate the creation of fees for grade levels and assign them fees
+//For Manage Fee page
 module.exports.automate_fees = async (req, res) => {
 
     const { isReset,session,inputter } = req.body
@@ -890,7 +887,7 @@ module.exports.generate_fees = async (req, res) => {
                         // Check if the fee matches the current year, student's grade level, and nationality code
                         const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                         const matchesGradeLevel = fee.gradeLevelId?._id.equals(student.academicId.gradeLevelId._id);
-                        const matchesNationality = !fee.nationality || fee.nationality === student.nationality.nationalityCodeId?.nationality
+                        const matchesNationality = !fee.nationality || fee.nationality === student.nationality?.nationality
 
                         console.log('Fee Conditions: ', {
                             matchesSchoolYear,
@@ -906,7 +903,7 @@ module.exports.generate_fees = async (req, res) => {
                                 feeGradeLevelId: fee.gradeLevelId._id,
                                 studentGradeLevelId: student.academicId.gradeLevelId._id,
                                 feeNationalityCodeId: fee.nationalityCodeId?._id,
-                                studentNationalityCodeId: student.nationality.nationalityCodeId?.nationalityCode,
+                                studentNationalityCodeId: student.nationality?.nationalityCode,
                                 manageFeeId: fee._id,
                                 amount: fee.amount // Add amount to the log
                             });

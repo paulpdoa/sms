@@ -10,7 +10,7 @@ const StudentSiblingTable = ({ setViewRecord,searchQuery }) => {
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'studentNo', header: 'Student No.' },
-        { accessorKey: 'registered', header: 'Registered' },
+        // { accessorKey: 'registered', header: 'Registered' },
         { accessorKey: 'dateRegistered', header: 'Date Registered' },
         { accessorKey: 'status', header: 'Status' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },

@@ -20,6 +20,7 @@ const StudentPayment = require('../model/StudentPayment');
 const Academic = require('../model/Academic');
 const Discount = require('../model/Discount');
 const Teacher = require('../model/Teacher');
+const Subject = require('../model/Subject');
 
 const bcrypt = require('bcrypt');
 
@@ -30,7 +31,9 @@ const createToken = (token) => {
     return jwt.sign({ token }, process.env.SECRET, {
         expiresIn: maxAge
     })
-}
+};
+
+const recordStatus = 'Live';
 
 // For Religion
 module.exports.get_religions = async (req,res) => {
@@ -101,7 +104,7 @@ module.exports.edit_religion = async (req,res) => {
 
 module.exports.get_nationalities = async (req,res) => {
     try {
-        const nationalities = await Nationality.find().populate('inputter nationalityCodeId');
+        const nationalities = await Nationality.find().populate('inputter');
         res.status(200).json(nationalities);
     } catch(err) {
         console.log(err);
@@ -110,10 +113,10 @@ module.exports.get_nationalities = async (req,res) => {
 
 module.exports.add_nationality = async (req,res) => {
 
-    const { nationality,nationalityCodeId,currentUserId: inputter, sessionId } = req.body
+    const { nationality,nationalityCode,currentUserId: inputter, sessionId } = req.body
 
     try {
-        await Nationality.create({ nationality,nationalityCodeId,inputter,sessionId });
+        await Nationality.create({ nationality,nationalityCode,inputter,sessionId });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -138,7 +141,7 @@ module.exports.get_nationality_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const nationalityFind = await Nationality.findById(id).populate('inputter nationalityCodeId');
+        const nationalityFind = await Nationality.findById(id).populate('inputter');
         res.status(200).json(nationalityFind);
     } catch(err) {
         console.log(err);
@@ -147,10 +150,11 @@ module.exports.get_nationality_detail = async (req,res) => {
 
 module.exports.edit_nationality = async (req,res) => {
     const { id } = req.params;
-    const { newNationality: nationality,newNationalityCodeId: nationalityCodeId,currentUserId: inputter,sessionId } = req.body;
+    const { newNationality: nationality,newNationalityCode: nationalityCode,currentUserId: inputter,sessionId } = req.body;
+    console.log(req.body)
     
     try {
-        const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCodeId,inputter,sessionId });
+        const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCode,inputter,sessionId });
         res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
     } catch(err) {
         console.log(err);
@@ -524,6 +528,76 @@ module.exports.edit_grade_level = async (req,res) => {
         
     } catch(err) {
         console.log(err);
+    }
+}
+
+// For Subjects
+module.exports.get_live_subjects = async(req,res) => {
+
+    const { session } = req.query;
+
+    try {  
+        const subjects = await Subject.find({ sessionId: session }).populate('gradeLevelId inputter sessionId');
+        res.status(200).json(subjects);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching subject records' });
+    }
+}
+
+module.exports.add_subject = async(req,res) => {
+    const { subjectName,gradeLevelId,sessionId, inputter } = req.body;
+
+    if(subjectName === '') {
+        return res.status(500).json({ mssg: `${subjectName} cannot be blank` });
+    }
+
+    try {
+        await Subject.create({ subjectName, gradeLevelId,sessionId,inputter,recordStatus});
+        res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({mssg:'An error occurred while adding subject record'});
+    }
+}
+
+module.exports.get_live_subject_detail = async (req,res) => {
+    
+    const { session } = req.query;
+    const { id } = req.params;
+
+    try {
+        const subject = await Subject.findOne({ _id: id}, { sessionId: session });
+        res.status(200).json(subject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching subject information record'});
+    }
+}
+
+module.exports.edit_live_subject = async(req,res) => {
+
+    const { id } = req.params;
+    const { subjectName,gradeLevelId,sessionId, inputter } = req.body;
+
+    try {
+        await Subject.findByIdAndUpdate(id,{ subjectName,gradeLevelId,sessionId,inputter });
+        res.status(200).json({ mssg: `${subjectName} has been updated successfully`});
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating subject information'});
+    }
+}
+
+module.exports.delete_live_subject = async(req,res) => {
+    const { id } = req.params;
+    
+    try {   
+        await Subject.findByIdAndUpdate(id,{ recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: 'Subject has been deleted successfully'});
+    } catch(err) {  
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting subject record'});
     }
 }
 
@@ -1415,7 +1489,7 @@ module.exports.get_dashboard_details = async (req, res) => {
         let studentsGender = { male: 0, female: 0 };
         let studentsNationality = { local: 0, foreign: 0 };
         let enrolledStudents = 0;
-        let academicStatusOfStudents = { new: 0, old: 0, transferred: 0, graduated: 0, admittedButDidNotContinue: 0 };
+        let academicStatusOfStudents = { new: 0, old: 0, transferred: 0,returnee: 0, graduated: 0, admittedButDidNotContinue: 0 };
 
         const gradeCounts = {};
         let teachersCount = 0;
@@ -1474,6 +1548,8 @@ module.exports.get_dashboard_details = async (req, res) => {
                 academicStatusOfStudents.old += 1;
             } else if(status === 'Admitted but did not continue') {
                 academicStatusOfStudents.admittedButDidNotContinue += 1;
+            } else if(status === 'Returnee') {
+                academicStatusOfStudents.returnee += 1;
             }
         }
 
