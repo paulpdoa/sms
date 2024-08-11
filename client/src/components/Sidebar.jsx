@@ -45,6 +45,7 @@ const initialMenus = [
                     { name: 'Fee Code', link: '/master/fee-code' },
                     { name: 'Manage Fees', link: '/master/manage-fees' },
                     { name: 'Discount', link: '/master/discount' },
+                    { name: 'Subject', link: '/master/subjects' },
                 ]
             },
             {

@@ -537,7 +537,7 @@ module.exports.get_live_subjects = async(req,res) => {
     const { session } = req.query;
 
     try {  
-        const subjects = await Subject.find({ sessionId: session }).populate('gradeLevelId inputter sessionId');
+        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Live' }).populate('gradeLevelId inputter sessionId');
         res.status(200).json(subjects);
     } catch(err) {
         console.log(err);
@@ -546,14 +546,14 @@ module.exports.get_live_subjects = async(req,res) => {
 }
 
 module.exports.add_subject = async(req,res) => {
-    const { subjectName,gradeLevelId,sessionId, inputter } = req.body;
+    const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
 
-    if(subjectName === '') {
-        return res.status(500).json({ mssg: `${subjectName} cannot be blank` });
+    if(subjectName === '' || subjectCode === '') {
+        return res.status(500).json({ mssg: `Subject name or subject code cannot be blank` });
     }
 
     try {
-        await Subject.create({ subjectName, gradeLevelId,sessionId,inputter,recordStatus});
+        await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
         res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
     } catch(err) {
         console.log(err);
@@ -567,7 +567,7 @@ module.exports.get_live_subject_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const subject = await Subject.findOne({ _id: id}, { sessionId: session });
+        const subject = await Subject.findOne({ _id: id, sessionId: session });
         res.status(200).json(subject);
     } catch(err) {
         console.log(err);
@@ -593,8 +593,8 @@ module.exports.delete_live_subject = async(req,res) => {
     const { id } = req.params;
     
     try {   
-        await Subject.findByIdAndUpdate(id,{ recordStatus: 'Deleted' });
-        res.status(200).json({ mssg: 'Subject has been deleted successfully'});
+        const subject = await Subject.findByIdAndUpdate(id,{ recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: `${subject.subjectName} has been deleted successfully` });
     } catch(err) {  
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while deleting subject record'});

@@ -77,7 +77,12 @@ edit_nationality_code,
 delete_nationality_code,
 close_school_year,
 generate_academic_students,
-get_dashboard_details} = require('../controller/masterController');
+get_dashboard_details,
+get_live_subjects,
+get_live_subject_detail,
+add_subject,
+edit_live_subject,
+delete_live_subject} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -134,6 +139,13 @@ route.post('/sections', add_sections);
 route.put('/section/:id', delete_section);
 route.get('/section/:id',allowUserView(userRoles), get_section_detail);
 route.patch('/section/:id',edit_section);
+
+// Subject
+route.get('/subjects',get_live_subjects);
+route.get('/subject/:id',get_live_subject_detail);
+route.post('/subject',add_subject);
+route.patch('/subject/:id',edit_live_subject);
+route.put('/subject/:id',delete_live_subject);
 
 // GradeLevel
 route.get('/grade-levels',allowUserView(userRoles), get_grade_levels);

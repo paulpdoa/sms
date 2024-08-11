@@ -10,6 +10,10 @@ const subjectSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    subjectCode: {
+        type: String,
+        required: true
+    },
     gradeLevelId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'gradeLevel'

@@ -59,6 +59,7 @@ import NewTextbook from "./pages/SuperAdmin/NewTextbook";
 import NewUser from "./pages/SuperAdmin/NewUser";
 import { useCookies } from 'react-cookie';
 import Profile from "./pages/Profile";
+import Subjects from "./pages/SuperAdmin/Subjects";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -137,8 +138,9 @@ function App() {
             <Route path='discount' element={<Discount />} />
             <Route path='sectioning' element={<Sectioning />} />
             <Route path='manage-fees' element={<ManageFees />} />
+            <Route path='subjects' element={<Subjects />} />
           </Route>
-
+          <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
           <Route path='/sectioning' element={<Sectioning />} />
