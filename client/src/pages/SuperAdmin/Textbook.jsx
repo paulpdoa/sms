@@ -54,7 +54,7 @@ const Textbook = () => {
 
     const deleteTextbook = async (id) => {
         try {
-            const removeTextbook = await axios.put(`${baseUrl()}/textbook/${id}`,{ data: { role } });
+            const removeTextbook = await axios.put(`${baseUrl()}/textbook/${id}`,{ role,recordStatus: 'Deleted' });
             toast.success(removeTextbook.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

@@ -21,7 +21,8 @@ const admissionSchema = new mongoose.Schema({
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const AdmissionModel = mongoose.model('admission',admissionSchema);

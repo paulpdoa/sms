@@ -29,7 +29,8 @@ const userSchema = new mongoose.Schema({
     password: requiredString,
     profilePictureUrl: {
         type: String
-    }
+    },
+    recordStatus: requiredString
 
 }, { timestamps: true });
 

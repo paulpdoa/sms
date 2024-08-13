@@ -40,7 +40,7 @@ const Users = () => {
 
     const deleteUser = async (id) => {
         try {
-            const removeUser = await axios.put(`${baseUrl()}/user/${id}`,{ data: { role: userRole } });
+            const removeUser = await axios.put(`${baseUrl()}/user/${id}`,{ role: userRole, recordStatus: 'Deleted' });
             toast.success(removeUser.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -57,6 +57,16 @@ const Users = () => {
             },2000)
         } catch(err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
         }
     }
 

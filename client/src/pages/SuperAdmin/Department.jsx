@@ -64,7 +64,7 @@ const Department = () => {
 
     const deleteDepartment = async (id) => {
         try {
-            const removeDepartment = await axios.delete(`${baseUrl()}/department/${id}`,{ data: { role,session } });
+            const removeDepartment = await axios.put(`${baseUrl()}/department/${id}`,{ recordStatus: 'Deleted' });
             toast.success(removeDepartment.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

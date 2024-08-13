@@ -18,6 +18,10 @@ const religionSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
+    },
+    recordStatus: {
+        type: String,
+        required: true
     }
 }, { timestamps: true })
 

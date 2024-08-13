@@ -26,7 +26,8 @@ const studentBookSchema = new mongoose.Schema({
     manageFeeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'manageFee'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const StudentBookModel = mongoose.model('studentBook',studentBookSchema);

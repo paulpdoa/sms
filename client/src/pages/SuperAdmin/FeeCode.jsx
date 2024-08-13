@@ -79,7 +79,7 @@ const FeeCode = () => {
 
     const deleteFeeCode = async (id) => {
         try {
-            const removeFeeCode = await axios.delete(`${baseUrl()}/fee-code/${id}`,{ data: { role } });
+            const removeFeeCode = await axios.put(`${baseUrl()}/fee-code/${id}`,{ role, recordStatus: 'Deleted' });
             toast.success(removeFeeCode.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

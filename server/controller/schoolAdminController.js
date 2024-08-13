@@ -16,7 +16,7 @@ const createToken = (token) => {
 
 module.exports.get_teachers = async (req,res) => {
     try {
-        const teachers = await Teacher.find().populate('religion nationality');
+        const teachers = await Teacher.find({ recordStatus: 'Live' }).populate('religion nationality');
         res.status(200).json(teachers);
     } catch(err) {
         console.log(err);
@@ -83,7 +83,8 @@ module.exports.add_teacher = async (req,res) => {
             yearsOfExperience,
             joiningDate,
             inputter,
-            sessionId
+            sessionId,
+            recordStatus: 'Live'
             });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {
@@ -94,13 +95,14 @@ module.exports.add_teacher = async (req,res) => {
 
 module.exports.delete_teacher = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const teacherFind = await Teacher.findByIdAndDelete(id);
+        const teacherFind = await Teacher.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${teacherFind.firstName}'s record has been deleted`});
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while deleting teacher record' });
+        res.status(500).json({ mssg: 'An error occurred while deleting teacher record' });
     }
 }
 
@@ -108,10 +110,12 @@ module.exports.get_teacher_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const teacherFind = await Teacher.findById(id).populate('religion nationality');
+        const teacherFind = await Teacher.findOne({ _id: id, recordStatus: 'Live'}).populate('religion nationality');
         res.status(200).json(teacherFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching teacher record' });
+
     }
 }
 
@@ -126,17 +130,19 @@ module.exports.edit_teacher = async (req,res) => {
         res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while updating teacher record' });
+        res.status(500).json({ mssg: 'An error occurred while updating teacher record' });
     }
 }
 
 // For Strand
 module.exports.get_strands = async (req,res) => {
     try {
-        const strands = await Strand.find({ status: true }).populate('inputter');
+        const strands = await Strand.find({ status: true,recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(strands);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching strand record' });
+
     }
 }
 
@@ -144,13 +150,14 @@ module.exports.add_strand = async (req,res) => {
 
     const { strand,inputter,sessionId } = req.body;
     const status = true;
+    const recordStatus = 'Live';
 
     try {
-        const newStrand = await Strand.addStrand(strand,inputter,status,sessionId);
+        const newStrand = await Strand.addStrand(strand,inputter,status,sessionId,recordStatus);
         res.status(200).json({ mssg: `${strand} has been added to the record` });
     } catch(err) {
         console.log(err.message);
-        res.status(400).json({ mssg: err.message });
+        res.status(500).json({ mssg: err.message });
     }
 }
 
@@ -159,11 +166,11 @@ module.exports.delete_strand = async (req,res) => {
     const status = false;
 
     try {
-        const strandFind = await Strand.findByIdAndUpdate({ _id: id },{ status });
+        const strandFind = await Strand.findByIdAndUpdate({ _id: id },{ status,recordStatus: 'Deleted' });
         res.status(200).json({ mssg: `${strandFind.strand} record has been deleted` });
     } catch(err) {
         console.log(err)
-        res.status(400).json({ mssg: 'An error occurred while deleting strand'});
+        res.status(500).json({ mssg: 'An error occurred while deleting strand'});
     }
 }
 
@@ -171,7 +178,7 @@ module.exports.get_strand_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const strandFind = await Strand.findById(id);
+        const strandFind = await Strand.findOne({_id: id, recordStatus: 'Live'});
         res.status(200).json(strandFind);
     } catch(err) {
         console.log(err);
@@ -197,7 +204,7 @@ module.exports.get_textbooks = async (req,res) => {
 
     try {
         // Will return active statuses
-        const textbooks = await Textbook.find({ status: true,sessionId: session })
+        const textbooks = await Textbook.find({ status: true,sessionId: session,recordStatus: 'Live' })
         .populate('inputter gradeLevel strand sessionId sessionId');
         res.status(200).json(textbooks);
     } catch(err) {
@@ -215,12 +222,12 @@ module.exports.add_textbook = async (req,res) => {
     }
 
     try {
-        await Textbook.create({ bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status });
+        await Textbook.create({ bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status,recordStatus: 'Live' });
         res.status(200).json({ mssg: `${bookTitle} has been added to the record` });
     } catch(err) {
         if(err.code === 11000) {
             console.log(err.keyValue.bookCode);
-            res.status(400).json({ mssg: err.keyValue.bookCode + ' has been added in the record, please add unique book code' });
+            res.status(500).json({ mssg: err.keyValue.bookCode + ' has been added in the record, please add unique book code' });
         }
     }
 }
@@ -230,10 +237,11 @@ module.exports.delete_textbook = async (req,res) => {
     const status = false;
 
     try {
-        const textbookFind = await Textbook.findByIdAndUpdate({ _id: id },{ status });
+        const textbookFind = await Textbook.findByIdAndUpdate({ _id: id },{ status,recordStatus: 'Deleted' });
         res.status(200).json({ mssg: `${textbookFind.bookTitle} record has been deleted` });
     } catch(err) {
-        console.log(err)
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting textbook record'})
     }
 }
 
@@ -243,10 +251,11 @@ module.exports.get_textbook_detail = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const textbookFind = await Textbook.findOne({ _id: id, sessionId: session});
+        const textbookFind = await Textbook.findOne({ _id: id, sessionId: session, recordStatus: 'Live'});
         res.status(200).json(textbookFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching textbook information' })
     }
 }
 
@@ -266,5 +275,6 @@ module.exports.edit_textbook = async (req,res) => {
         res.status(200).json({ mssg: `${bookTitle} has been edited successfully!` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating textbook information' })
     }
 }

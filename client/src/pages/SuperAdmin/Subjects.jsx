@@ -86,7 +86,7 @@ const Subjects = () => {
     const deleteSubject = async (id) => {
 
         try {
-            const data = await axios.put(`${baseUrl()}/subject/${id}`,{ role, recordStatus: 'Deleted' });
+            const data = await axios.put(`${baseUrl()}/subject/${id}`,{ role });
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

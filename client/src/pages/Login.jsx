@@ -16,11 +16,26 @@ const Login = () => {
     const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['userToken']);
 
+    const [error,setError] = useState({ username: '', password: '', session: '' });
+
     const schoolName = 'School Management System';
     const logoPath = '/schoolLogo/school-logo-filler.png';
 
     const loginUser = async (e) => {
         e.preventDefault();
+
+        if(username === '') {
+            setError({ username: 'Username cannot be empty' });
+        }
+
+        if(password === '') {
+            setError({ password: 'Password cannot be empty' });
+        }
+
+        if(schoolYear === '') {
+            setError({ session: 'Session cannot be empty' });
+        }
+
         try {
             const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
             

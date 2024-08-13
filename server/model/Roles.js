@@ -21,10 +21,11 @@ const roleSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
-roleSchema.statics.addRole = async function(userRole,inputter,status) {
+roleSchema.statics.addRole = async function(userRole,inputter,status,sessionId,recordStatus) {
 
     const exist = await this.findOne({ userRole });
     if(exist && exist.status){

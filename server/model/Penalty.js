@@ -19,7 +19,8 @@ const penaltySchema = new mongoose.Schema({
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const PenaltyModel = mongoose.model('penalty',penaltySchema);

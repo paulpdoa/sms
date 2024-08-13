@@ -20,7 +20,8 @@ const feeCodeSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const FeeCodeModel = mongoose.model('feeCode',feeCodeSchema);

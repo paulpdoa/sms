@@ -71,7 +71,7 @@ const GradeLevel = () => {
 
     const deleteGradeLevel = async (id) => {
         try {
-            const removeGradeLevel = await axios.delete(`${baseUrl()}/grade-level/${id}`, { data: { role } })
+            const removeGradeLevel = await axios.put(`${baseUrl()}/grade-level/${id}`, { recordStatus: 'Deleted' });
             toast.success(removeGradeLevel.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

@@ -131,6 +131,7 @@ const Discount = () => {
                 window.location.reload();
             }, 2000);
         } catch (err) {
+            console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
@@ -145,7 +146,7 @@ const Discount = () => {
 
     const deleteDiscount = async (id) => {
         try {
-            const removeDiscount = await axios.delete(`${baseUrl()}/discount/${id}`, { data: { role } });
+            const removeDiscount = await axios.put(`${baseUrl()}/discount/${id}`, { role,recordStatus: 'Deleted' });
             toast.success(removeDiscount.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -161,6 +162,15 @@ const Discount = () => {
             }, 2000);
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
         }
     };
 

@@ -67,7 +67,7 @@ const FeeCategory = () => {
 
     const deleteFeeCategory = async (id) => {
         try {
-            const removeFeeCategory = await axios.delete(`${baseUrl()}/fee-category/${id}`, { data: { role } });
+            const removeFeeCategory = await axios.put(`${baseUrl()}/fee-category/${id}`, { role, recordStatus: 'Deleted' });
             toast.success(removeFeeCategory.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

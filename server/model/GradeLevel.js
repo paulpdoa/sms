@@ -21,8 +21,9 @@ const gradeLevelSchema = new mongoose.Schema({
     },
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'schoolYear``'
-    }
+        ref: 'schoolYear'
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const GradeLevelModel = mongoose.model('gradeLevel',gradeLevelSchema);

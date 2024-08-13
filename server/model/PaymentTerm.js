@@ -22,7 +22,8 @@ const paymentTermSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const PaymentTermModel = mongoose.model('paymentTerm',paymentTermSchema);

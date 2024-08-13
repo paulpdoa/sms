@@ -20,7 +20,8 @@ const studentDiscountSchema = new mongoose.Schema({
     discount: {
         type: Number,
         required: true
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const StudentDiscountSchema = mongoose.model('studentDiscount',studentDiscountSchema);

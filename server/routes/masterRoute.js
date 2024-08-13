@@ -82,7 +82,9 @@ get_live_subjects,
 get_live_subject_detail,
 add_subject,
 edit_live_subject,
-delete_live_subject} = require('../controller/masterController');
+delete_live_subject,
+update_all_records_live,
+get_deleted_subjects} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -90,6 +92,8 @@ const { allowUserView,allowUserAction,upload } = require('../middleware/middlewa
 const userRoles = ['School Admin', 'Super Admin'];
 
 route.post('/user-login',user_login);
+
+route.get('/update-to-live-records', update_all_records_live);
 
 // Role
 route.get('/user-roles',allowUserView(userRoles), get_roles);
@@ -101,7 +105,7 @@ route.patch('/user-role/:id',edit_role);
 // Religion
 route.get('/religions',allowUserView(userRoles),get_religions);
 route.post('/religions',allowUserAction(userRoles),add_religion);
-route.delete('/religion/:id', delete_religion);
+route.put('/religion/:id', delete_religion);
 route.get('/religion/:id',allowUserView(userRoles), get_religion_detail);
 route.patch('/religion/:id',allowUserAction(userRoles),edit_religion);
 
@@ -140,12 +144,15 @@ route.put('/section/:id', delete_section);
 route.get('/section/:id',allowUserView(userRoles), get_section_detail);
 route.patch('/section/:id',edit_section);
 
-// Subject
+// Live Subject
 route.get('/subjects',get_live_subjects);
 route.get('/subject/:id',get_live_subject_detail);
 route.post('/subject',add_subject);
 route.patch('/subject/:id',edit_live_subject);
 route.put('/subject/:id',delete_live_subject);
+
+// Delete Subjects
+route.get('/deleted-subjects',get_deleted_subjects);
 
 // GradeLevel
 route.get('/grade-levels',allowUserView(userRoles), get_grade_levels);

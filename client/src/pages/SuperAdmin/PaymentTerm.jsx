@@ -78,7 +78,7 @@ const PaymentTerm = () => {
 
     const deletePaymentTerm = async (id) => {
         try {
-            const removePaymentTerm = await axios.delete(`${baseUrl()}/payment-term/${id}`,{ data: { role } });
+            const removePaymentTerm = await axios.put(`${baseUrl()}/payment-term/${id}`,{ role, recordStatus: 'Deleted' });
             toast.success(removePaymentTerm.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

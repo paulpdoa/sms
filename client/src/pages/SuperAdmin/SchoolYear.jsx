@@ -67,7 +67,7 @@ const SchoolYear = () => {
 
     const deleteSchoolYear = async (id) => {
         try {
-            const removeSchoolYear = await axios.put(`${baseUrl()}/school-year/${id}`, { data: { role } });
+            const removeSchoolYear = await axios.put(`${baseUrl()}/school-year/${id}`, { role, recordStatus: 'Deleted' });
             toast.success(removeSchoolYear.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

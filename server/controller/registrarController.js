@@ -20,7 +20,7 @@ const moment = require('moment');
 module.exports.get_students = async (req,res) => {
     try {
         // const students = await Student.find().populate('sex religion nationality sy_id gradeLevel academicId');
-        const students = await Student.find()
+        const students = await Student.find({recordStatus: 'Live'})
         .populate({
             path: 'academicId',
             populate: [
@@ -79,7 +79,7 @@ module.exports.add_student = async (req,res) => {
     const isAdmitted = false;
 
     try {
-        const addStudent = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,session });
+        await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
@@ -89,9 +89,10 @@ module.exports.add_student = async (req,res) => {
 
 module.exports.delete_student = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body; 
 
     try {
-        const studentFind = await Student.findByIdAndDelete(id);
+        const studentFind = await Student.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${studentFind.firstName}'s record has been deleted`});
     } catch(err) {
         console.log(err)
@@ -116,7 +117,7 @@ module.exports.edit_student = async(req,res) => {
 
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: err.message });
+        res.status(500).json({ mssg: err.message });
     }
 }
 
@@ -124,7 +125,7 @@ module.exports.get_student_detail = async (req, res) => {
     const { id } = req.params;  
 
     try {
-        const studentFind = await Student.findById(id)
+        const studentFind = await Student.findOne({ _id: id, recordStatus: 'Live'})
             .populate({
                 path: 'academicId',
                 populate: [
@@ -148,7 +149,7 @@ module.exports.get_student_detail = async (req, res) => {
         res.status(200).json(studentFind);
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'An error occurred while fetching student information' });
     }
 };
 
@@ -161,11 +162,11 @@ module.exports.submit_student_requirements = async (req,res) => {
     
     try {
         for(let i = 0; i < requirements.length; i++) {
-            const existReq = await Student.find({ submittedRequirements: requirements[i] });
+            const existReq = await Student.find({ submittedRequirements: requirements[i], recordStatus: 'Live' });
 
             if(!existReq) {
                 studentSubmitted = true;
-                const submitReqs = await Student.findByIdAndUpdate({_id:id},{ $push: {submittedRequirements: requirements[i]} });
+                await Student.findByIdAndUpdate({_id:id},{ $push: {submittedRequirements: requirements[i]}, recordStatus: 'Live' });
             } else {
                 studentSubmitted = false;
             }
@@ -179,6 +180,7 @@ module.exports.submit_student_requirements = async (req,res) => {
 
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while processing student requirements' });
     }
 }
 
@@ -186,10 +188,11 @@ module.exports.submit_student_requirements = async (req,res) => {
 
 module.exports.get_admission = async (req,res) => {
     try {
-        const admissions = await Admission.find().populate('sessionId requirementId studentId');
+        const admissions = await Admission.find({ recordStatus: 'Live' }).populate('sessionId requirementId studentId');
         res.status(200).json(admissions);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching admission details' });
     }
 }
 
@@ -201,15 +204,15 @@ module.exports.add_admission = async (req, res) => {
     
     try {
         // Check for Academic Record of student if existing
-        const studentAcademicExist = await Academic.findOne({ studentId });
+        const studentAcademicExist = await Academic.findOne({ studentId,recordStatus: 'Live' });
         
         // Fetch all required documents
-        const requiredDocs = await Requirement.find({ sessionId: schoolYear, isRequired: true });
+        const requiredDocs = await Requirement.find({ sessionId: schoolYear, isRequired: true, recordStatus: 'Live' });
         const requiredDocIds = requiredDocs.map(doc => doc._id.toString());
         console.log('Required Documents:', requiredDocIds);
 
         // Check if the student already submitted the required documents
-        const existingAdmissions = await Admission.find({ studentId, sessionId: schoolYear });
+        const existingAdmissions = await Admission.find({ studentId, sessionId: schoolYear, recordStatus: 'Live' });
         const existingDocIds = existingAdmissions.map(admission => admission.requirementId.toString());
         console.log('Existing Admissions:', existingDocIds);
 
@@ -217,14 +220,14 @@ module.exports.add_admission = async (req, res) => {
         const toRemove = existingDocIds.filter(id => !requirements.includes(id));
         console.log('To Remove:', toRemove);
         for (let i = 0; i < toRemove.length; i++) {
-            await Admission.findOneAndDelete({ studentId, requirementId: toRemove[i] });
+            await Admission.findOneAndUpdate({ studentId, requirementId: toRemove[i] });
         }
 
         // Add new requirements
         const toAdd = requirements.filter(id => !existingDocIds.includes(id));
         console.log('To Add:', toAdd);
         for (let i = 0; i < toAdd.length; i++) {
-            await Admission.create({ sessionId: schoolYear, studentId, requirementId: toAdd[i] });
+            await Admission.create({ sessionId: schoolYear, studentId, requirementId: toAdd[i], recordStatus: 'Live' });
         }
 
         // Combine existing and new submissions
@@ -241,7 +244,7 @@ module.exports.add_admission = async (req, res) => {
                 console.log('Found Academic Record:', foundAcademic);
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: foundAcademic._id });
             } else { // if student academic not existing, create new record
-                const academic = await Academic.create({ studentId, isAdmitted: true, sessionId: schoolYear });
+                const academic = await Academic.create({ studentId, isAdmitted: true, sessionId: schoolYear, recordStatus: 'Live' });
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: academic._id });
                 console.log('Creating academic')
             }
@@ -254,7 +257,7 @@ module.exports.add_admission = async (req, res) => {
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: foundAcademic._id });
                 console.log('Found Academic Record:', foundAcademic);
             } else { // if student academic not existing, create new record
-                await Academic.create({ studentId, isAdmitted: false, sessionId: schoolYear });
+                await Academic.create({ studentId, isAdmitted: false, sessionId: schoolYear, recordStatus: 'Live' });
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: academic._id });
                 console.log('Creating academic')
             }
@@ -267,7 +270,7 @@ module.exports.add_admission = async (req, res) => {
         res.status(200).json({ mssg: 'Student requirement has been updated' });
     } catch (err) {
         console.log('Error:', err);
-        res.status(500).json({ mssg: 'Server error' });
+        res.status(500).json({ mssg: 'An error occurred while processing admission' });
     }
 };
 
@@ -278,11 +281,11 @@ module.exports.get_admission_student = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const admission = await Admission.find({ studentId: student,sessionId: session });
+        const admission = await Admission.find({ studentId: student,sessionId: session,recordStatus: 'Live' });
         res.status(200).json(admission);
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while getting admission records'});
+        res.status(500).json({ mssg: 'An error occurred while getting admission records'});
     }
 }
 
@@ -324,17 +327,17 @@ module.exports.update_student_info = async (req, res) => {
     }
 
     try {
-        const studentAcademic = await Academic.findOne({ studentId: id, sessionId: session });
+        const studentAcademic = await Academic.findOne({ studentId: id, sessionId: session,recordStatus: 'Live' });
         console.log('student Academic', studentAcademic);
 
         if (!studentAcademic?.isAdmitted) {
             return res.status(404).json({ mssg: 'Please complete students requirements first before adding academic record' });
         }
 
-        const latestStudent = await Student.findOne({ studentNo: { $exists: true } }).sort({ _id: -1 });
+        const latestStudent = await Student.findOne({ studentNo: { $exists: true }, recordStatus: 'Live' }).sort({ _id: -1 });
         console.log('Latest Student: ', latestStudent);
 
-        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus, inputter });
+        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus, inputter, recordStatus: 'Live' });
         console.log('New Record: ', studentAcademicNewRecord);
 
         const student = await Student.findByIdAndUpdate(
@@ -355,18 +358,19 @@ module.exports.update_student_info = async (req, res) => {
                 suffix,
                 lrn,
                 academicId: studentAcademicNewRecord._id,
-                inputter
+                inputter,
+                recordStatus: 'Live'
             },
             { new: true }
         );
 
         const isStudentRegistered = await Student.findById(id);
-        const currentSession = await SchoolYear.findById(session);
+        const currentSession = await SchoolYear.findOne({ _id: session, recordStatus: 'Live'});
 
         if (currentSession) {
             currentYear = currentSession.startYear.split('-')[0];
         } else {
-            return res.status(400).json({ mssg: 'Session not found' });
+            return res.status(404).json({ mssg: 'Session not found' });
         }
 
         if (isRegistered) {
@@ -405,20 +409,20 @@ module.exports.get_academics = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const academics = await Academic.find({ sessionId: session })
+        const academics = await Academic.find({ sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'sectionId', populate: { path: 'adviser' }})
         .populate('gradeLevelId studentId departmentId strandId sessionId');
         res.status(200).json(academics);
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while fetching academic record'});
+        res.status(500).json({ mssg: 'An error occurred while fetching academic record'});
     }
 }
 
 module.exports.get_student_academic = async (req,res) => {
     const { session } = req.query;
     try {
-        const studentAcademic = await Academic.find({ sessionId: session }).populate({ path: 'studentId' });
+        const studentAcademic = await Academic.find({ sessionId: session,recordStatus: 'Live' }).populate({ path: 'studentId' });
         res.status(200).json(studentAcademic);
     } catch(err) {
         console.log(err);
@@ -430,7 +434,7 @@ module.exports.get_student_academic_detail = async (req,res) => {
     const { session } = req.query;
     
     try {
-        const studentAcademic = await Academic.find({ studentId, sessionId: session },{ sort: { 'createdAt': -1 } });
+        const studentAcademic = await Academic.find({ studentId, sessionId: session,recordStatus: 'Live' },{ sort: { 'createdAt': -1 } });
         console.log(studentAcademic)
         res.status(200).json(studentAcademic);
     } catch(err) {
@@ -454,7 +458,7 @@ module.exports.add_academic = async (req,res) => {
     try {
 
         //await Academic.findOneAndDelete({ studentId: studentId });
-        const studentAcademic = await Academic.findOne({ studentId,sessionId });
+        const studentAcademic = await Academic.findOne({ studentId,sessionId,recordStatus: 'Live' });
 
         if(!studentAcademic.isRegistered || !studentAcademic.isAdmitted) {
             return res.status(400).json({ mssg: 'Please admit or register the student first before creating academic record' });
@@ -475,21 +479,21 @@ module.exports.add_academic = async (req,res) => {
         res.status(200).json({ mssg: `Students academic record has been created successfully` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'Error on creating academic record, please ensure all fields were entered' });
+        res.status(500).json({ mssg: 'Error on creating academic record, please ensure all fields were entered' });
     }
 }
 
 module.exports.delete_academic = async (req,res) => {
     const { id } = req.params;
-
-    console.log(id);
+    const { recordStatus } = req.body;
+  
     try {
-        const academic = await Academic.findByIdAndDelete(id);
-        res.status(200).json({mssg: `Academic record has been deleted`});
+        await Academic.findByIdAndUpdate(id, { recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: `Academic record has been deleted` });
         
     } catch(err) {
         console.log(err);
-        res.status(400).json({mssg:'Failed to delete academic record'});
+        res.status(500).json({ mssg:'Failed to delete academic record' });
     }
 }
 
@@ -498,10 +502,11 @@ module.exports.delete_academic = async (req,res) => {
 module.exports.get_discounts = async (req,res) => {
     const { session } = req.query;
     try {
-        const discount = await Discount.find({ sessionId: session }).populate('sessionId gradeLevelId inputter');
+        const discount = await Discount.find({ sessionId: session,recordStatus: 'Live' }).populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg:'An error occurred while fetching discount records' });
     }
 }
 
@@ -510,10 +515,11 @@ module.exports.get_discount_detail = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const discount = await Discount.findOne({ _id: id,sessionId: session }).populate('sessionId gradeLevelId inputter');
+        const discount = await Discount.findOne({ _id: id,sessionId: session,recordStatus: 'Live' }).populate('sessionId gradeLevelId inputter');
         res.status(200).json(discount);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg:'An error occurred while fetching discount records' });
     }
 }
 
@@ -527,9 +533,9 @@ module.exports.add_discount = async (req, res) => {
 
     try {
         if(gradeLevelId === '') {
-            await Discount.create({ sessionId, discountType, discountPercent, discountCode, inputter });
+            await Discount.create({ sessionId, discountType, discountPercent, discountCode, inputter,recordStatus: 'Live' });
         } else {
-            await Discount.create({ sessionId, gradeLevelId, discountType, discountPercent, amount, discountCode, inputter });
+            await Discount.create({ sessionId, gradeLevelId, discountType, discountPercent, amount, discountCode, inputter,recordStatus: 'Live' });
         }
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
     } catch (err) {
@@ -543,12 +549,14 @@ module.exports.add_discount = async (req, res) => {
 
 module.exports.delete_discount = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const discount = await Discount.findByIdAndDelete(id);
+        await Discount.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: 'Discount was deleted successfully!' });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting discount record' })
     }
 }
 
@@ -567,6 +575,7 @@ module.exports.edit_discount = async (req,res) => {
         res.status(200).json({ mssg: `${discount.discountType} has been updated successfully!` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating discount record' })
     }
 }
 
@@ -575,7 +584,7 @@ module.exports.edit_discount = async (req,res) => {
 module.exports.get_student_discounts = async (req,res) => {
     
     try {
-        const studentDiscounts = await StudentDiscount.find().populate('studentId sessionId discountId inputter');
+        const studentDiscounts = await StudentDiscount.find({ recordStatus: 'Live' }).populate('studentId sessionId discountId inputter');
         res.status(200).json(studentDiscounts);
     } catch(err) {
         console.log(err);
@@ -584,12 +593,14 @@ module.exports.get_student_discounts = async (req,res) => {
 
 module.exports.delete_student_discount = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const studentDiscount = await StudentDiscount.findByIdAndDelete(id);
+        await StudentDiscount.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: 'Student discount has been removed successfully!' });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting student discount record' })
     }
 }
 
@@ -597,10 +608,11 @@ module.exports.get_student_discount_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const studentDiscount = await StudentDiscount.findById(id).populate('studentId sessionId discountId inputter');
+        const studentDiscount = await StudentDiscount.findOne({ _id: id, recordStatus: 'Live' }).populate('studentId sessionId discountId inputter');
         res.status(200).json(studentDiscount);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching student discount record' })
     }
 }
 
@@ -608,10 +620,11 @@ module.exports.get_discounts_of_student = async (req,res) => {
     const { studentId } = req.params;
 
     try {
-        const studentDiscount = await StudentDiscount.find({ studentId: studentId }).populate('studentId sessionId discountId inputter');
+        const studentDiscount = await StudentDiscount.find({ studentId: studentId,recordStatus: 'Live' }).populate('studentId sessionId discountId inputter');
         res.status(200).json(studentDiscount);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching student discount record' })
     }
 }
 
@@ -620,14 +633,16 @@ module.exports.add_student_discount = async (req,res) => {
 
     try {
 
-        const discount = await Discount.findById(discountId);
+        const discount = await Discount.findOne({ _id: discountId, recordStatus: 'Live' });
         const discountPrice = discount.amount * discount.discountPercent;
         
 
-        const studentDiscount = await StudentDiscount.create({ studentId,sessionId,discountId,inputter,discount: discountPrice });
+        await StudentDiscount.create({ studentId,sessionId,discountId,inputter,discount: discountPrice, recordStatus: 'Live' });
         res.status(200).json({ mssg: 'Discount has been added to the student' });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while adding student discount record' })
+
     }
 
 }
@@ -638,10 +653,11 @@ module.exports.edit_student_discount = async(req,res) => {
     const { studentId,sessionId,discountId,inputter } = req.body;
 
     try {
-        const studentDiscount = await StudentDiscount.create({ studentId,sessionId,discountId,inputter });
+        await StudentDiscount.create({ studentId,sessionId,discountId,inputter });
         res.status(200).json({ mssg: 'Discount has been added to the student' });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating student discount record' })
     }
 
 }
@@ -650,7 +666,7 @@ module.exports.edit_student_discount = async(req,res) => {
 
 module.exports.get_sectioning = async (req,res) => {
     try {
-        const sectionings = await Sectioning.find({  }).populate('sessionId studentId sectionId inputter');
+        const sectionings = await Sectioning.find({ recordStatus: 'Live' }).populate('sessionId studentId sectionId inputter');
         res.status(200).json(sectionings);
     } catch(err) {
         console.log(err);
@@ -664,7 +680,7 @@ module.exports.add_sectioning = async (req,res) => {
         // insert record in Academic table 
 
         // check if student already has academic record
-        const academicFound = await Academic.findOne({ studentId }).populate('gradeLevelId studentId');
+        const academicFound = await Academic.findOne({ studentId, recordStatus: 'Live' }).populate('gradeLevelId studentId');
         console.log('academic found: ', academicFound);
 
         const withStrands = ['11','12'];
@@ -686,7 +702,7 @@ module.exports.add_sectioning = async (req,res) => {
         }
         
         // insert in sectioning table
-        const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter });
+        const addSectioning = await Sectioning.create({ sessionId,studentId,sectionId,inputter,recordStatus: 'Live' });
         console.log('addSectioning',addSectioning);
         res.status(200).json({ mssg: `Student has been added new section successfully` });
     } catch(err) {
@@ -702,12 +718,13 @@ module.exports.get_manage_fees = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const managedFees = await ManageFee.find({ sessionId: session })
+        const managedFees = await ManageFee.find({ sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
         .populate('sessionId gradeLevelId strandId');
         res.status(200).json(managedFees);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching managed fees record' })
     }
 }
 
@@ -717,12 +734,14 @@ module.exports.get_manage_fee_detail = async(req,res) => {
     const { session } = req.query;
 
     try {
-        const managedFee = await ManageFee.findById({ _id: id,sessionId: session })
+        const managedFee = await ManageFee.findById({ _id: id,sessionId: session, recordStatus: 'Live' })
         .populate({ path: 'feeDescription',populate: { path: 'feeCateg' } })
         .populate('sessionId gradeLevelId strandId');
         res.status(200).json(managedFee);
     } catch(err) {
         console.log(err)
+        res.status(500).json({ mssg: 'An error occurred while fetching managed fees record' })
+
     }
 }
 
@@ -741,9 +760,9 @@ module.exports.add_manage_fees = async (req,res) => {
             const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
 
             if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied, inputter});
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied, inputter,recordStatus: 'Live'});
             } else {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied, inputter });
+                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied, inputter, recordStatus: 'Live' });
             }
 
         }
@@ -767,9 +786,9 @@ module.exports.automate_fees = async (req, res) => {
         }
         // Fetch all grade levels, fees, and strands
         const [gradeLevels, fees, strands] = await Promise.all([
-            GradeLevel.find(),
-            FeeCode.find(),
-            Strand.find({ status: true })
+            GradeLevel.find({ recordStatus:'Live' }),
+            FeeCode.find({recordStatus:'Live'}),
+            Strand.find({ status: true,recordStatus:'Live' })
         ]);
 
         // Assign fees for each grade level
@@ -789,7 +808,8 @@ module.exports.automate_fees = async (req, res) => {
                     for (const fee of fees) {
                         await ManageFee.create({
                             ...manageFeesInfo(fee),
-                            strandId: strand._id
+                            strandId: strand._id,
+                            recordStatus:'Live'
                         });
                     }
                 }
@@ -812,7 +832,7 @@ module.exports.delete_manage_fee = async(req,res) => {
     const { id } = req.params;
 
     try {
-        await ManageFee.findByIdAndDelete(id);
+        await ManageFee.findByIdAndUpdate(id,{ recordStatus: 'Deleted'});
         res.status(200).json({ mssg: `Fee has been deleted successfully` });
     } catch(err) {
         console.log(err);
@@ -839,7 +859,7 @@ module.exports.generate_fees = async (req, res) => {
 
     try {
         // Fetch students who are registered and admitted
-        const students = await Student.find({ isRegistered: true, isAdmitted: true })
+        const students = await Student.find({ isRegistered: true, isAdmitted: true,recordStatus: 'Live' })
             .populate({
                 path: 'academicId',
                 populate: [
@@ -865,19 +885,19 @@ module.exports.generate_fees = async (req, res) => {
             .populate('gradeLevel');
 
         // Fetch tables to be assigned to students fees
-        const manageFees = await ManageFee.find({ sessionId: currentYear })
+        const manageFees = await ManageFee.find({ sessionId: currentYear,recordStatus: 'Live' })
             .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
             .populate('sessionId gradeLevelId strandId');
         
-        const textbooks = await Textbook.find({ sessionId: currentYear }).populate('inputter gradeLevel strand schoolYear');
+        const textbooks = await Textbook.find({ sessionId: currentYear,recordStatus:'Live' }).populate('inputter gradeLevel strand schoolYear');
 
-        const paymentSchedules = await PaymentSchedule.find({ sessionId: currentYear }).populate('sessionId paymentTermId');
-        const studentDiscounts = await StudentDiscount.find({ sessionId: currentYear }).populate('studentId sessionId discountId');
+        const paymentSchedules = await PaymentSchedule.find({ sessionId: currentYear,recordStatus:'Live' }).populate('sessionId paymentTermId');
+        const studentDiscounts = await StudentDiscount.find({ sessionId: currentYear,recordStatus: 'Live' }).populate('studentId sessionId discountId');
         console.log('Payment Schedules Lists: ' + paymentSchedules);
         console.log('Current School Year Id: ' + currentYear);
         console.log(studentDiscounts);
         // Fetch the current school year
-        const currYear = await SchoolYear.findById(currentYear);
+        const currYear = await SchoolYear.findOne({_id: currentYear,recordStatus: 'Live'});
 
         if(paymentSchedules.length > 0) {
             if (currYear) {
@@ -914,7 +934,8 @@ module.exports.generate_fees = async (req, res) => {
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 feeCodeId: fee.feeDescription._id,
                                 manageFeeId: fee._id,
-                                amount: fee.amount // Add amount to the payment info
+                                amount: fee.amount, // Add amount to the payment info,
+                                recordStatus: 'Live'
                             };
     
                             const existingPayment = await StudentPayment.findOne(paymentInfo);
@@ -952,7 +973,8 @@ module.exports.generate_fees = async (req, res) => {
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 textBookId: textbook._id,
-                                bookAmount: textbook.bookAmount // Add bookAmount to the textbook info
+                                bookAmount: textbook.bookAmount, // Add bookAmount to the textbook info
+                                recordStatus: 'Live'
                             };
     
                             const existingTextbook = await StudentPayment.findOne(studentTextbook);
@@ -985,7 +1007,8 @@ module.exports.generate_fees = async (req, res) => {
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 paymentScheduleId: paymentSchedule._id,
                                 totalPaymentAmount, // Include the total amount in the payment schedule info
-                                payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy
+                                payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy,
+                                recordStatus: 'Live'
                             };
     
                             const existingPaymentSchedule = await StudentPayment.findOne(paymentScheduleInfo);
@@ -1028,6 +1051,7 @@ module.exports.generate_fees = async (req, res) => {
                                 studentId: student._id,
                                 gradeLevelId: student.academicId.gradeLevelId._id,
                                 studentDiscountId: studentDiscount._id,
+                                recordStatus: 'Live'
                             };
     
                             const existingStudentDiscount = await StudentPayment.findOne(studentDiscountInfo);
@@ -1078,7 +1102,7 @@ module.exports.get_student_payments = async (req,res) => {
     const { session } = req.query;
     
     try {
-        const studPayments = await StudentPayment.find({ sessionId: session })
+        const studPayments = await StudentPayment.find({ sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },
@@ -1109,7 +1133,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
     const { session } = req.query;
    
     try {
-        const studentPayments = await StudentPayment.find({ studentId: id,sessionId: session })
+        const studentPayments = await StudentPayment.find({ studentId: id,sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'studentId', 
             populate: [
                 { path: 'nationality', populate: 'nationalityCodeId' },
@@ -1141,7 +1165,7 @@ module.exports.get_payment_schedule = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const paymentSchedules = await PaymentSchedule.find({ sessionId:session })
+        const paymentSchedules = await PaymentSchedule.find({ sessionId:session,recordStatus: 'Live' })
         .populate('sessionId paymentTermId');
         res.status(200).json(paymentSchedules);
     } catch(err) {
@@ -1158,7 +1182,7 @@ module.exports.add_payment_schedule = async (req, res) => {
 
     try {
         // Get Payment Terms
-        const paymentTerms = await PaymentTerm.find();
+        const paymentTerms = await PaymentTerm.find({ recordStatus: 'Live' });
 
         // Get the current start of school year
         const currentSchoolYear = await SchoolYear.findById(session);
@@ -1182,7 +1206,8 @@ module.exports.add_payment_schedule = async (req, res) => {
                     sessionId: currentSchoolYear._id,
                     paymentTermId: paymentTermId,
                     dateSchedule: startDate.format('YYYY-MM-DD'),
-                    inputter
+                    inputter,
+                    recordStatus: 'Live'
                 });
 
                 startDate.add(payEvery, 'months'); // Increment the date by one month for the next installment

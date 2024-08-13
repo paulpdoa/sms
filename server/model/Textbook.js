@@ -32,7 +32,8 @@ const textbookSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'schoolYear'
     },
-    status: requiredString
+    status: requiredString,
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const TextbookModel = mongoose.model('textbook',textbookSchema);

@@ -62,7 +62,7 @@ const UserRoles = () => {
 
     const deleteUserRoles = async (id) => {
         try {
-            const removeUserRoles = await axios.put(`${baseUrl()}/user-role/${id}`,{ data: { role } });
+            const removeUserRoles = await axios.put(`${baseUrl()}/user-role/${id}`,{ recordStatus: 'Deleted' });
             toast.success(removeUserRoles.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

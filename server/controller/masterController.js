@@ -35,10 +35,40 @@ const createToken = (token) => {
 
 const recordStatus = 'Live';
 
+module.exports.update_all_records_live = async (req,res) => {
+    try {  
+        const religions = await Religion.find();
+        const nationalities = await Nationality.find();
+
+        for(const religion of religions) {
+            if(!religion.recordStatus) {
+                console.log('Updating religion: ', religion.religion)
+                await Religion.findByIdAndUpdate({ _id: religion._id }, { recordStatus: 'Live' });
+            }
+        }
+
+        for(const natl of nationalities) {
+            if(!natl.recordStatus) {
+                console.log('Updating nationality: ', natl.nationality)
+                await Nationality.findByIdAndUpdate({ _id: natl._id }, { recordStatus: 'Live' });
+
+            }
+        }
+
+        res.status(200).json({ mssg: 'All records were updated successfully' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating record status records' })
+    }
+}
+
 // For Religion
 module.exports.get_religions = async (req,res) => {
+
+    const { session } = req.query;
+
     try {
-        const religions = await Religion.find().populate('inputter');
+        const religions = await Religion.find({ recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(religions);
     } catch(err) {
         console.log(err);
@@ -50,7 +80,7 @@ module.exports.add_religion = async (req,res) => {
     const { religion,currentUserId: inputter,sessionId } = req.body
 
     try {
-        const newReligion = await Religion.create({ religion,inputter,sessionId });
+        const newReligion = await Religion.create({ religion,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${religion} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -62,7 +92,7 @@ module.exports.delete_religion = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const religionFind = await Religion.findByIdAndDelete(id);
+        const religionFind = await Religion.findByIdAndUpdate(id,{ recordStatus: 'Deleted' });
         res.status(200).json({ mssg: `${religionFind.religion} religion record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -104,23 +134,24 @@ module.exports.edit_religion = async (req,res) => {
 
 module.exports.get_nationalities = async (req,res) => {
     try {
-        const nationalities = await Nationality.find().populate('inputter');
+        const nationalities = await Nationality.find({ recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(nationalities);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching nationalities record' });
     }
 }
 
 module.exports.add_nationality = async (req,res) => {
 
-    const { nationality,nationalityCode,currentUserId: inputter, sessionId } = req.body
+    const { nationality,nationalityCode,currentUserId: inputter, sessionId } = req.body;
 
     try {
-        await Nationality.create({ nationality,nationalityCode,inputter,sessionId });
+        await Nationality.create({ nationality,nationalityCode,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while creating nationality record' });
+        res.status(500).json({ mssg: 'An error occurred while creating nationality record' });
     }
 }
 
@@ -128,11 +159,11 @@ module.exports.delete_nationality = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const nationalityFind = await Nationality.findByIdAndDelete(id);
+        const nationalityFind = await Nationality.findByIdAndUpdate(id,{ recordStatus: 'Deleted' });
         res.status(200).json({ mssg: `${nationalityFind.nationality} nationality record has been deleted` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while deleting nationality record' });
+        res.status(500).json({ mssg: 'An error occurred while deleting nationality record' });
 
     }
 }
@@ -141,17 +172,17 @@ module.exports.get_nationality_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const nationalityFind = await Nationality.findById(id).populate('inputter');
+        const nationalityFind = await Nationality.findOne({ _id: id, recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(nationalityFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching nationality record' });
     }
 }
 
 module.exports.edit_nationality = async (req,res) => {
     const { id } = req.params;
     const { newNationality: nationality,newNationalityCode: nationalityCode,currentUserId: inputter,sessionId } = req.body;
-    console.log(req.body)
     
     try {
         const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCode,inputter,sessionId });
@@ -288,7 +319,7 @@ module.exports.edit_gender = async (req,res) => {
 
 module.exports.get_departments = async (req,res) => {
     try {
-        const departments = await Department.find().populate('inputter sessionId');
+        const departments = await Department.find({ recordStatus: 'Live' }).populate('inputter sessionId');
         res.status(200).json(departments);
     } catch(err) {
         console.log(err);
@@ -300,7 +331,7 @@ module.exports.add_departments = async (req,res) => {
     const { department,sessionId,currentUserId } = req.body
 
     try {
-        const newDepartment = await Department.create({ department,sessionId,inputter: currentUserId });
+        const newDepartment = await Department.create({ department,sessionId,inputter: currentUserId, recordStatus });
         res.status(200).json({ mssg: `${newDepartment.department} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -310,9 +341,10 @@ module.exports.add_departments = async (req,res) => {
 
 module.exports.delete_department = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const departmentFind = await Department.findByIdAndDelete(id);
+        const departmentFind = await Department.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${departmentFind.department} department record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -324,7 +356,7 @@ module.exports.get_department_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const departmentFind = await Department.findById(id);
+        const departmentFind = await Department.findOne({ _id: id, recordStatus: 'Live' });
         res.status(200).json(departmentFind);
     } catch(err) {
         console.log(err);
@@ -357,7 +389,7 @@ module.exports.get_sections = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const sections = await Section.find({ status: true,sessionId: session })
+        const sections = await Section.find({ status: true,sessionId: session, recordStatus: 'Live' })
         .populate({ path: 'gradeLevel', populate: { path: 'department' } })
         .populate('adviser');
         res.status(200).json(sections);
@@ -381,7 +413,7 @@ module.exports.add_sections = async (req,res) => {
     }
 
     try {
-        const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId,inputter);
+        const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId,inputter,recordStatus);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -392,9 +424,10 @@ module.exports.add_sections = async (req,res) => {
 module.exports.delete_section = async (req,res) => {
     const { id } = req.params;
     const status = false;
+    const { recordStatus } = req.body;
 
     try {
-        const sectionFind = await Section.findByIdAndUpdate({ _id: id },{ status: status });
+        const sectionFind = await Section.findByIdAndUpdate({ _id: id },{ status: status, recordStatus });
         res.status(200).json({ mssg: `${sectionFind.section} section record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -407,7 +440,7 @@ module.exports.get_section_detail = async (req, res) => {
     const { session } = req.query;
 
     try {
-        const sectionFind = await Section.findOne({ _id: id, sessionId: session });
+        const sectionFind = await Section.findOne({ _id: id, sessionId: session, recordStatus: 'Live' });
 
         if (!sectionFind) {
             return res.status(404).json({ mssg: "Section not found for the specified session" });
@@ -467,10 +500,9 @@ module.exports.edit_section = async (req, res) => {
 };
 
 // For Grade Level
-
 module.exports.get_grade_levels = async (req,res) => {
     try {
-        const gradeLevels = await GradeLevel.find().populate('inputter department');
+        const gradeLevels = await GradeLevel.find({ recordStatus: 'Live' }).populate('inputter department');
         res.status(200).json(gradeLevels);
     } catch(err) {
         console.log(err);
@@ -482,18 +514,20 @@ module.exports.add_grade_levels = async (req,res) => {
     const { gradeLevel,inputter,department,sessionId } = req.body
 
     try {
-        const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter,department, sessionId });
+        const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter,department,sessionId,recordStatus });
         res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been added to the record` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while adding grade level' });
     }
 }
 
 module.exports.delete_grade_level = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const gradeLevelFind = await GradeLevel.findByIdAndDelete(id);
+        const gradeLevelFind = await GradeLevel.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${gradeLevelFind.gradeLevel} grade level record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -505,10 +539,11 @@ module.exports.get_grade_level_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const gradeLevelFind = await GradeLevel.findById(id);
+        const gradeLevelFind = await GradeLevel.findOne({ _id: id, recordStatus: 'Live' });
         res.status(200).json(gradeLevelFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching grade level record' });
     }
 }
 
@@ -528,6 +563,7 @@ module.exports.edit_grade_level = async (req,res) => {
         
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating grade level' });
     }
 }
 
@@ -542,6 +578,20 @@ module.exports.get_live_subjects = async(req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching subject records' });
+    }
+}
+
+module.exports.get_deleted_subjects = async (req,res) => {
+
+    const { session } = req.query;
+
+    try {
+        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Deleted' }).populate('gradeLevelId inputter sessionId');
+        res.status(200).json(subjects);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching subject records' });
+
     }
 }
 
@@ -618,7 +668,7 @@ module.exports.add_requirements = async (req,res) => {
     const { requirement,isRequired,currentUserId, session } = req.body
 
     try {
-        const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId,sessionId: session });
+        const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId,sessionId: session,recordStatus });
         res.status(200).json({ mssg: `${newRequirement.requirement} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -627,9 +677,10 @@ module.exports.add_requirements = async (req,res) => {
 
 module.exports.delete_requirement = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const requirementFind = await Requirement.findByIdAndDelete(id);
+        const requirementFind = await Requirement.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${requirementFind.requirement} requirement record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -671,7 +722,7 @@ module.exports.edit_requirement = async (req,res) => {
 
 module.exports.get_roles = async (req,res) => {
     try {
-        const roles = await Role.find({ status: true }).populate('inputter');
+        const roles = await Role.find({ status: true, recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(roles);
     } catch(err) {
         console.log(err);
@@ -684,7 +735,7 @@ module.exports.add_roles = async (req,res) => {
     const status = true
 
     try {
-        const newRole = await Role.addRole(userRole,inputter,status,sessionId);
+        const newRole = await Role.addRole(userRole,inputter,status,sessionId,recordStatus);
         res.status(200).json({ mssg: `${newRole.userRole} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -695,9 +746,10 @@ module.exports.add_roles = async (req,res) => {
 module.exports.delete_role = async (req,res) => {
     const { id } = req.params;
     const status = false;
+    const { recordStatus } = req.body;
 
     try {
-        const roleFind = await Role.findByIdAndUpdate({ _id:id },{ status });
+        const roleFind = await Role.findByIdAndUpdate({ _id:id },{ status,recordStatus});
         res.status(200).json({ mssg: `${roleFind.userRole} user role record has been deleted` });
     } catch(err) {
         console.log(err)
@@ -709,10 +761,11 @@ module.exports.get_role_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const roleFind = await Role.findById(id);
+        const roleFind = await Role.findOne({ _id: id, recordStatus: 'Live' });
         res.status(200).json(roleFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching role detail' });
     }
 }
 
@@ -739,7 +792,7 @@ module.exports.edit_role = async (req,res) => {
 
 module.exports.get_school_years = async (req,res) => {
     try {
-        const schoolYears = await SchoolYear.find();
+        const schoolYears = await SchoolYear.find({ recordStatus: 'Live' });
         res.status(200).json(schoolYears);
     } catch(err) {
         console.log(err);
@@ -762,7 +815,7 @@ module.exports.add_school_year = async (req, res) => {
         console.log('Previous school year found:', previousSy);
 
         // Create the new school year
-        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear: yearEnd, startYear: yearStart, isYearDone, sessionName,inputter });
+        const newSy = await SchoolYear.create({ schoolTheme: syTheme, endYear: yearEnd, startYear: yearStart, isYearDone, sessionName,inputter, recordStatus });
         console.log('New school year created:', newSy);
 
         const gradeLevels = await GradeLevel.find();
@@ -782,7 +835,8 @@ module.exports.add_school_year = async (req, res) => {
                     ...rest,
                     _id: undefined,
                     sessionId: newSy._id,
-                    inputter
+                    inputter,
+                    recordStatus
                 });
                 console.log('Academic record copied:', rest);
             }
@@ -797,7 +851,8 @@ module.exports.add_school_year = async (req, res) => {
                     ...rest,
                     _id: undefined,
                     sessionId: newSy._id,
-                    inputter
+                    inputter,
+                    recordStatus
                 });
                 console.log('Requirement record copied:', rest);
             }
@@ -812,7 +867,8 @@ module.exports.add_school_year = async (req, res) => {
                     ...rest,
                     _id: undefined,
                     sessionId: newSy._id,
-                    inputter
+                    inputter,
+                    recordStatus
                 });
                 console.log('Discount record copied:', rest);
             }
@@ -820,9 +876,9 @@ module.exports.add_school_year = async (req, res) => {
             // Add empty sections for each grade level
             for (const gradeLevel of gradeLevels) {
                 await Section.insertMany([
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter },
-                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter }
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter,recordStatus },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter,recordStatus },
+                    { sessionId: newSy._id, gradeLevel: gradeLevel._id, section: '', status: true,inputter,recordStatus }
                 ]);
                 console.log('Empty sections added for grade level:', gradeLevel);
             }
@@ -836,7 +892,8 @@ module.exports.add_school_year = async (req, res) => {
                     ...rest,
                     _id: undefined,
                     sessionId: newSy._id,
-                    inputter
+                    inputter,
+                    recordStatus
                 });
             }
 
@@ -849,7 +906,8 @@ module.exports.add_school_year = async (req, res) => {
                     ...rest,
                     _id: undefined,
                     sessionId: newSy._id,
-                    inputter
+                    inputter,
+                    recordStatus
                 }) 
             }
             
@@ -888,9 +946,10 @@ module.exports.add_school_year = async (req, res) => {
 
 module.exports.delete_school_year = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const schoolYearFind = await SchoolYear.findByIdAndUpdate({ _id: id },{ isYearDone: true });
+        const schoolYearFind = await SchoolYear.findByIdAndUpdate({ _id: id },{ isYearDone: true, recordStatus });
         res.status(200).json({ mssg: `${schoolYearFind.startYear.split('-')[0]} to ${schoolYearFind.endYear.split('-')[0]} year has ended` });
     } catch(err) {
         console.log(err)
@@ -902,7 +961,7 @@ module.exports.get_school_year_detail = async (req,res) => {
     
     try {
         if(typeof id !== String) {
-            const schoolYearFind = await SchoolYear.findOne({ _id: id });
+            const schoolYearFind = await SchoolYear.findOne({ _id: id,recordStatus: 'Live' });
             res.status(200).json(schoolYearFind);
         }
     } catch(err) {
@@ -917,16 +976,16 @@ module.exports.edit_school_year = async (req, res) => {
 
     try {
         const currSchoolYear = await SchoolYear.findById(id);
-        const newSchoolYear = await SchoolYear.findByIdAndUpdate(id, { schoolTheme, startYear, endYear,inputter }, { new: true });
+        const newSchoolYear = await SchoolYear.findByIdAndUpdate(id, { schoolTheme, startYear, endYear,inputter,recordStatus }, { new: true });
 
         const existPaymentSchedule = await PaymentSchedule.find();
 
         if (existPaymentSchedule.length > 0) {
             // Delete all records in PaymentSchedule
-            await PaymentSchedule.deleteMany({ sessionId: id });
+            await PaymentSchedule.deleteMany({ sessionId: id, recordStatus: 'Deleted' });
 
             // Delete related records in StudentPayment
-            await StudentPayment.deleteMany({ paymentScheduleId: { $in: existPaymentSchedule.map(ps => ps._id) } });
+            await StudentPayment.deleteMany({ paymentScheduleId: { $in: existPaymentSchedule.map(ps => ps._id), recordStatus: 'Deleted' } });
 
             res.status(200).json({ mssg: 'School year has been updated, please re-generate Payment Schedule for this year' });
         } else {
@@ -942,7 +1001,7 @@ module.exports.close_school_year = async (req,res) => {
     const { sessionId } = req.body
 
     try { 
-        await SchoolYear.findByIdAndUpdate({ _id: sessionId },{ isYearDone: true });
+        await SchoolYear.findByIdAndUpdate({ _id: sessionId },{ isYearDone: true, recordStatus: 'Deleted' });
         res.status(200).json({ mssg: 'School year has been closed' });
     } catch(err) {
         console.log(err);
@@ -957,6 +1016,7 @@ module.exports.get_users = async (req,res) => {
         res.status(200).json(users);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching user records' });
     }
 }
 
@@ -968,7 +1028,7 @@ module.exports.add_user = async (req,res) => {
 
     try {
         if(password === confirmPassword) {
-            const newUser = await User.create({ firstName,middleName,role,lastName,username,password,isActive,inputter });
+            const newUser = await User.create({ firstName,middleName,role,lastName,username,password,isActive,inputter,recordStatus });
             const token = createToken(newUser._id);
             res.status(200).json({ mssg: `${firstName} has been added to the record`, token });
         } else {
@@ -976,18 +1036,20 @@ module.exports.add_user = async (req,res) => {
         }
     } catch(err) {
         console.log(err.message);
-        res.status(400).json({ mssg: err.message });
+        res.status(500).json({ mssg: err.message });
     }
 }
 
 module.exports.delete_user = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const userFind = await User.findByIdAndUpdate({ _id: id },{ isActive: false });
+        const userFind = await User.findByIdAndUpdate({ _id: id },{ isActive: false, recordStatus });
         res.status(200).json({ mssg: `${userFind.firstName}'s user record has been deleted` });
     } catch(err) {
         console.log(err)
+        res.status(500).json({ mssg: 'An error occurred while deleting user record' });
     }
 }
 
@@ -995,10 +1057,11 @@ module.exports.get_user_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const userFind = await User.findById(id).populate('role');
+        const userFind = await User.findOne({ _id: id, recordStatus: 'Live' }).populate('role');
         res.status(200).json(userFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching user records' });
     }
 }
 
@@ -1065,10 +1128,11 @@ module.exports.user_login = async (req,res) => {
 
 module.exports.get_payment_terms = async (req,res) => {
     try {
-        const paymentTerms = await PaymentTerm.find().populate('inputter');
+        const paymentTerms = await PaymentTerm.find({ recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(paymentTerms);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching payment terms record' });
     }
 }
 
@@ -1078,23 +1142,24 @@ module.exports.add_payment_term = async (req,res) => {
 
     try {
 
-        await PaymentTerm.create({ term,payEvery,installmentBy,inputter,sessionId });
+        await PaymentTerm.create({ term,payEvery,installmentBy,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${term} has been added in payment terms record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while adding payment term'});
+        res.status(500).json({ mssg: 'An error occurred while adding payment term'});
     }
 }
 
 module.exports.delete_payment_term = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const paymentTermFind = await PaymentTerm.findByIdAndDelete(id);
+        const paymentTermFind = await PaymentTerm.findByIdAndUpdate(id, { recordStatus });
         res.status(200).json({ mssg: `${paymentTermFind.term} record has been deleted in the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while deleting payment term'});
+        res.status(500).json({ mssg: 'An error occurred while deleting payment term'});
     }
 }
 
@@ -1106,6 +1171,7 @@ module.exports.get_payment_term_details = async (req,res) => {
         res.status(200).json(paymentTermFind);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching payment terms record' });
     }
 }   
 
@@ -1129,11 +1195,11 @@ module.exports.get_fee_categories = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const feeCategs = await FeeCategory.find({sessionId: session}).populate('inputter');
+        const feeCategs = await FeeCategory.find({sessionId: session, recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(feeCategs);
     } catch(err) {
         console.log(err)
-        res.status(400).json({ mssg: 'An error occurred while getting fee categories' });
+        res.status(500).json({ mssg: 'An error occurred while getting fee categories' });
     }
 
 }
@@ -1144,10 +1210,11 @@ module.exports.get_fee_category_detail = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const feeCategs = await FeeCategory.find({ _id:id,sessionId: session }).populate('inputter');
+        const feeCategs = await FeeCategory.findOne({ _id:id,sessionId: session, recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(feeCategs);
     } catch(err) {
-        console.log(err)
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while getting fee categories' });
     }
 
 }
@@ -1157,11 +1224,11 @@ module.exports.add_fee_category = async (req,res) => {
     const { category,code,inputter,sessionId } = req.body;
 
     try {
-        await FeeCategory.create({ category,code,inputter,sessionId });
+        await FeeCategory.create({ category,code,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg:`${category} has been added to the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while adding fee category' });
+        res.status(500).json({ mssg: 'An error occurred while adding fee category' });
     }
 
 }
@@ -1169,8 +1236,10 @@ module.exports.add_fee_category = async (req,res) => {
 module.exports.delete_fee_category = async (req,res) => {
     const { id } = req.params;
 
+    const { recordStatus } = req.body;
+
     try {
-        const feeCategFind = await FeeCategory.findByIdAndDelete(id);
+        const feeCategFind = await FeeCategory.findByIdAndUpdate(id, { recordStatus });
         res.status(200).json({ mssg: `${feeCategFind.category} record has been deleted in the record` });
     } catch(err) {
         console.log(err)
@@ -1200,37 +1269,37 @@ module.exports.get_fee_codes = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const feeCodes = await FeeCode.find({ sessionId: session }).populate('inputter feeCateg');
+        const feeCodes = await FeeCode.find({ sessionId: session,recordStatus: 'Live' }).populate('inputter feeCateg');
         res.status(200).json(feeCodes);
     } catch(err) {
         console.log(err)
-        res.status(400).json({ mssg: 'An error occurred while getting fee codes' });
+        res.status(500).json({ mssg: 'An error occurred while getting fee codes' });
     }
 }
 
 module.exports.add_fee_code = async (req,res) => {
     const { description,code,inputter,feeCategory,sessionId } = req.body;
-    console.log(feeCategory)
 
     try {
-        const newFeeCode = await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory, sessionId });
+        await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory, sessionId, recordStatus });
         res.status(200).json({ mssg: `${description} has been added to the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while adding fee code' });
+        res.status(500).json({ mssg: 'An error occurred while adding fee code' });
     }
     
 }
 
 module.exports.delete_fee_code = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const feeCode = await FeeCode.findByIdAndDelete(id);
+        const feeCode = await FeeCode.findByIdAndUpdate(id, { recordStatus });
         res.status(200).json({ mssg: `${feeCode.description} record has been deleted in the record` });
     } catch(err) {
         console.log(err)
-        res.status(400).json({ mssg: 'An error occurred while deleting fee code' });
+        res.status(500).json({ mssg: 'An error occurred while deleting fee code' });
     }
 }
 
@@ -1253,7 +1322,7 @@ module.exports.edit_fee_code = async (req,res) => {
 module.exports.get_parents = async (req,res) => {
     
     try {   
-        const parents = await Parent.find().populate('studentId');
+        const parents = await Parent.find({ recordStatus: 'Live' }).populate('studentId');
         res.status(200).json(parents);
     } catch(err) {
         console.log(err);
@@ -1264,7 +1333,7 @@ module.exports.get_student_parent = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const parent = await Parent.find({ studentId: id }).populate('studentId');
+        const parent = await Parent.findOne({ studentId: id, recordStatus: 'Live' }).populate('studentId');
         res.status(200).json(parent[0]);
     } catch(err) {
         console.log(err);
@@ -1312,7 +1381,8 @@ module.exports.add_parent = async (req,res) => {
                 guardianOffice,
                 studentId,
                 inputter,
-                sessionId
+                sessionId,
+                recordStatus
             });
 
             res.status(200).json({ mssg:`Parent for ${student.firstName} ${student.lastName} has been added to the record`});
@@ -1367,7 +1437,7 @@ module.exports.edit_parent = async (req,res) => {
             res.status(200).json({ mssg: `Parent's record has been updated successfully!` });
         } catch(err) {
             console.log(err);
-            res.status(400).json({ mssg: 'An error occurred while updating parents record' })
+            res.status(500).json({ mssg: 'An error occurred while updating parents record' })
 
         }
 }
@@ -1376,22 +1446,24 @@ module.exports.get_parent_detail = async (req,res) => {
     const { id } = req.params;
 
     try {
-        const parent = await Parent.findById(id).populate('studentId');
+        const parent = await Parent.findOne({ _id: id, recordStatus: 'Live' }).populate('studentId');
         res.status(200).json(parent);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching parent record detail' });
     }
 }
 
 module.exports.delete_parent = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        const parent = await Parent.findByIdAndDelete(id).populate('studentId');
+        const parent = await Parent.findByIdAndUpdate(id, { recordStatus }).populate('studentId');
         res.status(200).json({ mssg: `Parent of ${parent.studentId.firstName} has been deleted in the record successfully` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while deleting parent record' })
+        res.status(500).json({ mssg: 'An error occurred while deleting parent record' })
     }
 }
 
@@ -1402,10 +1474,11 @@ module.exports.get_siblings = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const siblings = await Sibling.find({ sessionId: session }).populate('studentId');
+        const siblings = await Sibling.find({ sessionId: session,recordStatus: 'Live' }).populate('studentId');
         res.status(200).json(siblings);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching siblings record' })
     }
 
 }
@@ -1415,23 +1488,24 @@ module.exports.add_sibling = async (req,res) => {
 
     try {
         const existingStudent = await Student.findById(studentId);
-        await Sibling.create({studentId,firstName,middleName,lastName,email,inputter,sessionId: session});
+        await Sibling.create({ studentId,firstName,middleName,lastName,email,inputter,sessionId: session,recordStatus });
         res.status(200).json({ mssg: `${existingStudent.firstName}'s sibling ${firstName} has been added to the record`,redirect:'/'});
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while adding sibling record' });
+        res.status(500).json({ mssg: 'An error occurred while adding sibling record' });
     }
 }
 
 module.exports.delete_sibling = async (req,res) => {
     const { id } = req.params;
+    const { recordStatus } = req.body;
 
     try {
-        await Sibling.findByIdAndDelete(id);
+        await Sibling.findByIdAndUpdate(id,{ recordStatus });
         res.status(200).json({ mssg: `${sibling.firstName} has been delete in the record` });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while deleting sibling record' });
+        res.status(500).json({ mssg: 'An error occurred while deleting sibling record' });
     }
 }
 
@@ -1440,10 +1514,12 @@ module.exports.get_sibling_details = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const sibling = await Sibling.findOne({ _id: id, sessionId: session}).populate('studentId');
+        const sibling = await Sibling.findOne({ _id: id, sessionId: session,recordStatus: 'Live'}).populate('studentId');
         res.status(200).json(sibling)
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching sibling details' });
+
     }
 }
 
@@ -1452,10 +1528,11 @@ module.exports.get_student_sibling = async (req,res) => {
     const { session } = req.query;
   
     try {
-        const studentSibling = await Sibling.findOne({ _id: id, sessionId: session }).populate('studentId');
+        const studentSibling = await Sibling.findOne({ _id: id, sessionId: session,recordStatus: 'Live' }).populate('studentId');
         res.status(200).json(studentSibling);
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching student sibling details' });
     }
 }
 
@@ -1474,6 +1551,7 @@ module.exports.edit_sibling = async (req,res) => {
         res.status(200).json({ mssg: `${sibling.firstName}'s record has been updated successfully!` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating sibling details' });
     }
 }
 
@@ -1495,7 +1573,7 @@ module.exports.get_dashboard_details = async (req, res) => {
         let teachersCount = 0;
 
         // Get all Academic records
-        const academics = await Academic.find({ sessionId: session })
+        const academics = await Academic.find({ sessionId: session,recordStatus: 'Live' })
             .populate({
                 path: 'studentId',
                 populate: {
@@ -1513,9 +1591,9 @@ module.exports.get_dashboard_details = async (req, res) => {
             })
             .populate('gradeLevelId departmentId strandId sectionId paymentTermId');
 
-        const studentsEnrolled = await StudentPayment.find({ sessionId: session });
-        const gradeLevels = await GradeLevel.find();
-        const teachers = await Teacher.find();
+        const studentsEnrolled = await StudentPayment.find({ sessionId: session,recordStatus: 'Live' });
+        const gradeLevels = await GradeLevel.find({recordStatus: 'Live'});
+        const teachers = await Teacher.find({recordStatus: 'Live'});
         
         teachersCount = teachers ? teachers.length : 0;
 

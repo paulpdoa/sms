@@ -91,7 +91,7 @@ const Section = () => {
 
     const deleteSection = async (id) => {
         try {
-            const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { data: { role,session } });
+            const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { recordStatus: 'Deleted' });
             toast.success(removeSection.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -141,6 +141,7 @@ const Section = () => {
                 window.location.reload();
             }, 2000)
         } catch (err) {
+            console.log(err)
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,

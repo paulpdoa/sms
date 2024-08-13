@@ -61,7 +61,7 @@ const Strands = () => {
 
     const deleteStrand = async (id) => {
         try {
-            const removeStrand = await axios.put(`${baseUrl()}/strand/${id}`,{ data: { role }});
+            const removeStrand = await axios.put(`${baseUrl()}/strand/${id}`,{ role, recordStatus: 'Deleted'});
             toast.success(removeStrand.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

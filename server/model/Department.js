@@ -18,7 +18,8 @@ const departmentSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'schoolYear'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const DepartmentModel = mongoose.model('department',departmentSchema);

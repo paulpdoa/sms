@@ -56,7 +56,7 @@ const Students = () => {
     
     const deleteStudent = async (id) => {
         try {
-            const removeStudent = await axios.delete(`${baseUrl()}/student/${id}`, { data: { role,session } });
+            const removeStudent = await axios.put(`${baseUrl()}/student/${id}`, { role,session,recordStatus: 'Deleted' });
             toast.success(removeStudent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

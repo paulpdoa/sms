@@ -86,7 +86,7 @@ const Religion = () => {
 
     const deleteReligion = async (id) => {
         try {
-            const removeReligion = await axios.delete(`${baseUrl()}/religion/${id}`, { data: { role,session } });
+            const removeReligion = await axios.put(`${baseUrl()}/religion/${id}`, { role });
             toast.success(removeReligion.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

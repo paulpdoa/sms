@@ -44,7 +44,8 @@ const studentPaymentSchema = new mongoose.Schema({
     },
     payEveryAmount: {
         type: Number
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const StudentPaymentModel = mongoose.model('studentPayment',studentPaymentSchema);

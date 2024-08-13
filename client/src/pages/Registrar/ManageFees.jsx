@@ -68,7 +68,7 @@ const ManageFees = () => {
 
     const deleteManagedFees = async (id) => {
         try {
-            const removeManageFee = await axios.delete(`${baseUrl()}/manage-fee/${id}`, { data: { role } });
+            const removeManageFee = await axios.put(`${baseUrl()}/manage-fee/${id}`, { role, recordStatus: 'Deleted' });
             toast.success(removeManageFee.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -85,6 +85,15 @@ const ManageFees = () => {
             }, 2000)
         } catch (err) {
             console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "colored"
+            });
         }
     }
 

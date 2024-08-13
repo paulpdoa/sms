@@ -68,7 +68,7 @@ const Nationality = () => {
 
     const deleteNationality = async (id) => {
         try {
-            const removeNationality = await axios.delete(`${baseUrl()}/nationality/${id}`,{ data: { role,session } });
+            const removeNationality = await axios.put(`${baseUrl()}/nationality/${id}`,{ role,session, recordStatus: 'Deleted' });
             toast.success(removeNationality.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

@@ -38,7 +38,7 @@ const Parents = () => {
 
     const deleteParent = async (id) => {
         try {
-            const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ data: { role } });
+            const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ role,recordStatus: 'Deleted' });
             toast.success(removeParent.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

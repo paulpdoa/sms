@@ -33,7 +33,7 @@ const Sibling = () => {
 
     const deleteSibling = async (id) => {
         try {
-            const removeSibling = await axios.delete(`${baseUrl()}/sibling/${id}`);
+            const removeSibling = await axios.put(`${baseUrl()}/sibling/${id}`,{ role,recordStatus:'Deleted' });
             toast.success(removeSibling.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,

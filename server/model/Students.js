@@ -89,7 +89,8 @@ const studentSchema = new mongoose.Schema({
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
-    }
+    },
+    recordStatus: requiredString
 },{ timestamps: true })
 
 const StudentModel = mongoose.model('student',studentSchema);

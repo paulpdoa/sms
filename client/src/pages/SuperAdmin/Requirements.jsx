@@ -67,7 +67,7 @@ const Requirements = () => {
 
     const deleteRequirement = async (id) => {
         try {
-            const removeRequirement = await axios.delete(`${baseUrl()}/requirement/${id}`,{ data: { role } });
+            const removeRequirement = await axios.put(`${baseUrl()}/requirement/${id}`,{ recordStatus: 'Deleted' });
             toast.success(removeRequirement.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -94,7 +94,6 @@ const Requirements = () => {
                 progress: undefined,
                 theme: "colored"
             });
-
         }
     }
 

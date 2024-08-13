@@ -11,8 +11,6 @@ const StudentSibling = () => {
     
     const { records: sibling } = useFetch(`${baseUrl()}/sibling/student/${id._id}`);
 
-    console.log(id);
-
     if(sibling) {
         return (
             <div className="mt-3 p-6 bg-white shadow-md rounded-md overflow-hidden">

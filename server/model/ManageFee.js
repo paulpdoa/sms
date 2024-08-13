@@ -35,7 +35,8 @@ const manageFeeSchema = new mongoose.Schema({
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
-    }
+    },
+    recordStatus: requiredString
 }, { timestamps: true })
 
 const ManageFeeModel = mongoose.model('manageFee',manageFeeSchema);
