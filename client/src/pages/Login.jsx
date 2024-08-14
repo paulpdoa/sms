@@ -71,7 +71,7 @@ const Login = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -81,29 +81,6 @@ const Login = () => {
             });
         }
     };
-
-    // const checkCookie = () => {
-    //     const token = cookies.userToken;
-    //     if (!token) {
-    //         // Cookie is not present, clear localStorage
-    //         localStorage.removeItem('role');
-    //         localStorage.removeItem('username');
-    //         localStorage.removeItem('id');
-    //         localStorage.removeItem('isFreshYear');
-    //         localStorage.removeItem('session');
-    //     }
-    // };
-    
-    // // Function to start the interval check
-    // const startCookieCheck = () => {
-    //     setInterval(checkCookie, 1000); // Check every second (adjust as needed)
-    // };
-    
-    // // Optional: If you want to clear the interval when the component unmounts
-    // useEffect(() => {
-    //     const interval = setInterval(checkCookie, 1000); // Check every second (adjust as needed)
-    //     return () => clearInterval(interval);
-    // }, []);
 
     return (
         <main className="bg-gray-200 h-screen flex items-center justify-center">
@@ -116,13 +93,16 @@ const Login = () => {
                 <h1 className="text-xl font-semibold text-gray-700">{schoolName}</h1>
                 <div className="flex flex-col gap-1 mt-5">
                     <span className="text-gray-700 text-sm">Username</span>
-                    <input onChange={(e) => setUsername(e.target.value)} className="border border-gray-300 outline-none p-2 bg-transparent rounded-md" type="text" />
+                    <input 
+                        onChange={(e) => setUsername(e.target.value)} 
+                        className="border border-gray-300 outline-none p-2 bg-transparent rounded-md text-sm" 
+                        type="text" />
                 </div>
                 <div className="flex flex-col gap-2 my-2 relative">
                     <span className="text-gray-700 text-sm">Password</span>
                     <input
                         onChange={(e) => setPassword(e.target.value)}
-                        className="border outline-none border-gray-300 p-2 bg-transparent rounded-md"
+                        className="border outline-none border-gray-300 p-2 bg-transparent rounded-md text-sm"
                         type={showPassword ? "text" : "password"}
                     />
                     <button
@@ -136,7 +116,10 @@ const Login = () => {
                 { schoolYears.length > 0 && (
                     <div className="flex flex-col gap-2 my-2">
                         <span className="text-gray-700 text-sm">Session</span>
-                        <select onChange={(e) => setSchoolYear(e.target.value)} className="border outline-none border-gray-300 p-2 bg-transparent rounded-md">
+                        <select
+                            onChange={(e) => setSchoolYear(e.target.value)} 
+                            className="border outline-none border-gray-300 p-2 bg-transparent rounded-md text-sm"
+                        >
                             <option hidden>Select session</option>
                             {schoolYears?.map(sy => (
                                 <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]} {sy.isYearDone && 'Done'}</option>

@@ -8,7 +8,7 @@ const userRoles = ['Super Admin', 'School Admin', 'Registrar']
 // Students
 route.get('/students',allowUserView(userRoles), get_students);
 route.post('/students', add_student);
-route.delete('/student/:id', delete_student);
+route.put('/student/:id', delete_student);
 route.get('/student/:id',allowUserView(userRoles), get_student_detail);
 route.patch('/student/:id',allowUserAction(userRoles),edit_student);
 route.get('/enrolled/students/:id',get_enrolled_students);
@@ -25,20 +25,20 @@ route.get('/academics',allowUserView(userRoles),get_academics);
 route.post('/academic',add_academic);
 route.get('/academic/student/:studentId',allowUserView(userRoles),get_student_academic_detail);
 route.get('/academic/students',allowUserView(userRoles),get_student_academic);
-route.delete('/academic/:id',delete_academic);
+route.put('/academic/:id',delete_academic);
 
 // Discount
 route.get('/discounts',allowUserView(userRoles),get_discounts);
 route.get('/discount/:id',allowUserView(userRoles),get_discount_detail);
 route.post('/discount',add_discount);
-route.delete('/discount/:id',delete_discount);
+route.put('/discount/:id',delete_discount);
 route.patch('/discount/:id',edit_discount);
 
 // Student Discount
 route.get('/student-discounts',allowUserView(userRoles),get_student_discounts);
 route.get('/student-discount/:id',allowUserView(userRoles),get_student_discount_detail);
 route.get('/student-discount/student/:studentId',allowUserView(userRoles),get_discounts_of_student);
-route.delete('/student-discount/:id',delete_student_discount);
+route.put('/student-discount/:id',delete_student_discount);
 route.post('/student-discount',add_student_discount);
 
 // Sectionings
@@ -49,7 +49,7 @@ route.post('/sectioning',add_sectioning);
 route.get('/manage-fees',allowUserView(userRoles),get_manage_fees);
 route.post('/manage-fee',add_manage_fees);
 route.get('/manage-fee/:id',allowUserView(userRoles),get_manage_fee_detail);
-route.delete('/manage-fee/:id',delete_manage_fee);
+route.put('/manage-fee/:id',delete_manage_fee);
 route.patch('/manage-fee/:id',edit_manage_fee);
 route.post('/generate-fees',allowUserAction(userRoles),generate_fees);
 route.post('/automate-fees',automate_fees);
@@ -57,7 +57,7 @@ route.post('/automate-fees',automate_fees);
 // Student Payment
 route.get('/student-payments',allowUserView(userRoles),get_student_payments);
 route.get('/student-payment/:id',allowUserView(userRoles),get_student_payment_detail);     
-route.delete('/delete-student-payments',delete_generated_fees); 
+route.put('/delete-student-payments',delete_generated_fees); 
 
 // Payment Schedule
 route.get('/payment-schedules',allowUserView(userRoles),get_payment_schedule);

@@ -21,9 +21,15 @@ const Academic = require('../model/Academic');
 const Discount = require('../model/Discount');
 const Teacher = require('../model/Teacher');
 const Subject = require('../model/Subject');
+const Admission = require('../model/Admission');
+const ManageFee = require('../model/ManageFee');
+const Textbook = require('../model/Textbook');
+const Strand = require('../model/Strand');
+const StudentBook = require('../model/StudentBooks');
+const StudentDiscount = require('../model/StudentDiscount');
+const Sectioning = require('../model/Sectioning');
 
 const bcrypt = require('bcrypt');
-
 const jwt = require('jsonwebtoken');
 
 const maxAge = 3 * 24 * 24 * 60;
@@ -36,21 +42,217 @@ const createToken = (token) => {
 const recordStatus = 'Live';
 
 module.exports.update_all_records_live = async (req,res) => {
+
+    const recordStatus = 'Live';
+
     try {  
         const religions = await Religion.find();
         const nationalities = await Nationality.find();
+        const academics = await Academic.find();
+        const admissions = await Admission.find();
+        const departments = await Department.find();
+        const discounts = await Discount.find();
+        const schoolYears = await SchoolYear.find();
+        const students = await Student.find();
+        const users = await User.find();
+        const feeCategories = await FeeCategory.find();
+        const feeCodes = await FeeCode.find();
+        const gradeLevels = await GradeLevel.find();
+        const manageFees = await ManageFee.find();
+        const parents = await Parent.find();
+        const paymentTerms = await PaymentTerm.find();
+        const requirements = await Requirement.find();
+        const roles = await Role.find();
+        const sections = await Section.find();
+        const sectionings = await Sectioning.find();
+        const siblings = await Sibling.find();
+        const strands = await Strand.find();
+        const studentBooks = await StudentBook.find();
+        const studentDiscounts = await StudentDiscount.find();
+        const studentPayments = await StudentPayment.find();
+        const teachers = await Teacher.find();
+        const textbooks = await Textbook.find();
+
+        for(const textbook of textbooks) {
+            if(!textbook.recordStatus) {
+                console.log('Updating textbook: ', textbook);
+                await Textbook.findByIdAndUpdate({ _id: textbook._id },{ recordStatus })
+            }
+        }
+
+        for(const teacher of teachers) {
+            if(!teacher.recordStatus) {
+                console.log('Updating teacher: ', teacher);
+                await Teacher.findByIdAndUpdate({ _id: teacher._id },{ recordStatus })
+            }
+        }
+
+        for(const studentPayment of studentPayments) {
+            if(!studentPayment.recordStatus) {
+                console.log('Updating student payment: ', studentPayment);
+                await StudentPayment.findByIdAndUpdate({ _id: studentPayment._id },{ recordStatus })
+            }
+        }
+
+        for(const studentDiscount of studentDiscounts) {
+            if(!studentDiscount.recordStatus) {
+                console.log('Updating student discount: ', studentDiscount);
+                await StudentDiscount.findByIdAndUpdate({ _id: studentDiscount._id }, { recordStatus })
+            }
+        }
+
+        for(const studentBook of studentBooks) {
+            if(!studentBook.recordStatus) {
+                console.log('Updating student book: ', studentBook);
+                await StudentBook.findByIdAndUpdate({ _id: studentBook._id }, { recordStatus });
+            }
+        }
+
+        for(const strand of strands) {
+            if(!strand.recordStatus) {
+                console.log('Updating strand: ', strand);
+                await Strand.findByIdAndUpdate({ _id: strand._id },{ recordStatus })
+            }
+        }
+
+        for(const sibling of siblings) {
+            if(!sibling.recordStatus) {
+                console.log('Updating sibling: ', sibling);
+                await Sibling.findByIdAndUpdate({ _id: sibling._id }, { recordStatus });
+            }
+        }
+
+        for(const sectioning of sectionings) {
+            if(!sectioning.recordStatus) {
+                console.log('Updating sectioning: ', sectioning);
+                await Sectioning.findByIdAndUpdate({_id: sectioning._id}, { recordStatus });
+            }
+        }
+
+        for(const section of sections) {
+            if(!section.recordStatus) {
+                console.log('Updating section: ', section);
+                await Section.findByIdAndUpdate({ _id: section._id}, { recordStatus });
+            }
+        }
+        
+        for(const role of roles) {
+            if(!role.recordStatus) {
+                console.log('Updating role: ', role);
+                await Role.findByIdAndUpdate({ _id: role._id },{ recordStatus });
+            }
+        }
+        
+        for(const requirement of requirements) {
+            if(!requirement.recordStatus) {
+                console.log('Updating requirement: ', requirement);
+                await Requirement.findByIdAndUpdate({ _id: requirement._id }, { recordStatus })
+            }
+        }
+
+        for(const paymentTerm of paymentTerms) {
+            if(!paymentTerm.recordStatus) {
+                console.log('Updating payment term: ', paymentTerm);
+                await PaymentTerm.findByIdAndUpdate({ _id: paymentTerm._id }, { recordStatus });
+            }
+        }
+
+        for(const parent of parents) {
+            if(!parent.recordStatus) {
+                console.log('Updating parent: ', parent);
+                await Parent.findByIdAndUpdate({ _id: parent._id }, { recordStatus });
+            }
+        }
+
+        for(const manageFee of manageFees) {
+            if(!manageFee.recordStatus) {
+                console.log('Updating managed fee: ', manageFee);
+                await ManageFee.findByIdAndUpdate({ _id: manageFee._id }, { recordStatus });
+            }
+        }
+
+        for(const gradeLevel of gradeLevels) {
+            if(!gradeLevel.recordStatus) {
+                console.log('Updating grade level: ', gradeLevel.gradeLevel);
+                await GradeLevel.findByIdAndUpdate({ _id: gradeLevel._id },{ recordStatus });
+            }
+        }
+
+        for(const feeCode of feeCodes) {
+            if(!feeCode.recordStatus) {
+                console.log('Updating fee code: ', feeCode);
+                await FeeCode.findByIdAndUpdate({ _id: feeCode._id }, { recordStatus });
+            }
+        }
+
+        for(const feeCategory of feeCategories) {
+            if(!feeCategory.recordStatus) {
+                console.log('Updating fee category: ', feeCategory.category);
+                await FeeCategory.findByIdAndUpdate({ _id: feeCategory._id }, { recordStatus });
+            }
+        }
+
+        for(const user of users) {
+            if(!user.recordStatus) {
+                console.log('Updating user: ', user.username);
+                await User.findByIdAndUpdate({ _id: user._id }, { recordStatus });
+            }
+        }
+
+        for(const student of students) {
+            if(!student.recordStatus) {
+                console.log('Updating student: ', student.firstName);
+                await Student.findByIdAndUpdate({ _id: student._id }, { recordStatus });
+            }
+        }
+
+        for(const schoolYear of schoolYears) {
+            if(!schoolYear.recordStatus) {
+                console.log('Updating school year: ', schoolYear);
+                await SchoolYear.findByIdAndUpdate({ _id: schoolYear._id }, { recordStatus });
+            }
+        }
+
+        for(const discount of discounts) {
+            if(!discount.recordStatus) {
+                console.log('Updating discount: ', discount.discount);
+                await Discount.findByIdAndUpdate({ _id: discount._id }, { recordStatus });
+            }
+        }
+
+        for(const department of departments) {
+            if(!departments.recordStatus) {
+                console.log('Updating department: ', department.department);
+                await Department.findByIdAndUpdate({ _id: department._id }, { recordStatus });
+            }
+        }
+
+        for(const admission of admissions) {
+            if(!admission.recordStatus) {
+                console.log('Updating admission: ', admission);
+                await Admission.findByIdAndUpdate({ _id: admission._id}, { recordStatus })
+            }
+        }
+
+
+        for(const academic of academics) {
+            if(!academic.recordStatus) {
+                console.log('Updating academic: ', academic);
+                await Academic.findByIdAndUpdate({ _id: academic._id }, { recordStatus });
+            }
+        }
 
         for(const religion of religions) {
             if(!religion.recordStatus) {
                 console.log('Updating religion: ', religion.religion)
-                await Religion.findByIdAndUpdate({ _id: religion._id }, { recordStatus: 'Live' });
+                await Religion.findByIdAndUpdate({ _id: religion._id }, { recordStatus });
             }
         }
 
         for(const natl of nationalities) {
             if(!natl.recordStatus) {
                 console.log('Updating nationality: ', natl.nationality)
-                await Nationality.findByIdAndUpdate({ _id: natl._id }, { recordStatus: 'Live' });
+                await Nationality.findByIdAndUpdate({ _id: natl._id }, { recordStatus });
 
             }
         }

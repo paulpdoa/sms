@@ -1228,8 +1228,30 @@ module.exports.add_payment_schedule = async (req, res) => {
         res.status(200).json({ mssg: 'Payment schedule has been created successfully' });
     } catch (err) {
         console.log(err.message);
-        res.status(500).json({ mssg: err.message });
+        res.status(500).json({ mssg: 'An error occurred while generating payment schedule' });
     }
+}
+
+// Assigning subjects per student
+
+module.exports.assign_subject_to_students = async (req,res) => {
+
+    try {
+        // Get all students who is registered, enrolled, admitted
+        const academicOfStudents = await Academic.find({ sessionId: session, recordStatus: 'Live',isAdmitted: true, isRegistered: true });
+        console.log('Academic of students: ', academicOfStudents);
+        
+        for(const acadOfStud of academicOfStudents) {
+            console.log(acadOfStud);
+
+
+        }
+
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while assigning subject to students' });
+    } 
 }
 
 

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
-const studentDiscountSchema = new mongoose.Schema({
+const studentSubjectSchema = new mongoose.Schema({
+    subjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'subject'
+    },
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'student'
@@ -9,17 +13,9 @@ const studentDiscountSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },
-    discountId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'discount'
-    },
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'
-    },
-    discount: {
-        type: Number,
-        required: true
     },
     recordStatus: {
         type: String,
@@ -27,5 +23,5 @@ const studentDiscountSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const StudentDiscountSchema = mongoose.model('studentDiscount',studentDiscountSchema);
-module.exports = StudentDiscountSchema;
+const StudentSubjectSchema = mongoose.model('studentDiscount',studentSubjectSchema);
+module.exports = StudentSubjectSchema;

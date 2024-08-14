@@ -8,7 +8,7 @@ const userRoles = ['School Admin','Super Admin'];
 // Teachers
 route.get('/teachers',allowUserView(userRoles), get_teachers);
 route.post('/teachers', add_teacher);
-route.delete('/teacher/:id', delete_teacher);
+route.put('/teacher/:id', delete_teacher);
 route.get('/teacher/:id',allowUserView(userRoles), get_teacher_detail);
 route.patch('/teacher/:id',edit_teacher);
 

@@ -112,28 +112,28 @@ route.patch('/religion/:id',allowUserAction(userRoles),edit_religion);
 // Nationality
 route.get('/nationalities',allowUserView(userRoles),get_nationalities);
 route.post('/nationalities',allowUserAction(userRoles), add_nationality);
-route.delete('/nationality/:id',allowUserAction(userRoles), delete_nationality);
+route.put('/nationality/:id',allowUserAction(userRoles), delete_nationality);
 route.get('/nationality/:id',allowUserView(userRoles), get_nationality_detail);
 route.patch('/nationality/:id',allowUserAction(userRoles),edit_nationality);
 
 // Nationality Code
-route.get('/nationality-codes',allowUserView(userRoles),get_nationality_codes);
-route.post('/nationality-code',add_nationality_code);
-route.get('/nationality-code/:id',allowUserView(userRoles),get_nationality_code_detail);
-route.patch('/nationality-code/:id',edit_nationality_code);
-route.delete('/nationality-code/:id',delete_nationality_code);
+// route.get('/nationality-codes',allowUserView(userRoles),get_nationality_codes);
+// route.post('/nationality-code',add_nationality_code);
+// route.get('/nationality-code/:id',allowUserView(userRoles),get_nationality_code_detail);
+// route.patch('/nationality-code/:id',edit_nationality_code);
+// route.put('/nationality-code/:id',delete_nationality_code);
 
 // Gender
-route.get('/genders',allowUserView(userRoles), get_genders);
-route.post('/genders', add_gender);
-route.delete('/gender/:id', delete_gender);
-route.get('/gender/:id',allowUserView(userRoles), get_gender_detail);
-route.patch('/gender/:id',edit_gender);
+// route.get('/genders',allowUserView(userRoles), get_genders);
+// route.post('/genders', add_gender);
+// route.put('/gender/:id', delete_gender);
+// route.get('/gender/:id',allowUserView(userRoles), get_gender_detail);
+// route.patch('/gender/:id',edit_gender);
 
 // Department
 route.get('/departments',allowUserView(userRoles), get_departments);
 route.post('/departments', add_departments);
-route.delete('/department/:id', delete_department);
+route.put('/department/:id', delete_department);
 route.get('/department/:id',allowUserView(userRoles), get_department_detail);
 route.patch('/department/:id',edit_department);
 
@@ -157,14 +157,14 @@ route.get('/deleted-subjects',get_deleted_subjects);
 // GradeLevel
 route.get('/grade-levels',allowUserView(userRoles), get_grade_levels);
 route.post('/grade-levels', add_grade_levels);
-route.delete('/grade-level/:id', delete_grade_level);
+route.put('/grade-level/:id', delete_grade_level);
 route.get('/grade-level/:id',allowUserView(userRoles), get_grade_level_detail);
 route.patch('/grade-level/:id',edit_grade_level);
 
 // Requirement
 route.get('/requirements',allowUserView(userRoles), get_requirements);
 route.post('/requirements', add_requirements);
-route.delete('/requirement/:id', delete_requirement);
+route.put('/requirement/:id', delete_requirement);
 route.get('/requirement/:id',allowUserView(userRoles), get_requirement_detail);
 route.patch('/requirement/:id',edit_requirement);
 
@@ -186,21 +186,21 @@ route.patch('/user/:id',upload.single('profilePicture'),edit_user);
 // Payment Term
 route.get('/payment-terms',allowUserView(userRoles), get_payment_terms);
 route.post('/payment-term', add_payment_term);
-route.delete('/payment-term/:id', delete_payment_term);
+route.put('/payment-term/:id', delete_payment_term);
 route.get('/payment-term/:id',allowUserView(userRoles), get_payment_term_details);
 route.patch('/payment-term/:id',edit_payment_term);
 
 // Fee Category
 route.get('/fee-categories',allowUserView(userRoles), get_fee_categories);
 route.post('/fee-category',add_fee_category);
-route.delete('/fee-category/:id',delete_fee_category);
+route.put('/fee-category/:id',delete_fee_category);
 route.patch('/fee-category/:id',edit_fee_category);
 route.get('/fee-category/:id',allowUserView(userRoles),get_fee_category_detail);
 
 // Fee Code
 route.get('/fee-codes',allowUserView(userRoles),get_fee_codes);
 route.post('/fee-code',allowUserView(userRoles),add_fee_code);
-route.delete('/fee-code/:id',delete_fee_code);
+route.put('/fee-code/:id',delete_fee_code);
 route.patch('/fee-code/:id',edit_fee_code);
 
 // Parent
@@ -208,7 +208,7 @@ route.get('/parents',get_parents);
 route.get('/parent/:id',get_parent_detail);
 route.get('/student/parent/:id',allowUserView(userRoles),get_student_parent);
 route.post('/parent',add_parent);
-route.delete('/parent/:id',delete_parent);
+route.put('/parent/:id',delete_parent);
 route.patch('/parent/:id',edit_parent);
 
 // Sibling
@@ -216,7 +216,7 @@ route.get('/siblings',allowUserView(userRoles),get_siblings);
 route.get('/sibling/:id',allowUserView(userRoles),get_sibling_details);
 route.get('/sibling/student/:id',allowUserView(userRoles),get_student_sibling);
 route.post('/sibling',add_sibling);
-route.delete('/sibling/:id',delete_sibling);
+route.put('/sibling/:id',delete_sibling);
 route.patch('/sibling/:id',edit_sibling);
 
 // Dashboard
