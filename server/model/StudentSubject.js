@@ -23,5 +23,5 @@ const studentSubjectSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const StudentSubjectSchema = mongoose.model('studentDiscount',studentSubjectSchema);
+const StudentSubjectSchema = mongoose.model('studentSubject',studentSubjectSchema);
 module.exports = StudentSubjectSchema;

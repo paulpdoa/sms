@@ -14,6 +14,8 @@ const PaymentSchedule = require('../model/PaymentSchedule');
 const PaymentTerm = require('../model/PaymentTerm');
 const FeeCode = require('../model/FeeCode');
 const Strand = require('../model/Strand');
+const Subject = require('../model/Subject');
+const StudentSubject = require('../model/StudentSubject');
 
 const moment = require('moment');
 
@@ -1232,20 +1234,60 @@ module.exports.add_payment_schedule = async (req, res) => {
     }
 }
 
+// Student Subjects
+
+module.exports.get_student_subjects = async(req,res) => {
+
+    const { session } = req.query;
+
+    try {
+        const studentSubjects = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
+        .populate('subjectId studentId inputter')
+
+        console.log(studentSubjects)
+        res.status(200).json(studentSubjects);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching student subjects record' });
+    }
+}
+
 // Assigning subjects per student
 
 module.exports.assign_subject_to_students = async (req,res) => {
 
+    const { session,currentUserId } = req.query;
+
     try {
         // Get all students who is registered, enrolled, admitted
-        const academicOfStudents = await Academic.find({ sessionId: session, recordStatus: 'Live',isAdmitted: true, isRegistered: true });
-        console.log('Academic of students: ', academicOfStudents);
+        const academicOfStudents = await Academic.find({ sessionId: session, recordStatus: 'Live',isAdmitted: true, isRegistered: true })
+        .populate('gradeLevelId')
+
+        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Live' })
+        .populate('gradeLevelId');
         
         for(const acadOfStud of academicOfStudents) {
-            console.log(acadOfStud);
+            if(acadOfStud.gradeLevelId) {
+                // assign subjects to students here
+                const gradeLevelOfStudent = acadOfStud.gradeLevelId.gradeLevel.toLowerCase();
 
-
+                for(const subject of subjects) {
+                    // get subject
+                    const subjectLevel = subject.gradeLevelId.gradeLevel.toLowerCase();
+                    if(subjectLevel === gradeLevelOfStudent) {
+                        await StudentSubject.create({ 
+                            subjectId: subject._id,
+                            studentId: acadOfStud.studentId,
+                            sessionId: session,
+                            inputter: currentUserId,
+                            recordStatus: 'Live'
+                        });
+                    }
+                }
+            }
         }
+
+        res.status(200).json({ mssg: 'Assigning of subjects per student is successful'});
 
 
     } catch(err) {
