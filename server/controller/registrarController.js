@@ -1242,7 +1242,12 @@ module.exports.get_student_subjects = async(req,res) => {
 
     try {
         const studentSubjects = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
-        .populate('subjectId studentId inputter')
+        .populate({ path: 'studentId', populate: {
+            path: 'academicId', populate: {
+                path: 'strandId'
+            }
+        } })
+        .populate('subjectId inputter')
 
         console.log(studentSubjects)
         res.status(200).json(studentSubjects);
@@ -1254,47 +1259,59 @@ module.exports.get_student_subjects = async(req,res) => {
 
 // Assigning subjects per student
 
-module.exports.assign_subject_to_students = async (req,res) => {
-
-    const { session,currentUserId } = req.query;
+module.exports.assign_subject_to_students = async (req, res) => {
+    const { session, currentUserId } = req.query;
 
     try {
-        // Get all students who is registered, enrolled, admitted
-        const academicOfStudents = await Academic.find({ sessionId: session, recordStatus: 'Live',isAdmitted: true, isRegistered: true })
-        .populate('gradeLevelId')
+        // Get all students who are registered, enrolled, and admitted
+        const academicOfStudents = await Academic.find({
+            sessionId: session,
+            recordStatus: 'Live',
+            isAdmitted: true,
+            isRegistered: true
+        }).populate('gradeLevelId strandId');
 
-        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Live' })
-        .populate('gradeLevelId');
-        
-        for(const acadOfStud of academicOfStudents) {
-            if(acadOfStud.gradeLevelId) {
-                // assign subjects to students here
+        // Get all subjects for the session
+        const subjects = await Subject.find({
+            sessionId: session,
+            recordStatus: 'Live'
+        }).populate('gradeLevelId');
+
+        for (const acadOfStud of academicOfStudents) {
+            if (acadOfStud.gradeLevelId && acadOfStud.strandId) {
+                // Assign subjects to students here
                 const gradeLevelOfStudent = acadOfStud.gradeLevelId.gradeLevel.toLowerCase();
+                const strandOfStudent = acadOfStud.strandId.strand.toLowerCase();
 
-                for(const subject of subjects) {
-                    // get subject
+                console.log(strandOfStudent);
+
+                for (const subject of subjects) {
                     const subjectLevel = subject.gradeLevelId.gradeLevel.toLowerCase();
-                    if(subjectLevel === gradeLevelOfStudent) {
-                        const studentSubjects = await StudentSubject.create({ 
+                    const strand = subject.subjectCode.toLowerCase().includes(strandOfStudent);
+
+                    // If same grade level and strand match or there's no strand requirement, create a student subject
+                    if (subjectLevel === gradeLevelOfStudent && (!acadOfStud.strandId || strand)) {
+                        const studentSubjects = await StudentSubject.create({
                             subjectId: subject._id,
                             studentId: acadOfStud.studentId,
                             sessionId: session,
                             inputter: currentUserId,
                             recordStatus: 'Live'
                         });
+
                         console.log('Creating student subjects: ', studentSubjects);
                     }
                 }
             }
         }
 
-        res.status(200).json({ mssg: 'Assigning of subjects per student is successful'});
+        res.status(200).json({ mssg: 'Assigning of subjects per student is successful' });
 
-
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while assigning subject to students' });
-    } 
+    }
 }
+
 
 

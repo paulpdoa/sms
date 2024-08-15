@@ -18,6 +18,10 @@ const subjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'gradeLevel'
     },
+    // strandId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'strand'
+    // },
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'

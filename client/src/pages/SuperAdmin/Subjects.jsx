@@ -17,6 +17,7 @@ const Subjects = () => {
 
     const { records: subjects,isLoading } = useFetch(`${baseUrl()}/subjects`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
+    // const { records: strands } = useFetch(`${baseUrl()}/strands`);
     
     const { session,currentUserId,setShowForm,searchQuery,showForm,role } = useContext(MainContext);
 
@@ -123,31 +124,36 @@ const Subjects = () => {
     const columns = [  
         { accessorKey: 'subjectName', header: 'Subject', editable: true },
         { accessorKey: 'subjectCode', header: 'Subject Code', editable: true },
-        { accessorKey: 'gradeLevel', header: 'Grade Level', editable: true, selectOptions: gradeLevels?.map(gl => ({ value: gl._id, label: gl.gradeLevel })) }
+        { accessorKey: 'gradeLevel', header: 'Grade Level', editable: true, selectOptions: gradeLevels?.map(gl => ({ value: gl._id, label: gl.gradeLevel })) },
+        // { accessorKey: 'strand', header: 'Strand', editable: true, selectOptions: strands?.map(strand => ({ value: strand._id, label: strand.strand })) }
     ]
 
     const form = () => (
         <>
         <h1 className="font-semibold text-xl text-gray-700">Add New Subject</h1>
 
-        <div className="flex flex-col mt-1">
-            <label className="text-sm" htmlFor="subject name">Subject</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectName(e.target.value)} />
-        </div>
-        <div className="flex flex-col mt-1">
-            <label className="text-sm" htmlFor="subject code">Subject Code</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectCode(e.target.value)} />
-        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col mt-1">
+                <label className="text-sm" htmlFor="subject name">Subject</label>
+                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectName(e.target.value)} />
+            </div>
+            <div className="flex flex-col mt-1">
+                <label className="text-sm" htmlFor="subject code">Subject Code</label>
+                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectCode(e.target.value)} />
+            </div>
 
-        <div className="flex flex-col mt-1">
-            <label className="text-sm" htmlFor="grade level">Grade Level</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setGradeLevelId(e.target.value)}>
-                <option hidden>Choose grade level</option>
-                { gradeLevels?.map(gl => (
-                    <option key={gl._id} value={gl._id}>{gl.gradeLevel}</option>
-                )) }
-                <option value="">N/A</option>
-            </select>
+            <div className="flex flex-col mt-1">
+                <label className="text-sm" htmlFor="grade level">Grade Level</label>
+                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setGradeLevelId(e.target.value)}>
+                    <option hidden>Choose grade level</option>
+                    { gradeLevels?.map(gl => (
+                        <option key={gl._id} value={gl._id}>{gl.gradeLevel}</option>
+                    )) }
+                    <option value="">N/A</option>
+                </select>
+            </div>
+
+          
         </div>
         </>
     )
