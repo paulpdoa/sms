@@ -55,9 +55,10 @@ const Subjects = () => {
     }
 
     const updateSubject = async (id, updatedData) => {
+        console.log(updatedData);
 
         try {   
-            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName, gradeLevelId: updatedData.gradeLevelId,currentUserId,session });
+            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,currentUserId,session });
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -68,6 +69,9 @@ const Subjects = () => {
                 progress: undefined,
                 theme: "colored"
             });
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
         } catch(err) {
             console.log(err);
             toast.error(err.response.data.mssg, {

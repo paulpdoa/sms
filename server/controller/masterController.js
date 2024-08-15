@@ -830,10 +830,10 @@ module.exports.get_live_subject_detail = async (req,res) => {
 module.exports.edit_live_subject = async(req,res) => {
 
     const { id } = req.params;
-    const { subjectName,gradeLevelId,sessionId, inputter } = req.body;
+    const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
 
     try {
-        await Subject.findByIdAndUpdate(id,{ subjectName,gradeLevelId,sessionId,inputter });
+        await Subject.findByIdAndUpdate(id,{ subjectName,subjectCode,gradeLevelId,sessionId,inputter });
         res.status(200).json({ mssg: `${subjectName} has been updated successfully`});
     } catch(err) {
         console.log(err);

@@ -1275,13 +1275,14 @@ module.exports.assign_subject_to_students = async (req,res) => {
                     // get subject
                     const subjectLevel = subject.gradeLevelId.gradeLevel.toLowerCase();
                     if(subjectLevel === gradeLevelOfStudent) {
-                        await StudentSubject.create({ 
+                        const studentSubjects = await StudentSubject.create({ 
                             subjectId: subject._id,
                             studentId: acadOfStud.studentId,
                             sessionId: session,
                             inputter: currentUserId,
                             recordStatus: 'Live'
                         });
+                        console.log('Creating student subjects: ', studentSubjects);
                     }
                 }
             }
