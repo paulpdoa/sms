@@ -1,17 +1,13 @@
-import DateTime from "../../components/DateTime";
-import ReusableTable from "../../components/ReusableTable";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useState, useEffect, useContext } from 'react';
-import Searchbar from "../../components/Searchbar";
 import axios from 'axios';
 import TabActions from '../../components/TabActions';
 import MasterTable from "../../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
-import MasterDataForm from "../../components/MasterDataForm";
 
 const SubjectAssigning = () => {
     const columns = [
@@ -35,9 +31,19 @@ const SubjectAssigning = () => {
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
 
+    const fetchStudentSubjects = async () => {
+        try {
+            const data = '';
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
     useEffect(() => {
         if (studentRecord) {
             setSectionId(studentRecord?.academicId?.sectionId?._id);
+
+            
         }
     }, [studentRecord]);
 
@@ -102,24 +108,6 @@ const SubjectAssigning = () => {
         }
     }
 
-    const form = () => {
-        const gradeLevel = studentRecord?.academicId?.gradeLevelId?.gradeLevel;
-        console.log("Grade Level:", gradeLevel);
-        const showStrandField = gradeLevel?.includes('11') || gradeLevel?.includes('12');
-        return (
-            <>
-                <h1 className="font-semibold text-xl text-gray-700">{`${studentRecord?.firstName} ${studentRecord?.lastName}'s Section`}</h1>
-                <div className="grid grid-cols-2 gap-5 mt-4">
-                    {renderStudentInfo('student name', `${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`, 'Student Name:')}
-                    {renderStudentInfo('grade level', `${studentRecord?.academicId?.gradeLevelId ? studentRecord?.academicId?.gradeLevelId?.gradeLevel : 'Not Assigned'} `, 'Grade Level')}
-                    {showStrandField && renderStudentInfo('strand', studentRecord?.academicId?.strandId?.strand, 'Strand:')}
-                    {renderStudentInfo('section', studentRecord?.academicId?.sectionId?.section, 'Section:', filteredSections, handleSectionChange)}
-                    {renderStudentInfo('adviser', studentRecord?.academicId?.sectionId?.adviser ? `${studentRecord?.academicId?.sectionId?.adviser?.firstName} ${studentRecord?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned', 'Adviser')}
-                </div>
-            </>
-        );
-    }
-
     // Subject assigning function
     const assignSubjects = async () => {
 
@@ -156,7 +144,30 @@ const SubjectAssigning = () => {
                     (
                         studentRecord ?
                             // Show here the form for the subjects assigned to student
-                            MasterDataForm(form, submitSectioning, setShowForm)
+                            // MasterDataForm(form, submitSectioning, setShowForm)
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                                <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-lg p-5">
+                                    <h1 className="font-semibold text-xl">Subjects Assigned to { studentRecord.firstName } { studentRecord.lastName }</h1>
+                                    
+                                    <div className="grid grid-cols-3 gap-5 py-5">
+                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
+                                            <h2>Filipino - FIL12</h2>
+                                            <p>Adviser: Paul Andres</p>
+                                            <p>Time: 12:30 - 1:30</p>                                    
+                                        </div>
+                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
+                                            <h2>Filipino - FIL12</h2>
+                                            <p>Adviser: Paul Andres</p>
+                                            <p>Time: 12:30 - 1:30</p>                                    
+                                        </div>
+                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
+                                            <h2>Filipino - FIL12</h2>
+                                            <p>Adviser: Paul Andres</p>
+                                            <p>Time: 12:30 - 1:30</p>                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             :
                             studentLists?.length < 1 ? (
                                 <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
