@@ -18,13 +18,13 @@ const AddNewData = ({ label,onShow }) => {
     return (
         <>
             { (isFreshYear && isSchoolYearPage) && (
-                <button disabled={isFreshYear ? false : true} onClick={() => onShow(prevVal => !prevVal)} className={`cursor-pointer flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md`}>
+                <button disabled={isFreshYear ? false : true} onClick={() => onShow(prevVal => !prevVal)} className={`cursor-pointer flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md text-sm`}>
                     { `Add New ${label}` }
                 </button>
             )}
 
             { (!isYearDone && isFreshYear === null && !isSchoolYearPage) ? (
-                <button disabled={isYearDone ? true : false} onClick={() => onShow(prevVal => !prevVal)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md`}>
+                <button disabled={isYearDone ? true : false} onClick={() => onShow(prevVal => !prevVal)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md text-sm`}>
                     { `Add New ${label}` }
                 </button>
             ) : (

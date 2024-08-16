@@ -59,7 +59,8 @@ const initialMenus = [
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
                             { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' }
+                            { name: 'Sectioning', link: '/sectioning' },
+                            { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
                 ]
@@ -74,7 +75,8 @@ const initialMenus = [
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
                             { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' }
+                            { name: 'Sectioning', link: '/sectioning' },
+                            { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
                 ]
@@ -105,7 +107,8 @@ const initialMenus = [
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
                             { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' }
+                            { name: 'Sectioning', link: '/sectioning' },
+                            { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
                 ]
@@ -120,7 +123,8 @@ const initialMenus = [
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
                             { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' }
+                            { name: 'Sectioning', link: '/sectioning' },
+                            { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
                 ]
@@ -177,7 +181,8 @@ const initialMenus = [
                         subMenus: [
                             { name: 'Admission', link: '/admission' },
                             { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' }
+                            { name: 'Sectioning', link: '/sectioning' },
+                            { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
                 ]

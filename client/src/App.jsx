@@ -60,6 +60,7 @@ import NewUser from "./pages/SuperAdmin/NewUser";
 import { useCookies } from 'react-cookie';
 import Profile from "./pages/Profile";
 import Subjects from "./pages/SuperAdmin/Subjects";
+import SubjectAssigning from "./pages/Registrar/SubjectAssigning";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -144,6 +145,7 @@ function App() {
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
           <Route path='/sectioning' element={<Sectioning />} />
+          <Route path='/subject-assigning' element={<SubjectAssigning />} />
           <Route path='/assessment' element={<Assessment />} />
 
           <Route path='/profile/:id' element={<Profile />} />
