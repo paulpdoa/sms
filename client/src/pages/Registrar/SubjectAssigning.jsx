@@ -107,12 +107,36 @@ const SubjectAssigning = () => {
                                     </h1>
 
                                     <div className="grid grid-cols-3 gap-6 py-4">
-                                    {studentSubjects?.filter(subj => subj.studentId._id === studentRecord._id)?.map(subj => (
-                                        <div key={subj._id} className="bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-700">
+                                    {studentSubjects?.filter(subj => subj.studentId._id === studentRecord._id)?.map(subj => {
+                                        let bgColorClass = '';
+
+                                        switch (subj.subjectId.subjectName) {
+                                        case 'Mathematics':
+                                            bgColorClass = 'bg-blue-100';
+                                            break;
+                                        case 'Science':
+                                            bgColorClass = 'bg-green-100';
+                                            break;
+                                        case 'English':
+                                            bgColorClass = 'bg-yellow-100';
+                                            break;
+                                        case 'Filipino':
+                                            bgColorClass = 'bg-red-100';
+                                            break;
+                                        case 'Social Studies':
+                                            bgColorClass = 'bg-orange-100';
+                                            break;
+                                        default:
+                                            bgColorClass = 'bg-gray-50';
+                                        }
+
+                                        return (
+                                        <div key={subj._id} className={`${bgColorClass} border border-gray-300 rounded-lg p-4 text-gray-700`}>
                                             <h2 className="font-medium text-lg">{subj.subjectId.subjectName}</h2>
                                             <p className="text-sm text-gray-500">{subj.subjectId.subjectCode}</p>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                     </div>
 
                                     <button 
@@ -126,6 +150,7 @@ const SubjectAssigning = () => {
                                     </button>
                                 </div>
                             </div>
+
 
                             :
                             studentLists?.length < 1 ? (
