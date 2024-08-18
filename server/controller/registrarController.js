@@ -1263,6 +1263,10 @@ module.exports.assign_subject_to_students = async (req, res) => {
     const { session, currentUserId } = req.query;
 
     try {
+
+        // Delete current subjects if clicked again for the same session
+        await StudentSubject.deleteMany({ sessionId: session });
+
         // Get all students who are registered, enrolled, and admitted
         const academicOfStudents = await Academic.find({
             sessionId: session,
@@ -1278,12 +1282,12 @@ module.exports.assign_subject_to_students = async (req, res) => {
         }).populate('gradeLevelId');
 
         for (const acadOfStud of academicOfStudents) {
-            if (acadOfStud.gradeLevelId && acadOfStud.strandId) {
+            if (acadOfStud.gradeLevelId) {
                 // Assign subjects to students here
                 const gradeLevelOfStudent = acadOfStud.gradeLevelId.gradeLevel.toLowerCase();
-                const strandOfStudent = acadOfStud.strandId.strand.toLowerCase();
+                const strandOfStudent = acadOfStud?.strandId?.strand?.toLowerCase();
 
-                console.log(strandOfStudent);
+                console.log(acadOfStud.studentId)
 
                 for (const subject of subjects) {
                     const subjectLevel = subject.gradeLevelId.gradeLevel.toLowerCase();
@@ -1298,8 +1302,6 @@ module.exports.assign_subject_to_students = async (req, res) => {
                             inputter: currentUserId,
                             recordStatus: 'Live'
                         });
-
-                        console.log('Creating student subjects: ', studentSubjects);
                     }
                 }
             }

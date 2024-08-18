@@ -22,6 +22,10 @@ const SubjectAssigning = () => {
 
     const navigate = useNavigate();
     const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role } = useContext(MainContext);
+
+    const { records: studentSubjects } = useFetch(`${baseUrl()}/student-subjects`);
+    console.log(studentSubjects);
+
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
@@ -31,29 +35,7 @@ const SubjectAssigning = () => {
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
 
-    const fetchStudentSubjects = async () => {
-        try {
-            const data = '';
-        } catch(err) {
-            console.log(err);
-        }
-    }
-
-    useEffect(() => {
-        if (studentRecord) {
-            setSectionId(studentRecord?.academicId?.sectionId?._id);
-
-            
-        }
-    }, [studentRecord]);
-
-    const filteredSections = sections.filter(section => section.gradeLevel?.gradeLevel === studentRecord?.academicId?.gradeLevelId?.gradeLevel);
-
-    const handleSectionChange = (e) => {
-        setSectionId(e.target.value);
-    }
-
-    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => ({
         ...student,
         firstName: student.firstName,
         lastName: student.lastName,
@@ -63,62 +45,35 @@ const SubjectAssigning = () => {
         adviser: student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
     }));
 
-    const submitSectioning = async (e) => {
-        e.preventDefault();
-
-        const sectioningInfo = {
-            sessionId: currentSession,
-            studentId: studentRecord._id,
-            sectionId: sectionId,
-            inputter: currentUserId,
-            gradeLevelId: studentRecord?.academicId?.gradeLevelId?._id,
-            strandId: studentRecord?.academicId?.strandId?._id,
-            lastSchoolAttended: studentRecord?.academicId?.lastSchoolAttended,
-            role,
-            session: currentSession
-        }
-
-        try {
-            const data = await axios.post(`${baseUrl()}/sectioning`, sectioningInfo);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        } catch (err) {
-            console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-        }
-    }
-
     // Subject assigning function
     const assignSubjects = async () => {
+        const toastId = toast.loading('Please wait while assigning subjects to students');
 
         try {
             const data = await axios.get(`${baseUrl()}/assign-subjects-student?session=${currentSession}`);
-            console.log(data);
+            toast.update(toastId, {
+                render: data.data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
+            toast.update(toastId, {
+                render: err.response.data.mssg,
+                type: "success",
+                isLoading: false,
+                autoClose: 2000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -134,7 +89,7 @@ const SubjectAssigning = () => {
             <div className="flex justify-between items-end">
             <TabActions title="Assign Subject to Students" noView={true} />
             <button
-                onClick={assignSubjects}
+                onClick={!isYearDone && assignSubjects}
                 className="bg-blue-500 p-2 rounded-md text-gray-200 text-sm hover:bg-blue-600 mb-2">
                 Assign Subjects
             </button>   
@@ -145,29 +100,33 @@ const SubjectAssigning = () => {
                         studentRecord ?
                             // Show here the form for the subjects assigned to student
                             // MasterDataForm(form, submitSectioning, setShowForm)
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                                <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-lg p-5">
-                                    <h1 className="font-semibold text-xl">Subjects Assigned to { studentRecord.firstName } { studentRecord.lastName }</h1>
-                                    
-                                    <div className="grid grid-cols-3 gap-5 py-5">
-                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
-                                            <h2>Filipino - FIL12</h2>
-                                            <p>Adviser: Paul Andres</p>
-                                            <p>Time: 12:30 - 1:30</p>                                    
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+                                <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-xl p-6">
+                                    <h1 className="font-semibold text-2xl text-gray-800 mb-4">
+                                    Subjects Assigned to {studentRecord.firstName} {studentRecord.lastName}
+                                    </h1>
+
+                                    <div className="grid grid-cols-3 gap-6 py-4">
+                                    {studentSubjects?.filter(subj => subj.studentId._id === studentRecord._id)?.map(subj => (
+                                        <div key={subj._id} className="bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-700">
+                                            <h2 className="font-medium text-lg">{subj.subjectId.subjectName}</h2>
+                                            <p className="text-sm text-gray-500">{subj.subjectId.subjectCode}</p>
                                         </div>
-                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
-                                            <h2>Filipino - FIL12</h2>
-                                            <p>Adviser: Paul Andres</p>
-                                            <p>Time: 12:30 - 1:30</p>                                    
-                                        </div>
-                                        <div className="text-sm py-2 border border-gray-300 rounded-md p-2">
-                                            <h2>Filipino - FIL12</h2>
-                                            <p>Adviser: Paul Andres</p>
-                                            <p>Time: 12:30 - 1:30</p>                                    
-                                        </div>
+                                    ))}
                                     </div>
+
+                                    <button 
+                                    onClick={() => {
+                                        setShowForm(false);
+                                        setStudentRecord(null);
+                                    }} 
+                                    className="mt-6 w-24 text-sm bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition duration-150 ease-in-out"
+                                    >
+                                    Close
+                                    </button>
                                 </div>
                             </div>
+
                             :
                             studentLists?.length < 1 ? (
                                 <div className="mt-3 p-6 bg-white shadow-md rounded-md h-fit">
