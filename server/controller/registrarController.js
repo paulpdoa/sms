@@ -16,6 +16,7 @@ const FeeCode = require('../model/FeeCode');
 const Strand = require('../model/Strand');
 const Subject = require('../model/Subject');
 const StudentSubject = require('../model/StudentSubject');
+const TeacherSubject = require('../model/TeacherSubject');
 
 const moment = require('moment');
 
@@ -1262,7 +1263,15 @@ module.exports.get_student_subjects = async(req,res) => {
 module.exports.assign_subject_to_students = async (req, res) => {
     const { session, currentUserId } = req.query;
 
+    // upon assigning subjects to students
+
     try {
+
+        // Check if there are already TeacherSubject content for current session
+        const teachersSubject = await TeacherSubject.find({ sessionId: session });
+        if(!teachersSubject) {
+            return res.status(404).json({ mssg: 'Teachers must be assigned a schedule and room number before assigning subjects' });
+        }
 
         // Delete current subjects if clicked again for the same session
         await StudentSubject.deleteMany({ sessionId: session });
@@ -1313,6 +1322,50 @@ module.exports.assign_subject_to_students = async (req, res) => {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while assigning subject to students' });
     }
+}
+
+// Teacher Subject 
+module.exports.add_teacher_subject = async (req,res) => {
+    
+    const { roomNumber,subjectId,timeSchedule,inputter,teacherId,sessionId } = req.body;
+
+    // Multiple rows for creating teacher due to teacher can handle many subjects
+    
+    try {
+        const assignedTeacher = await Teacher.findById(teacherId);
+        await TeacherSubject.create({ roomNumber,subjectId,timeSchedule,inputter,teacherId,recordStatus: 'Live',sessionId });
+        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${timeSchedule} has been assigned successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while assigning subject to teacher' });
+    }
+}
+
+module.exports.get_teacher_subject = async (req,res) => {
+
+    const { session } = req.query;
+
+    try {
+        const teacherSubjects = await TeacherSubject.find({ sessionId: session, recordStatus: 'Live' });
+        res.status(200).json(teacherSubjects);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching subjects with assigned teacher' });
+    }
+}
+
+module.exports.delete_teacher_subject = async (req,res) => {
+
+    const { id } = req.params;
+    
+    try {
+        await TeacherSubject.findByIdAndUpdate({ _id: id }, { recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: 'Teacher subject has been deleted successfully' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occured while deleting teacher subject record' });
+    }
+
 }
 
 

@@ -13,6 +13,10 @@ const studentSubjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },
+    teacherSubjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'teacherSubject'
+    },
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'
