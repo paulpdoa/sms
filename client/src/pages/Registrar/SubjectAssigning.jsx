@@ -50,7 +50,7 @@ const SubjectAssigning = () => {
         const toastId = toast.loading('Please wait while assigning subjects to students');
 
         try {
-            const data = await axios.get(`${baseUrl()}/assign-subjects-student?session=${currentSession}`);
+            const data = await axios.get(`${baseUrl()}/assign-subjects-student?session=${currentSession}&currentUserId=${currentUserId}`);
             toast.update(toastId, {
                 render: data.data.mssg,
                 type: "success",
@@ -87,15 +87,15 @@ const SubjectAssigning = () => {
     return (
         <main className="p-2 relative">
             <div className="flex justify-between items-end">
-            <TabActions title="Assign Subject to Students" noView={true} />
-            <button
-                onClick={!isYearDone && assignSubjects}
-                className="bg-blue-500 p-2 rounded-md text-gray-200 text-sm hover:bg-blue-600 mb-2">
-                Assign Subjects
-            </button>   
+                <TabActions title="Assign Subject to Students" noView={true} />
+                <button
+                    onClick={!isYearDone && assignSubjects}
+                    className="bg-blue-500 p-2 rounded-md text-gray-200 text-sm hover:bg-blue-600 mb-2">
+                    Assign Subjects
+                </button>   
             </div>
             <div className={`gap-2 mt-5`}>
-                {showForm &&
+                {showForm &&    
                     (
                         studentRecord ?
                             // Show here the form for the subjects assigned to student

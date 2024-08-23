@@ -9,6 +9,8 @@ import { useCookies } from 'react-cookie';
 
 const Login = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
+
+    // Create a way to stop user on creating new school year if there is still ongoing s.y
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [schoolYear, setSchoolYear] = useState('');
@@ -113,7 +115,7 @@ const Login = () => {
                         {(showPassword) ? "Hide" : "Show"}
                     </button>
                 </div>
-                { schoolYears.length > 0 && (
+                { (schoolYears.length > 0) && (
                     <div className="flex flex-col gap-2 my-2">
                         <span className="text-gray-700 text-sm">Session</span>
                         <select

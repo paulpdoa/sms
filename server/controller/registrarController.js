@@ -17,6 +17,7 @@ const Strand = require('../model/Strand');
 const Subject = require('../model/Subject');
 const StudentSubject = require('../model/StudentSubject');
 const TeacherSubject = require('../model/TeacherSubject');
+const Teacher = require('../model/Teacher');
 
 const moment = require('moment');
 
@@ -1325,21 +1326,6 @@ module.exports.assign_subject_to_students = async (req, res) => {
 }
 
 // Teacher Subject 
-module.exports.add_teacher_subject = async (req,res) => {
-    
-    const { roomNumber,subjectId,timeSchedule,inputter,teacherId,sessionId } = req.body;
-
-    // Multiple rows for creating teacher due to teacher can handle many subjects
-    
-    try {
-        const assignedTeacher = await Teacher.findById(teacherId);
-        await TeacherSubject.create({ roomNumber,subjectId,timeSchedule,inputter,teacherId,recordStatus: 'Live',sessionId });
-        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${timeSchedule} has been assigned successfully` });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ mssg: 'An error occurred while assigning subject to teacher' });
-    }
-}
 
 module.exports.get_teacher_subject = async (req,res) => {
 
@@ -1351,6 +1337,22 @@ module.exports.get_teacher_subject = async (req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching subjects with assigned teacher' });
+    }
+}
+
+module.exports.add_teacher_subject = async (req,res) => {
+    
+    const { roomNumber,subjectId,schedule: timeSchedule,inputter,teacherId,sessionId } = req.body;
+    console.log(req.body);
+    // Multiple rows for creating teacher due to teacher can handle many subjects
+    
+    try {
+        const assignedTeacher = await Teacher.findById(teacherId);
+        await TeacherSubject.create({ roomNumber,subjectId,timeSchedule,inputter,teacherId,recordStatus: 'Live',sessionId });
+        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${timeSchedule} has been assigned successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while assigning subject to teacher' });
     }
 }
 
