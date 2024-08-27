@@ -110,7 +110,7 @@ const Login = () => {
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-11 bg-transparent border-none cursor-pointer text-gray-500 text-xs"
+                        className="absolute right-2 top-10 bg-transparent border-none cursor-pointer text-gray-500 text-xs"
                     >
                         {(showPassword) ? "Hide" : "Show"}
                     </button>
@@ -130,7 +130,7 @@ const Login = () => {
                         </select>
                     </div>
                 ) }
-                <button className="bg-blue-500 hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer my-3">Login</button>
+                <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer my-3">Login</button>
             </form>
             <ToastContainer />
         </main>

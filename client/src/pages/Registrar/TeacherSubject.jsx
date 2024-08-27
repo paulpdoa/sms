@@ -17,30 +17,32 @@ const TeacherSubject = () => {
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
     const isYearDone = schoolYear.isYearDone;
 
+
     const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
     const { records: subjects } = useFetch(`${baseUrl()}/subjects`);
+    const { records: roomNumbers } = useFetch(`${baseUrl()}/room-numbers`)
 
     const [studentRecord, setStudentRecord] = useState(null);
 
     const [teacherId,setTeacherId] = useState('');
     const [subjectId,setSubjectId] = useState('');
-    const [roomNumber,setRoomNumber] = useState('');
+    const [roomNumberId,setRoomNumberId] = useState('');
     const [schedule,setSchedule] = useState('');
 
 
     const columns = [
-        { accessorKey: 'firstName', header: 'First Name' },
-        { accessorKey: 'lastName', header: 'Last Name' },
-        { accessorKey: 'studentNo', header: 'Student No' },
-        { accessorKey: 'gradeLevel', header: 'Grade Level' },
-        { accessorKey: 'strand', header: 'Strand' },
-        { accessorKey: 'section', header: 'Section' },
-        { accessorKey: 'adviser', header: 'Adviser' }
+        { accessorKey: 'teacher', header: 'Teacher', editable: true, selectOptions: teachers?.map(teacher => ({ label: `${teacher.firstName} ${teacher.lastName }`, value: teacher._id })) },
+        { accessorKey: 'subject', header: 'Subject', editable: true, selectOptions: subjects?.map(subject => ({ label: subject.subjectName, value: subject._id})) },
+        { accessorKey: 'roomNumber', header: 'Room Number', editable: true,type: 'number', selectOptions: roomNumbers?.map(rn => ({ label: rn.roomNumber, value: rn._id })) },
+        { accessorKey: 'timeSchedule', header: 'Schedule', editable: true, type: "time" }
+
     ];
 
     const teacherLists = teachersSubject?.map((teacher) => ({
         ...teacher,
-
+        teacher: `${teacher.teacherId.firstName} ${teacher.teacherId.lastName}`,
+        subject: teacher.subjectId.subjectName,
+        roomNumber: teacher.roomNumberId.roomNumber
     }))
 
     const form = () => (
@@ -56,7 +58,7 @@ const TeacherSubject = () => {
                     >
                         <option value="" hidden>Select teacher</option>
                         { teachers?.map(teacher => (
-                            <option value={teacher._id}>{teacher.firstName} {teacher.lastName}</option>
+                            <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.lastName}</option>
                         )) }
                         <option value="">N/A</option>
                     </select>
@@ -70,7 +72,7 @@ const TeacherSubject = () => {
                     >
                         <option value="" hidden>Select subject</option>
                         { subjects?.map(subject => (
-                            <option value={subject._id}>{subject.subjectName} - {subject.subjectCode}</option>
+                            <option key={subject._id} value={subject._id}>{subject.subjectName} - {subject.subjectCode}</option>
                         )) }
                         <option value="">N/A</option>
                     </select>            
@@ -78,12 +80,16 @@ const TeacherSubject = () => {
                 
                 <div className="flex flex-col mt-1">
                     <label className="text-sm" htmlFor="room number">Room Number</label>
-                    <input
-                        onChange={(e) => setRoomNumber(e.target.value)}
+                    <select
+                        onChange={(e) => setRoomNumberId(e.target.value)}
                         className="outline-none p-2 text-sm rounded-md border border-gray-300 focus:border-blue-400 focus:ring-2"
-                        type="number"
-                        required
-                    />
+                    >
+                        <option value="" hidden>Select room number</option>
+                        { roomNumbers?.map(rn => (
+                            <option key={rn._id} value={rn._id}>{rn.roomNumber}</option>
+                        )) }
+                        <option value="">N/A</option>
+                    </select>   
                 </div>
 
                 <div className="flex flex-col mt-1">
@@ -102,23 +108,94 @@ const TeacherSubject = () => {
     const assignTeacherSubject = async (e) => {
         e.preventDefault();
         try {
-            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumber,schedule,inputter: currentUserId, sessionId: currentSession });
+            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,schedule,inputter: currentUserId, sessionId: currentSession,role });
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 2000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
                 theme: "colored"
             });
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
+
         } catch(err) {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+    }
+
+    const editAssignedSubject = async (id,updatedData) => {
+
+        try {   
+            const data = await axios.patch(`${baseUrl()}/edit-assigned-teacher-subject/${id}`,updatedData);
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            // setTimeout(() => {
+            //     window.location.reload();
+            // },2000)
+
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+    }
+
+    const deleteAssignedSubject = async (id) => {
+
+        try {
+            const data = await axios.put(`${baseUrl()}/assigned-teacher-subject/${id}`,{ recordStatus: 'Deleted' });
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -138,7 +215,8 @@ const TeacherSubject = () => {
                         data={teacherLists}
                         columns={columns}
                         searchQuery={searchQuery}
-                        viewRecord={setStudentRecord}
+                        onUpdate={editAssignedSubject}
+                        onDelete={deleteAssignedSubject}                       
                         onShow={setShowForm}
                     />
                 </div>

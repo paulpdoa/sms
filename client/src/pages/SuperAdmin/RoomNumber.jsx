@@ -1,3 +1,5 @@
+import DateTime from "../../components/DateTime";
+import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
@@ -9,90 +11,25 @@ import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 
-const Department = () => {
+const RoomNumber = () => {
 
-    const { records,isLoading } = useFetch(`${baseUrl()}/departments`);
-    const [department,setDepartment] = useState('');
+    const { records: roomNumbers } = useFetch(`${baseUrl()}/room-numbers`);
 
-    const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext)
+    const [roomNumber,setRoomNumber] = useState('');
+
+    const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext);
+    const [isLoading,setIsLoading] = useState(false);
 
     const columns = [
-        {
-            accessorKey: 'department',
-            header: 'Department',
-            editable: true
-        }
+        { accessorKey: 'roomNumber', header: 'Room Number', editable: true }
     ]
 
-    const updateNewDepartment = async (id,updatedData) => {
-        try {
-            const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role,sessionId: session, session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        } catch(err) {
-            console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-        }
-    }      
-
-    const deleteDepartment = async (id) => {
-        try {
-            const removeDepartment = await axios.put(`${baseUrl()}/department/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(removeDepartment.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-        } catch(err) {
-            console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-        }
-    }
-
-    const addDepartment = async (e) => {
+    const addRoomNumber = async (e) => {
         e.preventDefault();
+
         try {
-            const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session,role, sessionId: session });
-            toast.success(newDepartment.data.mssg, {
+            const data = await axios.post(`${baseUrl()}/room-number`,{ roomNumber,inputter: currentUserId, sessionId: session,role })
+            toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: true,
@@ -121,40 +58,103 @@ const Department = () => {
         }
     }
 
-    const recordsWithInputter = records.map(record => ({
-        ...record,
-    }));
+    const updateRoomNumber = async (id,updatedData) => {
+        try {
+            const data = await axios.patch(`${baseUrl()}/room-number/${id}`, { roomNumber: updatedData.roomNumber,role,sessionId: session });
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+    }
+
+    const deleteRoomNumber = async (id) => {
+        try {
+            const data = await axios.put(`${baseUrl()}/room-number/${id}`,{ recordStatus: 'Deleted' });
+            toast.success(data.data.mssg, {
+                position: "top-center",
+                autoClose: 1000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+    }
 
     const form = () => (
         <>
-            <h1 className="font-semibold text-xl text-gray-700">Add New Department</h1>
+            <h1 className="font-semibold text-xl text-gray-700">Add New Room Number</h1>
 
             <div className="flex flex-col mt-1">
-                <label className="text-sm" htmlFor="department">Department</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setDepartment(e.target.value)} />
+                <label className="text-sm" htmlFor="room number">Room Number</label>
+                <input className="outline-none p-1 rounded-md border border-gray-300" type="number" onChange={(e) => setRoomNumber(e.target.value)} />
             </div>
         </>
     )
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Department" />
-            <div className={`gap-2 mt-5`}>
-                { showForm && MasterDataForm(form,addDepartment,setShowForm)}
-                <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
-                    <MasterTable
-                        columns={columns}
-                        data={recordsWithInputter}
-                        searchQuery={searchQuery}
-                        onUpdate={updateNewDepartment}
-                        onDelete={deleteDepartment}
-                        isLoading={isLoading}
-                    />
-                </div>    
-            </div> 
-            <ToastContainer />          
-        </main>
+        {/* <DateTime /> */}
+        <TabActions title="Room Number" />
+
+        <div className={`gap-2 mt-5`}>
+            { showForm && MasterDataForm(form,addRoomNumber,setShowForm)}
+
+            <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
+                <MasterTable
+                    columns={columns}
+                    data={roomNumbers}
+                    searchQuery={searchQuery}
+                    onUpdate={updateRoomNumber}
+                    onDelete={deleteRoomNumber}
+                    isLoading={isLoading}
+                />
+            </div>    
+        </div> 
+        <ToastContainer />          
+    </main>
     )
 }
 
-export default Department;
+export default RoomNumber;

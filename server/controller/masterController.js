@@ -28,6 +28,7 @@ const Strand = require('../model/Strand');
 const StudentBook = require('../model/StudentBooks');
 const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
+const RoomNumber = require('../model/RoomNumber');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -1872,4 +1873,93 @@ module.exports.generate_academic_students = async (req,res) => {
         console.log(err);
         res.status(400).json({ mssg: 'An error occurred while generating academic details'});
     }
+}
+
+
+// Room Number
+
+module.exports.get_room_numbers = async (req,res) => {
+
+    const { session } = req.query;
+
+    try {
+        const roomNumbers = await RoomNumber.find({ sessionId: session,recordStatus: 'Live' });
+        
+        if(!roomNumbers) {
+            return res.status(404).json({ mssg: 'There are no room numbers returned by the system' });
+        }
+
+        res.status(200).json(roomNumbers);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching room number records' });
+    }
+}
+
+module.exports.get_room_number_detail = async (req,res) => {
+    const { id } = req.params;
+
+    try {
+        const roomNumber = await RoomNumber.findOne({ _id: id, recordStatus: 'Live' });
+
+        if(!roomNumber) {
+            return res.status(404).json({ mssg: 'This room number is not existing' });
+        }
+
+        res.status(200).json(roomNumber);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching room number record' });
+    }
+}
+
+module.exports.add_room_number = async (req,res) => {
+
+    const { roomNumber,inputter,sessionId } = req.body;
+
+    try {
+        if(roomNumber < 1) {
+            return res.status(400).json({ mssg: 'Room number cannot be a negative number' });
+        }
+        
+        await RoomNumber.create({ roomNumber,inputter,sessionId,recordStatus: 'Live' });
+        res.status(200).json({ mssg: `Room number ${roomNumber} has been created successfully!` });
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while creating room number record' });
+    }
+}
+
+module.exports.delete_room_number = async (req,res) => {
+
+    const { id } = req.params;
+
+    try {   
+        const roomNumber = await RoomNumber.findByIdAndUpdate(id, { recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: `Room number ${roomNumber.roomNumber} has been deleted successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting room number record' });
+    }
+}
+
+module.exports.edit_room_number = async (req,res) => {
+
+    const { id } = req.params;
+    const { roomNumber,inputter,sessionId } = req.body;
+
+    try {
+
+        if(!roomNumber) {
+            return res.status(404).json({ mssg: 'Room number cannot be blank' });
+        }
+
+        await RoomNumber.findByIdAndUpdate(id, { roomNumber,inputter,sessionId });
+        res.status(200).json({ mssg: `Room number has been updated to ${roomNumber}` })
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating room number record' });
+    }
+
 }

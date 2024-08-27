@@ -15,9 +15,9 @@ const teacherSubjectSchema = new mongoose.Schema({
         ref: 'subject'
     },
     timeSchedule: requiredString,
-    roomNumber: {
-        type: String,
-        required: true
+    roomNumberId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'roomNumber'
     },
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 

@@ -81,9 +81,22 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
 
         if (editValues['nationalityCodeId']) {
             updatedValues.nationalityCodeId = { _id: editValues['nationalityCodeId'] }
+        }  
+
+        if(editValues['teacher']) {
+            updatedValues.teacher = editValues.teacherId._id
+        }
+
+        if(editValues['subject']) {
+            updatedValues.subject = editValues.subjectId._id
+        }
+
+        if(editValues['roomNumberId']) {
+            updatedValues.roomNumberId = editValues.roomNumberId._id
         }
 
         console.log(editValues);
+
 
         onUpdate(id, updatedValues);
         setEditId(null);
@@ -206,6 +219,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                         column.editable ? (
                                                             column.selectOptions ? (
                                                                 <select
+                                                                    key={record._id}
                                                                     name={column.accessorKey}
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
@@ -221,9 +235,9 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                             column.header
                                                                         }
                                                                     </option>
-                                                                    {column.selectOptions.map(option => (
+                                                                    {column.selectOptions.map((option,key) => (
                                                                         <>
-                                                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                                                            <option key={key} value={option.value}>{option.label}</option>
                                                                         </>
                                                                     ))}
                                                                 </select>

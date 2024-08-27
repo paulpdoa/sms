@@ -62,6 +62,7 @@ import Profile from "./pages/Profile";
 import Subjects from "./pages/SuperAdmin/Subjects";
 import SubjectAssigning from "./pages/Registrar/SubjectAssigning";
 import TeacherSubject from "./pages/Registrar/TeacherSubject";
+import RoomNumber from "./pages/SuperAdmin/RoomNumber";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -141,6 +142,7 @@ function App() {
             <Route path='sectioning' element={<Sectioning />} />
             <Route path='manage-fees' element={<ManageFees />} />
             <Route path='subjects' element={<Subjects />} />
+            <Route path='room-number' element={<RoomNumber />} />
           </Route>
           <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />

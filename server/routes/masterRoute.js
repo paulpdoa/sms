@@ -84,7 +84,12 @@ add_subject,
 edit_live_subject,
 delete_live_subject,
 update_all_records_live,
-get_deleted_subjects} = require('../controller/masterController');
+get_deleted_subjects,
+get_room_numbers,
+get_room_number_detail,
+edit_room_number,
+delete_room_number,
+add_room_number} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -219,8 +224,17 @@ route.post('/sibling',add_sibling);
 route.put('/sibling/:id',delete_sibling);
 route.patch('/sibling/:id',edit_sibling);
 
+// Room Number
+route.get('/room-numbers', get_room_numbers);
+route.get('/room-number/:id', get_room_number_detail);
+route.patch('/room-number/:id', edit_room_number);
+route.put('/room-number/:id', delete_room_number);
+route.post('/room-number', add_room_number);
+
 // Dashboard
 route.get('/dashboard/:sessionId',get_dashboard_details);
+
+
 
 //For test data
 route.get('/generate-academic-data',generate_academic_students);
