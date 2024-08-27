@@ -71,9 +71,9 @@ const SubjectAssigning = () => {
             console.log(err);
             toast.update(toastId, {
                 render: err.response.data.mssg,
-                type: "success",
+                type: "error",
                 isLoading: false,
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
