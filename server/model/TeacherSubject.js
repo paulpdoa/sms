@@ -14,7 +14,8 @@ const teacherSubjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'subject'
     },
-    timeSchedule: requiredString,
+    startTime: requiredString,
+    endTime: requiredString,
     roomNumberId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'roomNumber'

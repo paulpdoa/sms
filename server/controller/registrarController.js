@@ -1343,14 +1343,14 @@ module.exports.get_teacher_subject = async (req,res) => {
 
 module.exports.add_teacher_subject = async (req,res) => {
     
-    const { roomNumberId,subjectId,schedule: timeSchedule,inputter,teacherId,sessionId } = req.body;
+    const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId } = req.body;
     console.log(req.body);
     // Multiple rows for creating teacher due to teacher can handle many subjects
     
     try {
         const assignedTeacher = await Teacher.findById(teacherId);
-        await TeacherSubject.create({ roomNumberId,subjectId,timeSchedule,inputter,teacherId,recordStatus: 'Live',sessionId });
-        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${timeSchedule} has been assigned successfully` });
+        await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId });
+        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully` });
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while assigning subject to teacher' });
@@ -1374,7 +1374,7 @@ module.exports.delete_teacher_subject = async (req,res) => {
 module.exports.edit_assigned_teacher_subject = async (req,res) => {
     
     const { id } = req.params;
-    const { roomNumberId,teacher:teacherId,subject:subjectId,timeSchedule,inputter } = req.body;
+    const { roomNumberId,teacher:teacherId,subject:subjectId,startTime,endTime,inputter } = req.body;
     
     try {
         const teacher = await Teacher.findById(teacherId);
@@ -1383,7 +1383,7 @@ module.exports.edit_assigned_teacher_subject = async (req,res) => {
             res.status(404).json({ mssg: `This teacher is not an existing record` });
         }
 
-        await TeacherSubject.findByIdAndUpdate(id, { roomNumberId,teacherId,subjectId,timeSchedule,inputter });
+        await TeacherSubject.findByIdAndUpdate(id, { roomNumberId,teacherId,subjectId,startTime,endTime,inputter });
         res.status(200).json({ mssg: `Assigned subject to teacher ${teacher.firstName} has been updated successfully!` })
     } catch(err) {
         console.log(err);

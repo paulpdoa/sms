@@ -27,15 +27,16 @@ const TeacherSubject = () => {
     const [teacherId,setTeacherId] = useState('');
     const [subjectId,setSubjectId] = useState('');
     const [roomNumberId,setRoomNumberId] = useState('');
-    const [schedule,setSchedule] = useState('');
+    const [startTime,setStartTime] = useState('');
+    const [endTime,setEndTime] = useState('');
 
 
     const columns = [
         { accessorKey: 'teacher', header: 'Teacher', editable: true, selectOptions: teachers?.map(teacher => ({ label: `${teacher.firstName} ${teacher.lastName }`, value: teacher._id })) },
         { accessorKey: 'subject', header: 'Subject', editable: true, selectOptions: subjects?.map(subject => ({ label: subject.subjectName, value: subject._id})) },
         { accessorKey: 'roomNumber', header: 'Room Number', editable: true,type: 'number', selectOptions: roomNumbers?.map(rn => ({ label: rn.roomNumber, value: rn._id })) },
-        { accessorKey: 'timeSchedule', header: 'Schedule', editable: true, type: "time" }
-
+        { accessorKey: 'startTime', header: 'Start Time', editable: true, type: "time" },
+        { accessorKey: 'endTime', header: 'End Time', editable: true, type: "time" }
     ];
 
     const teacherLists = teachersSubject?.map((teacher) => ({
@@ -93,9 +94,19 @@ const TeacherSubject = () => {
                 </div>
 
                 <div className="flex flex-col mt-1">
-                    <label className="text-sm" htmlFor="schedule">Schedule</label>
+                    <label className="text-sm" htmlFor="start time">Start Time</label>
                     <input
-                        onChange={(e) => setSchedule(e.target.value)}
+                        onChange={(e) => setStartTime(e.target.value)}
+                        className="outline-none p-2 text-sm rounded-md border border-gray-300 focus:border-blue-400 focus:ring-2"
+                        type="time"
+                        required
+                    />
+                </div>
+
+                <div className="flex flex-col mt-1">
+                    <label className="text-sm" htmlFor="schedule">End Time</label>
+                    <input
+                        onChange={(e) => setEndTime(e.target.value)}
                         className="outline-none p-2 text-sm rounded-md border border-gray-300 focus:border-blue-400 focus:ring-2"
                         type="time"
                         required
@@ -108,7 +119,7 @@ const TeacherSubject = () => {
     const assignTeacherSubject = async (e) => {
         e.preventDefault();
         try {
-            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,schedule,inputter: currentUserId, sessionId: currentSession,role });
+            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,startTime,endTime,inputter: currentUserId, sessionId: currentSession,role });
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 2000,
