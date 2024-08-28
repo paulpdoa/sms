@@ -1250,7 +1250,7 @@ module.exports.get_student_subjects = async(req,res) => {
             }
         }})
         .populate({ path: 'teacherSubjectId', populate: {
-            path: 'teacherId subjectId'
+            path: 'teacherId subjectId roomNumberId'
         } })
         .populate('subjectId inputter');
 
@@ -1272,7 +1272,7 @@ module.exports.assign_subject_to_students = async (req, res) => {
     try {
         // Check if there are already TeacherSubject content for current session
         const teachersSubject = await TeacherSubject.find({ sessionId: session, recordStatus: 'Live' })
-            .populate('subjectId teacherId');
+            .populate('subjectId teacherId roomNumberId');
         if (teachersSubject.length < 1) {
             return res.status(404).json({ mssg: 'Teachers must be assigned a schedule and room number before assigning subjects' });
         }
@@ -1295,22 +1295,29 @@ module.exports.assign_subject_to_students = async (req, res) => {
         }).populate('gradeLevelId');
 
         for (const acadOfStud of academicOfStudents) {
-            if (acadOfStud.gradeLevelId) {
+            if(acadOfStud.gradeLevelId) {
                 // Assign subjects to students here
                 const gradeLevelOfStudent = acadOfStud.gradeLevelId.gradeLevel.toLowerCase();
                 const strandOfStudent = acadOfStud?.strandId?.strand?.toLowerCase();
+
+              
 
                 for(const subject of subjects) {
                     const subjectLevel = subject.gradeLevelId.gradeLevel.toLowerCase();
                     const strand = strandOfStudent ? subject.subjectCode.toLowerCase().includes(strandOfStudent) : true;
 
                     // Find the corresponding teacher's subject
-                    const teacherSubject = teachersSubject.find(ts => 
-                        ts.subjectId?._id.equals(subject._id) &&
-                        (!acadOfStud.strandId || (ts.strandId && ts.strandId.equals(acadOfStud.strandId._id)))
-                    );
-
-                    console.log('Found Subjects: ', teacherSubject);
+                    // 1. Check teachers subject
+                    // 2. Check subject of students and their strands
+                    const teacherSubject = teachersSubject.find(ts => {
+                        if(ts.subjectId.subjectCode.toLowerCase() === subject.subjectCode.toLowerCase()) {
+                            if(ts.subjectId?.subjectName.toLowerCase() === subject.subjectName.toLowerCase()) {
+                                return ts
+                            }
+                        }
+                    });
+                    
+                    
 
                     // If same grade level and strand match or there's no strand requirement, create a student subject
                     if(subjectLevel === gradeLevelOfStudent && (!acadOfStud.strandId || strand)) {
@@ -1323,8 +1330,7 @@ module.exports.assign_subject_to_students = async (req, res) => {
                         };
 
                         // Add teacherSubjectId if a teacher is found teaching that subject and strand
-                        if(teacherSubject !== undefined) {
-                            console.log('Assigned Subjects: ',teacherSubject);
+                        if(teacherSubject) {
                             studentSubjectData.teacherSubjectId = teacherSubject._id;
                         }
 

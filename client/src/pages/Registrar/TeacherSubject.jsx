@@ -42,7 +42,7 @@ const TeacherSubject = () => {
     const teacherLists = teachersSubject?.map((teacher) => ({
         ...teacher,
         teacher: `${teacher.teacherId.firstName} ${teacher.teacherId.lastName}`,
-        subject: teacher.subjectId.subjectName,
+        subject: `${teacher.subjectId.subjectName} - ${teacher.subjectId.subjectCode}`,
         roomNumber: teacher.roomNumberId.roomNumber
     }))
 

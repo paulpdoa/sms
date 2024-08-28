@@ -131,9 +131,16 @@ const SubjectAssigning = () => {
                                         }
 
                                         return (
-                                        <div key={subj._id} className={`${bgColorClass} border border-gray-300 rounded-lg p-4 text-gray-700`}>
+                                        <div key={subj._id} className={`${bgColorClass} border border-gray-300 rounded-lg p-4 text-gray-700 h-fit`}>
                                             <h2 className="font-medium text-lg">{subj.subjectId.subjectName}</h2>
                                             <p className="text-sm text-gray-500">{subj.subjectId.subjectCode}</p>
+                                            { subj.teacherSubjectId && (
+                                                <div className="text-sm text-gray-500 mt-5">
+                                                    <p>Teacher: {subj.teacherSubjectId.teacherId.firstName} {subj.teacherSubjectId.teacherId.middleName} {subj.teacherSubjectId.teacherId.lastName}</p>
+                                                    <p>Room No: {subj.teacherSubjectId.roomNumberId.roomNumber}</p>
+                                                    <p>Schedule: {subj.teacherSubjectId.startTime} - {subj.teacherSubjectId.endTime}</p>
+                                                </div>
+                                            ) }
                                         </div>
                                         );
                                     })}
