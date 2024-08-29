@@ -1366,6 +1366,26 @@ module.exports.get_teacher_subject = async (req,res) => {
     }
 }
 
+module.exports.get_teacher_subject_details = async (req,res) => {
+
+    const { id } = req.params;
+    const { session } = req.query;
+
+    try {
+        const teacherSubject = await TeacherSubject.findOne({ _id: id, recordStatus: 'Live', sessionId: session })
+        .populate('teacherId roomNumberId subjectId')
+        
+        if(!teacherSubject) {
+            return res.status(404).json({ mssg: 'There are no teachers assigned to subjects yet' });
+        }
+
+        res.status(200).json(teacherSubject);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching teacher subject detail' });
+    }
+}
+
 module.exports.add_teacher_subject = async (req,res) => {
     
     const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId,daySchedule } = req.body;
@@ -1399,7 +1419,7 @@ module.exports.delete_teacher_subject = async (req,res) => {
 module.exports.edit_assigned_teacher_subject = async (req,res) => {
     
     const { id } = req.params;
-    const { roomNumberId,teacher:teacherId,subject:subjectId,startTime,endTime,inputter } = req.body;
+    const { roomNumberId,teacherId,subjectId,startTime,endTime,inputter,daySchedules:daySchedule } = req.body;
     
     try {
         const teacher = await Teacher.findById(teacherId);
@@ -1408,7 +1428,7 @@ module.exports.edit_assigned_teacher_subject = async (req,res) => {
             res.status(404).json({ mssg: `This teacher is not an existing record` });
         }
 
-        await TeacherSubject.findByIdAndUpdate(id, { roomNumberId,teacherId,subjectId,startTime,endTime,inputter });
+        await TeacherSubject.findByIdAndUpdate(id, { roomNumberId,teacherId,subjectId,startTime,endTime,inputter,daySchedule });
         res.status(200).json({ mssg: `Assigned subject to teacher ${teacher.firstName} has been updated successfully!` })
     } catch(err) {
         console.log(err);

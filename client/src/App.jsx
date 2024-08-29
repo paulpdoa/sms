@@ -63,6 +63,7 @@ import Subjects from "./pages/SuperAdmin/Subjects";
 import SubjectAssigning from "./pages/Registrar/SubjectAssigning";
 import TeacherSubject from "./pages/Registrar/TeacherSubject";
 import RoomNumber from "./pages/SuperAdmin/RoomNumber";
+import EditTeacherSubject from "./pages/Registrar/EditTeacherSubject";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -144,6 +145,7 @@ function App() {
             <Route path='subjects' element={<Subjects />} />
             <Route path='room-number' element={<RoomNumber />} />
           </Route>
+
           <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
@@ -151,6 +153,7 @@ function App() {
           <Route path='/subject-assigning' element={<SubjectAssigning />} />
           <Route path='/teachers-subject' element={<TeacherSubject />} />
           <Route path='/assessment' element={<Assessment />} />
+          <Route path='/teacher-subject/:id' element={<EditTeacherSubject />} />
 
           <Route path='/profile/:id' element={<Profile />} />
 

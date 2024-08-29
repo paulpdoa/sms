@@ -40,6 +40,8 @@ const TeacherSubject = () => {
         });
     };
 
+    const navigate = useNavigate();
+
 
     const columns = [
         { accessorKey: 'teacher', header: 'Teacher', editable: true, selectOptions: teachers?.map(teacher => ({ label: `${teacher.firstName} ${teacher.lastName }`, value: teacher._id })) },
@@ -245,6 +247,8 @@ const TeacherSubject = () => {
         }
     }
 
+    const goToEdit = (id) => navigate(`/teacher-subject/${id}`);
+
     return (
         <main className="p-2 relative">
             <TabActions title="Teachers Subject" />
@@ -258,6 +262,7 @@ const TeacherSubject = () => {
                         onUpdate={editAssignedSubject}
                         onDelete={deleteAssignedSubject}                       
                         onShow={setShowForm}
+                        goToEdit={goToEdit}
                     />
                 </div>
             </div>
