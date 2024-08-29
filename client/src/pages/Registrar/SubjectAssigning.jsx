@@ -106,7 +106,7 @@ const SubjectAssigning = () => {
                                     Subjects Assigned to {studentRecord.firstName} {studentRecord.lastName}
                                     </h1>
 
-                                    <div className="grid grid-cols-3 gap-6 py-4">
+                                    <div className="grid grid-cols-2 gap-6 py-4">
                                     {studentSubjects?.filter(subj => subj.studentId._id === studentRecord._id)?.map(subj => {
                                         let bgColorClass = '';
 
@@ -138,7 +138,20 @@ const SubjectAssigning = () => {
                                                 <div className="text-sm text-gray-500 mt-5">
                                                     <p>Teacher: {subj.teacherSubjectId.teacherId.firstName} {subj.teacherSubjectId.teacherId.middleName} {subj.teacherSubjectId.teacherId.lastName}</p>
                                                     <p>Room No: {subj.teacherSubjectId.roomNumberId.roomNumber}</p>
-                                                    <p>Schedule: {subj.teacherSubjectId.startTime} - {subj.teacherSubjectId.endTime}</p>
+
+                                                    { subj.teacherSubjectId.daySchedule.length > 0 && (
+                                                        <div className="border border-gray-400 p-2 rounded-md mt-2">
+                                                            <label htmlFor="time">Time:</label>
+                                                            <p>{subj.teacherSubjectId.startTime} - {subj.teacherSubjectId.endTime}</p>
+                                                        
+                                                            <label htmlFor="days">Days:</label>
+                                                            <div className="flex items-center flex-wrap gap-2 text-sm">
+                                                                { subj.teacherSubjectId.daySchedule?.map(dy => (
+                                                                    <p>{dy}</p>
+                                                                )) }                                                            
+                                                            </div>
+                                                        </div>
+                                                    ) }
                                                 </div>
                                             ) }
                                         </div>

@@ -20,6 +20,10 @@ const teacherSubjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'roomNumber'
     },
+    daySchedule: [{
+        type: String,
+        required: true
+    }],
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'

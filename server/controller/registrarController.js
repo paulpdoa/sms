@@ -1368,13 +1368,13 @@ module.exports.get_teacher_subject = async (req,res) => {
 
 module.exports.add_teacher_subject = async (req,res) => {
     
-    const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId } = req.body;
-    console.log(req.body);
+    const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId,daySchedule } = req.body;
+    
     // Multiple rows for creating teacher due to teacher can handle many subjects
     
     try {
         const assignedTeacher = await Teacher.findById(teacherId);
-        await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId });
+        await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId,daySchedule });
         res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully` });
     } catch(err) {
         console.log(err);

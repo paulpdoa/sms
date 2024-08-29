@@ -17,18 +17,28 @@ const TeacherSubject = () => {
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
     const isYearDone = schoolYear.isYearDone;
 
+    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
     const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
     const { records: subjects } = useFetch(`${baseUrl()}/subjects`);
     const { records: roomNumbers } = useFetch(`${baseUrl()}/room-numbers`)
-
-    const [studentRecord, setStudentRecord] = useState(null);
 
     const [teacherId,setTeacherId] = useState('');
     const [subjectId,setSubjectId] = useState('');
     const [roomNumberId,setRoomNumberId] = useState('');
     const [startTime,setStartTime] = useState('');
     const [endTime,setEndTime] = useState('');
+    const [daySchedule,setDaySchedule] = useState([]);
+
+    const handleDayScheduleChange = (day) => {
+        setDaySchedule((prevDaySchedule) => {
+            if (prevDaySchedule.includes(day)) {
+                return prevDaySchedule.filter((d) => d !== day);
+            } else {
+                return [...prevDaySchedule, day];
+            }
+        });
+    };
 
 
     const columns = [
@@ -112,6 +122,25 @@ const TeacherSubject = () => {
                         required
                     />
                 </div>
+
+                <div className="flex flex-col mt-1">
+                    <label className="text-sm" htmlFor="day schedule">Day Schedule</label>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                    { days.map((day,key) => (
+                        <div key={key} className="flex items-center gap-2 justify-between text-sm border border-gray-300 p-1">
+                            <label htmlFor="day">{day}</label>
+                            <input 
+                                type="checkbox" 
+                                value={day} 
+                                onChange={() => handleDayScheduleChange(day)} 
+                                className="outline-none p-2 text-sm rounded-md border border-gray-300 focus:border-blue-400 focus:ring-2"
+                            />
+                        </div>
+                    )) }
+                    </div>
+                </div>
+
             </div>
         </>
     )
@@ -119,7 +148,7 @@ const TeacherSubject = () => {
     const assignTeacherSubject = async (e) => {
         e.preventDefault();
         try {
-            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,startTime,endTime,inputter: currentUserId, sessionId: currentSession,role });
+            const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,startTime,endTime,inputter: currentUserId, sessionId: currentSession,role,daySchedule });
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 2000,
@@ -164,9 +193,9 @@ const TeacherSubject = () => {
                 theme: "colored"
             });
 
-            // setTimeout(() => {
-            //     window.location.reload();
-            // },2000)
+            setTimeout(() => {
+                window.location.reload();
+            },2000)
 
         } catch(err) {
             console.log(err);
