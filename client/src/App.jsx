@@ -64,6 +64,8 @@ import SubjectAssigning from "./pages/Registrar/SubjectAssigning";
 import TeacherSubject from "./pages/Registrar/TeacherSubject";
 import RoomNumber from "./pages/SuperAdmin/RoomNumber";
 import EditTeacherSubject from "./pages/Registrar/EditTeacherSubject";
+import StudentGrading from "./pages/Teacher/StudentGrading";
+import GradingCategory from "./pages/SuperAdmin/GradingCategory";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -144,6 +146,7 @@ function App() {
             <Route path='manage-fees' element={<ManageFees />} />
             <Route path='subjects' element={<Subjects />} />
             <Route path='room-number' element={<RoomNumber />} />
+            <Route path='grading-category' element={<GradingCategory />} />
           </Route>
 
           <Route path='/subjects' element={<Subjects />} />
@@ -154,6 +157,9 @@ function App() {
           <Route path='/teachers-subject' element={<TeacherSubject />} />
           <Route path='/assessment' element={<Assessment />} />
           <Route path='/teacher-subject/:id' element={<EditTeacherSubject />} />
+
+          {/* For teachers route */}
+          <Route path='/student-grading' element={<StudentGrading />} />
 
           <Route path='/profile/:id' element={<Profile />} />
 

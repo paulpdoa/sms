@@ -89,7 +89,12 @@ get_room_numbers,
 get_room_number_detail,
 edit_room_number,
 delete_room_number,
-add_room_number} = require('../controller/masterController');
+add_room_number,
+get_grading_categories,
+get_grading_category_details,
+edit_grading_category,
+delete_grading_category,
+add_grading_category} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -230,6 +235,13 @@ route.get('/room-number/:id', get_room_number_detail);
 route.patch('/room-number/:id', edit_room_number);
 route.put('/room-number/:id', delete_room_number);
 route.post('/room-number', add_room_number);
+
+// Grading Category
+route.get('/grading-categories', get_grading_categories);
+route.get('/grading-category/:id', get_grading_category_details);
+route.patch('/grading-category/:id', edit_grading_category);
+route.put('/grading-category/:id',delete_grading_category);
+route.post('/grading-category', add_grading_category);
 
 // Dashboard
 route.get('/dashboard/:sessionId',get_dashboard_details);

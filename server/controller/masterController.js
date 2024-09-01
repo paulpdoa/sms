@@ -29,6 +29,7 @@ const StudentBook = require('../model/StudentBooks');
 const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
 const RoomNumber = require('../model/RoomNumber');
+const GradingCategory = require('../model/GradingCategory');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -1960,6 +1961,102 @@ module.exports.edit_room_number = async (req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while updating room number record' });
+    }
+
+}
+
+// Grading Category
+module.exports.get_grading_categories = async(req,res) => {
+    
+    const { session } = req.query;
+    
+    try {
+        const gradingCategories = await GradingCategory.find({ sessionId: session, recordStatus: 'Live' });
+
+        if(!gradingCategories) {
+            return res.status(404).json({ mssg: 'Grading categories is empty' });
+        }
+
+        res.status(200).json(gradingCategories);
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching grading categories record' });
+    }
+}
+
+module.exports.get_grading_category_details = async(req,res) => {
+    
+    const { session } = req.query;
+    const { id } = req.params;
+
+    try {
+
+        const gradingCategory = await GradingCategory.findOne({ _id: id, sessionId: session, recordStatus: 'Live' });
+
+        if(!gradingCategory) {
+            return res.status(404).json({ mssg: `${id} grading category is not existing` });
+        }
+
+        res.status(200).json(gradingCategory);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching grading categories record' });
+    }
+}
+
+module.exports.add_grading_category = async (req,res) => {
+
+    const { gradingCategory,sessionId,inputter } = req.body;
+
+    try {
+
+        const foundCategory = await GradingCategory.findOne({ gradingCategory: gradingCategory, recordStatus: 'Live' });
+
+        if(foundCategory) {
+            return res.status(400).json({ mssg: `${gradingCategory} is already existing and cannot be inserted as new record` });
+        }
+
+        await GradingCategory.create({ gradingCategory,sessionId,inputter,recordStatus: 'Live' });
+        res.status(200).json({ mssg: `${gradingCategory} has been added successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while adding grading category' });
+    }
+
+}
+
+module.exports.delete_grading_category = async (req,res) => {
+
+    const { id } = req.params
+
+    try {
+        const gradingCategory = await GradingCategory.findByIdAndUpdate(id, { recordStatus: 'Deleted' });
+        res.status(200).json({ mssg: `${gradingCategory.gradingCategory} has been deleted successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting grading category' });
+    }
+}
+
+module.exports.edit_grading_category = async (req,res) => {
+    
+    const { id } = req.params;
+    const { gradingCategory,inputter } = req.body;
+
+    try {
+
+        const gradingCategoryFound = await GradingCategory.findOne({ gradingCategory,recordStatus: 'Live' });
+
+        if(gradingCategoryFound) {
+            return res.status(400).json({ mssg: `${gradingCategoryFound.gradingCategory} is already existing, please choose another` });
+        }
+
+        const newGradingCateg = await GradingCategory.findByIdAndUpdate(id, { gradingCategory,inputter });
+        res.status(200).json({ mssg: `${newGradingCateg.gradingCategory} has been updated to ${gradingCategory} successfully` });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating grading category' });
     }
 
 }

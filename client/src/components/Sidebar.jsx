@@ -47,6 +47,7 @@ const initialMenus = [
                     { name: 'Discount', link: '/master/discount' },
                     { name: 'Subject', link: '/master/subjects' },
                     { name: 'Room Number', link: '/master/room-number' },
+                    { name: 'Grading Category', link: '/master/grading-category' },
                 ]
             },
             {
@@ -81,6 +82,22 @@ const initialMenus = [
                             { name: 'Subject Assigning', link: '/subject-assigning' }
                         ]
                     }
+                ]
+            },
+            {
+                name: 'Teacher',
+                icon: <FaCashRegister />,
+                subMenus: [
+                    { name: 'Student Grading', link: '/student-grading' },
+                    // {
+                    //     name: 'Enrollment Process',
+                    //     subMenus: [
+                    //         { name: 'Admission', link: '/admission' },
+                    //         { name: 'Assessment', link: '/assessment' },
+                    //         { name: 'Sectioning', link: '/sectioning' },
+                    //         { name: 'Subject Assigning', link: '/subject-assigning' }
+                    //     ]
+                    // }
                 ]
             },
             // {
