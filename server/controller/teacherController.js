@@ -1,10 +1,11 @@
 const StudentGrade = require('../model/StudentGrade');
 
-module.exports.get_student_grade = async (req,res) => {
+module.exports.get_student_grades = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const studentGrades = await StudentGrade.find({ recordStatus: 'Live', sessionId: session });
+        const studentGrades = await StudentGrade.find({ recordStatus: 'Live', sessionId: session })
+        .populate('studentId subjectId gradingCategoryId')
 
         if(!studentGrades) {
             return res.status(404).json({ mssg: 'Student grades is empty' });
@@ -35,7 +36,9 @@ module.exports.add_student_grade = async (req, res) => {
         sessionId
     } = req.body;
 
-    console.log(req.body);
+    if(taskTotal < 1 || passingScore < 0 || studentScore < 0) {
+        return res.status(400).json({ mssg: 'Scores cannot be a negative number' });
+    }
 
     // Check if any required field is missing or empty
     const requiredFields = {
