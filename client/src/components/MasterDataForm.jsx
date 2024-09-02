@@ -1,5 +1,5 @@
 
-const MasterDataForm = (form, onAdd, onClose,formTitle) => (
+const MasterDataForm = (form, onAdd, onClose,formTitle,setStudentId) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-lg">
       <form onSubmit={onAdd} className="p-6 space-y-6">
@@ -17,7 +17,14 @@ const MasterDataForm = (form, onAdd, onClose,formTitle) => (
           </button>
           <button
             type="button"
-            onClick={() => onClose(false)}
+            onClick={() => {
+              if(setStudentId) {
+                onClose(false);
+                setStudentId('');
+              } else {
+                onClose(false)
+              }
+            }}
             className="px-6 py-2 bg-red-500 text-white rounded-lg text-sm shadow hover:bg-red-600 focus:outline-none focus:ring focus:ring-gray-300"
           >
             Cancel

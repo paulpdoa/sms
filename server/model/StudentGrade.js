@@ -9,11 +9,34 @@ const studentGradeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'subject'
     },
-    category: {
+    gradingCategoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gradingCategory'
+    },
+    academicPeriod: { //(1st Grading, 2nd Grading,3rd Grading,4th Grading)
         type: String,
         required: true
     },
     dateTaken: {
+        type: String,
+        required: true
+    },
+    dueDate: { // Optional field
+        type: String
+    },
+    taskTotal: {
+        type: Number,
+        required: true
+    },
+    passingScore: {
+        type: Number,
+        required: true
+    },
+    gradeRemark: { // Passed or failed
+        type: String,
+        required: true
+    },
+    remarks: {
         type: String,
         required: true
     },

@@ -84,7 +84,7 @@ const Requirements = () => {
             },2000)
         } catch(err) {
             console.log(err);
-            toast.error(newRequirement.data.mssg, {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
                 hideProgressBar: true,

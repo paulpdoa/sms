@@ -9,6 +9,7 @@ const path = require('path');
 const registrarRoute = require('./routes/registrarRoute');
 const masterRoute = require('./routes/masterRoute');
 const schoolAdminRoute = require('./routes/schoolAdminRoute');
+const teacherRoute = require('./routes/teacherRoute');
 
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.DB_URI;
@@ -61,3 +62,4 @@ app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/',registrarRoute);
 app.use('/api/',masterRoute);
 app.use('/api/',schoolAdminRoute);
+app.use('/api', teacherRoute);
