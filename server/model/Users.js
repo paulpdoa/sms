@@ -26,6 +26,18 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean
     },
+    teacherId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'teacher'
+    },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'parent'
+    },
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'student'
+    },
     password: requiredString,
     profilePictureUrl: {
         type: String

@@ -23,7 +23,12 @@ const StudentGrading = () => {
     const { records: gradingCategories } = useFetch(`${baseUrl()}/grading-categories`);
     const { records: studentGrades } = useFetch(`${baseUrl()}/student-grades`);
     
+    
     const { searchQuery,showForm,currentUserId,setShowForm, session, role } = useContext(MainContext);
+
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+
+    const isYearDone = schoolYear.isYearDone;
 
     const [student,setStudent] = useState({});
     const [showStudentSubject,setShowStudentSubject] = useState(false);
@@ -41,6 +46,9 @@ const StudentGrading = () => {
 
     // For current academic period selected
     const [currentAcademicPeriod,setCurrentAcademicPeriod] = useState('');
+
+    //For student grades
+    const [showStudentGrades,setShowStudentGrades] = useState(false);
 
     // For posting to student grades
     const [studentId,setStudentId] = useState('');
@@ -63,6 +71,23 @@ const StudentGrading = () => {
         { accessorKey: 'section', header: 'Section' },
         { accessorKey: 'strand', header: 'Strand' }
     ]
+
+    // For student grade inside popup modals
+    const gradeColumns = [
+        { accessorKey: 'gradingCategoryId.gradingCategory', header: 'Category', editable: true },
+        { accessorKey: 'studentScore', header: 'Student Score',editable: true, type: 'number' },
+        { accessorKey: 'dueDate', header: 'Due Date', editable: true },
+        { accessorKey: 'dateTaken', header: 'Date Taken', editable: true },
+        { accessorKey: 'taskTotal', header: 'Task Total',editable: true },
+        { accessorKey: 'passingScore', header: 'Passing Score', editable: true },
+        { accessorKey: 'gradeRemark', header: 'Grade Remarks',editable: true },
+        { accessorKey: 'remarks', header: 'Remarks',editable: true }
+    ]
+
+    const studentGradeData = studentGrades?.filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod).map(studentGrade => ({
+        ...studentGrade
+    }));
+
 
     const studentData = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => ({
         ...student,
@@ -122,6 +147,26 @@ const StudentGrading = () => {
         }
     }
 
+    const updateStudentGrade = async (e) => {
+        e.preventDefault();
+
+        try {
+             
+        } catch(err) {
+            console.log(err);
+            toast.error(err.response.data.mssg, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+    }
+
     const form = () => (
         <>
             <h1 className="font-semibold text-xl text-gray-700">Add Student Grade</h1>
@@ -160,7 +205,6 @@ const StudentGrading = () => {
                             { studentSubjects?.filter(studentSubject => studentSubject.studentId._id === studentId).map(studentSubject => (
                                     <option value={studentSubject.subjectId._id}>{studentSubject.subjectId.subjectName} - {studentSubject.subjectId.subjectCode}</option>
                             )) }
-                            <option className="text-sm" value="">Leave as blank</option>
                         </select>
                     ) : (
                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
@@ -180,7 +224,6 @@ const StudentGrading = () => {
                             { gradingCategories.map(gradingCategory => (
                                     <option value={gradingCategory._id}>{gradingCategory.gradingCategory}</option>
                             )) }
-                            <option className="text-sm" value="">Leave as blank</option>
                         </select>
                     ) : (
                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
@@ -200,7 +243,6 @@ const StudentGrading = () => {
                             { academicPeriods.map(academicPeriod => (
                                 <option key={academicPeriod.id} value={academicPeriod.academicPeriod}>{academicPeriod.academicPeriod}</option>
                             )) }
-                            <option className="text-sm" value="">Leave as blank</option>
                         </select>
                     ) : (
                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
@@ -284,7 +326,6 @@ const StudentGrading = () => {
                             <option className="text-sm" value='' hidden>Select Grade Remark</option>
                             <option value="Passed">Passed</option>
                             <option value="Failed">Failed</option>
-                            <option className="text-sm" value="">Leave as blank</option>
                         </select>
                     ) : (
                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
@@ -309,25 +350,6 @@ const StudentGrading = () => {
         </>
     )
 
-    const renderSelect = () => {
-        return (
-            <div className="flex flex-col mt-1">
-                <label className="text-sm" htmlFor="student">Student</label>
-                <select className="outline-none p-1 rounded-md border border-gray-300">
-                    <option className="text-sm" value='' hidden>Select Student</option>
-                    { students.length > 0 ? (
-                        students?.filter(student => student.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => (
-                            <option className="text-sm" value={student._id}>{student.firstName} {student.lastName}</option>
-                        ))
-                    ) : (
-                        <Link className="text-sm" to='/students'>Add Student</Link>
-                    ) }
-                    <option className="text-sm" value="">Leave as blank</option>
-                </select>
-            </div>
-        )
-    }
-
     const viewStudentsGrade = (student) => {
         setStudent(student);
         // Will show popup for students subjects and grades
@@ -345,6 +367,18 @@ const StudentGrading = () => {
 
         // Set subject after clicking the tab subjects
         setSubjectId(id.subjectId._id);
+    }
+
+    const viewEditStudenGrade = (studentGrade) => {
+        setShowStudentGrades(true);
+        setShowStudentSubject(false)
+
+
+        // set initial values after opening view for edit mode
+        setGradingCategoryId(studentGrade.gradingCategoryId._id);
+        setAcademicPeriod(studentGrade.academicPeriod);
+        setDateTaken(studentGrade.dateTaken);
+        set
     }
 
     
@@ -367,11 +401,212 @@ const StudentGrading = () => {
                 </div>
             </div>
 
+            {/* For Student grades after clicking view inside subjects */}
+            { showStudentGrades && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-gray-100 p-5 rounded-md w-auto">
+                        <div className="flex justify-between items-center">
+                            <h1 className="font-semibold text-2xl text-gray-700">Grades of {student.firstName} {student.lastName}</h1>
+                            <button onClick={() => {
+                                setShowStudentGrades(false);
+                                setShowStudentSubject(true)
+                            }} className="text-red-500 text-sm hover:text-red-600 cursor-pointer">Close</button>
+                        </div>
+
+                        {/* Updating students grade here */}
+                        <form onSubmit={updateStudentGrade}>
+                            <h1 className="font-semibold text-xl text-gray-700">Add Student Grade</h1>
+
+                            <div className="grid grid-cols-3 gap-5">
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="student">Student:</label>
+                                    <select 
+                                        className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
+                                        onChange={(e) => setStudentId(e.target.value)}
+                                        value={studentId}
+                                        disabled
+                                    >
+                                        <option className="text-sm" value='' hidden>Select Student</option>
+                                        { students.length > 0 ? (
+                                            students?.filter(student => student.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => (
+                                                <option className="text-sm" value={student._id}>{student.firstName} {student.lastName}</option>
+                                            ))
+                                        ) : (
+                                            <Link className="text-sm" to='/students'>Add Student</Link>
+                                        ) }
+                                        <option className="text-sm" value="">Leave as blank</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="subject">Subject:</label>
+                                    { studentId ? (
+                                        <select 
+                                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
+                                            onChange={(e) => setSubjectId(e.target.value)}
+                                            value={subjectId}
+                                            disabled
+                                        >   
+                                            <option className="text-sm" value='' hidden>Select Subject</option>
+                                            { studentSubjects?.filter(studentSubject => studentSubject.studentId._id === studentId).map(studentSubject => (
+                                                    <option value={studentSubject.subjectId._id}>{studentSubject.subjectId.subjectName} - {studentSubject.subjectId.subjectCode}</option>
+                                            )) }
+                                        </select>
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="grading category">Grading Category:</label>
+                                    { studentId ? (
+                                        <select 
+                                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
+                                            onChange={(e) => setGradingCategoryId(e.target.value)}
+                                            value={gradingCategoryId}
+                                            disabled
+                                        >   
+                                            <option className="text-sm" value='' hidden>Select Grading Category</option>
+                                            { gradingCategories.map(gradingCategory => (
+                                                    <option value={gradingCategory._id}>{gradingCategory.gradingCategory}</option>
+                                            )) }
+                                        </select>
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="academic period">Academic Period:</label>
+                                    { studentId ? (
+                                        <select 
+                                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
+                                            onChange={(e) => setAcademicPeriod(e.target.value)}
+                                            value={academicPeriod}
+                                            disabled
+                                        >   
+                                            <option className="text-sm" value='' hidden>Select Academic Period</option>
+                                            { academicPeriods.map(academicPeriod => (
+                                                <option key={academicPeriod.id} value={academicPeriod.academicPeriod}>{academicPeriod.academicPeriod}</option>
+                                            )) }
+                                        </select>
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="date taken">Date Taken:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="date" onChange={(e) => setDateTaken(e.target.value)} value={dateTaken} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="due date">Due Date:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="date" onChange={(e) => setDueDate(e.target.value)} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="student score">Student Score:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="number" onChange={(e) => setStudentScore( e.target.value)} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="task total">Task Total:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="number" onChange={(e) => setTaskTotal(e.target.value)} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="passing score">Passing Score:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="number" onChange={(e) => setPassingScore(e.target.value)} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="grade remarks">Grade Remarks:</label>
+                                    { studentId ? (
+                                        <select 
+                                            className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                            onChange={(e) => setGradeRemark(e.target.value)}
+                                        >   
+                                            <option className="text-sm" value='' hidden>Select Grade Remark</option>
+                                            <option value="Passed">Passed</option>
+                                            <option value="Failed">Failed</option>
+                                        </select>
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+
+                                <div className="flex flex-col mt-1">
+                                    <label className="text-sm" htmlFor="remarks">Remarks:</label>
+                                    { studentId ? (
+                                        <input
+                                        className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                        type="text" onChange={(e) => setRemarks(e.target.value)} />
+                                    ) : (
+                                        <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
+                                            Please select student first
+                                        </div>
+                                    ) }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            ) }
+
             
             {/* Popup for students subject with grades */}
             { showStudentSubject && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-gray-100 p-5 rounded-md w-1/2">
+                    <div className="bg-gray-100 p-5 rounded-md w-auto">
                         <div className="flex justify-between items-center">
                             <h1 className="font-semibold text-2xl text-gray-700">Subjects taken by {student.firstName} {student.lastName}</h1>
                             <button onClick={() => {
@@ -395,7 +630,7 @@ const StudentGrading = () => {
                             { !currentTabSubject ? (
                                 <p className="text-red-500 font-semibold text-sm mt-1 p-2">Please select a subject to view student grades</p>
                             ) : (
-                            <div>
+                            <div className="overflow-y-scroll min-h-min">
                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
                                     {academicPeriods.map(academicPeriod => (
                                         <button 
@@ -411,13 +646,33 @@ const StudentGrading = () => {
                                         </button>
                                     ))}
                                 </div>
+                                {studentGrades?.filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod).length > 0 
+                                    ? 
+                                    (
+                                        <div className="mt-4">
+                                            <MasterTable 
+                                            columns={gradeColumns}
+                                            data={studentGradeData}
+                                            searchQuery={searchQuery}
+                                            viewRecord={viewEditStudenGrade}
+                                        />
+                                        </div>
+                                    )
+                                        : (
+                                    <div className="col-span-full text-center text-red-500 mt-4">
+                                        <p className="text-sm font-semibold">This student doesn't have any grades for the selected subject and academic period.</p>
+                                    </div>
+                                ) }
+                            
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                                {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                                     {studentGrades?.filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod).length > 0 
                                         ? studentGrades
                                             .filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod)
                                             .map(studentGrade => (
-                                                <div key={studentGrade._id} className="p-4 rounded-lg shadow-md bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out">
+                                                <div 
+                                                onClick={() => console.log(studentGrade)}
+                                                key={studentGrade._id} className="p-4 rounded-lg shadow-md bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out">
                                                     <h1 className="font-bold text-lg text-gray-800 mb-2">{studentGrade.academicPeriod}</h1>
                                                     <p className="text-sm text-gray-600 mb-1">
                                                         <span className="font-medium text-gray-700">{studentGrade.gradingCategoryId?.gradingCategory}</span>: 
@@ -437,11 +692,29 @@ const StudentGrading = () => {
                                             </div>
                                         )
                                     }
+                                </div> */}
+                                <div className="flex justify-end">
+                                    <button onClick={() => {
+                                        if(role === 'Teacher' && !isYearDone) {
+                                            setShowForm(true)
+                                            setShowStudentSubject(false);
+                                        } else {
+                                            // dont allow if not teacher
+                                            toast.error('Your current role is not allowed to perform this action', {
+                                                position: "top-center",
+                                                autoClose: 3000,
+                                                hideProgressBar: true,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                                theme: "colored"
+                                            });
+                                        }
+                                    }} className={`${role !== 'Teacher' ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-gray-100 mt-3`}>
+                                        Add New Student Grades
+                                    </button>
                                 </div>
-                                <button onClick={() => {
-                                    setShowForm(true)
-                                    setShowStudentSubject(false);
-                                }} className="text-sm bg-blue-500 hover:bg-blue-600 cursor-pointer p-2 rounded-md text-gray-100 mt-3">Add New Student Grades</button>
                             </div>
                             ) }
                         </div>

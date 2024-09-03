@@ -224,6 +224,17 @@ const NewTeacher = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Teacher User Account</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <Input label="Joining Date" type="date" name="joiningDate" value={joiningDate} onChange={setJoiningDate} />
+                        {/* <Select label="Department" name="department" value={department} options={departments} onChange={handleChange} />
+                        <Select label="Grade Level" name="gradeLevel" value={gradeLevel} options={gradeLevels} onChange={handleChange} />
+                        <Select label="Section" name="section" value={section} options={sections} onChange={handleChange} /> */}
+                    </div>
+                </section>
+
+
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         type="submit"

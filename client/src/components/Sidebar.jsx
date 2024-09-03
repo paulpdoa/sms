@@ -216,6 +216,22 @@ const initialMenus = [
             //     link: '/settings'
             // }
         ]
+    },
+    {
+        role: 'Teacher',
+        menus: [
+            {
+                name: 'Teacher Dashboard',
+                link: '/teacher/dashboard'
+            },
+            {
+                name: 'Teacher',
+                icon: <FaCashRegister />,
+                subMenus: [
+                    { name: 'Student Grading', link: '/student-grading' },
+                ]
+            }
+        ]
     }
 ];
 

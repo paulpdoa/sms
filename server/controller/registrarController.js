@@ -18,6 +18,7 @@ const Subject = require('../model/Subject');
 const StudentSubject = require('../model/StudentSubject');
 const TeacherSubject = require('../model/TeacherSubject');
 const Teacher = require('../model/Teacher');
+const TeacherAcademic = require('../model/TeacherAcademic');
 
 const moment = require('moment');
 
@@ -1394,7 +1395,10 @@ module.exports.add_teacher_subject = async (req,res) => {
     
     try {
         const assignedTeacher = await Teacher.findById(teacherId);
-        await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId,daySchedule });
+        const teacherSubject = await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId,daySchedule });
+
+        await TeacherAcademic.create({ teacherSubjectId: teacherSubject._id, inputter, sessionId, recordStatus: 'Live' });
+
         res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully` });
     } catch(err) {
         console.log(err);
@@ -1436,5 +1440,23 @@ module.exports.edit_assigned_teacher_subject = async (req,res) => {
     }
 }
 
+
+// Teacher Academic
+
+module.exports.get_teacher_academics = async (req,res) => {
+    const { session } = req.query;
+
+    try {
+        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session });
+        if(!teacherAcademics) {
+            return res.status(404).json({ mssg: 'Teachers academic record is empty' });
+        }
+
+        res.status(200).json(teacherAcademics)
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching teacher academic records' })
+    }
+}
 
 
