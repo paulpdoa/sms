@@ -72,7 +72,7 @@ const Users = () => {
 
     
 
-    const recordsWithoutInputter = records?.filter(record => record.isActive).map(record => ({
+    const recordsWithoutInputter = records?.filter(record => record.recordStatus === 'Live' && record.isActive).map(record => ({
         ...record,
         fullName: record?.firstName + ' ' + record?.lastName,
         isActive: record?.isActive ? 'Yes' : 'No'

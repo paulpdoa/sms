@@ -107,8 +107,36 @@ const NewTeacher = () => {
             joiningDate,
             age: getAge,
             session,
-            currentUserId
+            currentUserId,
+            password,
+            username
         };
+
+        if(password !== confirmPassword) {
+            return toast.error('Password does not match, please try again', {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
+
+        if(password.length < 8) {
+            return toast.error('Password should be greater than 8 characters long', {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
 
         try {
             const data = await axios.post(`${baseUrl()}/teachers`, teacherInformation);
@@ -227,10 +255,9 @@ const NewTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Teacher User Account</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <Input label="Joining Date" type="date" name="joiningDate" value={joiningDate} onChange={setJoiningDate} />
-                        {/* <Select label="Department" name="department" value={department} options={departments} onChange={handleChange} />
-                        <Select label="Grade Level" name="gradeLevel" value={gradeLevel} options={gradeLevels} onChange={handleChange} />
-                        <Select label="Section" name="section" value={section} options={sections} onChange={handleChange} /> */}
+                        <Input label="Username" type="text" name="username" value={username} onChange={setUsername} />
+                        <Input label="Password" type="password" name="password" value={password} onChange={setPassword} />
+                        <Input label="Confirm Password" type="password" name="confirmPassword" value={confirmPassword} onChange={setConfirmPassword} />
                     </div>
                 </section>
 

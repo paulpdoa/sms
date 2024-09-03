@@ -44,6 +44,8 @@ const Login = () => {
             localStorage.setItem('role', data.data.role);
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
+
+           
             
             if (schoolYear === 'true') {
                 localStorage.setItem('isFreshYear', schoolYear);
@@ -64,7 +66,14 @@ const Login = () => {
     
             setTimeout(() => {
                 setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
-                navigate(data.data.redirect);
+
+                if(data.data.role === 'Teacher') {
+                    navigate('/student-grading')
+                } else {
+                    navigate(data.data.redirect);
+                }
+
+               
                 // setTimeout(() => {
                 //     startCookieCheck();
                 // },3000)

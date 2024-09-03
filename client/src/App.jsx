@@ -66,6 +66,7 @@ import RoomNumber from "./pages/SuperAdmin/RoomNumber";
 import EditTeacherSubject from "./pages/Registrar/EditTeacherSubject";
 import StudentGrading from "./pages/Teacher/StudentGrading";
 import GradingCategory from "./pages/SuperAdmin/GradingCategory";
+import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -148,6 +149,9 @@ function App() {
             <Route path='room-number' element={<RoomNumber />} />
             <Route path='grading-category' element={<GradingCategory />} />
           </Route>
+
+          {/* For Teacher Pages*/}
+          <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
 
           <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />

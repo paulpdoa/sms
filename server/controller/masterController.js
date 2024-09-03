@@ -1216,7 +1216,7 @@ module.exports.close_school_year = async (req,res) => {
 
 module.exports.get_users = async (req,res) => {
     try {
-        const users = await User.find().populate('role');
+        const users = await User.find({ recordStatus: 'Live' }).populate('role');
         res.status(200).json(users);
     } catch(err) {
         console.log(err);

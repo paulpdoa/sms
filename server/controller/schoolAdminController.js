@@ -46,12 +46,12 @@ module.exports.add_teacher = async (req,res) => {
         joiningDate,
         currentUserId: inputter,
         session,
-        session: sessionId
+        session: sessionId,
         // department,
         // gradeLevel,
         // section,
-        // username,
-        // password,
+        username,
+        password,
         // confirmPassword
      } = req.body;
 
@@ -62,7 +62,7 @@ module.exports.add_teacher = async (req,res) => {
 
     try {
            
-        await Teacher.create({
+        const teacher = await Teacher.create({
             firstName,
             middleName,
             lastName,
@@ -86,7 +86,16 @@ module.exports.add_teacher = async (req,res) => {
             sessionId,
             recordStatus: 'Live'
             });
-        res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
+            
+            const salt = await bcrypt.genSalt();
+
+            const hashedPassword = await bcrypt.hash(password,salt);
+
+            const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live', isActive: true })
+
+            await User.create({ firstName, middleName, lastName, username, role: userRole._id, teacherId: teacher._id, recordStatus: 'Live', password: hashedPassword  });
+
+            res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: err.message })

@@ -1250,13 +1250,22 @@ module.exports.get_student_subjects = async(req,res) => {
                 path: 'strandId'
             }
         }})
+        .populate({ path: 'studentId', populate: {
+            path: 'academicId', populate: {
+                path: 'gradeLevelId'
+            }
+        }})
+        .populate({ path: 'studentId', populate: {
+            path: 'academicId', populate: {
+                path: 'sectionId'
+            }
+        }})
         .populate({ path: 'teacherSubjectId', populate: {
             path: 'teacherId subjectId roomNumberId'
         } })
         .populate('subjectId inputter');
 
         const teacherSubjects = await TeacherSubject.find({ recordStatus: 'Live', sessionId: session });
-        console.log('Teacher Subjects: ', teacherSubjects);
 
         res.status(200).json(studentSubjects);
     } catch(err) {
@@ -1375,6 +1384,7 @@ module.exports.get_teacher_subject_details = async (req,res) => {
     try {
         const teacherSubject = await TeacherSubject.findOne({ _id: id, recordStatus: 'Live', sessionId: session })
         .populate('teacherId roomNumberId subjectId')
+        console.log(teacherSubject);
         
         if(!teacherSubject) {
             return res.status(404).json({ mssg: 'There are no teachers assigned to subjects yet' });

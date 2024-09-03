@@ -56,11 +56,11 @@ const Teachers = () => {
 
     const deleteTeacher = async (id) => {
         try {
-            const removeTeacher = await axios.delete(`${baseUrl()}/teacher/${id}`, { role,recordStatus: 'Deleted' });
+            const removeTeacher = await axios.put(`${baseUrl()}/teacher/${id}`, { role,recordStatus: 'Deleted' });
             toast.success(removeTeacher.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,

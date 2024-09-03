@@ -35,7 +35,7 @@ const SubjectAssigning = () => {
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
 
-    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId && student?.academicId?.sectionId).map(student => ({
         ...student,
         firstName: student.firstName,
         lastName: student.lastName,
