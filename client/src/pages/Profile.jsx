@@ -97,7 +97,7 @@ const Profile = () => {
         <main className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
             <div className="w-4/5 bg-white rounded-lg shadow-md p-8">
                 <form onSubmit={(e) => { e.preventDefault(); handleProfileUpdate(); }} className="space-y-4">
-                    <h1 className="text-2xl font-semibold mb-6 text-center">Hi, {firstName} {lastName}</h1>
+                    <h1 className="text-2xl font-semibold mb-6 text-center">Hi, {username}</h1>
                     <div className="flex justify-center mb-4">
                         <img
                             src={profilePictureUrl ? `${baseUrl()}${profilePictureUrl}` : '/avatar/avatar.png'}
@@ -106,7 +106,7 @@ const Profile = () => {
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                             <label className="mb-1 font-medium text-gray-700">First Name:</label>
                             <input
                                 type="text"
@@ -132,7 +132,7 @@ const Profile = () => {
                                 onChange={(e) => setLastName(e.target.value)}
                                 className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                        </div>
+                        </div> */}
                         <div className="flex flex-col">
                             <label className="mb-1 font-medium text-gray-700">Username:</label>
                             <input

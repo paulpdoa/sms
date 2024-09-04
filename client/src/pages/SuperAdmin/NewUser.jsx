@@ -60,9 +60,9 @@ const NewUser = () => {
                 <h1 className="font-bold text-gray-700 text-2xl mb-4">Add User</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
+                    {/* {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
                     {renderInput('middleName', 'Middle Name', middleName, setMiddleName, 'text')}
-                    {renderInput('lastName', 'Last Name', lastName, setLastName,'text')}
+                    {renderInput('lastName', 'Last Name', lastName, setLastName,'text')} */}
                     {renderSelect('userRole', 'Role', role, setRole, roles, 'Select role', true)}
                     {renderInput('username', 'Username', username, setUsername, 'text')}
                     {renderInput('password', 'Password', password, setPassword, 'password')}

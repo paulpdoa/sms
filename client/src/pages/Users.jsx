@@ -21,21 +21,13 @@ const Users = () => {
     
     const columns = [
         {
-            accessorKey: 'fullName',
-            header: 'Full Name'
-        },
-        {
             accessorKey: 'username',
             header: 'Username',
         },
         {
             accessorKey: 'role.userRole',
             header: 'Role',
-        },
-        {
-            accessorKey: 'isActive',
-            header: 'Active',
-        },
+        }
     ]
 
     const deleteUser = async (id) => {
@@ -72,10 +64,8 @@ const Users = () => {
 
     
 
-    const recordsWithoutInputter = records?.filter(record => record.recordStatus === 'Live' && record.isActive).map(record => ({
+    const recordsWithoutInputter = records?.filter(record => record.recordStatus === 'Live').map(record => ({
         ...record,
-        fullName: record?.firstName + ' ' + record?.lastName,
-        isActive: record?.isActive ? 'Yes' : 'No'
     }));
 
     const goToEdit = (id) => navigate(`/edit-user/${id}`)

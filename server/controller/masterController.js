@@ -1216,7 +1216,7 @@ module.exports.close_school_year = async (req,res) => {
 
 module.exports.get_users = async (req,res) => {
     try {
-        const users = await User.find({ recordStatus: 'Live' }).populate('role');
+        const users = await User.find({ recordStatus: 'Live' }).populate('role teacherId studentId parentId');
         res.status(200).json(users);
     } catch(err) {
         console.log(err);
@@ -1226,15 +1226,15 @@ module.exports.get_users = async (req,res) => {
 
 module.exports.add_user = async (req,res) => {
 
-    const { firstName,middleName,lastName,role,username,password,confirmPassword,inputter } = req.body;
+    const { role,username,password,confirmPassword,inputter } = req.body;
     
     const isActive = true
 
     try {
         if(password === confirmPassword) {
-            const newUser = await User.create({ firstName,middleName,role,lastName,username,password,isActive,inputter,recordStatus });
+            const newUser = await User.create({ role,username,password,isActive,inputter,recordStatus });
             const token = createToken(newUser._id);
-            res.status(200).json({ mssg: `${firstName} has been added to the record`, token });
+            res.status(200).json({ mssg: `${username} has been added to the record`, token });
         } else {
             res.status(400).json({ mssg:'Password does not match, please check before submitting' });
         }
@@ -1270,10 +1270,12 @@ module.exports.get_user_detail = async (req,res) => {
 }
 
 module.exports.edit_user = async (req, res) => {
+
+    // Remove firstname, middlename, and lastname in updating user
     const { id } = req.params;
     const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword,inputter } = req.body;
 
-    let updatedData = { firstName, middleName, lastName, role, username, isActive };
+    let updatedData = { role, username, isActive };
     if (req.file) {
         updatedData.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
@@ -1303,7 +1305,7 @@ module.exports.edit_user = async (req, res) => {
 
         await User.findByIdAndUpdate(id, updatedData);
 
-        res.status(200).json({ mssg: `${firstName} has been edited successfully!`, redirect: '/users', profilePictureUrl: updatedData.profilePictureUrl });
+        res.status(200).json({ mssg: `${username} has been edited successfully!`, redirect: '/users', profilePictureUrl: updatedData.profilePictureUrl });
     } catch (err) {
         console.error(err);
         res.status(500).json({ mssg: 'An error occurred while updating the user', error: err.message });

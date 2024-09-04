@@ -23,9 +23,10 @@ module.exports.get_teachers = async (req,res) => {
     }
 }
 
-module.exports.add_teacher = async (req,res) => {
 
-    const { firstName,
+module.exports.add_teacher = async (req, res) => {
+    const {
+        firstName,
         middleName,
         lastName,
         dateOfBirth,
@@ -45,24 +46,32 @@ module.exports.add_teacher = async (req,res) => {
         yearsOfExperience,
         joiningDate,
         currentUserId: inputter,
-        session,
         session: sessionId,
-        // department,
-        // gradeLevel,
-        // section,
         username,
         password,
-        // confirmPassword
-     } = req.body;
+    } = req.body;
 
-     console.log(req.body);
+    console.log(req.body);
 
-    //  const role = 'Teacher';
-     const activeStatus = true;
+    let teacher;
 
     try {
-           
-        const teacher = await Teacher.create({
+        // Check if the teacher already exists
+        const existingTeacher = await Teacher.findOne({
+            firstName,
+            middleName,
+            lastName,
+            dateOfBirth,
+            sessionId,
+            recordStatus: 'Live'
+        });
+
+        if (existingTeacher) {
+            return res.status(400).json({ mssg: 'Teacher with these details already exists' });
+        }
+
+        // Create the teacher
+        teacher = await Teacher.create({
             firstName,
             middleName,
             lastName,
@@ -85,22 +94,50 @@ module.exports.add_teacher = async (req,res) => {
             inputter,
             sessionId,
             recordStatus: 'Live'
-            });
-            
-            const salt = await bcrypt.genSalt();
+        });
 
-            const hashedPassword = await bcrypt.hash(password,salt);
+        // Hash the password for the user account
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-            const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live', isActive: true })
+        const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live' });
 
-            await User.create({ firstName, middleName, lastName, username, role: userRole._id, teacherId: teacher._id, recordStatus: 'Live', password: hashedPassword  });
+         // Check if the role was found
+         if (!userRole) {
+            // Delete the created teacher if the role doesn't exist
+            await Teacher.findByIdAndDelete(teacher._id);
+            return res.status(400).json({ mssg: 'Role for Teacher not found. Please create the role first.' });
+        }
 
-            res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/teachers' });
-    } catch(err) {
+        // Create the user
+        await User.create({
+            username,
+            role: userRole._id,
+            teacherId: teacher._id,
+            recordStatus: 'Live',
+            password: hashedPassword,
+            isActive: true,
+            inputter
+        });
+
+        res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect: '/teachers' });
+
+    } catch (err) {
+        // If an error occurs, delete the teacher if it was created
+        if (err.code && err.code === 11000) {
+            return res.status(400).json({ mssg: 'Username already exists. Please choose another one.' });
+        }
+
+        // Clean up by deleting the teacher if the user creation fails
+        if (teacher) {
+            await Teacher.findByIdAndDelete(teacher._id);
+        }
+
         console.log(err);
-        res.status(400).json({ mssg: err.message })
+        res.status(400).json({ mssg: err.message });
     }
-} 
+};
+
 
 module.exports.delete_teacher = async (req,res) => {
     const { id } = req.params;

@@ -10,9 +10,6 @@ const requiredString = {
 }
 
 const userSchema = new mongoose.Schema({
-    firstName: requiredString,
-    middleName: requiredString, 
-    lastName: requiredString,
     username: {
         type: String,
         required: true,

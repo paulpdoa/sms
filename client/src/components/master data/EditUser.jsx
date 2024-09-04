@@ -122,9 +122,9 @@ const EditUser = () => {
                 <h1 className="font-bold text-gray-700 text-2xl mb-4">Edit User: {user?.username}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
+                    {/* {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
                     {renderInput('middleName', 'Middle Name', middleName, setMiddleName, 'text')}
-                    {renderInput('lastName', 'Last Name', lastName, setLastName, 'text')}
+                    {renderInput('lastName', 'Last Name', lastName, setLastName, 'text')} */}
                     {renderInput('username', 'Username', username, setUsername, 'text')}
                     {renderSelect('userRole', 'User Role', userRole, setUserRole, userRoles, 'Select User Role',currentRole)}
                     {renderInput('password', 'Password', password, setPassword, 'password')}
