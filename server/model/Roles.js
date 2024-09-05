@@ -32,7 +32,7 @@ roleSchema.statics.addRole = async function(userRole,inputter,status,sessionId,r
         throw Error('This role is already existing');
     } 
 
-    const newRole = await this.create({ userRole,inputter,status })
+    const newRole = await this.create({ userRole,inputter,status,recordStatus: 'Live' })
     return newRole
 
 }

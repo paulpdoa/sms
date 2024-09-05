@@ -907,6 +907,7 @@ module.exports.generate_fees = async (req, res) => {
                 for (const student of students) {
                     let totalPaymentAmount = 0; // Initialize total amount for each student
                     for (const fee of manageFees) {
+                        console.log('Fee :', fee._id);
                         // Check if the fee matches the current year, student's grade level, and nationality code
                         const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                         const matchesGradeLevel = fee.gradeLevelId?._id.equals(student.academicId.gradeLevelId._id);
