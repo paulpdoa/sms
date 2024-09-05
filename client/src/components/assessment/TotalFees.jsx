@@ -34,7 +34,7 @@ const TotalFees = ({ record }) => {
                     <tbody>
                         {filteredFeeLists?.map((fee, index) => (
                             <tr key={index} className="border-b">
-                                <td className="px-4 py-3">{`${fee?.feeCodeId?.code} ${fee?.gradeLevelId?.gradeLevel} ${fee?.studentId?.nationality?.nationalityCodeId?.nationalityCode}`}</td>
+                                <td className="px-4 py-3">{`${fee?.feeCodeId?.code} ${fee?.gradeLevelId?.gradeLevel} ${fee?.studentId?.nationality?.nationality === 'Filipino' ? 'Local' : 'Foreign'}`}</td>
                                 <td className="px-4 py-3">{fee?.feeCodeId?.description}</td>
                                 <td className="px-4 py-3 text-right">{(fee?.manageFeeId?.amount || 0).toFixed(2)}</td>
                             </tr>
