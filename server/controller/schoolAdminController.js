@@ -51,7 +51,7 @@ module.exports.add_teacher = async (req, res) => {
         password,
     } = req.body;
 
-    console.log(req.body);
+    console.log("Password entered: ", password);
 
     let teacher;
 
@@ -97,8 +97,8 @@ module.exports.add_teacher = async (req, res) => {
         });
 
         // Hash the password for the user account
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
+        // const salt = await bcrypt.genSalt();
+        // const hashedPassword = await bcrypt.hash(password, salt);
 
         const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live' });
 
@@ -115,7 +115,7 @@ module.exports.add_teacher = async (req, res) => {
             role: userRole._id,
             teacherId: teacher._id,
             recordStatus: 'Live',
-            password: hashedPassword,
+            password,
             isActive: true,
             inputter
         });
@@ -145,6 +145,9 @@ module.exports.delete_teacher = async (req,res) => {
 
     try {
         const teacherFind = await Teacher.findByIdAndUpdate(id,{ recordStatus });
+
+        const userFind = await User.findByIdAndUpdate(id, { recordStatus });
+
         res.status(200).json({ mssg: `${teacherFind.firstName}'s record has been deleted`});
     } catch(err) {
         console.log(err);

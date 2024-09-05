@@ -41,8 +41,6 @@ const AssessmentTable = ({ setViewRecord,searchQuery }) => {
     }));
     
 
-    console.log(formattedStudents)
-
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });

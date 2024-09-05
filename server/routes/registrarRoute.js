@@ -57,7 +57,7 @@ route.post('/automate-fees',automate_fees);
 // Student Payment
 route.get('/student-payments',allowUserView(userRoles),get_student_payments);
 route.get('/student-payment/:id',allowUserView(userRoles),get_student_payment_detail);     
-route.put('/delete-student-payments',delete_generated_fees); 
+route.delete('/delete-student-payments',delete_generated_fees); 
 
 // Payment Schedule
 route.get('/payment-schedules',allowUserView(userRoles),get_payment_schedule);

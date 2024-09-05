@@ -68,7 +68,7 @@ const Login = () => {
                 setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
 
                 if(data.data.role === 'Teacher') {
-                    navigate('/student-grading')
+                    navigate('/teacher/dashboard');
                 } else {
                     navigate(data.data.redirect);
                 }

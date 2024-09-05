@@ -1250,7 +1250,10 @@ module.exports.delete_user = async (req,res) => {
 
     try {
         const userFind = await User.findByIdAndUpdate({ _id: id },{ isActive: false, recordStatus });
-        res.status(200).json({ mssg: `${userFind.firstName}'s user record has been deleted` });
+
+        // find a way to delete teacher record when user record has been deleted
+
+        res.status(200).json({ mssg: `User record has been deleted` });
     } catch(err) {
         console.log(err)
         res.status(500).json({ mssg: 'An error occurred while deleting user record' });

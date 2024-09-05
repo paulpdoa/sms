@@ -106,9 +106,9 @@ const Assessment = () => {
             }, 2000)
         } catch (err) {
             console.log(err);
-            toast.error(err.data.response.mssg, {
+            toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -131,8 +131,6 @@ const Assessment = () => {
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
     }));
-
-    console.log(formattedStudents)
 
     return (
         <main className="p-4 relative h-screen overflow-hidden">

@@ -3,7 +3,8 @@ import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { MainContext } from '../helpers/MainContext';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export const useFetch = (url) => {
 
    const [records,setRecords] = useState([]);
@@ -36,9 +37,20 @@ export const useFetch = (url) => {
             setIsLoading(false);
             setRecords(data.data);
          } catch(err) {
+            console.log(err);
             const data = err.response?.data;
             setError(data.mssg);
             navigate(data.redirect);
+            toast.error(data.mssg, {
+               position: "top-center",
+               autoClose: 3000,
+               hideProgressBar: true,
+               closeOnClick: true,
+               pauseOnHover: true,
+               draggable: true,
+               progress: undefined,
+               theme: "colored"
+           });
          }
       }
       fetchData();

@@ -4,19 +4,17 @@ import { useFetch } from '../../hooks/useFetch';
 const TotalFees = ({ record }) => {
 
     const { records: studentPayments } = useFetch(`${baseUrl()}/student-payment/${record?._id}`);
-
     const gradeLevel = record?.academicId?.gradeLevelId?._id;
     const natlCode = record.nationality.toLowerCase();
 
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationality.toLowerCase() === natlCode &&
+            fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
             fee?.manageFeeId !== undefined
         );
     });
-    console.log(studentPayments);
-    console.log(natlCode);
+    console.log(filteredFeeLists);
     
 
     const totalAmount = filteredFeeLists?.reduce((sum, fee) => sum + (fee?.manageFeeId?.amount || 0), 0);

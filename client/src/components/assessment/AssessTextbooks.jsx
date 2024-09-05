@@ -17,13 +17,11 @@ const AssessTextbooks = ({ record }) => {
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationality.toLowerCase() === natlCode &&
+            fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
             fee?.studentId?.academicId?.strandId === strandId &&
             fee?.textBookId !== undefined
         );
     });
-
-    console.log(studentPayments);
 
     const totalAmount = filteredFeeLists?.reduce((sum, fee) => sum + (fee?.textBookId?.bookAmount || 0), 0);
 
@@ -46,7 +44,7 @@ const AssessTextbooks = ({ record }) => {
                             <tbody>
                                 {filteredFeeLists?.map((fee, index) => (
                                     <tr key={index} className="border-b">
-                                        <td className="px-4 py-3">{`${fee?.gradeLevelId?.gradeLevel} ${fee?.textBookId?.bookCode} ${fee?.textBookId?.strand?.strand}`}</td>
+                                        <td className="px-4 py-3">{`${fee?.gradeLevelId?.gradeLevel} ${fee?.textBookId?.bookCode} ${fee?.textBookId?.strand?.strand ?? ''}`}</td>
                                         <td className="px-4 py-3">{fee?.gradeLevelId?.gradeLevel} {fee?.textBookId?.bookTitle} {fee?.textBookId?.strand?.strand}</td>
                                         <td className="px-4 py-3 text-right">{(fee?.textBookId?.bookAmount || 0).toFixed(2)}</td>
                                     </tr>

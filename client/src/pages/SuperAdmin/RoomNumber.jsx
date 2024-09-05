@@ -1,5 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";

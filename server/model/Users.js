@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
     },
     role:  {
         type: mongoose.Schema.Types.ObjectId, 
@@ -56,8 +55,8 @@ userSchema.pre('save', async function(next) {
 
 // create static login method for user
 userSchema.statics.login = async function(username,password,session) {
-    const user = await this.findOne({ username });
-
+    const user = await this.findOne({ username, recordStatus: 'Live' });
+    console.log('Password Login: ', password);
     // This will check if the school year table is still empty, meaning it's a new system
     const schoolYears = await SchoolYear.find();
 

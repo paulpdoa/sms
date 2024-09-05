@@ -17,7 +17,7 @@ const PaymentTerm = ({ record }) => {
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationality.toLowerCase() === natlCode &&
+            fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
             fee?.studentId?.academicId?.strandId === strandId &&
             fee?.paymentScheduleId !== undefined
         );

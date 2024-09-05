@@ -873,6 +873,7 @@ module.exports.generate_fees = async (req, res) => {
                     { path: 'departmentId' },
                     { path: 'gradeLevelId' },
                     { path: 'sessionId' },
+                    { path: 'nationality' },
                     { 
                         path: 'sectionId',
                         populate: { path: 'adviser' }
@@ -880,10 +881,7 @@ module.exports.generate_fees = async (req, res) => {
                     { path: 'paymentTermId' }
                 ]
             })
-            .populate({
-                path: 'nationality',
-                populate: { path: 'nationalityCodeId' }
-            })
+            
             .populate('sex')
             .populate('religion')
             .populate('sy_id')
@@ -894,7 +892,7 @@ module.exports.generate_fees = async (req, res) => {
             .populate({ path: 'feeDescription', populate: { path: 'feeCateg' } })
             .populate('sessionId gradeLevelId strandId');
         
-        const textbooks = await Textbook.find({ sessionId: currentYear,recordStatus:'Live' }).populate('inputter gradeLevel strand schoolYear');
+        const textbooks = await Textbook.find({ sessionId: currentYear,recordStatus:'Live' }).populate('inputter gradeLevel strand sessionId');
 
         const paymentSchedules = await PaymentSchedule.find({ sessionId: currentYear,recordStatus:'Live' }).populate('sessionId paymentTermId');
         const studentDiscounts = await StudentDiscount.find({ sessionId: currentYear,recordStatus: 'Live' }).populate('studentId sessionId discountId');
@@ -913,7 +911,7 @@ module.exports.generate_fees = async (req, res) => {
                         const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                         const matchesGradeLevel = fee.gradeLevelId?._id.equals(student.academicId.gradeLevelId._id);
                         const matchesNationality = !fee.nationality || fee.nationality === student.nationality?.nationality
-
+                        
                         console.log('Fee Conditions: ', {
                             matchesSchoolYear,
                             matchesGradeLevel,
@@ -954,7 +952,7 @@ module.exports.generate_fees = async (req, res) => {
                     }
     
                     for (const textbook of textbooks) { 
-                        const matchesSchoolYear = textbook.schoolYear._id.equals(currYear._id);
+                        const matchesSchoolYear = textbook.sessionId._id.equals(currYear._id);
                         const matchesGradeLevel = textbook.gradeLevel?._id.equals(student.academicId.gradeLevelId?._id);
                         const matchesStrand = !textbook.strand || textbook.strand._id.equals(student.academicId?.strandId?._id);
     
@@ -1110,7 +1108,7 @@ module.exports.get_student_payments = async (req,res) => {
         const studPayments = await StudentPayment.find({ sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'studentId', 
             populate: [
-                { path: 'nationality', populate: 'nationalityCodeId' },
+                { path: 'nationality' },
                 { path: 'academicId', populate: 'paymentTermId' }
             ]
         })
@@ -1141,7 +1139,7 @@ module.exports.get_student_payment_detail = async (req,res) => {
         const studentPayments = await StudentPayment.find({ studentId: id,sessionId: session,recordStatus: 'Live' })
         .populate({ path: 'studentId', 
             populate: [
-                { path: 'nationality', populate: 'nationalityCodeId' },
+                { path: 'nationality' },
                 { path: 'academicId', populate: 'paymentTermId' }
             ]
         })

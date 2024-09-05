@@ -63,7 +63,7 @@ const NewUser = () => {
                     {/* {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
                     {renderInput('middleName', 'Middle Name', middleName, setMiddleName, 'text')}
                     {renderInput('lastName', 'Last Name', lastName, setLastName,'text')} */}
-                    {renderSelect('userRole', 'Role', role, setRole, roles, 'Select role', true)}
+                    {renderSelect('userRole', 'Role', role, setRole, roles.filter(role => role.userRole.toLowerCase() !== 'teacher'), 'Select role', true)}
                     {renderInput('username', 'Username', username, setUsername, 'text')}
                     {renderInput('password', 'Password', password, setPassword, 'password')}
                     {renderInput('confirmPassword', 'Confirm Password', confirmPassword, setConfirmPassword, 'password')}                

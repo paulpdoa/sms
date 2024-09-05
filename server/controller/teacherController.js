@@ -1,4 +1,37 @@
 const StudentGrade = require('../model/StudentGrade');
+const User = require('../model/Users');
+const Teacher = require('../model/Teacher');
+
+module.exports.get_teacher_dashboard = async(req,res) => {
+    const { session } = req.query;
+    const { userId } = req.params;
+
+    try {   
+        console.log("Starting get_teacher_dashboard with userId:", userId);
+        const teacherId = await User.findById(userId);
+        console.log("User found:", teacherId);
+
+        if (!teacherId) {
+            console.log("User not found or not a teacher");
+            return res.status(404).json({ mssg: 'This user id is not a teacher or user is not existing' });
+        }
+
+        const teacherFound = await Teacher.findOne({ _id: teacherId });
+        console.log("Teacher found:", teacherFound);
+
+        if (!teacherFound) {
+            console.log("Teacher not found");
+            return res.status(404).json({ mssg: `${teacherId.username} is not a valid teacher and is not existing record` });
+        }
+
+        console.log("Teacher details:", teacherFound);
+        res.status(200).json({ teacher: teacherFound }); // Example success response
+        
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching ' });
+    }
+}
 
 module.exports.get_student_grades = async (req,res) => {
     const { session } = req.query;
