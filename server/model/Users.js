@@ -93,7 +93,7 @@ userSchema.statics.login = async function(username,password,session) {
     throw Error('This username doesn\'t exist');
 }
 
-userSchema.statics.updateUser = async function(id, firstName, middleName, lastName, role, username, password, isActive) {
+userSchema.statics.updateUser = async function(id,role, username, password, isActive) {
     const user = await this.findOne({ username });
 
     if (user && user._id.toString() !== id.toString()) {
@@ -108,9 +108,6 @@ userSchema.statics.updateUser = async function(id, firstName, middleName, lastNa
     const newPassword = password ? await bcrypt.hash(password, salt) : undefined;
 
     const updatedFields = {
-        firstName,
-        middleName,
-        lastName,
         role,
         username,
         isActive,

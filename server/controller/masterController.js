@@ -1276,7 +1276,7 @@ module.exports.edit_user = async (req, res) => {
 
     // Remove firstname, middlename, and lastname in updating user
     const { id } = req.params;
-    const { firstName, middleName, lastName, userRole: role, username, isActive, password, confirmPassword,inputter } = req.body;
+    const { userRole: role, username, isActive, password, confirmPassword,inputter } = req.body;
 
     let updatedData = { role, username, isActive };
     if (req.file) {
@@ -1306,7 +1306,7 @@ module.exports.edit_user = async (req, res) => {
             updatedData.password = newPassword;
         }
 
-        await User.findByIdAndUpdate(id, updatedData);
+        await User.updateUser(id,role,username,password,isActive);
 
         res.status(200).json({ mssg: `${username} has been edited successfully!`, redirect: '/users', profilePictureUrl: updatedData.profilePictureUrl });
     } catch (err) {
