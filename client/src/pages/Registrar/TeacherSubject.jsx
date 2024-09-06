@@ -30,6 +30,14 @@ const TeacherSubject = () => {
     const [endTime,setEndTime] = useState('');
     const [daySchedule,setDaySchedule] = useState([]);
 
+
+    const formatTime = (time) => {
+        const [hours, minutes] = time.split(':');
+        const date = new Date();
+        date.setHours(hours, minutes);
+        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    };
+
     const handleDayScheduleChange = (day) => {
         setDaySchedule((prevDaySchedule) => {
             if (prevDaySchedule.includes(day)) {
@@ -47,16 +55,22 @@ const TeacherSubject = () => {
         { accessorKey: 'teacher', header: 'Teacher', editable: true, selectOptions: teachers?.map(teacher => ({ label: `${teacher.firstName} ${teacher.lastName }`, value: teacher._id })) },
         { accessorKey: 'subject', header: 'Subject', editable: true, selectOptions: subjects?.map(subject => ({ label: subject.subjectName, value: subject._id})) },
         { accessorKey: 'roomNumber', header: 'Room Number', editable: true,type: 'number', selectOptions: roomNumbers?.map(rn => ({ label: rn.roomNumber, value: rn._id })) },
-        { accessorKey: 'startTime', header: 'Start Time', editable: true, type: "time" },
-        { accessorKey: 'endTime', header: 'End Time', editable: true, type: "time" }
+        { accessorKey: 'time', header: 'Time', editable: true, type: "time" }
     ];
 
     const teacherLists = teachersSubject?.map((teacher) => ({
         ...teacher,
         teacher: `${teacher.teacherId.firstName} ${teacher.teacherId.lastName}`,
         subject: `${teacher.subjectId.subjectName} - ${teacher.subjectId.subjectCode}`,
-        roomNumber: teacher.roomNumberId.roomNumber
-    }))
+        roomNumber: teacher.roomNumberId.roomNumber,
+        time: `${formatTime(teacher.startTime)}-${formatTime(teacher.endTime)}`
+    })).sort((a, b) => {
+        // Compare by start time
+        const timeA = a.startTime;
+        const timeB = b.startTime;
+    
+        return timeA.localeCompare(timeB); // Sort by start time
+    });
 
     const form = () => (
         <>

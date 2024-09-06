@@ -86,6 +86,18 @@ function App() {
     }
   },[cookies])
 
+  const notAllowedUsers = () => {
+      if(role !== 'Teacher') {
+        alert('User is not a teacher, logging you out...');
+
+        setTimeout(() => {
+          ['id','currentUserId','session','role','username'].forEach(lclstg => localStorage.removeItem(lclstg));
+        },2000);
+      } else {
+        return true
+      }
+  }
+
 
 
   const router = createBrowserRouter(
@@ -150,8 +162,8 @@ function App() {
             <Route path='grading-category' element={<GradingCategory />} />
           </Route>
 
-          {/* For Teacher Pages*/}
-          <Route path='/teacher/dashboard' element={<TeacherDashboard />} />
+          
+          
 
           <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />
@@ -163,8 +175,12 @@ function App() {
           <Route path='/teacher-subject/:id' element={<EditTeacherSubject />} />
 
           {/* For teachers route */}
-          <Route path='/student-grading' element={<StudentGrading />} />
-
+          {/* { notAllowedUsers && <> */}
+            <Route path='/student-grading' element={<StudentGrading />} />
+            <Route path='/teacher/dashboard' element={role === 'Teacher' && <TeacherDashboard />  } />
+          {/* </> } */}
+       
+          
           <Route path='/profile/:id' element={<Profile />} />
 
           <Route path='/new-textbook' element={<NewTextbook />} />

@@ -19,6 +19,8 @@ const StudentSubject = require('../model/StudentSubject');
 const TeacherSubject = require('../model/TeacherSubject');
 const Teacher = require('../model/Teacher');
 const TeacherAcademic = require('../model/TeacherAcademic');
+const User = require('../model/Users');
+const Role = require('../model/Roles');
 
 const moment = require('moment');
 
@@ -80,15 +82,46 @@ module.exports.get_enrolled_students = async (req, res) => {
 
 
 module.exports.add_student = async (req,res) => {
-    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId } = req.body;
+    const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId,password,confirmPassword,username } = req.body;
     const isAdmitted = false;
 
     try {
-        await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' });
+
+        if(password !== confirmPassword) {
+            return res.status(400).json({ mssg: 'Password does not match, please check your password' });
+        }
+
+        // Create a user record 
+        const userRole = await Role.findOne({ userRole: 'Student', recordStatus: 'Live' });
+        if(!userRole) {
+            return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
+        }
+
+        const student = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' });
+        const user = await User.create({
+            username,
+            role: userRole._id,
+            studentId: student._id,
+            recordStatus: 'Live',
+            password,
+            isActive: true,
+            inputter
+        });
+
+        if(!user) {
+            // Delete the student if user creation fails
+            await Student.findByIdAndDelete(student._id);
+        }
+        
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
-        res.status(400).json({ mssg: 'An error occurred while adding student record'});
+
+        if(err.keyPattern?.email) {
+            return res.status(400).json({ mssg: `The email ${err.keyValue.email} is already in use, please choose another email` });
+        }
+
+        res.status(400).json({ mssg: err.message });
     }
 } 
 
@@ -1411,11 +1444,20 @@ module.exports.add_teacher_subject = async (req,res) => {
     const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId,daySchedule } = req.body;
     
     // Multiple rows for creating teacher due to teacher can handle many subjects
+    // Add a validation if there is already a teacher who is teaching that subject already
     
     try {
         const assignedTeacher = await Teacher.findById(teacherId);
+
+        const teacherSubjectExists = await TeacherSubject.findOne({ subjectId }).populate('teacherId');
+        if(teacherSubjectExists) {
+            return res.status(400).json({ mssg: `${teacherSubjectExists.teacherId.firstName} ${teacherSubjectExists.teacherId.lastName} is already teaching this subject, please select another subject` });
+        }
+
         const teacherSubject = await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId,daySchedule });
 
+
+        // Create teacher academic record after assigning a subject
         await TeacherAcademic.create({ teacherSubjectId: teacherSubject._id, inputter, sessionId, recordStatus: 'Live' });
 
         res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully` });
@@ -1466,7 +1508,7 @@ module.exports.get_teacher_academics = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session });
+        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session }).populate('teacherSubjectId');
         if(!teacherAcademics) {
             return res.status(404).json({ mssg: 'Teachers academic record is empty' });
         }

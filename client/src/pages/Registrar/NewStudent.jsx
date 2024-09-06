@@ -37,6 +37,9 @@ const NewStudent = () => {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
+    const [password,setPassword] = useState('');
+    const [confirmPassword,setConfirmPassword] = useState('');
+    const [username,setUsername] = useState('');
 
     const calculateAge = (dob) => {
         const age = Math.floor((new Date() - new Date(dob).getTime()) / 3.15576e+10);
@@ -71,12 +74,16 @@ const NewStudent = () => {
             sessionId:session
         };
 
+        studentInformation.password = password;
+        studentInformation.confirmPassword = confirmPassword;
+        studentInformation.username = username;
+
         try {
             const data = await axios.post(`${baseUrl()}/students`, studentInformation);
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -92,7 +99,7 @@ const NewStudent = () => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -111,7 +118,7 @@ const NewStudent = () => {
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
-                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text",true)}
+                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
                         {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
                         {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix",false)}
                         {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
@@ -145,6 +152,15 @@ const NewStudent = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mb-4">User Information</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {renderInput("username", "Username", username, setUsername, "text")}
+                        {renderInput("password", "Password", password, setPassword, "password")}
+                        {renderInput("confirmPassword", "Confirm Password", confirmPassword, setConfirmPassword, "password")}
+                    </div>
+                </section>
+
                 <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
@@ -161,7 +177,7 @@ const renderInput = (id, label, value, onChange, type, disabled = false, fullSpa
     <div className={`flex flex-col ${fullSpan ? "col-span-full sm:col-span-2 md:col-span-3" : ""}`}>
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <input
-            className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+            className="outline-none p-2 rounded-md border border-gray-300 focus:border-blue-500"
             type={type}
             id={id}
             value={value}
@@ -176,7 +192,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder,required 
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
-            className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+            className="outline-none p-2 rounded-md border border-gray-300 focus:border-blue-500"
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}

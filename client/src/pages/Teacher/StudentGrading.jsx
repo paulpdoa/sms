@@ -23,10 +23,6 @@ const StudentGrading = () => {
     
     const { records: gradingCategories } = useFetch(`${baseUrl()}/grading-categories`);
     const { records: studentGrades } = useFetch(`${baseUrl()}/student-grades`);
-
-    
-
-
     
     const { searchQuery,showForm,currentUserId,setShowForm, session, role } = useContext(MainContext);
 
@@ -117,6 +113,7 @@ const StudentGrading = () => {
         section: `${studentSubject.studentId.academicId.sectionId?.section}`,
         strand: studentSubject.studentId.academicId.strandId ? `${studentSubject.studentId.academicId.strandId.strand}` : 'Not Applicable'
     }));
+    const renderedSubjects = new Set();
 
     console.log(subjectOfTeachers);
 
@@ -667,14 +664,24 @@ const StudentGrading = () => {
                         <div className="flex gap-2 items-center mt-3">
 
                             { role === 'Teacher' ? 
-                                subjectOfTeachers?.filter(studentSubj => studentSubj.studentId.academicId?.isRegistered && studentSubj.studentId.academicId?.isAdmitted && studentSubj.studentId.academicId.gradeLevelId && studentSubj.studentId.academicId.sectionId).map(studentSubj => (
+                                subjectOfTeachers?.filter(studentSubj => studentSubj.studentId.academicId?.isRegistered && studentSubj.studentId.academicId?.isAdmitted && studentSubj.studentId.academicId.gradeLevelId && studentSubj.studentId.academicId.sectionId)
+                                .filter(studentSubj => {
+                                    // Check if subject name is already in the set
+                                    const subjectKey = `${studentSubj.subjectId.subjectName} - ${studentSubj.subjectId.subjectCode}`;
+                                    if (renderedSubjects.has(subjectKey)) {
+                                        return false; // Skip rendering this subject if it's already been rendered
+                                    }
+                                    renderedSubjects.add(subjectKey); // Add subject to the set if not already present
+                                    return true; // Render this subject
+                                })
+                                .map(studentSubj => (
                                     <button
                                         onClick={() => getStudentGrades(studentSubj)} 
                                         className={`${currentTabSubject === `${studentSubj.subjectId.subjectName} - ${studentSubj.subjectId.subjectCode}` ? 'bg-gray-700 text-gray-300 hover:bg-gray-800' : 'bg-none text-gray-800 hover:bg-gray-700 hover:text-gray-300'} text-sm transition font-semibold p-2 rounded-md border border-gray-400`} 
                                         key={studentSubj._id}>
                                         {studentSubj.subjectId.subjectName} - {studentSubj.subjectId.subjectCode}
-                                    </button> 
-                            )) : (
+                                    </button>
+                                )) : (
                                 studentSubjects?.filter(studSubj => student._id === studSubj.studentId._id).map(student => (
                                     <button
                                         onClick={() => getStudentGrades(student)} 

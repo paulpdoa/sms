@@ -20,11 +20,22 @@ const SubjectAssigning = () => {
         { accessorKey: 'adviser', header: 'Adviser' }
     ];
 
+    // For student subjects 
+    const studentSubjectColumns = [
+        { accessorKey: 'subject', header: 'Subject' },
+        { accessorKey: 'teacher', header: 'Teacher' },
+        { accessorKey: 'room', header: 'Room No.' },
+        { accessorKey: 'time', header: 'Time' },
+        { accessorKey: 'days', header: 'Scheduled Days' }
+    ]
+    
+    
+
     const navigate = useNavigate();
     const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role } = useContext(MainContext);
 
     const { records: studentSubjects } = useFetch(`${baseUrl()}/student-subjects`);
-    console.log(studentSubjects);
+    
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
@@ -44,6 +55,29 @@ const SubjectAssigning = () => {
         section: student?.academicId?.sectionId?.section || 'Not Assigned',
         adviser: student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
     }));
+
+    const formatTime = (time) => {
+        const [hours, minutes] = time.split(':');
+        const date = new Date();
+        date.setHours(hours, minutes);
+        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    };
+
+    const studentSubjectData = studentSubjects?.filter(subj => subj.studentId?._id === studentRecord?._id)?.map(subj => ({
+        ...subj,
+        subject: `${subj.subjectId.subjectName} ${subj.subjectId.subjectCode}`,
+        teacher: `${subj.teacherSubjectId.teacherId.firstName} ${subj.teacherSubjectId.teacherId.middleName} ${subj.teacherSubjectId.teacherId.lastName}`,
+        room: subj.teacherSubjectId.roomNumberId.roomNumber,
+        startTime: subj.teacherSubjectId.startTime,
+        time: `${formatTime(subj.teacherSubjectId.startTime)} - ${formatTime(subj.teacherSubjectId.endTime)}`,
+        days: subj.teacherSubjectId.daySchedule?.map(dy => dy + ' ')
+    })).sort((a, b) => {
+        // Compare by start time
+        const timeA = a.startTime;
+        const timeB = b.startTime;
+    
+        return timeA.localeCompare(timeB); // Sort by start time
+    });
 
     // Subject assigning function
     const assignSubjects = async () => {
@@ -101,12 +135,18 @@ const SubjectAssigning = () => {
                             // Show here the form for the subjects assigned to student
                             // MasterDataForm(form, submitSectioning, setShowForm)
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-                                <div className="relative w-full max-w-2xl mx-auto my-8 bg-white rounded-lg shadow-xl p-6">
+                                <div className="relative w-auto max-w-auto mx-auto my-8 bg-white rounded-lg shadow-xl p-6">
                                     <h1 className="font-semibold text-2xl text-gray-800 mb-4">
                                     Subjects Assigned to {studentRecord.firstName} {studentRecord.lastName}
                                     </h1>
 
-                                    <div className="grid grid-cols-2 gap-6 py-4">
+                                    <MasterTable 
+                                        columns={studentSubjectColumns}
+                                        searchQuery={searchQuery}
+                                        data={studentSubjectData}
+                                        disableAction={true}
+                                    />
+                                    {/* <div className="grid grid-cols-2 gap-6 py-4">
                                     {studentSubjects?.filter(subj => subj.studentId._id === studentRecord._id)?.map(subj => {
                                         let bgColorClass = '';
 
@@ -157,7 +197,7 @@ const SubjectAssigning = () => {
                                         </div>
                                         );
                                     })}
-                                    </div>
+                                    </div> */}
 
                                     <button 
                                     onClick={() => {

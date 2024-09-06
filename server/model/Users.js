@@ -93,29 +93,35 @@ userSchema.statics.login = async function(username,password,session) {
     throw Error('This username doesn\'t exist');
 }
 
-userSchema.statics.updateUser = async function(id,role, username, password, isActive) {
+userSchema.statics.updateUser = async function(id,updatedData) {
+    const { role,username,password,isActive } = updatedData;
+
     const user = await this.findOne({ username });
 
     if (user && user._id.toString() !== id.toString()) {
         throw Error('This username is already taken, please choose another username');
     }
 
-    if(!validator.isStrongPassword(password)) {
+    if(password && !validator.isStrongPassword(password)) {
         throw Error('Password not strong enough, please create another password')
     }
 
-    const salt = await bcrypt.genSalt();
-    const newPassword = password ? await bcrypt.hash(password, salt) : undefined;
-
+    // const salt = await bcrypt.genSalt();
+    // const newPassword = password ? await bcrypt.hash(password, salt) : undefined;
+    // console.log(newPassword);    
     const updatedFields = {
         role,
         username,
         isActive,
     };
 
-    if (newPassword) {
-        updatedFields.password = newPassword;
+    if(password) {
+        updatedFields.password = password;
     }
+
+    // if (newPassword) {
+    //     updatedFields.password = newPassword;
+    // }
 
     return await this.findByIdAndUpdate(id, updatedFields, { new: true });
 };

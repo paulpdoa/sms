@@ -1,35 +1,51 @@
 const StudentGrade = require('../model/StudentGrade');
 const User = require('../model/Users');
 const Teacher = require('../model/Teacher');
+const TeacherSubject = require('../model/TeacherSubject');
+const TeacherAcademic = require('../model/TeacherAcademic');
+const Session = require('../model/SchoolYear');
 
 module.exports.get_teacher_dashboard = async(req,res) => {
     const { session } = req.query;
-    const { userId } = req.params;
+    const { userId } = req.params;  
 
+    const today = new Date().getDay();
+    // Sunday = 0, Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const todayValue = days[today];
+    
     try {   
-        console.log("Starting get_teacher_dashboard with userId:", userId);
-        const teacherId = await User.findById(userId);
-        console.log("User found:", teacherId);
 
+        const teacherId = await User.findById(userId);
         if (!teacherId) {
-            console.log("User not found or not a teacher");
             return res.status(404).json({ mssg: 'This user id is not a teacher or user is not existing' });
         }
 
-        const teacherFound = await Teacher.findOne({ _id: teacherId });
-        console.log("Teacher found:", teacherFound);
-
+        const teacherFound = await Teacher.findById(teacherId.teacherId);
         if (!teacherFound) {
-            console.log("Teacher not found");
             return res.status(404).json({ mssg: `${teacherId.username} is not a valid teacher and is not existing record` });
         }
+        const teacherName = `${teacherFound.firstName} ${teacherFound.lastName}`;
 
-        console.log("Teacher details:", teacherFound);
-        res.status(200).json({ teacher: teacherFound }); // Example success response
+        const teacherSubjects = await TeacherSubject.find({ teacherId: teacherId.teacherId, recordStatus: 'Live', sessionId: session })
+        .populate('subjectId teacherId roomNumberId')
+
+        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session }).populate('teacherSubjectId');
+
+        const teacherAllAcademicRecords = [];
+
+        for(const teacherAcademic of teacherAcademics) {
+            // If the teachers logged in id is here, then get all his academic record
+            if(teacherId.teacherId.equals(teacherAcademic.teacherSubjectId.teacherId) && teacherAcademic.sessionId.equals(session)) {
+                teacherAllAcademicRecords.push(teacherAcademic);
+            } 
+        }
+
+        res.status(200).json({ teacherSubjects,teacherName,todayValue }); // Example success response
         
     } catch(err) {
         console.log(err);
-        res.status(500).json({ mssg: 'An error occurred while fetching ' });
+        res.status(500).json({ mssg: 'An error occurred while fetching teacher dashboard details' });
     }
 }
 

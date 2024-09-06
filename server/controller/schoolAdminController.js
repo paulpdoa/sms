@@ -51,7 +51,6 @@ module.exports.add_teacher = async (req, res) => {
         password,
     } = req.body;
 
-    console.log("Password entered: ", password);
 
     let teacher;
 

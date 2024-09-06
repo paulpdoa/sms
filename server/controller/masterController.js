@@ -1273,12 +1273,12 @@ module.exports.get_user_detail = async (req,res) => {
 }
 
 module.exports.edit_user = async (req, res) => {
-
-    // Remove firstname, middlename, and lastname in updating user
     const { id } = req.params;
-    const { userRole: role, username, isActive, password, confirmPassword,inputter } = req.body;
+    const { userRole: role, username, isActive, password, confirmPassword } = req.body;
 
     let updatedData = { role, username, isActive };
+    
+    // If a file is uploaded, add the profile picture URL
     if (req.file) {
         updatedData.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
@@ -1290,23 +1290,19 @@ module.exports.edit_user = async (req, res) => {
             return res.status(404).json({ mssg: 'User not found' });
         }
 
-        if (password && password !== '') {
+        // Update password only if provided
+        if (password && password.trim() !== '') {
             if (password !== confirmPassword) {
                 return res.status(400).json({ mssg: 'Passwords do not match' });
             }
 
-            if(password === '' || confirmPassword === '') {
-                return res.status(400).json({ mssg: 'Password cannot be empty' });
-            }
-
             const salt = await bcrypt.genSalt();
-
-            const newPassword = await bcrypt.hash(password,salt);
+            const newPassword = await bcrypt.hash(password, salt);
 
             updatedData.password = newPassword;
         }
 
-        await User.updateUser(id,role,username,password,isActive);
+        await User.updateUser(id, updatedData);
 
         res.status(200).json({ mssg: `${username} has been edited successfully!`, redirect: '/users', profilePictureUrl: updatedData.profilePictureUrl });
     } catch (err) {
@@ -1314,6 +1310,7 @@ module.exports.edit_user = async (req, res) => {
         res.status(500).json({ mssg: 'An error occurred while updating the user', error: err.message });
     }
 };
+
 
 
 module.exports.user_login = async (req,res) => {
