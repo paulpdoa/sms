@@ -35,10 +35,26 @@ const NewParent = () => {
     const [fatherOffice, setFatherOffice] = useState('');
     const [guardianOffice, setGuardianOffice] = useState('');
     const [studentId, setStudentId] = useState('');
+    const [username,setUsername] = useState('');
+    const [password,setPassword] = useState('');
+    const [confirmPassword,setConfirmPassword] = useState('');
 
     // Function to handle form submission
     const addParent = async (e) => {
         e.preventDefault();
+
+        if(password !== confirmPassword) {
+            return toast.error('Password does not match', {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored"
+            });
+        }
 
         const parentInformation = {
             motherName,
@@ -59,7 +75,9 @@ const NewParent = () => {
             studentId,
             session,
             inputter: currentUserId,
-            sessionId: session
+            sessionId: session,
+            username,
+            password
         }
 
         try {
@@ -274,10 +292,40 @@ const NewParent = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl">User Information:</h2>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="flex flex-col mt-4">
+                            <label className="text-sm" htmlFor="username">Username</label>
+                            <input
+                                    className="outline-none p-2 rounded-md border border-gray-300"
+                                    type="text"
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                        </div>
+                        <div className="flex flex-col mt-4">
+                            <label className="text-sm" htmlFor="password">Password</label>
+                            <input
+                                    className="outline-none p-2 rounded-md border border-gray-300"
+                                    type="password"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                        </div>
+                        <div className="flex flex-col mt-4">
+                            <label className="text-sm" htmlFor="password">Confirm Password</label>
+                            <input
+                                    className="outline-none p-2 rounded-md border border-gray-300"
+                                    type="password"
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                        </div>
+                    </div>
+                </section>
+
                 <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                <button type="button" onClick={() => navigate('/parents')} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md cursor-pointer">
                     Cancel
                 </button>
             </form>

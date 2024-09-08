@@ -133,7 +133,7 @@ const Assessment = () => {
     }));
 
     return (
-        <main className="p-4 relative h-screen overflow-hidden">
+        <main className="p-4 relative overflow-hidden">
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-2xl text-gray-700 font-bold">Assessment</h1>
                 <div className="flex items-center gap-2">
@@ -159,9 +159,9 @@ const Assessment = () => {
             </div>
 
 
-            <div className="grid grid-cols-1 gap-4 mt-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
 
-                <div className="rounded-md h-fit w-full">
+                <div className="rounded-md h-fit">
                     <MasterTable columns={columns} data={formattedStudents} viewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
                 </div>
 

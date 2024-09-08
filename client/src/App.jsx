@@ -67,6 +67,10 @@ import EditTeacherSubject from "./pages/Registrar/EditTeacherSubject";
 import StudentGrading from "./pages/Teacher/StudentGrading";
 import GradingCategory from "./pages/SuperAdmin/GradingCategory";
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
+import StudentDashboard from "./pages/Student/StudentDashboard";
+import StudentGrades from "./pages/Student/StudentGrades";
+import StudentAttendance from "./pages/Student/StudentAttendance";
+import ParentDashboard from "./pages/Parent/ParentDashboard";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -86,24 +90,15 @@ function App() {
     }
   },[cookies])
 
-  const notAllowedUsers = () => {
-      if(role !== 'Teacher') {
-        alert('User is not a teacher, logging you out...');
-
-        setTimeout(() => {
-          ['id','currentUserId','session','role','username'].forEach(lclstg => localStorage.removeItem(lclstg));
-        },2000);
-      } else {
-        return true
-      }
-  }
-
-
-
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route>
         <Route path='/login' element={userToken ? <Navigate to='/' /> : <Login />} />
+
+        {/* For Signing up student record without logging in */}
+        <Route path='/new-student' element={<NewStudent />} />
+        {/* For Signing up student record without logging in */}
+
 
         <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
           <Route path='/' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Dashboard />} />
@@ -162,9 +157,6 @@ function App() {
             <Route path='grading-category' element={<GradingCategory />} />
           </Route>
 
-          
-          
-
           <Route path='/subjects' element={<Subjects />} />
           <Route path='/teachers' element={<Teachers />} />
           <Route path='/strands' element={<Strands />} />
@@ -179,7 +171,14 @@ function App() {
             <Route path='/student-grading' element={<StudentGrading />} />
             <Route path='/teacher/dashboard' element={role === 'Teacher' && <TeacherDashboard />  } />
           {/* </> } */}
-       
+
+          {/* For student routes */}
+          <Route path='/student/dashboard' element={<StudentDashboard />} />
+          <Route path='/student/grades' element={<StudentGrades />} />
+          <Route path='/student/attendance' element={<StudentAttendance />} />
+
+          {/* For Parent Routes */}
+          <Route path='/parent/dashboard' element={<ParentDashboard />} />
           
           <Route path='/profile/:id' element={<Profile />} />
 

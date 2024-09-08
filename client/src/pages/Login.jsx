@@ -3,9 +3,9 @@ import { baseUrl } from '../baseUrl';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
@@ -19,6 +19,7 @@ const Login = () => {
     const [cookies, setCookie] = useCookies(['userToken']);
 
     const [error,setError] = useState({ username: '', password: '', session: '' });
+
 
     const schoolName = 'School Management System';
     const logoPath = '/schoolLogo/school-logo-filler.png';
@@ -63,15 +64,17 @@ const Login = () => {
                 progress: undefined,
                 theme: "colored"
             });
+
+            
     
             setTimeout(() => {
-                setCookie('userToken', data.data.token, { maxAge: 6000 }); // Set cookie with token
+                setCookie('userToken', data.data.token, { maxAge: 100000 }); // Set cookie with token
+                navigate(data.data.redirect);
 
-                if(data.data.role === 'Teacher') {
-                    navigate('/teacher/dashboard');
-                } else {
-                    navigate(data.data.redirect);
-                }
+                // if(data.data.role === 'Teacher') {
+                // } else {
+                //     navigate(data.data.redirect);
+                // }
 
                
                 // setTimeout(() => {
@@ -92,6 +95,16 @@ const Login = () => {
             });
         }
     };
+
+    const signUpNewStudent = async () => {
+        
+        // Set something in local storage that says student is signing up from login page
+        localStorage.setItem('isStudentSignup', true);
+
+        // Navigate user to signup page of student
+        navigate('/new-student');
+
+    }   
 
     return (
         <main className="bg-gray-200 h-screen flex items-center justify-center">
@@ -139,7 +152,10 @@ const Login = () => {
                         </select>
                     </div>
                 ) }
-                <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer my-3">Login</button>
+                <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer mt-3">Login</button>
+                <button onClick={signUpNewStudent} type="button" className="text-xs text-blue-500 underline text-right hover:text-blue-600" to='/new-student'>
+                    Sign Up Student
+                </button>
             </form>
             <ToastContainer />
         </main>

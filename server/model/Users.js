@@ -38,7 +38,10 @@ const userSchema = new mongoose.Schema({
     profilePictureUrl: {
         type: String
     },
-    recordStatus: requiredString
+    recordStatus: requiredString,
+    isAllowedToLogin: {
+        type: Boolean
+    }
 
 }, { timestamps: true });
 
@@ -56,9 +59,13 @@ userSchema.pre('save', async function(next) {
 // create static login method for user
 userSchema.statics.login = async function(username,password,session) {
     const user = await this.findOne({ username, recordStatus: 'Live' });
-    console.log('Password Login: ', password);
     // This will check if the school year table is still empty, meaning it's a new system
     const schoolYears = await SchoolYear.find();
+
+    // Create a function here to check isAllowedToLogin if the user has studentId
+    if(!user.isAllowedToLogin && user.studentId) {
+        throw Error(`Sorry, you are not allowed to access the system, please contact your registrar to access the system`);
+    }
 
     if(!user) {
         throw Error(`${username} does not exist`);

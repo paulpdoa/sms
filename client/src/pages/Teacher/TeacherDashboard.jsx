@@ -34,29 +34,35 @@ const TeacherDashboard = () => {
             <section className="w-full px-7 mt-8">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your subjects class today</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {records?.teacherSubjects?.filter(ts => ts.daySchedule.includes(records?.todayValue)).map((teacherSubject, index) => (
-                        <div key={index} className="bg-white border border-gray-300 shadow-sm rounded-lg p-6">
-                            <h3 className="text-xl font-semibold text-indigo-600 mb-2">
-                                {teacherSubject.subjectId.subjectName} ({teacherSubject.subjectId.subjectCode})
-                            </h3>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Room No.:</span> {teacherSubject.roomNumberId.roomNumber}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Time:</span> {formatTime(teacherSubject.startTime)} - {formatTime(teacherSubject.endTime)}
-                            </p>
-                            <p className="text-gray-700">
-                                <span className="font-semibold">Schedule:</span> 
-                                {teacherSubject.daySchedule.map((dy, i) => (
-                                    <span 
-                                        key={i} 
-                                        className={dy === records?.todayValue ? 'text-indigo-600 font-semibold' : ''}>
-                                        {dy}{i < teacherSubject.daySchedule.length - 1 ? ', ' : ''}
-                                    </span>
-                                ))}
-                            </p>
-                        </div>
-                    ))}
+
+                    { records?.teacherSubjects?.filter(ts => ts.daySchedule.includes(records?.todayValue)).length > 0 ? (
+                        records?.teacherSubjects?.filter(ts => ts.daySchedule.includes(records?.todayValue)).map((teacherSubject, index) => (
+                            <div key={index} className="bg-white border border-gray-300 shadow-sm rounded-lg p-6 hover:-translate-y-1 transition">
+                                <h3 className="text-xl font-semibold text-indigo-600 mb-2">
+                                    {teacherSubject.subjectId.subjectName} ({teacherSubject.subjectId.subjectCode})
+                                </h3>
+                                <p className="text-gray-700 mb-2">
+                                    <span className="font-semibold">Room No.:</span> {teacherSubject.roomNumberId.roomNumber}
+                                </p>
+                                <p className="text-gray-700 mb-2">
+                                    <span className="font-semibold">Time:</span> {formatTime(teacherSubject.startTime)} - {formatTime(teacherSubject.endTime)}
+                                </p>
+                                <p className="text-gray-700">
+                                    <span className="font-semibold">Schedule:</span> 
+                                    {teacherSubject.daySchedule.map((dy, i) => (
+                                        <span 
+                                            key={i} 
+                                            className={dy === records?.todayValue ? 'text-indigo-600 font-semibold' : ''}>
+                                            {dy}{i < teacherSubject.daySchedule.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-red-500 text-lg font-semibold animate-pulse">No subjects scheduled for today</p>
+                    ) }
+                    {}
                 </div>
             </section>
          
@@ -64,22 +70,26 @@ const TeacherDashboard = () => {
             <section className="w-full px-7 mt-8">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to You</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {records?.teacherSubjects?.map((teacherSubject, index) => (
-                        <div key={index} className="bg-white border border-gray-300 shadow-sm rounded-lg p-6">
-                            <h3 className="text-xl font-semibold text-indigo-600 mb-2">
-                                {teacherSubject.subjectId.subjectName} ({teacherSubject.subjectId.subjectCode})
-                            </h3>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Room No.:</span> {teacherSubject.roomNumberId.roomNumber}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Time:</span> {formatTime(teacherSubject.startTime)} - {formatTime(teacherSubject.endTime)}
-                            </p>
-                            <p className="text-gray-700">
-                                <span className="font-semibold">Schedule:</span> {teacherSubject.daySchedule.map(dy => dy + ' ')}
-                            </p>
-                        </div>
-                    ))}
+                    { records?.teacherSubjects?.length > 0 ? (
+                        records?.teacherSubjects?.map((teacherSubject, index) => (
+                            <div key={index} className="bg-white border border-gray-300 shadow-sm rounded-lg p-6 hover:-translate-y-1 transition">
+                                <h3 className="text-xl font-semibold text-indigo-600 mb-2">
+                                    {teacherSubject.subjectId.subjectName} ({teacherSubject.subjectId.subjectCode})
+                                </h3>
+                                <p className="text-gray-700 mb-2">
+                                    <span className="font-semibold">Room No.:</span> {teacherSubject.roomNumberId.roomNumber}
+                                </p>
+                                <p className="text-gray-700 mb-2">
+                                    <span className="font-semibold">Time:</span> {formatTime(teacherSubject.startTime)} - {formatTime(teacherSubject.endTime)}
+                                </p>
+                                <p className="text-gray-700">
+                                    <span className="font-semibold">Schedule:</span> {teacherSubject.daySchedule.map(dy => dy + ' ')}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-red-500 text-lg font-semibold animate-pulse">No subjects yet assigned to you</p>
+                    ) }
                 </div>
             </section>
         </main>

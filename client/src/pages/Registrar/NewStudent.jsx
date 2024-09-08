@@ -164,7 +164,10 @@ const NewStudent = () => {
                 <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                <button type="button" onClick={() => {
+                    navigate(-1)
+                    localStorage.removeItem('isStudentSignup')
+                }} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>

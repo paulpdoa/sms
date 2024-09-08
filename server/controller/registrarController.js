@@ -72,7 +72,6 @@ module.exports.get_enrolled_students = async (req, res) => {
             }
         }
 
-        console.log(filteredEnrolledStudents);
         res.status(200).json(filteredEnrolledStudents);
     } catch (err) {
         console.log(err);
@@ -952,7 +951,7 @@ module.exports.generate_fees = async (req, res) => {
                             // Check if the fee matches the current year, student's grade level, and nationality code
                             const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                             const matchesGradeLevel = fee.gradeLevelId?.gradeLevel.toLowerCase() === student.academicId.gradeLevelId.gradeLevel.toLowerCase();
-                            const matchesNationality = !fee.nationality || fee.nationality.toLowerCase() === (student?.academicId?.studentId?.nationality?.nationality === 'Filipino' ? 'local' : 'foreign')
+                            const matchesNationality = !fee.nationality || fee.nationality.toLowerCase() === (student?.academicId?.studentId?.nationality?.nationality === 'Filipino' ? 'local' : 'foreigner')
                             
                             // console.log('Fee Conditions: ', {
                             //     matchesSchoolYear,
@@ -1508,7 +1507,12 @@ module.exports.get_teacher_academics = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session }).populate('teacherSubjectId');
+        const teacherAcademics = await TeacherAcademic.find({ recordStatus: 'Live', sessionId: session })
+        .populate(
+            { path: 'teacherSubjectId', populate: {
+                path: 'teacherId subjectId'
+            } }
+        );
         if(!teacherAcademics) {
             return res.status(404).json({ mssg: 'Teachers academic record is empty' });
         }

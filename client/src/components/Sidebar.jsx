@@ -232,6 +232,56 @@ const initialMenus = [
                 ]
             }
         ]
+    },
+    {
+        role: 'Student',
+        menus: [
+            {
+                name: 'Student Dashboard',
+                link: '/student/dashboard'
+            },
+            {
+                name: 'Grades',
+                icon: <FaCashRegister />,
+                link: '/student/grades'
+                // subMenus: [
+                //     { name: 'Student Grading', link: '/student-grading' },
+                // ]
+            },
+            {
+                name: 'Attendance',
+                icon: <FaCashRegister />,
+                link: '/student/attendance'
+                // subMenus: [
+                //     { name: 'Student Grading', link: '/student-grading' },
+                // ]
+            }
+        ]
+    },
+    {
+        role: 'Parent',
+        menus: [
+            {
+                name: 'Parent Dashboard',
+                link: '/parent/dashboard'
+            },
+            {
+                name: 'Grades',
+                icon: <FaCashRegister />,
+                link: '/student/grades'
+                // subMenus: [
+                //     { name: 'Student Grading', link: '/student-grading' },
+                // ]
+            },
+            {
+                name: 'Attendance',
+                icon: <FaCashRegister />,
+                link: '/student/attendance'
+                // subMenus: [
+                //     { name: 'Student Grading', link: '/student-grading' },
+                // ]
+            }
+        ]
     }
 ];
 

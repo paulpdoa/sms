@@ -1317,13 +1317,36 @@ module.exports.user_login = async (req,res) => {
 
     const { username,password,session } = req.body;
 
+    const userRoles = [
+        { role: 'Super Admin', path: '/' },
+        { role: 'Teacher', path: '/teacher/dashboard' },
+        { role: 'Student', path: '/student/dashboard' },
+        { role: 'Finance', path:'/finance/dashboard' },
+        { role: 'Parent', path: '/parent/dashboard' },
+        { role: 'Registrar', path: '/' }
+    ]
+
+
+    let userDestination = '';
+
     try {
 
         const login = await User.login(username,password,session);
         const token = createToken(login._id);
-        const roleDetail = await Role.find({ _id: login.role });
+        const roleDetail = await Role.findOne({ _id: login.role });
 
-        res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail[0].userRole,redirect:'/' });
+        // Check user roles when logging in and redirect them to proper pages
+        for(const userRole of userRoles) {
+            if(roleDetail.userRole === userRole.role) {
+                userDestination = userRole.path
+            }
+        }
+
+        if(!userDestination) {
+            return res.status(404).json({ mssg: "User doesn't have any page yet" });
+        }
+
+        res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail.userRole,redirect: userDestination });
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: err.message });
@@ -1565,12 +1588,23 @@ module.exports.add_parent = async (req,res) => {
         guardianOffice,
         studentId, 
         inputter,
-        sessionId
+        sessionId,
+        username,
+        password
     } = req.body;
 
         try {  
+
+            // Create a user record 
+            const userRole = await Role.findOne({ userRole: 'Parent', recordStatus: 'Live' });
+            if(!userRole) {
+                return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
+            }
+
+
+
             const student = await Student.findById(studentId);
-            await Parent.create({ motherName,
+            const parent = await Parent.create({ motherName,
                 fatherName,
                 guardianName,
                 motherOccupation,
@@ -1590,6 +1624,21 @@ module.exports.add_parent = async (req,res) => {
                 sessionId,
                 recordStatus
             });
+
+            const user = await User.create({
+                username,
+                role: userRole._id,
+                parentId: parent._id,
+                recordStatus: 'Live',
+                password,
+                isActive: true,
+                inputter
+            });
+    
+            if(!user) {
+                // Delete the student if user creation fails
+                await Student.findByIdAndDelete(student._id);
+            }
 
             res.status(200).json({ mssg:`Parent for ${student.firstName} ${student.lastName} has been added to the record`});
         } catch(err) {

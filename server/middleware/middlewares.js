@@ -5,7 +5,11 @@ const multer = require('multer');
 const allowUserView = (roles) => {
     return (req,res,next) => {
         const { role } = req.query;
-        next()
+          next();
+
+        // Add a logic here if the user creating a student profile is coming from login page
+        // newStudentFromLogin = true
+
         // if(roles.includes(role)) {
         //     next()
         // } else {
@@ -22,7 +26,6 @@ const allowUserAction = (roles) => {
         const role = req.body.role;
         const session = req.body.session;
         const currentSessionYear = await Session.findOne({ _id: session });
-        console.log(session);
   
         if (!currentSessionYear) {
           return res.status(404).json({ mssg: 'Session not found', redirect: '/' });
