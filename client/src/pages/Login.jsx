@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 import { baseUrl } from '../baseUrl';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,35 +9,25 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
-
-    // Create a way to stop user on creating new school year if there is still ongoing s.y
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [schoolYear, setSchoolYear] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
     const [cookies, setCookie] = useCookies(['userToken']);
+    const [error, setError] = useState({ username: '', password: '', session: '' });
+    const navigate = useNavigate();
 
-    const [error,setError] = useState({ username: '', password: '', session: '' });
-
-
-    const schoolName = 'School Management System';
+    const schoolName = 'Login';
     const logoPath = '/schoolLogo/school-logo-filler.png';
 
     const loginUser = async (e) => {
         e.preventDefault();
 
-        if(username === '') {
-            setError({ username: 'Username cannot be empty' });
-        }
+        if (!username) setError((prev) => ({ ...prev, username: 'Username cannot be empty' }));
+        if (!password) setError((prev) => ({ ...prev, password: 'Password cannot be empty' }));
+        if (!schoolYear) setError((prev) => ({ ...prev, session: 'Session cannot be empty' }));
 
-        if(password === '') {
-            setError({ password: 'Password cannot be empty' });
-        }
-
-        if(schoolYear === '') {
-            setError({ session: 'Session cannot be empty' });
-        }
+        if (!username || !password || !schoolYear) return;
 
         try {
             const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
@@ -46,117 +36,113 @@ const Login = () => {
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
 
-           
-            
-            if (schoolYear === 'true') {
-                localStorage.setItem('isFreshYear', schoolYear);
-            } else {
-                localStorage.setItem('session', schoolYear);
-            }
-    
+            localStorage.setItem('session', schoolYear);
+
             toast.success(data.data.mssg, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 1000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: 'colored'
             });
 
-            
-    
             setTimeout(() => {
-                setCookie('userToken', data.data.token, { maxAge: 100000 }); // Set cookie with token
+                setCookie('userToken', data.data.token, { maxAge: 100000 });
                 navigate(data.data.redirect);
-
-                // if(data.data.role === 'Teacher') {
-                // } else {
-                //     navigate(data.data.redirect);
-                // }
-
-               
-                // setTimeout(() => {
-                //     startCookieCheck();
-                // },3000)
             }, 2000);
         } catch (err) {
-            console.log(err);
             toast.error(err.response.data.mssg, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: 'colored'
             });
         }
     };
 
-    const signUpNewStudent = async () => {
-        
-        // Set something in local storage that says student is signing up from login page
+    const signUpNewStudent = () => {
         localStorage.setItem('isStudentSignup', true);
-
-        // Navigate user to signup page of student
         navigate('/new-student');
-
-    }   
+    };
 
     return (
-        <main className="bg-gray-200 h-screen flex items-center justify-center">
-            <img className="absolute right-0 top-0" src="/loginImage/Vector.png" alt="Vector" />
-            <img className="absolute left-0 bottom-0 z-50" src='/loginImage/Ellipse.png' alt="Ellipse" />
-            <img className="absolute left-0 bottom-0 z-40" src='/loginImage/Ellipse-1.png' alt="Ellipse 1" />
-            <img className="absolute left-0 bottom-0" src='/loginImage/Ellipse-2.png' alt="Ellipse 2" />
-            <form onSubmit={loginUser} className="z-50 bg-white p-10 rounded-lg">
-                <img className="mx-auto mb-4 w-24 h-24" src={logoPath} alt="School Logo" />
-                <h1 className="text-xl font-semibold text-gray-700">{schoolName}</h1>
-                <div className="flex flex-col gap-1 mt-5">
-                    <span className="text-gray-700 text-sm">Username</span>
-                    <input 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        className="border border-gray-300 outline-none p-2 bg-transparent rounded-md text-sm" 
-                        type="text" />
-                </div>
-                <div className="flex flex-col gap-2 my-2 relative">
-                    <span className="text-gray-700 text-sm">Password</span>
-                    <input
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="border outline-none border-gray-300 p-2 bg-transparent rounded-md text-sm"
-                        type={showPassword ? "text" : "password"}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-10 bg-transparent border-none cursor-pointer text-gray-500 text-xs"
-                    >
-                        {(showPassword) ? "Hide" : "Show"}
-                    </button>
-                </div>
-                { (schoolYears.length > 0) && (
-                    <div className="flex flex-col gap-2 my-2">
-                        <span className="text-gray-700 text-sm">Session</span>
+        <main className="bg-gray-200 h-screen flex justify-center items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-2xl overflow-hidden max-w-4xl w-full">
+                {/* Login Form */}
+                <form onSubmit={loginUser} className="bg-white p-10 flex flex-col justify-center">
+                    <h1 className="text-2xl font-semibold text-gray-700 mb-5">{schoolName}</h1>
+                    
+                    <div className="flex flex-col gap-1">
+                        <label className="text-gray-700 text-sm">Username</label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className={`border ${error.username ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
+                        />
+                        {error.username && <span className="text-red-500 text-xs">{error.username}</span>}
+                    </div>
+
+                    <div className="flex flex-col gap-1 mt-3 relative">
+                        <label className="text-gray-700 text-sm">Password</label>
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={`border ${error.password ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-2 top-8 bg-transparent text-gray-500 text-xs"
+                        >
+                            {showPassword ? 'Hide' : 'Show'}
+                        </button>
+                        {error.password && <span className="text-red-500 text-xs">{error.password}</span>}
+                    </div>
+
+                    <div className="flex flex-col gap-1 mt-3">
+                        <label className="text-gray-700 text-sm">Session</label>
                         <select
-                            onChange={(e) => setSchoolYear(e.target.value)} 
-                            className="border outline-none border-gray-300 p-2 bg-transparent rounded-md text-sm"
+                            value={schoolYear}
+                            onChange={(e) => setSchoolYear(e.target.value)}
+                            className={`border ${error.session ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
                         >
                             <option hidden>Select session</option>
-                            {schoolYears?.map(sy => (
-                                <option key={sy._id} value={sy._id}>{sy.startYear.split('-')[0]}-{sy.endYear.split('-')[0]} {sy.isYearDone && 'Done'}</option>
+                            {schoolYears.map((sy) => (
+                                <option key={sy._id} value={sy._id}>
+                                    {`${sy.startYear.split('-')[0]}-${sy.endYear.split('-')[0]}`} {sy.isYearDone && 'Done'}
+                                </option>
                             ))}
                             <option value={true}>Create new school year</option>
                         </select>
+                        {error.session && <span className="text-red-500 text-xs">{error.session}</span>}
                     </div>
-                ) }
-                <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer mt-3">Login</button>
-                <button onClick={signUpNewStudent} type="button" className="text-xs text-blue-500 underline text-right hover:text-blue-600" to='/new-student'>
-                    Sign Up Student
-                </button>
-            </form>
+
+                    <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer mt-5">Login</button>
+                </form>
+
+                {/* Right Side - School Logo and Information */}
+                <div className="bg-blue-500 flex items-center justify-center flex-col p-10 text-white">
+                    <img className="mb-4 w-24 h-24" src={logoPath} alt="School Logo" />
+                    <h1 className="text-xl font-semibold">Welcome to {schoolName}</h1>
+                    <p className="mt-2 text-sm">Manage your school's activities effectively.</p>
+                    <button
+                        onClick={signUpNewStudent}
+                        className="mt-5 bg-white text-blue-500 px-4 py-2 rounded-md text-sm hover:bg-gray-200"
+                    >
+                        Register as a Student
+                    </button>
+                </div>
+            </div>
+
             <ToastContainer />
         </main>
     );

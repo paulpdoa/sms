@@ -9,11 +9,11 @@ import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 
-const ParentDashboard = () => {
+const FinanceDashboard = () => {
 
     const { currentUserId } = useContext(MainContext);
 
-    const { records } = useFetch(`${baseUrl()}/parent-dashboard/${currentUserId}`);
+    const { records } = useFetch(`${baseUrl()}/student-dashboard/${currentUserId}`);
 
     const formatTime = (time) => {
         const [hours, minutes] = time.split(':');
@@ -22,16 +22,14 @@ const ParentDashboard = () => {
         return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
     };
 
-
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
-            <header className="w-full bg-white shadow-md py-6 px-8">
-                <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.parentName}!</h1>
-                <p className="text-sm text-gray-500">Parent of {records?.studentName}</p>
+            <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
+                <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.studentName}!</h1>
             </header>
 
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects of {records?.studentName}</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your Subjects For Today</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     { records?.studentSubjects?.teacherSubjectId?.filter(ts => ts.daySchedule.includes(records?.todayValue))?.length > 0 ? (
                         records?.studentSubjects?.map((studentSubject,index) => (
@@ -65,9 +63,9 @@ const ParentDashboard = () => {
                     ) }
                 </div>
             </section>
-
+            
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to {records?.studentName}</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to you</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     { records?.studentSubjects?.length > 0 ? (
                         records?.studentSubjects?.map((studentSubject,index) => (
@@ -106,4 +104,4 @@ const ParentDashboard = () => {
     )
 }
 
-export default ParentDashboard;
+export default FinanceDashboard;

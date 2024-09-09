@@ -71,8 +71,16 @@ import StudentDashboard from "./pages/Student/StudentDashboard";
 import StudentGrades from "./pages/Student/StudentGrades";
 import StudentAttendance from "./pages/Student/StudentAttendance";
 import ParentDashboard from "./pages/Parent/ParentDashboard";
+import ParentChildGrades from "./pages/Parent/ParentChildGrades";
+import ParentPaymentSchedule from "./pages/Parent/ParentPaymentSchedule";
+import ParentChildAttendance from "./pages/Parent/ParentChildAttendance";
+import StudentPaymentSchedule from "./pages/Student/StudentPaymentSchedule";
+import Finance from "./pages/Finance";
+import NewFinance from "./pages/SuperAdmin/NewFinance";
+import EditFinance from "./pages/EditFinance";
+import FinanceDashboard from "./pages/Finance/FinanceDashboard";
 
-function App() {
+const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
   const userToken = cookies.userToken;
   const role = localStorage.getItem('role');
@@ -101,7 +109,7 @@ function App() {
 
 
         <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
-          <Route path='/' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Dashboard />} />
+          <Route path='/' element={(checkFreshYear() && (role === 'School Admin' || role === 'Super Admin')) ? <Navigate to='/master/school-year' /> : <Dashboard />} />
           <Route path='/students' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Students />} />
           <Route path='/admission' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Admission />} />
           <Route path='/registrar' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Registrar />}>
@@ -136,6 +144,7 @@ function App() {
             <Route path='requirements' element={<Requirements />} />
             <Route path='user-roles' element={<UserRoles />} />
             <Route path='students' element={<Students />} />
+            <Route path='finance' element={<Finance />} />
             <Route path='school-year' element={<SchoolYear />} />
             <Route path='teachers' element={<Teachers />} />
             <Route path='users' element={<Users />} />
@@ -155,6 +164,7 @@ function App() {
             <Route path='subjects' element={<Subjects />} />
             <Route path='room-number' element={<RoomNumber />} />
             <Route path='grading-category' element={<GradingCategory />} />
+            <Route path='edit-finance/:id' element={<EditFinance />} />
           </Route>
 
           <Route path='/subjects' element={<Subjects />} />
@@ -165,6 +175,9 @@ function App() {
           <Route path='/teachers-subject' element={<TeacherSubject />} />
           <Route path='/assessment' element={<Assessment />} />
           <Route path='/teacher-subject/:id' element={<EditTeacherSubject />} />
+          <Route path='/finance' element={<Finance />} />
+          <Route path='/new-finance' element={<NewFinance />} />
+          <Route path='/edit-finance/:id' element={<EditFinance />} />
 
           {/* For teachers route */}
           {/* { notAllowedUsers && <> */}
@@ -176,9 +189,16 @@ function App() {
           <Route path='/student/dashboard' element={<StudentDashboard />} />
           <Route path='/student/grades' element={<StudentGrades />} />
           <Route path='/student/attendance' element={<StudentAttendance />} />
+          <Route path='/student/payment-schedule' element={<StudentPaymentSchedule />} />
 
           {/* For Parent Routes */}
           <Route path='/parent/dashboard' element={<ParentDashboard />} />
+          <Route path='/parent/grades' element={<ParentChildGrades />} />
+          <Route path='/parent/payment-schedule' element={<ParentPaymentSchedule />} />
+          <Route path='/parent/attendance' element={<ParentChildAttendance />} />
+
+          {/* For Finance Routes */}
+          <Route path='/finance/dashboard' element={<FinanceDashboard />} />
           
           <Route path='/profile/:id' element={<Profile />} />
 

@@ -2,6 +2,7 @@ const User = require('../model/Users');
 const Student = require('../model/Students');
 const StudentSubject = require('../model/StudentSubject');
 const StudentGrade = require('../model/StudentGrade');
+const StudentPayment = require('../model/StudentPayment');
 
 module.exports.get_student_dashboard = async (req,res) => {
     const { session } = req.query;
@@ -76,7 +77,7 @@ module.exports.get_student_grade_detail = async (req,res) => {
         } })
         .populate('subjectId studentId');
 
-        const studentGrades = await StudentGrade.find({ studentId: student._id, recordStatus: 'Live' });
+        const studentGrades = await StudentGrade.find({ studentId: student._id, recordStatus: 'Live' }).populate('subjectId gradingCategoryId');
         if(!studentGrades) {
             return res.status(404).json({ mssg: "You don't have grades existing yet" });
         }
@@ -85,5 +86,38 @@ module.exports.get_student_grade_detail = async (req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching student grade details' });
+    }
+}
+
+module.exports.get_student_payment = async(req,res) => {
+    const { session } = req.query;
+    const { userId } = req.params;
+    
+    let studentName = '';
+
+    try {
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({ mssg: 'User is not existing' });
+        }
+
+        const student = await Student.findById(user.studentId);
+        if(!student) {
+            return res.status(404).json({ mssg: 'Student is not exitsing' });
+        }
+        studentName = `${student.firstName} ${student.middleName} ${student.lastName}`;
+
+        // Get Student Payment Schedule
+        const studentPayments = await StudentPayment.find({ studentId: student._id, recordStatus: 'Live', sessionId: session })
+        .populate({ path: 'paymentScheduleId', populate: {
+            path: 'paymentTermId'
+        } })
+        const paymentSchedules = studentPayments?.filter(studentPayment => studentPayment.paymentScheduleId);
+
+        res.status(200).json({ studentPayments: paymentSchedules, studentName });
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching parents child payment schedules' });
     }
 }

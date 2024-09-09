@@ -1,18 +1,18 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
-import { baseUrl } from '../../baseUrl';
+import { baseUrl } from '../baseUrl';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useFetch } from '../../hooks/useFetch';
-import { genders as genderSelections } from '../../data/genders.json';
-import { MainContext } from '../../helpers/MainContext';
+import { useFetch } from '../hooks/useFetch';
+import { genders as genderSelections } from '../data/genders.json';
+import { MainContext } from '../helpers/MainContext';
 
-const EditTeacher = () => {
+const EditFinance = () => {
     
     const navigate = useNavigate();
     const { id } = useParams();
-    const { records, isLoading } = useFetch(`${baseUrl()}/teacher/${id}`);
+    const { records, isLoading } = useFetch(`${baseUrl()}/finance/${id}`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
 
@@ -27,14 +27,6 @@ const EditTeacher = () => {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
-    const [spouseName, setSpouseName] = useState('');
-    const [spouseCel, setSpouseCel] = useState('');
-    const [education, setEducation] = useState('');
-    const [schoolGraduated, setSchoolGraduated] = useState('');
-    const [yearGraduated, setYearGraduated] = useState('');
-    const [yearsOfExperience, setYearsOfExperience] = useState('');
-    const [joiningDate, setJoiningDate] = useState('');
-    const [username, setUsername] = useState('');
 
     const { session,currentUserId } = useContext(MainContext);
 
@@ -46,20 +38,12 @@ const EditTeacher = () => {
             setLastName(records.lastName);
             setDateOfBirth(records.dateOfBirth);
             setSex(records?.sex);
-            setReligion(records?.religion?._id);
-            setNationality(records?.nationality?._id);
+            setReligion(records?.religionId?._id);
+            setNationality(records?.nationalityId?._id);
             setPlaceOfBirth(records.placeOfBirth);
             setEmail(records.email);
             setContactNumber(records.contactNumber);
             setAddress(records.address);
-            setSpouseName(records.spouseName);
-            setSpouseCel(records.spouseCel);
-            setEducation(records.education);
-            setSchoolGraduated(records.schoolGraduated);
-            setYearGraduated(records.yearGraduated);
-            setYearsOfExperience(records.yearsOfExperience);
-            setJoiningDate(records.joiningDate);
-            setUsername(records.username);
         }
     }, [records]);
 
@@ -69,10 +53,10 @@ const EditTeacher = () => {
         setDateOfBirth(dob);
     };
 
-    const editTeacher = async (e) => {
+    const editFinance = async (e) => {
         e.preventDefault();
 
-        const teacherInformation = {
+        const financeInformation = {
             firstName,
             middleName,
             lastName,
@@ -84,20 +68,12 @@ const EditTeacher = () => {
             email,
             contactNumber,
             address,
-            spouseName,
-            spouseCel,
-            education,
-            schoolGraduated,
-            yearGraduated,
-            yearsOfExperience,
-            joiningDate,
-            username,
             session,
             inputter: currentUserId
         };
 
         try {
-            const data = await axios.patch(`${baseUrl()}/teacher/${id}`, teacherInformation);
+            const data = await axios.patch(`${baseUrl()}/finance/${id}`, financeInformation);
             toast.success(data.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
@@ -130,8 +106,8 @@ const EditTeacher = () => {
 
     return (
         <main className="p-4 bg-gray-100">
-            <form onSubmit={editTeacher} className="bg-white p-6 rounded-lg shadow-lg">
-                <h1 className="font-bold text-start text-gray-700 text-3xl mb-4">Edit Teacher</h1>
+            <form onSubmit={editFinance} className="bg-white p-6 rounded-lg shadow-lg">
+                <h1 className="font-bold text-start text-gray-700 text-3xl mb-4">Edit Finance</h1>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -140,8 +116,6 @@ const EditTeacher = () => {
                         {renderInput("last-name", "Last Name", lastName, setLastName, "text")}
                         {renderInput("date-of-birth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
                         {renderInput("place-of-birth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
-                        {renderInput("spouse-name", "Spouse Name", spouseName, setSpouseName, "text")}
-                        {renderInput("spouse-cel", "Spouse Contact Number", spouseCel, setSpouseCel, "text")}
                         {renderInput("address", "Address", address, setAddress, "text")}
                         
                         {/* For Gender Selection */}
@@ -203,38 +177,9 @@ const EditTeacher = () => {
                     </div>
                 </section>
 
-                <section>
-                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Academic Information</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderInput("education", "Education", education, setEducation, "text")}
-                        {renderInput("school-graduated", "School Graduated", schoolGraduated, setSchoolGraduated, "text")}
-                        {renderInput("year-graduated", "Year Graduated", yearGraduated, setYearGraduated, "text")}
-                        {renderInput("years-of-experience", "Years of Experience", yearsOfExperience, setYearsOfExperience, "number")}
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">School Information</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderInput("joining-date", "Joining Date", joiningDate, setJoiningDate, "date")}
-                        {/* {renderSelect("department", "Department", department, setDepartment, departments, "Department")}
-                        {renderSelect("grade-level", "Grade Level", gradeLevel, setGradeLevel, gradeLevels, "Grade Level")}
-                        {renderSelect("section", "Section", section, setSection, sections, "Section")} */}
-                    </div>
-                </section>
-
-                {/* <section>
-                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Credentials</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {renderInput("username", "Username", username, setUsername, "text")}
-                        {renderInput("password", "Password", password, setPassword, "password")}
-                        {renderInput("confirm-password", "Confirm Password", confirmPassword, setConfirmPassword, "password")}
-                    </div>
-                </section> */}
-
                 <div className="flex items-center justify-end gap-2">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
-                    <button type="button" onClick={() => navigate('/teachers')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Finance</button>
+                    <button type="button" onClick={() => navigate('/finance')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
             <ToastContainer />
@@ -273,4 +218,4 @@ const renderSelect = (id, label, value, onChange, options, optionLabel) => (
     </div>
 );
 
-export default EditTeacher;
+export default EditFinance;

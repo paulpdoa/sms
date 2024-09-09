@@ -30,6 +30,7 @@ const StudentDiscount = require('../model/StudentDiscount');
 const Sectioning = require('../model/Sectioning');
 const RoomNumber = require('../model/RoomNumber');
 const GradingCategory = require('../model/GradingCategory');
+const Finance = require('../model/Finance');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -2110,4 +2111,100 @@ module.exports.edit_grading_category = async (req,res) => {
         res.status(500).json({ mssg: 'An error occurred while updating grading category' });
     }
 
+}
+
+// Finance
+module.exports.get_finance_info = async(req,res) => {
+    
+    try {
+        const financeProfiles = await Finance.find({ recordStatus: 'Live' })
+        .populate('nationalityId religionId')
+        if(!financeProfiles) {
+            return res.status(404).json({ mssg: 'Finance profiles is not existing' });
+        }
+
+        res.status(200).json(financeProfiles);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching finance information profiles' });
+    }
+}
+
+module.exports.get_finance_info_detail = async(req,res) => {
+    const { id } = req.params;
+
+    try {
+        const financeProfile = await Finance.findById(id)
+        .populate('nationalityId religionId')
+        if(!financeProfile) {
+            return res.status(404).json({ mssg: 'Finance profile is not existing' });
+        }
+
+        res.status(200).json(financeProfile);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching finance information profile' });
+    }
+}
+
+module.exports.add_finance_info = async(req,res) => {
+    const { firstName,lastName,middleName,dateOfBirth,gender,religion,nationality,placeOfBirth,email,contactNumber,address,age,session,currentUserId,role,password,username } = req.body;
+
+    try {
+
+        // Create a user record 
+        const userRole = await Role.findOne({ userRole: 'Finance', recordStatus: 'Live' });
+        if(!userRole) {
+            return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
+        }
+
+       
+        const finance = await Finance.create({ firstName,lastName,middleName,dateOfBirth,sex: gender,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,age,sessionId:session,inputter:currentUserId,recordStatus: 'Live' });
+        const user = await User.create({
+            username,
+            role: userRole._id,
+            financeId: finance._id,
+            recordStatus: 'Live',
+            isActive: true,
+            inputter: currentUserId,
+            password
+        });
+
+        if(!user) {
+            await Finance.findByIdAndDelete(finance._id);
+        }
+
+        res.status(200).json({ mssg: `${firstName} ${lastName} has been successfully added to the record`, redirect: '/finance' });
+       
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while creating finance information' });
+    }
+}
+
+module.exports.delete_finance_info = async(req,res) => {
+    const { id } = req.params;
+    const { recordStatus } = req.body;
+
+    try {
+        await Finance.findByIdAndUpdate(id,{ recordStatus });
+        res.status(200).json({ mssg: 'Finance profile has been successfully deleted' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while deleting finance info record' });
+    }
+}
+
+module.exports.edit_finance_info = async(req,res) => {
+
+    const { id } = req.params;
+    const { firstName,middleName,lastName,dateOfBirth,sex,religion,nationality,placeOfBirth,email,contactNumber,address,session,inputter } = req.body;
+
+    try {
+        const finance = await Finance.findByIdAndUpdate(id,{ firstName,middleName,lastName,dateOfBirth,sex,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,sessionId: session,inputter });
+        res.status(200).json({ mssg: `${firstName}'s record has been updated successfully`, redirect: '/finance' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating finance information profile' });
+    }
 }

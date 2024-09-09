@@ -63,12 +63,14 @@ userSchema.statics.login = async function(username,password,session) {
     const schoolYears = await SchoolYear.find();
 
     // Create a function here to check isAllowedToLogin if the user has studentId
-    if(!user.isAllowedToLogin && user.studentId) {
-        throw Error(`Sorry, you are not allowed to access the system, please contact your registrar to access the system`);
-    }
+   
 
     if(!user) {
         throw Error(`${username} does not exist`);
+    }
+
+    if(!user.isAllowedToLogin && user.studentId) {
+        throw Error(`Sorry, you are not allowed to access the system, please contact your registrar to access the system`);
     }
 
     const { userRole } = await UserRole.findOne({ _id: user.role });

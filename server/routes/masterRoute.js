@@ -94,7 +94,12 @@ get_grading_categories,
 get_grading_category_details,
 edit_grading_category,
 delete_grading_category,
-add_grading_category} = require('../controller/masterController');
+add_grading_category,
+get_finance_info,
+get_finance_info_detail,
+add_finance_info,
+delete_finance_info,
+edit_finance_info} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -242,6 +247,13 @@ route.get('/grading-category/:id', get_grading_category_details);
 route.patch('/grading-category/:id', edit_grading_category);
 route.put('/grading-category/:id',delete_grading_category);
 route.post('/grading-category', add_grading_category);
+
+// Finance
+route.get('/finance', get_finance_info);
+route.get('/finance/:id', get_finance_info_detail);
+route.post('/finance', add_finance_info);
+route.put('/finance/:id', delete_finance_info);
+route.patch('/finance/:id', edit_finance_info);
 
 // Dashboard
 route.get('/dashboard/:sessionId',get_dashboard_details);

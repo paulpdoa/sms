@@ -10,6 +10,10 @@ import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RiSecurePaymentLine } from "react-icons/ri";
+import { MdOutlineDashboardCustomize } from "react-icons/md";
+import { MdCoPresent } from "react-icons/md";
+import { MdGrade } from "react-icons/md";
 
 const initialMenus = [
     {
@@ -30,6 +34,7 @@ const initialMenus = [
                     { name: 'Sections', link: '/master/sections' },
                     { name: 'Students', link: '/master/students' },
                     { name: 'Teachers', link: '/master/teachers' },
+                    { name: 'Finance', link: '/master/finance' },
                     { name: 'Parents', link: '/master/parents' },
                     { name: 'Siblings', link: '/master/siblings' },
                     { name: 'Grade Level', link: '/master/grade-levels' },
@@ -56,6 +61,7 @@ const initialMenus = [
                 subMenus: [
                     { name: 'Teachers', link: '/teachers' },
                     { name: 'Students', link: '/students' },
+                    { name: 'Finance', link:'/finance' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
@@ -237,20 +243,26 @@ const initialMenus = [
         role: 'Student',
         menus: [
             {
+                icon: <MdOutlineDashboardCustomize />,
                 name: 'Student Dashboard',
                 link: '/student/dashboard'
             },
             {
                 name: 'Grades',
-                icon: <FaCashRegister />,
+                icon: <MdGrade />,
                 link: '/student/grades'
                 // subMenus: [
                 //     { name: 'Student Grading', link: '/student-grading' },
                 // ]
             },
             {
+                name: 'Payment Schedule',
+                icon: <RiSecurePaymentLine />,
+                link: '/student/payment-schedule'
+            },
+            {
                 name: 'Attendance',
-                icon: <FaCashRegister />,
+                icon: <MdCoPresent />,
                 link: '/student/attendance'
                 // subMenus: [
                 //     { name: 'Student Grading', link: '/student-grading' },
@@ -262,21 +274,24 @@ const initialMenus = [
         role: 'Parent',
         menus: [
             {
+                icon: <MdOutlineDashboardCustomize />,
                 name: 'Parent Dashboard',
                 link: '/parent/dashboard'
             },
             {
                 name: 'Grades',
-                icon: <FaCashRegister />,
-                link: '/student/grades'
-                // subMenus: [
-                //     { name: 'Student Grading', link: '/student-grading' },
-                // ]
+                icon: <MdGrade />,
+                link: '/parent/grades'
+            },
+            {
+                name: 'Payment Schedule',
+                icon: <RiSecurePaymentLine />,
+                link: '/parent/payment-schedule'
             },
             {
                 name: 'Attendance',
-                icon: <FaCashRegister />,
-                link: '/student/attendance'
+                icon: <MdCoPresent />,
+                link: '/parent/attendance'
                 // subMenus: [
                 //     { name: 'Student Grading', link: '/student-grading' },
                 // ]

@@ -9,60 +9,39 @@ import axios from "axios";
 import { MainContext } from '../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 import MasterTable from '../components/MasterTable';
+import AddFinanceBtn from '../components/buttons/AddFinanceBtn';
 
-const columns = [
-    {
-        accessorKey: 'firstName',
-        header: 'First Name',
-    },
-    {
-        accessorKey: 'middleName',
-        header: 'Middle Name',
-    },
-    {
-        accessorKey: 'lastName',
-        header: 'Last Name',
-    },
-    {
-        accessorKey: 'dateOfBirth',
-        header: 'Date Of Birth'
-    },
-    {
-        accessorKey: 'sex.gender',
-        header: 'Gender'
-    },
-    {
-        accessorKey: 'nationality.nationality',
-        header: 'Nationality'
-    }
-];
-
-const Teachers = () => {
-    const { records, isLoading } = useFetch(`${baseUrl()}/teachers`);
+const Finance = () => {
+    const { records: financeLists, isLoading } = useFetch(`${baseUrl()}/finance`);
     const { searchQuery,setSearchQuery,role } = useContext(MainContext);
 
     const navigate = useNavigate();
 
-    const recordsWithoutInputter = records.map(record => ({
-        ...record,
-        sex: {
-            gender: record?.sex
-        },
-        nationality: {
-            _id: record?.nationality?._id,
-            nationality: record?.nationality?.nationality || 'Not Assigned'
-        },
-        dateOfBirth: new Date(record.dateOfBirth).toLocaleDateString('en-US', {
+    const columns = [
+        { accessorKey: 'fullName', header: 'Full Name' },
+        { accessorKey: 'sex', header: 'Gender' },
+        { accessorKey: 'birthDate', header: 'Date Of Birth' },
+        { accessorKey: 'nationalityId.nationality', header: 'Nationality' }
+    ];
+
+    const financeData = financeLists?.map(fl => ({
+        ...fl,
+        fullName: `${fl.firstName} ${fl.middleName} ${fl.lastName}`,
+        birthDate: new Date(fl.dateOfBirth).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric' 
+            day: 'numeric'
         })
-    }))
+    }));
 
-    const deleteTeacher = async (id) => {
+    console.log(financeData);
+
+   
+
+    const deleteFinance = async (id) => {
         try {
-            const removeTeacher = await axios.put(`${baseUrl()}/teacher/${id}`, { role,recordStatus: 'Deleted' });
-            toast.success(removeTeacher.data.mssg, {
+            const removeFinance = await axios.put(`${baseUrl()}/finance/${id}`, { role,recordStatus: 'Deleted' });
+            toast.success(removeFinance.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: true,
@@ -91,24 +70,24 @@ const Teachers = () => {
         }
     };
 
-    const goToEdit = (id) => navigate(`/registrar/edit-teacher/${id}`)
+    const goToEdit = (id) => navigate(`/master/edit-finance/${id}`)
 
     return (
         <main className="p-2">
             {/* <DateTime /> */}
             <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Teachers</h1>
+                <h1 className="text-2xl text-gray-700 font-semibold">Finance</h1>
                 <div className="flex items-center justify-between mt-3">
                     <Searchbar onSearch={setSearchQuery} />
-                    <AddTeacherBtn />
+                    <AddFinanceBtn />
                 </div>
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
-                    data={recordsWithoutInputter}
-                    onDelete={deleteTeacher}
+                    data={financeData}
+                    onDelete={deleteFinance}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}
                     isLoading={isLoading}
@@ -119,4 +98,4 @@ const Teachers = () => {
     );
 };
 
-export default Teachers;
+export default Finance;

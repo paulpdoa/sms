@@ -131,7 +131,8 @@ const StudentGrading = () => {
             passingScore,
             gradeRemark,
             remarks,
-            studentScore
+            studentScore,
+            session
         }
         studentGradeData.inputter = currentUserId;
         studentGradeData.sessionId = session;
@@ -763,7 +764,7 @@ const StudentGrading = () => {
                                 </div> */}
                                 <div className="flex justify-end">
                                     <button onClick={() => {
-                                        if(role === 'Teacher' && !isYearDone) {
+                                        if(!isYearDone && role === 'Teacher') {
                                             setShowForm(true)
                                             setShowStudentSubject(false);
                                         } else {
