@@ -12,6 +12,7 @@ const schoolAdminRoute = require('./routes/schoolAdminRoute');
 const teacherRoute = require('./routes/teacherRoute');
 const studentRoute = require('./routes/studentRoute');
 const parentRoute = require('./routes/parentRoute');
+const financeRoute = require('./routes/financeRoute');
 
 const uri = process.env.DB_URI;
 
@@ -38,3 +39,4 @@ app.use('/api/',schoolAdminRoute);
 app.use('/api', teacherRoute);
 app.use('/api',studentRoute);
 app.use('/api',parentRoute);
+app.use('/api',financeRoute);

@@ -17,7 +17,7 @@ const Login = () => {
     const [error, setError] = useState({ username: '', password: '', session: '' });
     const navigate = useNavigate();
 
-    const schoolName = 'Login';
+    const schoolName = 'Name Of School';
     const logoPath = '/schoolLogo/school-logo-filler.png';
 
     const loginUser = async (e) => {
@@ -77,7 +77,7 @@ const Login = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-2xl overflow-hidden max-w-4xl w-full">
                 {/* Login Form */}
                 <form onSubmit={loginUser} className="bg-white p-10 flex flex-col justify-center">
-                    <h1 className="text-2xl font-semibold text-gray-700 mb-5">{schoolName}</h1>
+                    <h1 className="text-2xl font-semibold text-gray-700 mb-5">Login</h1>
                     
                     <div className="flex flex-col gap-1">
                         <label className="text-gray-700 text-sm">Username</label>
@@ -131,7 +131,7 @@ const Login = () => {
 
                 {/* Right Side - School Logo and Information */}
                 <div className="bg-blue-500 flex items-center justify-center flex-col p-10 text-white">
-                    <img className="mb-4 w-24 h-24" src={logoPath} alt="School Logo" />
+                    <img className="mb-4 w-32 h-32" src={logoPath} alt="School Logo" />
                     <h1 className="text-xl font-semibold">Welcome to {schoolName}</h1>
                     <p className="mt-2 text-sm">Manage your school's activities effectively.</p>
                     <button

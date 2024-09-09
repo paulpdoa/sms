@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'student'
     },
+    financeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'finance'
+    },
     password: requiredString,
     profilePictureUrl: {
         type: String

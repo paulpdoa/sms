@@ -297,6 +297,21 @@ const initialMenus = [
                 // ]
             }
         ]
+    },
+    {
+        role: 'Finance',
+        menus: [
+            {
+                icon: <MdOutlineDashboardCustomize />,
+                name: 'Finance Dashboard',
+                link: '/finance/dashboard'
+            },
+            {
+                name: 'Payment Schedule',
+                icon: <RiSecurePaymentLine />,
+                link: '/finance/payment-schedule'
+            }
+        ]
     }
 ];
 
