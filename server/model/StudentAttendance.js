@@ -5,7 +5,9 @@ const requiredString = {
     required: true
 }
 
-const studentBookSchema = new mongoose.Schema({
+const studentAttendanceSchema = new mongoose.Schema({
+    dateToday: requiredString,
+    remarks: requiredString,
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
@@ -14,20 +16,12 @@ const studentBookSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'student'
     },
-    gradeLevelId: {
+    inputter: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'gradeLevel'
-    },
-    feeCodeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'feeCode'
-    },
-    manageFeeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'manageFee'
+        ref: 'user'
     },
     recordStatus: requiredString
 }, { timestamps: true })
 
-const StudentBookModel = mongoose.model('studentBook',studentBookSchema);
-module.exports = StudentBookModel;
+const StudentAttendanceModel = mongoose.model('studentAttendance',studentAttendanceSchema);
+module.exports = StudentAttendanceModel;

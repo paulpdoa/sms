@@ -4,6 +4,7 @@ const Teacher = require('../model/Teacher');
 const TeacherSubject = require('../model/TeacherSubject');
 const TeacherAcademic = require('../model/TeacherAcademic');
 const Session = require('../model/SchoolYear');
+const StudentSubject = require('../model/StudentSubject');
 
 module.exports.get_teacher_dashboard = async(req,res) => {
     const { session } = req.query;
@@ -135,3 +136,33 @@ module.exports.add_student_grade = async (req, res) => {
         res.status(500).json({ mssg: 'An error occurred while adding student grade' });
     }
 };
+
+module.exports.get_teacher_student_attendance = async(req,res) => {
+    const { session } = req.query;  
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        const teacher = await Teacher.findById(user.teacherId)
+        .populate({ path: 'teacherAcademicId', populate: { path: 'teacherSubjectId' } });
+        const teacherAcademicLists = teacher.teacherAcademicId.filter(teacherAcad => {
+            return teacherAcad.recordStatus === 'Live' && teacherAcad.teacherSubjectId && teacherAcad.sessionId.equals(session)
+        });
+        const teacherName = `${teacher.firstName} ${teacher.lastName}`;
+
+        const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
+        .populate('teacherSubjectId studentId')
+        const teacherStudentLists = teacherStudents.filter(teacherSubj => {
+            if(teacherSubj.teacherSubjectId.teacherId.equals(teacher._id)) {
+                return teacherSubj
+            }
+        });
+        console.log(teacherStudentLists);
+
+        res.status(200).json({ teacherAcademics: teacherAcademicLists, teacherStudentLists, teacherName })
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching students attendance records' });
+    }
+}

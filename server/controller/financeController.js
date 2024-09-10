@@ -47,13 +47,24 @@ module.exports.get_finance_payment_schedule = async(req,res) => {
         }
         financeName = `${finance.firstName} ${finance.middleName} ${finance.lastName}`;
 
-        const students = await Student.find({ recordStatus: 'Live' }).populate('academicId');
+        const students = await Student.find({ recordStatus: 'Live' }).populate({ path: 'academicId', populate: {
+            path: 'gradeLevelId'
+        } });
         if(!students) {
             return res.status(404).json({ mssg: 'Student information is not existing' });
         }
         const studentFilteredLists = students.filter(student => student.academicId?.isAdmitted && student.academicId?.isRegistered);
 
-        const studentPayments = await StudentPayment.find({ recordStatus: 'Live', sessionId: session });
+        const studentPayments = await StudentPayment.find({ recordStatus: 'Live', sessionId: session })
+        .populate({ path: 'paymentScheduleId', populate: {
+            path: 'paymentTermId'
+        } })
+        .populate({ path: 'manageFeeId', populate: {
+            path: 'feeDescription', populate: {
+                path: 'feeCateg'
+            }
+        } })
+        .populate('feeCodeId gradeLevelId textBookId studentDiscountId')
         if(!studentPayments) {
             return res.status(404).json({ mssg:'Student payments is not existing' });
         }

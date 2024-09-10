@@ -59,6 +59,10 @@ const teacherSchema = new mongoose.Schema({
     socMedAcct: {
         type: String
     },
+    teacherAcademicId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'teacherAcademic'
+    }],
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'user'

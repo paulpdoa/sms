@@ -80,6 +80,7 @@ import NewFinance from "./pages/SuperAdmin/NewFinance";
 import EditFinance from "./pages/EditFinance";
 import FinanceDashboard from "./pages/Finance/FinanceDashboard";
 import FinancePaymentSchedule from "./pages/Finance/FinancePaymentSchedule";
+import TeacherStudentAttendance from "./pages/Teacher/TeacherStudentAttendance";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -181,10 +182,9 @@ const App = () => {
           <Route path='/edit-finance/:id' element={<EditFinance />} />
 
           {/* For teachers route */}
-          {/* { notAllowedUsers && <> */}
-            <Route path='/student-grading' element={<StudentGrading />} />
-            <Route path='/teacher/dashboard' element={role === 'Teacher' && <TeacherDashboard />  } />
-          {/* </> } */}
+          <Route path='/teacher/student-grading' element={<StudentGrading />} />
+          <Route path='/teacher/dashboard' element={role === 'Teacher' && <TeacherDashboard />  } />
+          <Route path='/teacher/student-attendance' element={<TeacherStudentAttendance />} />
 
           {/* For student routes */}
           <Route path='/student/dashboard' element={<StudentDashboard />} />

@@ -16,7 +16,7 @@ const createToken = (token) => {
 
 module.exports.get_teachers = async (req,res) => {
     try {
-        const teachers = await Teacher.find({ recordStatus: 'Live' }).populate('religion nationality');
+        const teachers = await Teacher.find({ recordStatus: 'Live' }).populate('religion nationality teacherAcademicId');
         res.status(200).json(teachers);
     } catch(err) {
         console.log(err);

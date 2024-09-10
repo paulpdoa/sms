@@ -1438,33 +1438,58 @@ module.exports.get_teacher_subject_details = async (req,res) => {
     }
 }
 
-module.exports.add_teacher_subject = async (req,res) => {
-    
-    const { roomNumberId,subjectId,startTime,endTime,inputter,teacherId,sessionId,daySchedule } = req.body;
-    
-    // Multiple rows for creating teacher due to teacher can handle many subjects
-    // Add a validation if there is already a teacher who is teaching that subject already
+// Assuming TeacherSubject, TeacherAcademic, and Teacher models are properly imported here
+
+module.exports.add_teacher_subject = async (req, res) => {
+    const { roomNumberId, subjectId, startTime, endTime, inputter, teacherId, sessionId, daySchedule } = req.body;
     
     try {
+        // Find the teacher by ID
         const assignedTeacher = await Teacher.findById(teacherId);
 
+        // Check if any other teacher is already teaching this subject
         const teacherSubjectExists = await TeacherSubject.findOne({ subjectId }).populate('teacherId');
-        if(teacherSubjectExists) {
-            return res.status(400).json({ mssg: `${teacherSubjectExists.teacherId.firstName} ${teacherSubjectExists.teacherId.lastName} is already teaching this subject, please select another subject` });
+        if (teacherSubjectExists) {
+            return res.status(400).json({
+                mssg: `${teacherSubjectExists.teacherId.firstName} ${teacherSubjectExists.teacherId.lastName} is already teaching this subject, please select another subject`
+            });
         }
 
-        const teacherSubject = await TeacherSubject.create({ roomNumberId,subjectId,startTime,endTime,inputter,teacherId,recordStatus: 'Live',sessionId,daySchedule });
-
+        // Create the teacher subject entry
+        const teacherSubject = await TeacherSubject.create({
+            roomNumberId,
+            subjectId,
+            startTime,
+            endTime,
+            inputter,
+            teacherId,
+            recordStatus: 'Live',
+            sessionId,
+            daySchedule
+        });
 
         // Create teacher academic record after assigning a subject
-        await TeacherAcademic.create({ teacherSubjectId: teacherSubject._id, inputter, sessionId, recordStatus: 'Live' });
+        const teacherAcademic = await TeacherAcademic.create({
+            teacherSubjectId: teacherSubject._id,
+            inputter,
+            sessionId,
+            recordStatus: 'Live'
+        });
 
-        res.status(200).json({ mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully` });
-    } catch(err) {
-        console.log(err);
+        // Update teacher's teacherAcademicId (append instead of replacing)
+        await Teacher.findByIdAndUpdate(teacherId, {
+            $push: { teacherAcademicId: teacherAcademic._id }
+        });
+
+        res.status(200).json({
+            mssg: `Teacher ${assignedTeacher.firstName} with subject for schedule of ${startTime} to ${endTime} has been assigned successfully`
+        });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ mssg: 'An error occurred while assigning subject to teacher' });
     }
-}
+};
+
 
 module.exports.delete_teacher_subject = async (req,res) => {
 

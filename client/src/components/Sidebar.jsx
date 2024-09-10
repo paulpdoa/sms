@@ -227,15 +227,19 @@ const initialMenus = [
         role: 'Teacher',
         menus: [
             {
+                icon: <MdOutlineDashboardCustomize />,
                 name: 'Teacher Dashboard',
                 link: '/teacher/dashboard'
             },
             {
-                name: 'Teacher',
-                icon: <FaCashRegister />,
-                subMenus: [
-                    { name: 'Student Grading', link: '/student-grading' },
-                ]
+                name: 'Student Grades',
+                icon: <MdGrade />,
+                link: '/teacher/student-grading',
+            },
+            {
+                name: 'Student Attendance',
+                icon: <MdCoPresent />,
+                link: '/teacher/student-attendance'
             }
         ]
     },

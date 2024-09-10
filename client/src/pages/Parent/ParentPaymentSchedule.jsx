@@ -16,7 +16,7 @@ const ParentPaymentSchedule = () => {
         { accessorKey: 'paymentDate', header: 'Payment Date' },
         { accessorKey: 'payEveryAmount', header: 'Amount Payable' },
         // { accessorKey: 'section', header: 'Section' },   
-    ]
+    ];
 
     const paymentData = records?.studentPayments?.map(studentPayment => ({
         ...studentPayment,
