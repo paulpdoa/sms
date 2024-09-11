@@ -4,9 +4,10 @@ import { useState, useContext, useEffect } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
+import axios from 'axios';
 
 const TeacherStudentAttendance = () => {
-    const { currentUserId, searchQuery } = useContext(MainContext);
+    const { currentUserId, searchQuery, session } = useContext(MainContext);
     const { records } = useFetch(`${baseUrl()}/teacher-student-attendance/${currentUserId}`);
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Default to current month
@@ -23,6 +24,26 @@ const TeacherStudentAttendance = () => {
     useEffect(() => {
         setDaysInMonth(calculateDaysInMonth(selectedMonth, selectedYear));
     }, [selectedMonth, selectedYear]);
+
+    useEffect(() => {
+        // Initialize attendanceData based on fetched records
+        console.log(records?.attendanceData);
+        if (records?.attendanceData) {
+            const initializedData = {};
+            records.attendanceData.forEach(record => {
+                const studentId = record.studentId;
+                const dayKey = `day${new Date(record.dateToday).getDate()}`;
+                
+                                
+                if (!initializedData[studentId]) {
+                    initializedData[studentId] = {};
+                }
+                
+                initializedData[studentId][dayKey] = record.remarks;
+            });
+            setAttendanceData(initializedData);
+        }
+    }, [records]);
 
     const handleMonthChange = (e) => {
         setSelectedMonth(parseInt(e.target.value));
@@ -70,19 +91,9 @@ const TeacherStudentAttendance = () => {
                 inputter: currentUserId
             });
     
-            // If the attendance submission is successful, update the attendanceData state with the saved records
-            const updatedAttendanceData = data.attendanceRecords.reduce((acc, record) => {
-                const dayKey = `day${new Date(record.dateToday).getDate()}`;
-                if (!acc[record.studentId]) {
-                    acc[record.studentId] = {};
-                }
-                acc[record.studentId][dayKey] = record.remarks;
-                return acc;
-            }, {});
-    
             setAttendanceData(prev => ({
                 ...prev,
-                ...updatedAttendanceData
+                ...attendanceData
             }));
     
             alert('Attendance successfully submitted!');
@@ -91,7 +102,6 @@ const TeacherStudentAttendance = () => {
             alert('Error submitting attendance');
         }
     };
-    
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
@@ -131,7 +141,14 @@ const TeacherStudentAttendance = () => {
                             className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
-                </div>
+                </div> 
+
+                <button
+                    onClick={submitAttendance}
+                    className="bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md text-sm my-2"
+                >
+                    Submit Attendance
+                </button>
 
                 {/* Attendance Table */}
                 <div className="overflow-x-auto shadow-md rounded-lg w-full">
@@ -164,7 +181,7 @@ const TeacherStudentAttendance = () => {
                                                     value={attendanceData?.[row.studentId._id]?.[`day${colIndex}`] || ""}
                                                     onChange={(e) => handleAttendanceChange(row.studentId._id, `day${colIndex}`, e.target.value)}
                                                 >
-                                                    <option value="">Select</option>
+                                                    <option value="" hidden>Select</option>
                                                     <option value="Present">Present</option>
                                                     <option value="Absent">Absent</option>
                                                     <option value="Late">Late</option>

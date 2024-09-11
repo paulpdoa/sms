@@ -179,6 +179,8 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
 module.exports.add_students_attendance = async (req, res) => {
     const { attendanceData, selectedMonth, selectedYear, sessionId, inputter } = req.body;
 
+    console.log('Attendance Data: ',req.body.attendanceData);
+
     if (!attendanceData || !sessionId || !selectedMonth || !selectedYear || !inputter) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -188,7 +190,10 @@ module.exports.add_students_attendance = async (req, res) => {
 
         for (const [studentId, attendanceDays] of Object.entries(attendanceData)) {
             for (const [day, remarks] of Object.entries(attendanceDays)) {
-                const dateToday = new Date(selectedYear, selectedMonth - 1, parseInt(day.replace('day', ''))).toISOString();
+                const dayNumber = parseInt(day.replace('day', ''));
+                const dateToday = `${selectedYear}-${String(selectedMonth).padStart(2,'0')}-${String(dayNumber).padStart(2,'0')}`
+               
+                console.log(dateToday);
 
                 const attendanceRecord = new StudentAttendance({
                     dateToday,

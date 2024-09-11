@@ -4,6 +4,8 @@ const route = express.Router();
 const { allowUserView,allowUserAction } = require('../middleware/middlewares');
 const { get_teacher_academics } = require('../controller/registrarController');
 
+const StudentAttendance = require('../model/StudentAttendance');
+
 const userRoles = ['School Admin','Super Admin', 'Teacher'];
 const teacherRole = ['Teacher'];
 
@@ -21,5 +23,15 @@ route.post('/student-grade',allowUserAction(teacherRole), add_student_grade);
 // Students attendance
 route.get('/teacher-student-attendance/:userId', get_teacher_student_attendance);
 route.post('/teacher-student-attendance', add_students_attendance);
+
+// For Testing deletion of StudentAttendance
+route.get('/delete-student-attendance', async(req,res) => {
+    try {
+        await StudentAttendance.deleteMany();
+        res.status(201).json({ mssg: 'Students attendance has been deleted' });
+    } catch(err) {
+        console.log(err)
+    }
+})
 
 module.exports = route
