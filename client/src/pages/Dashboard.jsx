@@ -16,6 +16,7 @@ import { PiStudentDuotone, PiChalkboardTeacherFill } from 'react-icons/pi';
 import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
 import { MainContext } from '../helpers/MainContext';
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(
   ArcElement,
@@ -30,7 +31,7 @@ ChartJS.register(
 
 const Dashboard = () => {
 
-  const { session } = useContext(MainContext);
+  const { session,role } = useContext(MainContext);
   const { records: students } = useFetch(`${baseUrl()}/students`);
   const { records: teachers } = useFetch(`${baseUrl()}/teachers`);
   const { records: academics } = useFetch(`${baseUrl()}/academics`);
@@ -39,6 +40,8 @@ const Dashboard = () => {
   const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
   const { records: dashboard } = useFetch(`${baseUrl()}/dashboard/${session}`);
+
+  const navigate = useNavigate();
 
   const [studentRegistered, setStudentRegistered] = useState(0);
   const [studentAdmitted, setStudentAdmitted] = useState(0);
@@ -68,7 +71,11 @@ const Dashboard = () => {
 
       })
     }
-  },[dashboard])
+
+    if(role !== 'Super Admin' || role !== 'School Admin') {
+      navigate(`/${role.toLowerCase()}/dashboard`);
+    }
+  },[dashboard,role])
 
   useEffect(() => {
     // if (students) {

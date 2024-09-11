@@ -5,6 +5,7 @@ const TeacherSubject = require('../model/TeacherSubject');
 const TeacherAcademic = require('../model/TeacherAcademic');
 const Session = require('../model/SchoolYear');
 const StudentSubject = require('../model/StudentSubject');
+const StudentAttendance = require('../model/StudentAttendance');
 
 module.exports.get_teacher_dashboard = async(req,res) => {
     const { session } = req.query;
@@ -137,32 +138,80 @@ module.exports.add_student_grade = async (req, res) => {
     }
 };
 
-module.exports.get_teacher_student_attendance = async(req,res) => {
-    const { session } = req.query;  
+module.exports.get_teacher_student_attendance = async (req, res) => {
+    const { session, month, year } = req.query;  
     const { userId } = req.params;
 
     try {
         const user = await User.findById(userId);
         const teacher = await Teacher.findById(user.teacherId)
-        .populate({ path: 'teacherAcademicId', populate: { path: 'teacherSubjectId' } });
-        const teacherAcademicLists = teacher.teacherAcademicId.filter(teacherAcad => {
-            return teacherAcad.recordStatus === 'Live' && teacherAcad.teacherSubjectId && teacherAcad.sessionId.equals(session)
-        });
-        const teacherName = `${teacher.firstName} ${teacher.lastName}`;
-
+            .populate({ path: 'teacherAcademicId', populate: { path: 'teacherSubjectId' } });
+        
         const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
         .populate('teacherSubjectId studentId')
-        const teacherStudentLists = teacherStudents.filter(teacherSubj => {
-            if(teacherSubj.teacherSubjectId.teacherId.equals(teacher._id)) {
-                return teacherSubj
-            }
+        // .distinct('studentId'); // This ensures you only get unique student IDs
+
+        const teacherStudentLists = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
+        
+        // Filter attendance records for the selected month and year
+        const startOfMonth = new Date(year, month - 1, 1);
+        const endOfMonth = new Date(year, month, 0);
+
+        const attendanceData = await StudentAttendance.find({
+            sessionId: session,
+            recordStatus: 'Live',
+            // dateToday: { $gte: startOfMonth, $lte: endOfMonth }
         });
-        console.log(teacherStudentLists);
+        console.log(attendanceData);
 
-        res.status(200).json({ teacherAcademics: teacherAcademicLists, teacherStudentLists, teacherName })
-
-    } catch(err) {
+        res.status(200).json({
+            teacherStudentLists,
+            teacherName: `${teacher.firstName} ${teacher.lastName}`,
+            attendanceData // Send filtered attendance data
+        });
+    } catch (err) {
         console.log(err);
-        res.status(500).json({ mssg: 'An error occurred while fetching students attendance records' });
+        res.status(500).json({ message: 'An error occurred while fetching students attendance records' });
     }
-}
+};
+
+
+module.exports.add_students_attendance = async (req, res) => {
+    const { attendanceData, selectedMonth, selectedYear, sessionId, inputter } = req.body;
+
+    if (!attendanceData || !sessionId || !selectedMonth || !selectedYear || !inputter) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const attendanceRecords = [];
+
+        for (const [studentId, attendanceDays] of Object.entries(attendanceData)) {
+            for (const [day, remarks] of Object.entries(attendanceDays)) {
+                const dateToday = new Date(selectedYear, selectedMonth - 1, parseInt(day.replace('day', ''))).toISOString();
+
+                const attendanceRecord = new StudentAttendance({
+                    dateToday,
+                    remarks,
+                    sessionId,
+                    studentId,
+                    inputter,
+                    recordStatus: 'Live'
+                });
+
+                attendanceRecords.push(attendanceRecord);
+            }
+        }
+
+        const savedRecords = await StudentAttendance.insertMany(attendanceRecords);
+
+        // Respond with the saved records
+        res.status(201).json({ message: 'Attendance records successfully saved', attendanceRecords: savedRecords });
+    } catch (error) {
+        console.error('Error saving attendance:', error);
+        res.status(500).json({ message: 'Error saving attendance records' });
+    }
+};
+
+
+
