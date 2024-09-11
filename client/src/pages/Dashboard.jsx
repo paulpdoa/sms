@@ -71,10 +71,7 @@ const Dashboard = () => {
 
       })
     }
-
-    if(role !== 'Super Admin' || role !== 'School Admin') {
-      navigate(`/${role.toLowerCase()}/dashboard`);
-    }
+    
   },[dashboard,role])
 
   useEffect(() => {

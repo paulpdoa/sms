@@ -8,17 +8,30 @@ import axios from 'axios';
 
 const TeacherStudentAttendance = () => {
     const { currentUserId, searchQuery, session } = useContext(MainContext);
-    const { records } = useFetch(`${baseUrl()}/teacher-student-attendance/${currentUserId}`);
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Default to current month
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());    // Default to current year
     const [daysInMonth, setDaysInMonth] = useState(30); // Default to 30 days
     const [attendanceData, setAttendanceData] = useState({}); // Track attendance inputs
 
+    const { records } = useFetch(`${baseUrl()}/teacher-student-attendance/${currentUserId}?month=${selectedMonth}&&year=${selectedYear}`);
+
+
     // Function to get the number of days in a given month and year
     const calculateDaysInMonth = (month, year) => {
         return new Date(year, month, 0).getDate();
     };
+
+    useEffect(() => {
+        const fetchStudentsAttendance = async() => {
+            try {
+
+            } catch(err) {
+                console.log(err);
+            }
+        }
+        fetchStudentsAttendance();
+    },[selectedMonth,selectedYear])
 
     // Update days in month whenever the month or year changes
     useEffect(() => {
@@ -34,7 +47,7 @@ const TeacherStudentAttendance = () => {
                 const studentId = record.studentId;
                 const dayKey = `day${new Date(record.dateToday).getDate()}`;
                 
-                                
+
                 if (!initializedData[studentId]) {
                     initializedData[studentId] = {};
                 }

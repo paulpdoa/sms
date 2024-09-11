@@ -6,7 +6,10 @@ const requiredString = {
 }
 
 const studentAttendanceSchema = new mongoose.Schema({
-    dateToday: requiredString,
+    dateToday: {
+        type: Date,
+        required: true
+    },
     remarks: requiredString,
     sessionId: {
         type: mongoose.Schema.Types.ObjectId,

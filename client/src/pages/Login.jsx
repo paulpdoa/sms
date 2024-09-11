@@ -59,7 +59,7 @@ const Login = () => {
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
-                pauseOnHover: true,
+                pauseOnHover: true, 
                 draggable: true,
                 progress: undefined,
                 theme: 'colored'

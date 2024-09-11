@@ -149,13 +149,14 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
         
         const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
         .populate('teacherSubjectId studentId')
-        // .distinct('studentId'); // This ensures you only get unique student IDs
 
         const teacherStudentLists = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
         
-        // Filter attendance records for the selected month and year
-        const startOfMonth = new Date(year, month - 1, 1);
-        const endOfMonth = new Date(year, month, 0);
+        // Fixing the start and end of the month calculation
+        const startOfMonth = new Date(year, month, 1);
+        const endOfMonth = new Date(year, parseInt(month) + 1, 0); // Correct end of month
+        console.log('Start Month: ', startOfMonth);
+        console.log('End of Month: ', endOfMonth);
 
         const attendanceData = await StudentAttendance.find({
             sessionId: session,
@@ -174,6 +175,7 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
         res.status(500).json({ message: 'An error occurred while fetching students attendance records' });
     }
 };
+
 
 
 module.exports.add_students_attendance = async (req, res) => {
