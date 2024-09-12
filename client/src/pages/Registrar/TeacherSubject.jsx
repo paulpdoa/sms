@@ -13,7 +13,7 @@ import MasterDataForm from '../../components/MasterDataForm';
 const TeacherSubject = () => {
 
     const { records: teachersSubject } = useFetch(`${baseUrl()}/teachers-subject`);
-    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role } = useContext(MainContext);
+    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role,genericPath } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
     const isYearDone = schoolYear.isYearDone;
 
@@ -261,7 +261,7 @@ const TeacherSubject = () => {
         }
     }
 
-    const goToEdit = (id) => navigate(`/teacher-subject/${id}`);
+    const goToEdit = (id) => navigate(`/${genericPath}/teacher-subject/${id}`);
 
     return (
         <main className="p-2 relative">

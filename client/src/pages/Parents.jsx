@@ -33,7 +33,7 @@ const columns = [
 const Parents = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/parents`);
-    const { searchQuery,setSearchQuery,role,currentUserId } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,currentUserId,genericPath } = useContext(MainContext);
     const navigate = useNavigate();
 
     const deleteParent = async (id) => {
@@ -69,7 +69,7 @@ const Parents = () => {
         }
     }
 
-    const goToEdit = (id) => navigate(`/registrar/edit-parent/${id}`)
+    const goToEdit = (id) => navigate(`/${genericPath}/edit-parent/${id}`)
 
     const recordsWithoutInputter = records.filter(record => record.studentId !== null).map(record => ({
         ...record,

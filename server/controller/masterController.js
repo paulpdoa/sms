@@ -1275,9 +1275,9 @@ module.exports.get_user_detail = async (req,res) => {
 
 module.exports.edit_user = async (req, res) => {
     const { id } = req.params;
-    const { userRole: role, username, isActive, password, confirmPassword } = req.body;
+    const { userRole: role, username, isActive, password, confirmPassword,isAllowedToLogin } = req.body;
 
-    let updatedData = { role, username, isActive };
+    let updatedData = { role, username, isActive, isAllowedToLogin };
     
     // If a file is uploaded, add the profile picture URL
     if (req.file) {
@@ -1319,12 +1319,12 @@ module.exports.user_login = async (req,res) => {
     const { username,password,session } = req.body;
 
     const userRoles = [
-        { role: 'Super Admin', path: '/' },
+        { role: 'Super Admin', path: '/master/dashboard' },
         { role: 'Teacher', path: '/teacher/dashboard' },
         { role: 'Student', path: '/student/dashboard' },
         { role: 'Finance', path:'/finance/dashboard' },
         { role: 'Parent', path: '/parent/dashboard' },
-        { role: 'Registrar', path: '/' }
+        { role: 'Registrar', path: '/registrar/dashboard' }
     ]
 
 
@@ -1860,8 +1860,8 @@ module.exports.get_dashboard_details = async (req, res) => {
         }
 
         // For getting enrollees counts
-        const uniqueStudentIds = new Set(studentsEnrolled.map(student => student.studentId.toString()));
-        enrolledStudents = uniqueStudentIds.size;
+        // const uniqueStudentIds = new Set(studentsEnrolled.map(student => student.studentId.toString()));
+        // enrolledStudents = uniqueStudentIds.size;
 
         for (const academic of academics) {
             studentsRegistered += academic.isRegistered ? 1 : 0;
@@ -1870,6 +1870,10 @@ module.exports.get_dashboard_details = async (req, res) => {
             studentsGender.female += academic.studentId.sex === 'Female' ? 1 : 0;
             studentsNationality.local += academic.studentId.nationality.nationality === 'Filipino' ? 1 : 0;
             studentsNationality.foreign += academic.studentId.nationality.nationality !== 'Filipino' ? 1 : 0;
+
+            if(academic.isEnrolled) {
+                enrolledStudents += 1
+            }
 
             const status = academic.academicStatus;
             if(status === 'New') {

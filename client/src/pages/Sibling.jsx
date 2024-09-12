@@ -10,26 +10,37 @@ import MasterTable from '../components/MasterTable';
 import { MainContext } from '../helpers/MainContext';
 import { useContext } from 'react';
 
-const columns = [
-    {
-        header: 'Full Name',
-    },
-    {
-        header: 'Sibling Name',
-    },
-    {
-        header: 'Email'
-    },
-    {
-        accessorKey: 'action',
-        header: 'Action'
-    }
-]
+
 
 const Sibling = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/siblings`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,genericPath } = useContext(MainContext);
+
+    const navigate = useNavigate();
+
+    const columns = [
+        {
+            accessorKey: 'fullName',
+            header: 'Full Name',
+        },
+        {
+           accessorKey: 'siblingName',
+           header: 'Sibling'
+        },
+        {
+            accessorKey: 'email',
+            header: 'Email'
+        }
+    ];
+
+    console.log(records);
+
+    const siblingData = records?.map(sibling => ({
+        ...sibling,
+        fullName: `${sibling.firstName} ${sibling.middleName} ${sibling.lastName}`,
+        siblingName: `${sibling.studentId.firstName} ${sibling.studentId.middleName} ${sibling.studentId.lastName}`
+    }))
 
     const deleteSibling = async (id) => {
         try {
@@ -63,7 +74,7 @@ const Sibling = () => {
         }
     }
 
-    const goToEdit = id => navigate(`/registrar/edit-sibling/${id}`);
+    const goToEdit = id => navigate(`/${genericPath}/edit-sibling/${id}`);
 
     return (
         <main className="p-2">
@@ -78,7 +89,7 @@ const Sibling = () => {
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
-                    data={records}
+                    data={siblingData || []}
                     onDelete={deleteSibling}
                     searchQuery={searchQuery}
                     goToEdit={goToEdit}

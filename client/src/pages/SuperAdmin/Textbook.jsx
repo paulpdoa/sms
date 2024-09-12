@@ -18,7 +18,7 @@ const Textbook = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const navigate = useNavigate();
 
-    const { role,currentUserId,setSearchQuery,searchQuery,session } = useContext(MainContext);
+    const { role,currentUserId,genericPath,setSearchQuery,searchQuery,session } = useContext(MainContext);
 
     const columns = [
        
@@ -87,7 +87,7 @@ const Textbook = () => {
         }
     }));
 
-    const goToEdit = (id) => navigate(`/edit-textbook/${id}`);
+    const goToEdit = (id) => navigate(`/${genericPath}/edit-textbook/${id}`);
 
     return (
         <main className="p-2">

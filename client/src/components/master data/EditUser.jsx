@@ -27,6 +27,7 @@ const EditUser = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isActive,setIsActive] = useState('');
+    const [isAllowedToLogin,setIsAllowedToLogin] = useState(false);
 
     const [currentRole,setCurrentRole] = useState('');
     
@@ -41,6 +42,7 @@ const EditUser = () => {
             setUserRole(user?.role || '');
             setIsActive(user?.isActive || ''); 
             setCurrentRole(user?.role?.userRole || '');
+            setIsAllowedToLogin(user?.isAllowedToLogin || '');
        }
     },[user])
 
@@ -73,7 +75,8 @@ const EditUser = () => {
                 confirmPassword,
                 role,
                 isActive,
-                inputter: currentUserId
+                inputter: currentUserId,
+                isAllowedToLogin
             });
             toast.success(newData.data.mssg, {
                 position: "top-center",
@@ -122,11 +125,21 @@ const EditUser = () => {
                 <h1 className="font-bold text-gray-700 text-2xl mb-4">Edit User: {user?.username}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    {/* {renderInput('firstName', 'First Name', firstName, setFirstName, 'text')}
-                    {renderInput('middleName', 'Middle Name', middleName, setMiddleName, 'text')}
-                    {renderInput('lastName', 'Last Name', lastName, setLastName, 'text')} */}
                     {renderInput('username', 'Username', username, setUsername, 'text')}
                     {renderSelect('userRole', 'User Role', userRole, setUserRole, userRoles, 'Select User Role',currentRole)}
+                    { currentRole === 'Student' && (
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-medium mb-2">Allowed</label>
+                            <select
+                                onChange={(e) => setIsAllowedToLogin(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value={isAllowedToLogin || ''} hidden>{ isAllowedToLogin ? 'Allowed' : 'Don\'t Allow' }</option>
+                                <option value={true}>Allow</option>
+                                <option value={false}>Don't Allow</option>
+                            </select>
+                        </div>
+                    )}
                     {renderInput('password', 'Password', password, setPassword, 'password')}
                     {renderInput('confirmPassword', 'Confirm Password', confirmPassword, setConfirmPassword, 'password')}
                 </div>
@@ -151,7 +164,7 @@ const renderInput = (id, label, value, onChange, type) => (
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
     </div>
 );
@@ -163,7 +176,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder,currentVa
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
             <option value={currentValue || ''} hidden>{ currentValue ?? placeholder }</option>
             {options?.map((option) => (
@@ -171,6 +184,7 @@ const renderSelect = (id, label, value, onChange, options, placeholder,currentVa
                     {option[id]}
                 </option>
             ))}
+            <option value="">N/A</option>
         </select>
     </div>
 );

@@ -59,16 +59,17 @@ const initialMenus = [
                 name: 'School Admin',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Teachers', link: '/teachers' },
-                    { name: 'Students', link: '/students' },
-                    { name: 'Finance', link:'/finance' },
+                    { name: 'Teachers', link: '/master/teachers' },
+                    { name: 'Students', link: '/master/students' },
+                    { name: 'Finance', link:'/master/finance' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
-                            { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' },
-                            { name: 'Subject Assigning', link: '/subject-assigning' }
+                            { name: 'Admission', link: '/master/admission' },
+                            { name: 'Registration', link: '/master/registration' },
+                            { name: 'Assessment', link: '/master/assessment' },
+                            { name: 'Sectioning', link: '/master/sectioning' },
+                            { name: 'Subject Assigning', link: '/master/subject-assigning' }
                         ]
                     }
                 ]
@@ -77,15 +78,16 @@ const initialMenus = [
                 name: 'Registrar',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Students', link: '/students' },
-                    { name: 'Teachers subject', link: '/teachers-subject' },
+                    { name: 'Students', link: '/master/students' },
+                    { name: 'Teachers subject', link: '/master/teachers-subject' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
-                            { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' },
-                            { name: 'Subject Assigning', link: '/subject-assigning' }
+                            { name: 'Admission', link: '/master/admission' },
+                            { name: 'Registration', link: '/master/registration' },
+                            { name: 'Assessment', link: '/master/assessment' },
+                            { name: 'Sectioning', link: '/master/sectioning' },
+                            { name: 'Subject Assigning', link: '/master/subject-assigning' }
                         ]
                     }
                 ]
@@ -94,7 +96,7 @@ const initialMenus = [
                 name: 'Teacher',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Student Grading', link: '/student-grading' },
+                    { name: 'Student Grading', link: '/master/student-grading' },
                     // {
                     //     name: 'Enrollment Process',
                     //     subMenus: [
@@ -166,61 +168,57 @@ const initialMenus = [
         role: 'Registrar',
         menus: [
             {
-                name: 'Dashboard',
+                name: 'Registrar Dashboard',
                 icon: <AiFillDashboard />,
-                link: '/'
+                link: '/registrar/dashboard'
             },
             {
                 name: 'Master Data',
                 icon: <RiAccountPinBoxFill />,
                 subMenus: [
-                    { name: 'Religion', link: '/master/religion' },
-                    { name: 'Nationality', link: '/master/nationality' },
-                    { name: 'Departments', link: '/master/departments' },
-                    { name: 'Sections', link: '/master/sections' },
-                    { name: 'Students', link: '/master/students' },
-                    { name: 'Teachers', link: '/master/teachers' },
-                    { name: 'Parents', link: '/master/parents' },
-                    { name: 'Siblings', link: '/master/siblings' },
-                    { name: 'Grade Level', link: '/master/grade-levels' },
-                    { name: 'Requirements', link: '/master/requirements' },
-                    { name: 'User Roles', link: '/master/user-roles' },
-                    { name: 'School Year', link: '/master/school-year' },
-                    { name: 'Users', link: '/master/users' },
-                    { name: 'Strands', link: '/master/strands' },
-                    { name: 'Textbooks', link: '/master/text-books' },
-                    { name: 'Payment Terms', link: '/master/payment-terms' },
-                    { name: 'Payment Schedule', link: '/master/payment-schedule' },
-                    { name: 'Fee Category', link: '/master/fee-category' },
-                    { name: 'Fee Code', link: '/master/fee-code' },
-                    { name: 'Manage Fees', link: '/master/manage-fees' },
-                    { name: 'Discount', link: '/master/discount' },
-                    { name: 'Subject', link: '/master/subjects' },
-                    { name: 'Room Number', link: '/master/room-number' },
+                    { name: 'Religion', link: '/registrar/religion' },
+                    { name: 'Nationality', link: '/registrar/nationality' },
+                    { name: 'Departments', link: '/registrar/departments' },
+                    { name: 'Sections', link: '/registrar/sections' },
+                    { name: 'Students', link: '/registrar/students' },
+                    { name: 'Teachers', link: '/registrar/teachers' },
+                    { name: 'Parents', link: '/registrar/parents' },
+                    { name: 'Siblings', link: '/registrar/siblings' },
+                    { name: 'Grade Level', link: '/registrar/grade-levels' },
+                    { name: 'Requirements', link: '/registrar/requirements' },
+                    { name: 'User Roles', link: '/registrar/user-roles' },
+                    { name: 'School Year', link: '/registrar/school-year' },
+                    { name: 'Users', link: '/registrar/users' },
+                    { name: 'Strands', link: '/registrar/strands' },
+                    { name: 'Textbooks', link: '/registrar/text-books' },
+                    { name: 'Payment Terms', link: '/registrar/payment-terms' },
+                    { name: 'Payment Schedule', link: '/registrar/payment-schedule' },
+                    { name: 'Fee Category', link: '/registrar/fee-category' },
+                    { name: 'Fee Code', link: '/registrar/fee-code' },
+                    { name: 'Manage Fees', link: '/registrar/manage-fees' },
+                    { name: 'Discount', link: '/registrar/discount' },
+                    { name: 'Subject', link: '/registrar/subjects' },
+                    { name: 'Room Number', link: '/registrar/room-number' },
                 ]
             },
             {
                 name: 'Registrar',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Students', link: '/students' },
-                    { name: 'Teachers subject', link: '/teachers-subject' },
+                    { name: 'Students', link: '/registrar/students' },
+                    { name: 'Teachers subject', link: '/registrar/teachers-subject' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
-                            { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' },
-                            { name: 'Subject Assigning', link: '/subject-assigning' }
+                            { name: 'Admission', link: '/registrar/admission' },
+                            { name: 'Registration', link: '/registrar/registration' },
+                            { name: 'Assessment', link: '/registrar/assessment' },
+                            { name: 'Sectioning', link: '/registrar/sectioning' },
+                            { name: 'Subject Assigning', link: '/registrar/subject-assigning' }
                         ]
                     }
                 ]
-            },
-            // {
-            //     name: 'Settings',
-            //     icon: <IoSettings />,
-            //     link: '/settings'
-            // }
+            }
         ]
     },
     {

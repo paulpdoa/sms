@@ -16,7 +16,7 @@ const Users = () => {
     
     const navigate = useNavigate();
 
-    const { role: userRole,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext);
+    const { role: userRole,currentUserId,searchQuery,setSearchQuery,genericPath } = useContext(MainContext);
 
     
     const columns = [
@@ -68,7 +68,7 @@ const Users = () => {
         ...record,
     }));
 
-    const goToEdit = (id) => navigate(`/edit-user/${id}`)
+    const goToEdit = (id) => navigate(`/${genericPath}/edit-user/${id}`)
 
     return (
         <main className="p-2">

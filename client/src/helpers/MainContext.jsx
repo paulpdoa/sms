@@ -20,8 +20,10 @@ export const MainProvider = ({ children }) => {
   const currentUserId = localStorage.getItem('id');
   const currentUser = localStorage.getItem('username');
   const userToken = cookies.userToken;
-  const role = localStorage.getItem('role');
+  const role = localStorage.getItem('role') || 'Guest';
   const isFreshYear = localStorage.getItem('isFreshYear');
+
+  const genericPath = role === 'Super Admin' ? 'master' : role.toLowerCase();
 
   return (
     <MainContext.Provider value={{ 
@@ -36,7 +38,8 @@ export const MainProvider = ({ children }) => {
       setShowForm,
       isFreshYear,
       currStudRec,
-      setCurrStudRec
+      setCurrStudRec,
+      genericPath
     }}>
       {children}
     </MainContext.Provider>

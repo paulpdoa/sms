@@ -107,7 +107,7 @@ userSchema.statics.login = async function(username,password,session) {
 }
 
 userSchema.statics.updateUser = async function(id,updatedData) {
-    const { role,username,password,isActive } = updatedData;
+    const { role,username,password,isActive,isAllowedToLogin } = updatedData;
 
     const user = await this.findOne({ username });
 
@@ -126,6 +126,7 @@ userSchema.statics.updateUser = async function(id,updatedData) {
         role,
         username,
         isActive,
+        isAllowedToLogin
     };
 
     if(password) {

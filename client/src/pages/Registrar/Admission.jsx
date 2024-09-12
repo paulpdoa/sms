@@ -16,7 +16,7 @@ import StudentSiblingTable from '../../components/admission/sibling/StudentSibli
 import { MainContext } from '../../helpers/MainContext';
 
 const Admission = () => {
-    const admissionPages = ['Requirements', 'Information', 'Parents', 'Sibling', 'Academic'];
+    const admissionPages = ['Requirements', 'Parents', 'Sibling', 'Academic'];
     const [currentPage, setCurrentPage] = useState('Requirements');
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -56,7 +56,6 @@ const Admission = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
                 <div className="rounded-md h-fit">
                     {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
-                    {currentPage === 'Information' && <StudentInfoTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Parents' && <StudentParentTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}

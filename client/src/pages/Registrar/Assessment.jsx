@@ -166,11 +166,15 @@ const Assessment = () => {
                 </div>
 
                 {currStudRec?._id && (
-                    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 mt-20 p-4 bg-white rounded-lg border border-gray-300 max-h-[80vh] overflow-y-auto shadow-lg z-50 w-3/4">
-                        <div className="p-4">
+                    <>
+                    {/* Backdrop */}
+                    <div className="fixed inset-0 bg-black opacity-50 z-40"></div>
+                    
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="bg-white w-full h-full md:w-3/4 md:h-[90%] p-4 rounded-lg border border-gray-300 shadow-lg overflow-y-auto">
                             <div className="flex items-center justify-between mb-3">
-                                <h1 className="font-semibold text-xl text-gray-700 mb-4">
-                                    {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
+                                <h1 className="font-semibold text-2xl text-gray-700">
+                                    {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'}
                                 </h1>
                                 <button onClick={() => {
                                     setCurrStudRec(null)
@@ -205,6 +209,7 @@ const Assessment = () => {
                             )}
                         </div>
                     </div>
+                    </>
                 )}
             </div>
             <ToastContainer />

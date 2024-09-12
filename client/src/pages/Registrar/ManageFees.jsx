@@ -13,7 +13,7 @@ import ConfirmationPopup from '../../components/ConfirmationPopup';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
-    const { searchQuery, setSearchQuery, role,session,currentUserId } = useContext(MainContext);
+    const { searchQuery, setSearchQuery,genericPath, role,session,currentUserId } = useContext(MainContext);
     const navigate = useNavigate();
     const [openPopup,setOpenPopup] = useState(false);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
@@ -136,7 +136,7 @@ const ManageFees = () => {
         }
     }
 
-    const goToEdit = id => navigate(`/registrar/edit-manage-fee/${id}`);
+    const goToEdit = id => navigate(`/${genericPath}/edit-manage-fee/${id}`);
 
     return (
         <main className="p-2 relative">

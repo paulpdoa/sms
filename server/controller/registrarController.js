@@ -1109,6 +1109,8 @@ module.exports.generate_fees = async (req, res) => {
 
                     }
                         
+                    // Update to true isEnrolled if the student has been assessed successfully
+                    await Academic.findOneAndUpdate({ studentId: student._id },{ isEnrolled: true });
 
                 }
     

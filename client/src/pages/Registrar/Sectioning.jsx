@@ -47,7 +47,7 @@ const Sectioning = () => {
         setSectionId(e.target.value);
     }
 
-    const studentLists = students?.filter(student => student?.academicId?.isRegistered && student?.academicId?.isAdmitted).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isEnrolled).map(student => ({
         ...student,
         firstName: student.firstName,
         lastName: student.lastName,

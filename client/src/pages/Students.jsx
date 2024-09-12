@@ -50,7 +50,7 @@ const columns = [
 const Students = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
-    const { searchQuery,setSearchQuery,session,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,session,role,genericPath } = useContext(MainContext);
     
     const navigate = useNavigate();
     
@@ -86,7 +86,7 @@ const Students = () => {
         }
     }
 
-    const goToEdit = (id) => navigate(`/registrar/edit-student/${id}`);
+    const goToEdit = (id) => navigate(`/${genericPath}/edit-student/${id}`);
 
     const formattedStudents = records?.map(student => ({
         ...student,

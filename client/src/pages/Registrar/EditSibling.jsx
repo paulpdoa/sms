@@ -58,7 +58,7 @@ const EditSibling = () => {
             });
 
             setTimeout(() => {
-                navigate('/siblings')
+                navigate(`${role === 'Super Admin' ? 'master' : role.toLowerCase()}/siblings`)
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -97,8 +97,11 @@ const EditSibling = () => {
                     </div>
                 </section>
 
-                <button className="bg-green-600 text-white text-sm p-3 mt-5 rounded-md hover:bg-green-700 transition duration-300">
+                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
+                </button>
+                <button type="button" onClick={() => navigate(-1)} className="ml-2 bg-red-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-600 transition duration-300">
+                    Cancel
                 </button>
             </form>
             <ToastContainer />

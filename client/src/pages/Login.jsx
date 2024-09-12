@@ -8,6 +8,7 @@ import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');

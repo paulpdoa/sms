@@ -6,14 +6,14 @@ import { useContext } from "react";
 import { MainContext } from "../../helpers/MainContext";
 
 const AddStudentBtn = () => {
-    const { session } = useContext(MainContext);
+    const { session,genericPath } = useContext(MainContext);
 
     const { records:schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
     return (
         <div>
             { !isYearDone && (
-                <Link onClick={(e) => isYearDone && e.preventDefault() } to='/registrar/new-student' className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                <Link onClick={(e) => isYearDone && e.preventDefault() } to={`/${genericPath}/new-student`} className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                     <PiStudentFill /> Add New Student
                 </Link>                
             ) }

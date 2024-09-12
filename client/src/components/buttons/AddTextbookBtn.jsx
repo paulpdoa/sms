@@ -7,7 +7,7 @@ import { MainContext } from "../../helpers/MainContext";
 import { GiBookshelf } from "react-icons/gi";
 
 const AddTextbookBtn = () => {
-    const { session } = useContext(MainContext);
+    const { session,genericPath } = useContext(MainContext);
 
     const { records:schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
@@ -15,7 +15,7 @@ const AddTextbookBtn = () => {
     return (
         <div>
             {!isYearDone && (
-                <Link to='/new-textbook' onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                <Link to={`/${genericPath}/new-textbook`} onClick={(e) => isYearDone && e.preventDefault() } className={`flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md ${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                     <GiBookshelf /> Add New Textbook
                 </Link>
             )}                

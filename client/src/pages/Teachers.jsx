@@ -39,7 +39,7 @@ const columns = [
 
 const Teachers = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/teachers`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,genericPath } = useContext(MainContext);
 
     const navigate = useNavigate();
 
@@ -91,7 +91,7 @@ const Teachers = () => {
         }
     };
 
-    const goToEdit = (id) => navigate(`/registrar/edit-teacher/${id}`)
+    const goToEdit = (id) => navigate(`/${genericPath}/edit-teacher/${id}`)
 
     return (
         <main className="p-2">
