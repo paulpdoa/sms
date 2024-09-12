@@ -30,7 +30,7 @@ import Requirements from "./pages/SuperAdmin/Requirements";
 import UserRoles from "./pages/SuperAdmin/UserRoles";
 import SchoolYear from "./pages/SuperAdmin/SchoolYear";
 import NewTeacher from "./pages/Registrar/NewTeacher";
-import SchoolAdmin from './layouts/SchoolAdmin';
+import SchoolAdmin from './layouts/SchoolAdminLayout';
 import Strands from "./pages/SuperAdmin/Strands";
 import Textbook from "./pages/SuperAdmin/Textbook";
 import PaymentTerm from "./pages/SuperAdmin/PaymentTerm";
@@ -85,6 +85,10 @@ import TeacherLayout from "./layouts/TeacherLayout";
 import Registration from "./pages/Registrar/Registration";
 import StudentLayout from "./layouts/StudentLayout";
 import RegistrarLayout from "./layouts/RegistrarLayout";
+import FinanceLayout from "./layouts/FinanceLayout";
+import ParentLayout from "./layouts/ParentLayout";
+import SchoolAdminLayout from "./layouts/SchoolAdminLayout";
+import ErrorPage from "./pages/ErrorPage";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -115,27 +119,10 @@ const App = () => {
 
 
         <Route element={!userToken ? <Navigate to='/login' /> : <DashboardLayout />}>
-          <Route path='/' element={(checkFreshYear() && (role === 'School Admin' || role === 'Super Admin')) ? <Navigate to='/master/school-year' /> : <Dashboard />} />
+          {/* <Route path='/' element={(checkFreshYear() && (role === 'School Admin' || role === 'Super Admin')) ? <Navigate to='/master/school-year' /> : <Dashboard />} /> */}
           <Route path='/students' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Students />} />
           <Route path='/admission' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Admission />} />
-          <Route path='/registrar' element={checkFreshYear() ? <Navigate to='/master/school-year' /> : <Registrar />}>
-            <Route path='new-student' element={<NewStudent />} />
-            <Route path='new-teacher' element={<NewTeacher />} />
-            <Route path='edit-student/:id' element={<EditStudent />} />  
-            <Route path='new-parent' element={<NewParent />} />
-            <Route path='new-sibling' element={<NewSibling />} />
-            <Route path='edit-sibling/:id' element={<EditSibling />} />
-            <Route path='edit-teacher/:id' element={<EditTeacher />} />
-            <Route path='edit-parent/:id' element={<EditParent />} />
-            <Route path='manage-fees' element={<ManageFees />} />
-            <Route path='create-fees' element={<NewManageFee />} />
-            <Route path='edit-manage-fee/:id' element={<EditManageFee />} />
-          </Route>
-
-          <Route path='/edit-user/:id' element={<EditUser />} />
-          <Route path='/edit-textbook/:id' element={<EditTextbook />} />
-
-            
+          
           
           {/* For Super admin routes */}
           <Route path='/master' element={(role === 'Super Admin' || role === 'School Admin') && <MasterLayout />}>
@@ -196,7 +183,6 @@ const App = () => {
             <Route path='create-fees' element={<NewManageFee />} />
             <Route path='new-finance' element={<NewFinance />} />
             <Route path='new-textbook' element={<NewTextbook />} />
-
           </Route>
 
           {/* <Route path='/subjects' element={<Subjects />} />
@@ -226,19 +212,23 @@ const App = () => {
           </Route>
 
           {/* For Parent Routes */}
-          <Route path='/parent/dashboard' element={<ParentDashboard />} />
-          <Route path='/parent/grades' element={<ParentChildGrades />} />
-          <Route path='/parent/payment-schedule' element={<ParentPaymentSchedule />} />
-          <Route path='/parent/attendance' element={<ParentChildAttendance />} />
+          <Route element={<ParentLayout />}>
+            <Route path='/parent/dashboard' element={<ParentDashboard />} />
+            <Route path='/parent/grades' element={<ParentChildGrades />} />
+            <Route path='/parent/payment-schedule' element={<ParentPaymentSchedule />} />
+            <Route path='/parent/attendance' element={<ParentChildAttendance />} />
+          </Route>
 
           {/* For Finance Routes */}
-          <Route path='/finance/dashboard' element={<FinanceDashboard />} />
-          <Route path='/finance/payment-schedule' element={<FinancePaymentSchedule />} />
+          <Route element={<FinanceLayout />}>
+            <Route path='/finance/dashboard' element={<FinanceDashboard />} />
+            <Route path='/finance/payment-schedule' element={<FinancePaymentSchedule />} />
+          </Route>
 
           {/* Registrar Route */}
           <Route path='/registrar' element={<RegistrarLayout />}>
-            <Route path='/registrar/dashboard' element={<Dashboard />} />
-            <Route path='/registrar/registration' element={<Registration />} />
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='registration' element={<Registration />} />
 
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='religion' element={<Religion />} />
@@ -302,8 +292,67 @@ const App = () => {
           <Route path='/profile/:id' element={<Profile />} />
           <Route path='/new-textbook' element={<NewTextbook />} />
           
-          <Route path='/school-admin' element={(role === 'School Admin' || role === 'Super Admin') ? <SchoolAdmin /> : <Navigate to='/' />}>
+          <Route path='/schooladmin' element={<SchoolAdminLayout />}>
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='registration' element={<Registration />} />
+
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='religion' element={<Religion />} />
+            <Route path='nationality' element={<Nationality />} />
+            <Route path='nationality-code' element={<NationalityCode />} />
+            <Route path='gender' element={<Gender />} />
+            <Route path='departments' element={<Department />} />
+            <Route path='sections' element={<Section />} />
+            <Route path='grade-levels' element={<GradeLevel />} />
+            <Route path='requirements' element={<Requirements />} />
+            <Route path='user-roles' element={<UserRoles />} />
+            <Route path='students' element={<Students />} />
+            <Route path='finance' element={<Finance />} />
+            <Route path='school-year' element={<SchoolYear />} />
+            <Route path='teachers' element={<Teachers />} />
+            <Route path='users' element={<Users />} />
+            <Route path='strands' element={<Strands />} />
+            <Route path='text-books' element={<Textbook />} />
+            <Route path='payment-terms' element={<PaymentTerm />} />
+            <Route path='payment-penalty' element={<PaymentPenalty />} />
+            <Route path='payment-schedule' element={<PaymentSchedule />} />
+            <Route path='admission' element={<Admission />} />
+            <Route path='fee-category' element={<FeeCategory />} />
+            <Route path='fee-code' element={<FeeCode />} />
+            <Route path='parents' element={<Parents />} />
+            <Route path='siblings' element={<Sibling />} />
+            <Route path='discount' element={<Discount />} />
+            <Route path='sectioning' element={<Sectioning />} />
+            <Route path='manage-fees' element={<ManageFees />} />
+            <Route path='subjects' element={<Subjects />} />
+            <Route path='room-number' element={<RoomNumber />} />
+            <Route path='grading-category' element={<GradingCategory />} />
+            <Route path='student-grading' element={<StudentGrading />} />
+            <Route path='subject-assigning' element={<SubjectAssigning />} />
+            <Route path='assessment' element={<Assessment />} />
+            <Route path='teachers-subject' element={<TeacherSubject />} />
+            <Route path='registration' element={<Registration />} />
+
+            {/* For editing */}
+            <Route path='edit-student/:id' element={<EditStudent />} />  
+            <Route path='edit-sibling/:id' element={<EditSibling />} />
+            <Route path='edit-teacher/:id' element={<EditTeacher />} />
+            <Route path='edit-parent/:id' element={<EditParent />} />
+            <Route path='edit-manage-fee/:id' element={<EditManageFee />} />
+            <Route path='edit-finance/:id' element={<EditFinance />} />
+            <Route path='edit-user/:id' element={<EditUser />} />
+            <Route path='edit-textbook/:id' element={<EditTextbook />} />
+            <Route path='teacher-subject/:id' element={<EditTeacherSubject />} />
+            {/* For Adding */}
+            <Route path='new-student' element={<NewStudent />} />
             <Route path='new-teacher' element={<NewTeacher />} />
+            <Route path='new-parent' element={<NewParent />} />
+            <Route path='new-user' element={<NewUser />} />
+            <Route path='new-sibling' element={<NewSibling />} />
+            <Route path='manage-fees' element={<ManageFees />} />
+            <Route path='create-fees' element={<NewManageFee />} />
+            <Route path='new-finance' element={<NewFinance />} />
+            <Route path='new-textbook' element={<NewTextbook />} />
           </Route>
 
           <Route path='/siblings' element={<Sibling />} />
@@ -314,13 +363,7 @@ const App = () => {
           <Route path='/settings' element={<Settings />} />
         </Route>
 
-        <Route path="*" element={ () => {
-          return (
-            <div>
-              <h1>Nothin to display here</h1>
-            </div>
-          )
-        } }/>
+        <Route path="*" element={<ErrorPage />} />
       </Route>
     )
   );

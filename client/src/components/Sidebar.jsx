@@ -121,21 +121,54 @@ const initialMenus = [
             {
                 name: 'Dashboard',
                 icon: <AiFillDashboard />,
-                link: '/'
+                link: '/schooladmin/dashboard'
+            },
+            {
+                name: 'Master Data',
+                icon: <RiAccountPinBoxFill />,
+                subMenus: [
+                    { name: 'Religion', link: '/schooladmin/religion' },
+                    { name: 'Nationality', link: '/schooladmin/nationality' },
+                    { name: 'Departments', link: '/schooladmin/departments' },
+                    { name: 'Sections', link: '/schooladmin/sections' },
+                    { name: 'Students', link: '/schooladmin/students' },
+                    { name: 'Teachers', link: '/schooladmin/teachers' },
+                    { name: 'Finance', link: '/schooladmin/finance' },
+                    { name: 'Parents', link: '/schooladmin/parents' },
+                    { name: 'Siblings', link: '/schooladmin/siblings' },
+                    { name: 'Grade Level', link: '/schooladmin/grade-levels' },
+                    { name: 'Requirements', link: '/schooladmin/requirements' },
+                    { name: 'User Roles', link: '/schooladmin/user-roles' },
+                    { name: 'School Year', link: '/schooladmin/school-year' },
+                    { name: 'Users', link: '/schooladmin/users' },
+                    { name: 'Strands', link: '/schooladmin/strands' },
+                    { name: 'Textbooks', link: '/schooladmin/text-books' },
+                    { name: 'Payment Terms', link: '/schooladmin/payment-terms' },
+                    { name: 'Payment Schedule', link: '/schooladmin/payment-schedule' },
+                    { name: 'Fee Category', link: '/schooladmin/fee-category' },
+                    { name: 'Fee Code', link: '/schooladmin/fee-code' },
+                    { name: 'Manage Fees', link: '/schooladmin/manage-fees' },
+                    { name: 'Discount', link: '/schooladmin/discount' },
+                    { name: 'Subject', link: '/schooladmin/subjects' },
+                    { name: 'Room Number', link: '/schooladmin/room-number' },
+                    { name: 'Grading Category', link: '/schooladmin/grading-category' },
+                ]
             },
             {
                 name: 'School Admin',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Teachers', link: '/teachers' },
-                    { name: 'Students', link: '/students' },
+                    { name: 'Teachers', link: '/schooladmin/teachers' },
+                    { name: 'Students', link: '/schooladmin/students' },
+                    { name: 'Finance', link:'/schooladmin/finance' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
-                            { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' },
-                            { name: 'Subject Assigning', link: '/subject-assigning' }
+                            { name: 'Admission', link: '/schooladmin/admission' },
+                            { name: 'Registration', link: '/schooladmin/registration' },
+                            { name: 'Assessment', link: '/schooladmin/assessment' },
+                            { name: 'Sectioning', link: '/schooladmin/sectioning' },
+                            { name: 'Subject Assigning', link: '/schooladmin/subject-assigning' }
                         ]
                     }
                 ]
@@ -144,24 +177,27 @@ const initialMenus = [
                 name: 'Registrar',
                 icon: <FaCashRegister />,
                 subMenus: [
-                    { name: 'Students', link: '/students' },
-                    { name: 'Teachers subject', link: '/teachers-subject' },
+                    { name: 'Students', link: '/schooladmin/students' },
+                    { name: 'Teachers subject', link: '/schooladmin/teachers-subject' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
-                            { name: 'Admission', link: '/admission' },
-                            { name: 'Assessment', link: '/assessment' },
-                            { name: 'Sectioning', link: '/sectioning' },
-                            { name: 'Subject Assigning', link: '/subject-assigning' }
+                            { name: 'Admission', link: '/schooladmin/admission' },
+                            { name: 'Registration', link: '/schooladmin/registration' },
+                            { name: 'Assessment', link: '/schooladmin/assessment' },
+                            { name: 'Sectioning', link: '/schooladmin/sectioning' },
+                            { name: 'Subject Assigning', link: '/schooladmin/subject-assigning' }
                         ]
                     }
                 ]
             },
-            // {
-            //     name: 'Settings',
-            //     icon: <IoSettings />,
-            //     link: '/settings'
-            // }
+            {
+                name: 'Teacher',
+                icon: <FaCashRegister />,
+                subMenus: [
+                    { name: 'Student Grading', link: '/schooladmin/student-grading' },
+                ]
+            },
         ]
     },
     {
@@ -376,7 +412,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <div onClick={() => navigate(`/profile/${currentUserId}`)} className="border border-gray-700 shadow-lg flex items-stretch gap-2 justify-start p-2 m-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
                         <img className="w-16 h-16 rounded-full object-cover" src={ user.profilePictureUrl ? `${baseUrl()}${user.profilePictureUrl}` : '/avatar/avatar.png'} alt="Profile Picture" />
                         <div className="text-gray-200 flex flex-col">
-                            <h2 className="text-lg">{currentUser}</h2>
+                            <h2 className="text-md">{currentUser}</h2>
                             <span className="text-xs">{currentRole}</span>
                         </div>
                     </div>

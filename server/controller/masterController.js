@@ -1318,15 +1318,17 @@ module.exports.user_login = async (req,res) => {
 
     const { username,password,session } = req.body;
 
-    const userRoles = [
-        { role: 'Super Admin', path: '/master/dashboard' },
-        { role: 'Teacher', path: '/teacher/dashboard' },
-        { role: 'Student', path: '/student/dashboard' },
-        { role: 'Finance', path:'/finance/dashboard' },
-        { role: 'Parent', path: '/parent/dashboard' },
-        { role: 'Registrar', path: '/registrar/dashboard' }
-    ]
+    // const userRoles = [
+    //     { role: 'Super Admin', path: '/master/dashboard' },
+    //     { role: 'Teacher', path: '/teacher/dashboard' },
+    //     { role: 'Student', path: '/student/dashboard' },
+    //     { role: 'Finance', path:'/finance/dashboard' },
+    //     { role: 'Parent', path: '/parent/dashboard' },
+    //     { role: 'Registrar', path: '/registrar/dashboard' },
+    //     { role: 'School Admin', path: '/schooladmin/dashboard' }
+    // ]
 
+    const userRoles = [];
 
     let userDestination = '';
 
@@ -1336,6 +1338,18 @@ module.exports.user_login = async (req,res) => {
         const token = createToken(login._id);
         const roleDetail = await Role.findOne({ _id: login.role });
 
+        const roles = await Role.find({ recordStatus: 'Live', status: true });
+
+        for(const role of roles) {
+            if(role.userRole === 'Super Admin') {
+                userRoles.push({ role: role.userRole, path: '/master/dashboard'})
+            } else {
+                userRoles.push({ role: role.userRole, path: `/${role?.userRole?.replace(" ","").toLowerCase()}/dashboard` })   ;
+            }
+        }
+
+        console.log(userRoles);
+
         // Check user roles when logging in and redirect them to proper pages
         for(const userRole of userRoles) {
             if(roleDetail.userRole === userRole.role) {
@@ -1344,7 +1358,11 @@ module.exports.user_login = async (req,res) => {
         }
 
         if(!userDestination) {
-            return res.status(404).json({ mssg: "User doesn't have any page yet" });
+            return res.status(404).json({ mssg: "User doesn't have any page yet" });    
+        }
+
+        if(session === 'true') { // This means that the user is creating a new school year
+            userDestination = '/master/school-year';
         }
 
         res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail.userRole,redirect: userDestination });

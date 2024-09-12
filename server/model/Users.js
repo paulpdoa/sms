@@ -67,6 +67,8 @@ userSchema.statics.login = async function(username,password,session) {
     const schoolYears = await SchoolYear.find();
 
     // Create a function here to check isAllowedToLogin if the user has studentId
+
+    console.log('Session', session);
    
 
     if(!user) {

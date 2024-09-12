@@ -14,7 +14,8 @@ const Nationality = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/nationalities`);
     // const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
-    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext)
+    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
+    const [error,setError] = useState({ nationality: '', nationalityCode: '' });
 
     const columns = [
         {
@@ -35,6 +36,8 @@ const Nationality = () => {
 
     const updateNewNationality = async (id,updatedData) => {
         
+      
+
         try {
             const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCode:updatedData.nationalityCode,currentUserId,role,session,sessionId: session });
             toast.success(newData.data.mssg, {
@@ -55,7 +58,7 @@ const Nationality = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -87,7 +90,7 @@ const Nationality = () => {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -100,6 +103,16 @@ const Nationality = () => {
 
     const addNationality = async (e) => {
         e.preventDefault();
+
+        if(!nationality) setError(prev => ({ ...prev,nationality: 'Nationality cannot be empty' }))
+        if(!nationalityCode) setError(prev => ({ ...prev,nationalityCode: 'Nationality code cannot be empty' }));
+
+        setTimeout(() => {
+            setError({ nationality: '', nationalityCode: '' });
+        },3000)
+
+        if(!nationality || !nationalityCode) return
+        
         try {
             const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCode,currentUserId,role,session,sessionId: session });
             toast.success(newNationality.data.mssg, {
@@ -142,17 +155,19 @@ const Nationality = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="nationality">Nationality</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setNationality(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${error.nationality ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setNationality(e.target.value)} />
+                { error.nationality && <span className="text-xs text-red-500">{error.nationality}</span> }
             </div>
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="nationality">Nationality Code</label>
-                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setNationalityCode(e.target.value)}>
+                <select className={`outline-none p-1 rounded-md border ${error.nationalityCode ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setNationalityCode(e.target.value)}>
                     <option hidden>Select nationality code</option>
                     { nationalityCodes?.map(nc => (
                         <option key={nc._id} value={nc.name}>{nc.name}</option>
                     )) }
                 </select>
+                { error.nationalityCode && <span className="text-xs text-red-500">{error.nationalityCode}</span> }
             </div>
         </>
     )

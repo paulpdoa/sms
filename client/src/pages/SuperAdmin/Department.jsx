@@ -13,6 +13,7 @@ const Department = () => {
 
     const { records,isLoading } = useFetch(`${baseUrl()}/departments`);
     const [department,setDepartment] = useState('');
+    const [error,setError] = useState({ department: '' });
 
     const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext)
 
@@ -90,6 +91,13 @@ const Department = () => {
 
     const addDepartment = async (e) => {
         e.preventDefault();
+
+        if(!department) setError(prev => ({...prev, department: 'Department cannot be empty'}));
+        setTimeout(() => {
+            setError({ department: '' });
+        },3000)
+        if(!department) return
+
         try {
             const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session,role, sessionId: session });
             toast.success(newDepartment.data.mssg, {
@@ -131,7 +139,8 @@ const Department = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="department">Department</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setDepartment(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${error.department ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setDepartment(e.target.value)} />
+                { error.department && <span className="text-xs text-red-500">{error.department}</span> }
             </div>
         </>
     )

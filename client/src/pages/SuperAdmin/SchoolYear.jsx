@@ -22,8 +22,9 @@ const SchoolYear = () => {
     const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
 
     const { role, currentUserId, showForm, searchQuery, setShowForm,session,isFreshYear } = useContext(MainContext);
-    const { records:schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
-    const isYearDone = schoolYear.isYearDone;
+
+    const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
+    const isYearDone = schoolYear?.isYearDone;
 
     const columns = [
         { accessorKey: 'startYear', header: 'Start Year', editable: true, type: "date" },
@@ -54,7 +55,7 @@ const SchoolYear = () => {
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,

@@ -23,7 +23,7 @@ export const MainProvider = ({ children }) => {
   const role = localStorage.getItem('role') || 'Guest';
   const isFreshYear = localStorage.getItem('isFreshYear');
 
-  const genericPath = role === 'Super Admin' ? 'master' : role.toLowerCase();
+  const genericPath = role === 'Super Admin' ? 'master' : role.replace(" ","").toLowerCase();
 
   return (
     <MainContext.Provider value={{ 

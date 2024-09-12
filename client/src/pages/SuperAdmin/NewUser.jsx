@@ -29,7 +29,7 @@ const NewUser = () => {
             toast.success(newUser.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -44,7 +44,7 @@ const NewUser = () => {
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,

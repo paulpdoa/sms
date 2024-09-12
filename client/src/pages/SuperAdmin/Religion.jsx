@@ -14,6 +14,7 @@ const Religion = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/religions`);
     const [religion, setReligion] = useState('');
     const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
+    const [error,setError] = useState({ religion: '' });
 
     const columns = [
         { accessorKey: 'religion', header: 'Religion',editable: true }
@@ -21,6 +22,16 @@ const Religion = () => {
 
     const addReligion = async (e) => {
         e.preventDefault();
+
+       
+        if(!religion) {
+            setError(prev => ({ ...prev, religion: 'Religion cannot be empty' }));
+            setTimeout(() => {
+                setError({religion: ''});
+            },3000)
+            return;
+        }
+
         try {
             const newReligion = await axios.post(`${baseUrl()}/religions`, { religion, currentUserId, role,session,sessionId: session });
             toast.success(newReligion.data.mssg, {
@@ -124,7 +135,8 @@ const Religion = () => {
             <h1 className="font-semibold text-xl text-gray-700">Add New Religion</h1>
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="religion">Religion</label>
-                <input required className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setReligion(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${error.religion ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setReligion(e.target.value)} />
+                { error.religion && <span className="text-red-500 text-xs">{error.religion}</span> }
             </div>
         </>
     ) 

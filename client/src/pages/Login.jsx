@@ -27,6 +27,9 @@ const Login = () => {
         if (!username) setError((prev) => ({ ...prev, username: 'Username cannot be empty' }));
         if (!password) setError((prev) => ({ ...prev, password: 'Password cannot be empty' }));
         if (!schoolYear) setError((prev) => ({ ...prev, session: 'Session cannot be empty' }));
+        setTimeout(() => {
+            setError({ username: '', password: '', session: '' });
+        },3000)
 
         if (!username || !password || !schoolYear) return;
 
@@ -37,7 +40,12 @@ const Login = () => {
             localStorage.setItem('username', data.data.data.username);
             localStorage.setItem('id', data.data.data._id);
 
-            localStorage.setItem('session', schoolYear);
+
+            if(schoolYear === 'true') {
+                localStorage.setItem('isFreshYear', true)
+            } else {
+                localStorage.setItem('session', schoolYear);
+            }
 
             toast.success(data.data.mssg, {
                 position: 'top-center',
@@ -86,7 +94,7 @@ const Login = () => {
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className={`border ${error.username ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
+                            className={`border ${error.username ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
                         />
                         {error.username && <span className="text-red-500 text-xs">{error.username}</span>}
                     </div>
@@ -97,7 +105,7 @@ const Login = () => {
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className={`border ${error.password ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
+                            className={`border ${error.password ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
                         />
                         <button
                             type="button"
@@ -114,7 +122,7 @@ const Login = () => {
                         <select
                             value={schoolYear}
                             onChange={(e) => setSchoolYear(e.target.value)}
-                            className={`border ${error.session ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm`}
+                            className={`border ${error.session ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
                         >
                             <option hidden>Select session</option>
                             {schoolYears.map((sy) => (
