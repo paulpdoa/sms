@@ -54,7 +54,7 @@ const NewFinance = () => {
     const { records: religions, isLoading: religionsLoading } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session, currentUserId, role } = useContext(MainContext);
+    const { session, currentUserId, role,genericPath } = useContext(MainContext);
 
     // State variables
     const [firstName, setFirstName] = useState('');
@@ -140,7 +140,7 @@ const NewFinance = () => {
             });
 
             setTimeout(() => {
-                navigate(data.redirect);
+                navigate(`/${genericPath}/finance`);
             }, 2000);
         } catch (err) {
             toast.error(err.response.data.mssg, {

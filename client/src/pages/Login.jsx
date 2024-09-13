@@ -29,6 +29,8 @@ const Login = () => {
             } else {
                 navigate(`/${role.replace(" ","").toLowerCase()}/dashboard`);
             }
+        } else {
+            navigate('/login');
         }
     },[role])
 

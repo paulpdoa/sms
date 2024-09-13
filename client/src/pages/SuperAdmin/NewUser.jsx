@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const NewUser = () => {
 
     const navigate = useNavigate();
-    const { role: userRole, currentUserId } = useContext(MainContext);
+    const { role: userRole, currentUserId,genericPath } = useContext(MainContext);
     const { records: roles } = useFetch(`${baseUrl()}/user-roles`);
 
     const [firstName,setFirstName] = useState('');
@@ -38,7 +38,7 @@ const NewUser = () => {
             });
 
             setTimeout(() => {
-                navigate('/users')
+                navigate(`/${genericPath}/users`)
             },2000)
         } catch(err) {
             toast.error(err.response.data.mssg, {

@@ -14,7 +14,7 @@ const NewParent = () => {
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session,currentUserId } = useContext(MainContext);
+    const { session,currentUserId,genericPath } = useContext(MainContext);
 
     const navigate = useNavigate();
 
@@ -94,7 +94,7 @@ const NewParent = () => {
             });
 
             setTimeout(() => {
-                navigate('/parents')
+                navigate(`/${genericPath}/parents`);
             }, 2000);
         } catch (err) {
             console.log(err);

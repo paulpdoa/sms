@@ -55,7 +55,7 @@ const NewTeacher = () => {
     const { records: genders, isLoading: gendersLoading } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session,currentUserId } = useContext(MainContext);
+    const { session,currentUserId,genericPath } = useContext(MainContext);
 
     const [firstName,setFirstName] = useState('');
     const [middleName,setMiddleName] = useState('');
@@ -125,19 +125,6 @@ const NewTeacher = () => {
             });
         }
 
-        if(password.length < 8) {
-            return toast.error('Password should be greater than 8 characters long', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
-        }
-
         try {
             const data = await axios.post(`${baseUrl()}/teachers`, teacherInformation);
             toast.success(data.data.mssg, {
@@ -152,7 +139,7 @@ const NewTeacher = () => {
             });
 
             setTimeout(() => {
-                navigate(data.data.redirect);
+                navigate(`/${genericPath}/teachers`);
             }, 2000);
         } catch (err) {
             console.log(err);

@@ -96,23 +96,29 @@ module.exports.add_student = async (req,res) => {
             return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
         }
 
-        const student = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' });
-        const user = await User.create({
-            username,
-            role: userRole._id,
-            studentId: student._id,
-            recordStatus: 'Live',
-            password,
-            isActive: true,
-            inputter
-        });
 
-        if(!user) {
-            // Delete the student if user creation fails
+        // Will create the user
+        const student = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' });
+        
+        // Try creating a user
+        try {
+            const user = await User.create({
+                username,
+                role: userRole._id,
+                studentId: student._id,
+                recordStatus: 'Live',
+                password,
+                isActive: true,
+                inputter
+            });
+
+            res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect: '/students' });
+        } catch (userError) {
+            // If user creation fails, remove the student record
             await Student.findByIdAndDelete(student._id);
+            throw userError;  // Rethrow the error to be caught by the outer catch
         }
         
-        res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been created`, redirect:'/students' });
     } catch(err) {
         console.log(err);
 

@@ -17,7 +17,7 @@ const NewSibling = () => {
     const [email, setEmail] = useState('');
     const [studentId, setStudentId] = useState('');
 
-    const { currentUserId, session } = useContext(MainContext);
+    const { currentUserId, session,genericPath } = useContext(MainContext);
 
     const addSibling = async (e) => {
         e.preventDefault();
@@ -47,7 +47,7 @@ const NewSibling = () => {
             });
 
             setTimeout(() => {
-                navigate('/siblings')
+                navigate(`/${genericPath}/siblings`)
             }, 2000);
            }
         } catch (err) {

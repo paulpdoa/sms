@@ -12,7 +12,7 @@ const NewTextbook = () => {
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
 
-    const { role, session, currentUserId } = useContext(MainContext);
+    const { role, session, currentUserId,genericPath } = useContext(MainContext);
 
     const [schoolYear, setSchoolYear] = useState(session);
     const [bookCode, setBookCode] = useState('');
@@ -67,7 +67,7 @@ const NewTextbook = () => {
             });
 
             setTimeout(() => {
-                navigate(-1);
+                navigate(`/${genericPath}/text-books`);
             }, 2000)
         } catch (err) {
             toast.error(err.response.data.mssg, {

@@ -95,10 +95,6 @@ module.exports.add_teacher = async (req, res) => {
             recordStatus: 'Live'
         });
 
-        // Hash the password for the user account
-        // const salt = await bcrypt.genSalt();
-        // const hashedPassword = await bcrypt.hash(password, salt);
-
         const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live' });
 
          // Check if the role was found

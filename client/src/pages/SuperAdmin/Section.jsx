@@ -21,6 +21,7 @@ const Section = () => {
     const [gradeLevel, setGradeLevel] = useState('');
     const [adviser, setAdviser] = useState('');
     // const [department, setDepartment] = useState('');
+    const [error,setError] = useState({ section: '', gradeLevel: '', adviser: '' });
 
     const { role,searchQuery,showForm,setShowForm,session,currentUserId } = useContext(MainContext);
 
@@ -124,6 +125,16 @@ const Section = () => {
     const addSection = async (e) => {
         e.preventDefault();
 
+        if(!section) setError(prev => ({ ...prev, section: 'Section cannot be empty' }));
+        if(!gradeLevel) setError(prev => ({ ...prev, gradeLevel: 'Grade level cannot be empty' }));
+        if(!adviser) setError(prev => ({ ...prev, adviser: 'Adviser cannot be empty' }));
+
+        setTimeout(() => {
+            setError({ section: '', gradeLevel: '', adviser: '' });
+        },3000)
+
+        if(!section || !gradeLevel || !adviser) return
+
         try {
             const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session,session,currentUserId });
             toast.success(newSection.data.mssg, {
@@ -174,13 +185,13 @@ const Section = () => {
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="section">Section</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSection(e.target.value)} required />
+            <input className={`outline-none p-1 rounded-md border ${error.section ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setSection(e.target.value)} />
+            { error.section && <span className="text-xs text-red-500">{error.section}</span> }
         </div>
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="grade level">Grade Level</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300"
+            <select className={`outline-none p-1 rounded-md border ${error.gradeLevel ? 'border-red-500' : 'border-gray-300'}`}
                 onChange={(e) => setGradeLevel(e.target.value)}
-                required
             >
                 <option hidden>Grade Level</option>
                 {gradeLevels?.map(gradeLevel => (
@@ -188,12 +199,12 @@ const Section = () => {
                 ))}
                 <option value="">Leave as blank</option>
             </select>
+            { error.gradeLevel && <span className="text-xs text-red-500">{error.gradeLevel}</span> }
         </div>
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="adviser">Adviser</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300"
+            <select className={`outline-none p-1 rounded-md border ${error.adviser ? 'border-red-500' : 'border-gray-300'}`}
                 onChange={(e) => setAdviser(e.target.value)}
-                required
             >
                 <option hidden>Select adviser</option>
                 {teachers?.map(teacher => (
@@ -201,6 +212,7 @@ const Section = () => {
                 ))}
                 <option value="">Leave as blank</option>
             </select>
+            { error.adviser && <span className="text-xs text-red-500">{error.adviser}</span> }
         </div>
         </>
     )
