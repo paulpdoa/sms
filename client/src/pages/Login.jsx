@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState,useEffect,useContext } from 'react';
+import { MainContext } from '../helpers/MainContext';
 import { baseUrl } from '../baseUrl';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,6 +18,20 @@ const Login = () => {
     const [cookies, setCookie] = useCookies(['userToken']);
     const [error, setError] = useState({ username: '', password: '', session: '' });
     const navigate = useNavigate();
+
+    const { role } = useContext(MainContext);
+
+    // Don't allow user to go back if he has userToken
+    useEffect(() => {
+        if(cookies.userToken) {
+            if(role === 'Super Admin') {
+                navigate('/master/dashboard');
+            } else {
+                navigate(`/${role.replace(" ","").toLowerCase()}/dashboard`);
+            }
+        }
+    },[role])
+
 
     const schoolName = 'Name Of School';
     const logoPath = '/schoolLogo/school-logo-filler.png';

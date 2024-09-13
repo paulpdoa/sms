@@ -28,7 +28,7 @@ const EditFinance = () => {
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
 
-    const { session,currentUserId } = useContext(MainContext);
+    const { session,currentUserId,genericPath } = useContext(MainContext);
 
 
     useEffect(() => {
@@ -179,7 +179,7 @@ const EditFinance = () => {
 
                 <div className="flex items-center justify-end gap-2">
                     <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Finance</button>
-                    <button type="button" onClick={() => navigate('/finance')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                    <button type="button" onClick={() => navigate(`/${genericPath}/finance`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
             <ToastContainer />

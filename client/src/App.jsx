@@ -111,6 +111,7 @@ const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route>
+        <Route index element={<Login />} />
         <Route path='/login' element={userToken ? <Navigate to='/' /> : <Login />} />
 
         {/* For Signing up student record without logging in */}

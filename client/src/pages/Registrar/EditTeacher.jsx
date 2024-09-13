@@ -36,7 +36,7 @@ const EditTeacher = () => {
     const [joiningDate, setJoiningDate] = useState('');
     const [username, setUsername] = useState('');
 
-    const { session,currentUserId } = useContext(MainContext);
+    const { session,currentUserId,genericPath } = useContext(MainContext);
 
 
     useEffect(() => {
@@ -234,7 +234,7 @@ const EditTeacher = () => {
 
                 <div className="flex items-center justify-end gap-2">
                     <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
-                    <button type="button" onClick={() => navigate('/teachers')} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                    <button type="button" onClick={() => navigate(`/${genericPath}/teachers`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
             <ToastContainer />
