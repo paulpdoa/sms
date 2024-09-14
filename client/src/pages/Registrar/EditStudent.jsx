@@ -16,7 +16,7 @@ const EditStudent = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session,currentUserId,role } = useContext(MainContext);
+    const { session,currentUserId,role,genericPath } = useContext(MainContext);
 
     const suffixes = [
         { _id: 'Jr',suffix: 'Jr' },
@@ -39,30 +39,35 @@ const EditStudent = () => {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
-    const [isRegistered,setIsRegistered] = useState(false);
-    const [passedReportCard,setPassedReportCard] = useState(false);
-    const [settledArrears,setSettledArrears] = useState(false);
-    const [completedClearance,setCompletedClearance] = useState(false);
+    const [error,setError] = useState({
+        firstName: '',
+        lastName: '',
+        suffix: '',
+        dateOfBirth: '',
+        sex: '',
+        religin: '',
+        nationality: '',
+        placeOfBirth: '',
+        email: '',
+        contactNumber: '',
+        address: ''
+    });
 
     useEffect(() => {
         if(records) {
-            setFirstName(records.firstName);
-            setMiddleName(records.middleName);
-            setLastName(records.lastName);
-            setSuffix(records.suffix);
-            setDateOfBirth(records.dateOfBirth);
+            setFirstName(records.firstName || '');
+            setMiddleName(records.middleName || '');
+            setLastName(records.lastName || '');
+            setSuffix(records.suffix || '');
+            setDateOfBirth(records.dateOfBirth || '');
             setAge(calculateAge(records.dateOfBirth));
-            setSex(records.sex);
-            setReligion(records.religion?._id);
-            setNationality(records.nationality?._id);
-            setPlaceOfBirth(records.placeOfBirth);
-            setEmail(records.email);
-            setContactNumber(records.contactNumber);
-            setAddress(records.address);
-            setIsRegistered(records.isRegistered);
-            setPassedReportCard(records.passedReportCard);
-            setSettledArrears(records.settledArrears);
-            setCompletedClearance(records.completedClearance);
+            setSex(records.sex || '');
+            setReligion(records.religion?._id || '');
+            setNationality(records.nationality?._id || '');
+            setPlaceOfBirth(records.placeOfBirth || '');
+            setEmail(records.email || '');
+            setContactNumber(records.contactNumber || '');
+            setAddress(records.address || '');
         }
     }, [records]);
 
@@ -80,6 +85,38 @@ const EditStudent = () => {
 
     const editStudent = async (e) => {
         e.preventDefault();
+
+
+        if(!firstName) setError(prev => ({ ...prev, firstName: 'First name cannot be empty' }));
+        if(!lastName) setError(prev => ({ ...prev, lastName: 'Last name cannot be empty' }));
+        if(!suffix) setError(prev => ({ ...prev,suffix: 'Suffix cannot be empty' }));
+        if(!dateOfBirth) setError(prev => ({ ...prev, dateOfBirth: 'Date of birth cannot be empty' }));
+        if(!sex) setError(prev => ({ ...prev, sex: 'Gender cannot be empty' }));
+        if(!religion) setError(prev => ({ ...prev, religion: 'Religion cannot be empty' }));
+        if(!nationality) setError(prev => ({ ...prev, nationality: 'Nationality cannot be empty' }));
+        if(!placeOfBirth) setError(prev => ({ ...prev, placeOfBirth: 'Place of birth cannot be empty' }));
+        if(!email) setError(prev => ({ ...prev, email: 'Email cannot be empty' }));
+        if(!contactNumber) setError(prev => ({ ...prev, contactNumber: 'Contact number cannot be empty' }));
+        if(!address) setError(prev => ({ ...prev, address: 'Address cannot be empty' }));
+
+
+        setTimeout(() => {
+            setError({
+                firstName: '',
+                lastName: '',
+                suffix: '',
+                dateOfBirth: '',
+                sex: '',
+                religin: '',
+                nationality: '',
+                placeOfBirth: '',
+                email: '',
+                contactNumber: '',
+                address: ''
+            })
+        },3000)
+
+        if(!firstName || !lastName || !suffix || !dateOfBirth || !sex || !religion || !nationality || !placeOfBirth || !email || !contactNumber || !address) return
 
         const studentInformation = {
             firstName,
@@ -114,7 +151,7 @@ const EditStudent = () => {
             });
 
             setTimeout(() => {
-                navigate(data.data.redirect);
+                navigate(`/${genericPath}/students`);
             }, 2000);
         } catch (err) {
             console.log(err);
@@ -138,37 +175,37 @@ const EditStudent = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        {renderInput("firstName", "First Name", firstName, setFirstName, "text")}
-                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text")}
-                        {renderInput("lastName", "Last Name", lastName, setLastName, "text")}
-                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix",false) }
-                        {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
-                        {renderInput("age", "Age", age, () => {}, "number", true)}
-                        {renderSelect("sex", "Sex", sex, setSex, genderSelections, "Gender")}
-                        {renderSelect("religion", "Religion", religion, setReligion, religions, "Religion")}
-                        {renderSelect("nationality", "Nationality", nationality, setNationality, nationalities, "Nationality")}
-                        {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
-                        {renderInput("address", "Address", address, setAddress, "text", false, true)}
+                        {renderInput("firstName", "First Name", firstName, setFirstName, "text",false,false,error)}
+                        {renderInput("middleName", "Middle Name", middleName, setMiddleName, "text",false,false)}
+                        {renderInput("lastName", "Last Name", lastName, setLastName, "text",false,false,error)}
+                        {renderSelect("suffix", "Ext/Suffix", suffix, setSuffix, suffixes, "Suffix",false,true,error) }
+                        {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date",false,false,error)}
+                        {renderInput("age", "Age", age, () => {}, "number", true,error)}
+                        {renderSelect("sex", "Sex", sex, setSex, genderSelections, "Gender",false,false,error)}
+                        {renderSelect("religion", "Religion", religion, setReligion, religions, "Religion",false,false,error)}
+                        {renderSelect("nationality", "Nationality", nationality, setNationality, nationalities, "Nationality",false,false,error)}
+                        {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text",false,false,error)}
+                        {renderInput("address", "Address", address, setAddress, "text", false, true,error)}
                     </div>
                 </section>
 
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        {renderInput("email", "Active Email", email, setEmail, "email")}
+                        {renderInput("email", "Active Email", email, setEmail, "email",false,false,error)}
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="contactNumber">Contact Number</label>
                             <div className="flex border border-gray-300 rounded-md overflow-hidden focus-within:border-green-500">
                                 <span className="bg-gray-500 p-2 text-gray-100">+63</span>
                                 <input
-                                    className="outline-none p-2 flex-grow"
+                                    className={`outline-none p-2 flex-grow ${error.contactNumber ? 'border-red-500' : 'border-gray-300'} border`}
                                     type="text"
                                     id="contactNumber"
                                     value={contactNumber}
                                     onChange={(e) => setContactNumber(e.target.value)}
-                                    required
                                 />
                             </div>
+                            { error.contactNumber && <span className="text-red-500 text-xs">{error.contactNumber}</span> }
                         </div>
                     </div>
                 </section>
@@ -185,30 +222,29 @@ const EditStudent = () => {
     );
 };
 
-const renderInput = (id, label, value, onChange, type, disabled = false, fullSpan = false) => (
+const renderInput = (id, label, value, onChange, type, disabled = false, fullSpan = false,error = {}) => (
     <div className={`flex flex-col ${fullSpan ? "col-span-full sm:col-span-2 md:col-span-3" : ""}`}>
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <input
-            className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+            className={`outline-none p-2 rounded-md border ${error[id] ? 'border-red-500' : 'border-gray-300'}`}
             type={type}
             id={id}
             value={value}
             onChange={type === "date" ? onChange : (e) => onChange(e.target.value)}
             disabled={disabled}
-            required={!disabled}
         />
+        { error[id] && <span className="text-red-500 text-xs">{error[id]}</span> }
     </div>
 );
 
-const renderSelect = (id, label, value, onChange, options, placeholder,required = false) => (
+const renderSelect = (id, label, value, onChange, options, placeholder,required = false, withNA = false,error = {}) => (
     <div className="flex flex-col">
         <label className="text-sm font-medium mb-1" htmlFor={id}>{label}</label>
         <select
-            className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+            className={`outline-none p-2 rounded-md border ${error[id] ? 'border-red-500' : 'border-gray-300'}`}
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required={required}
         >
             <option value="" hidden>{value ?? placeholder}</option>
             {options?.map(option => (
@@ -219,8 +255,9 @@ const renderSelect = (id, label, value, onChange, options, placeholder,required 
                     { id === 'suffix' && option.suffix }
                 </option>
             ))}
-            <option value="">N/A</option>
+            { withNA && <option value="">N/A</option> }
         </select>
+        { error[id] && <span className="text-red-500 text-xs">{error[id]}</span> }
     </div>
 );
 

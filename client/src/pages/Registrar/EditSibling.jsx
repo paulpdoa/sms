@@ -20,7 +20,7 @@ const EditSibling = () => {
     const [email, setEmail] = useState('');
     const [studentId, setStudentId] = useState('');
 
-    const { currentUserId } = useContext(MainContext);
+    const { currentUserId,genericPath } = useContext(MainContext);
 
     useEffect(() => {
         if (records) {
@@ -54,23 +54,23 @@ const EditSibling = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
 
             setTimeout(() => {
-                navigate(`${role === 'Super Admin' ? 'master' : role.toLowerCase()}/siblings`)
+                navigate(`${genericPath}/siblings`)
             }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error("Error editing student. Please try again.", {
+            toast.error("Error editing sibling. Please try again.", {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light"
+                theme: "colored"
             });
         }
     };

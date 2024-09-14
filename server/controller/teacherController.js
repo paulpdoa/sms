@@ -17,17 +17,20 @@ module.exports.get_teacher_dashboard = async(req,res) => {
     const todayValue = days[today];
     
     try {   
-
         const teacherId = await User.findById(userId);
         if (!teacherId) {
             return res.status(404).json({ mssg: 'This user id is not a teacher or user is not existing' });
         }
+
+        console.log(teacherId);
 
         const teacherFound = await Teacher.findById(teacherId.teacherId);
         if (!teacherFound) {
             return res.status(404).json({ mssg: `${teacherId.username} is not a valid teacher and is not existing record` });
         }
         const teacherName = `${teacherFound.firstName} ${teacherFound.lastName}`;
+
+        console.log(teacherFound)
 
         const teacherSubjects = await TeacherSubject.find({ teacherId: teacherId.teacherId, recordStatus: 'Live', sessionId: session })
         .populate('subjectId teacherId roomNumberId')

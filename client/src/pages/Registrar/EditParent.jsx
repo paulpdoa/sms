@@ -13,7 +13,7 @@ const EditParent = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/parent/${id}`);
     const { records: students } = useFetch(`${baseUrl()}/students`);
 
-    const { currentUserId,session } = useContext(MainContext);
+    const { currentUserId,session,genericPath } = useContext(MainContext);
 
     const [motherName, setMotherName] = useState('');
     const [fatherName, setFatherName] = useState('');
@@ -91,7 +91,7 @@ const EditParent = () => {
             });
 
             setTimeout(() => {
-                navigate('/parents');
+                navigate(`/${genericPath}/parents`);
             }, 2000);
         } catch (err) {
             console.log(err);

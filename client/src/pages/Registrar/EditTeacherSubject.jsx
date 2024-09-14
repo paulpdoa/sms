@@ -1,10 +1,11 @@
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useParams,useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { MainContext } from '../../helpers/MainContext';
 
 const EditTeacherSubject = () => {
     const { id } = useParams();
@@ -18,6 +19,8 @@ const EditTeacherSubject = () => {
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [daySchedules, setDaySchedules] = useState([]);
+
+    const { genericPath,role } = useContext(MainContext);
 
     useEffect(() => {
         if (teacherSubject) {
@@ -55,7 +58,8 @@ const EditTeacherSubject = () => {
                 roomNumberId,
                 startTime,
                 endTime,
-                daySchedules 
+                daySchedules,
+                role
             });
 
             toast.success(data.data.mssg, {
@@ -70,7 +74,7 @@ const EditTeacherSubject = () => {
             });
 
             setTimeout(() => {
-                navigate(-1);
+                navigate(`/${genericPath}/teachers-subject`);
             }, 2000)
         } catch (err) {
             console.log(err);

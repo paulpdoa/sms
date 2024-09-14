@@ -31,7 +31,7 @@ const EditUser = () => {
 
     const [currentRole,setCurrentRole] = useState('');
     
-    const { role,currentUserId } = useContext(MainContext);
+    const { role,currentUserId, genericPath } = useContext(MainContext);
 
     useEffect(() => {
        if(user) {
@@ -96,11 +96,12 @@ const EditUser = () => {
             // Logout the user after updating his profile
             if(user._id === currentUserId) {
                 setTimeout(() => {
+                    ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
                     removeCookie('userToken',{ path: '/login' });
                 },2000)
             } else {
                 setTimeout(() => {
-                    navigate(newData.data.redirect);
+                    navigate(`/${genericPath}/users`);
                 }, 2000);
             }
             

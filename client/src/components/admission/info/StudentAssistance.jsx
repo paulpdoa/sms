@@ -20,7 +20,7 @@ const StudentAssistance = ({ id, closeModal }) => {
         { accessorKey: 'discountType', header: 'Discount Type' },
         { accessorKey: 'discountPercent', header: 'Discount Percent' },
         { accessorKey: 'amount', header: 'Amount' },
-        { accessorKey: 'discount', header: 'Discount' },
+        { accessorKey: 'discount', header: 'Discount' }
     ];
 
     const [discountId, setDiscountId] = useState('');

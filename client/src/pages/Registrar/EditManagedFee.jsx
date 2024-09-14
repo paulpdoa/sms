@@ -9,7 +9,7 @@ import { MainContext} from '../../helpers/MainContext';
 
 const EditManageFee = () => {
     const { id } = useParams();
-    const { session:sessionId,currentUserId } = useContext(MainContext);
+    const { session:sessionId,currentUserId,genericPath } = useContext(MainContext);
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${sessionId}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
@@ -67,7 +67,7 @@ const EditManageFee = () => {
                 theme: "colored"
             });
             setTimeout(() => {
-                navigate('/master/manage-fees')
+                navigate(`/${genericPath}/manage-fees`)
             }, 2000);
         } catch (err) {
             console.log(err);

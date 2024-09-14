@@ -23,7 +23,7 @@ const EditTextbook = () => {
     const [bookAmount, setBookAmount] = useState('');
     const [schoolYear, setSchoolYear] = useState('');
 
-    const { role, currentUserId, session } = useContext(MainContext);
+    const { role, currentUserId, session, genericPath } = useContext(MainContext);
 
     useEffect(() => {
         if (textbook) {
@@ -70,7 +70,7 @@ const EditTextbook = () => {
             });
 
             setTimeout(() => {
-                navigate(-1);
+                navigate(`/${genericPath}/text-books`);
             }, 2000)
         } catch (err) {
             toast.error(err.response.data.mssg, {

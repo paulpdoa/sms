@@ -110,7 +110,7 @@ const EditTeacher = () => {
             });
 
             setTimeout(() => {
-                navigate(data.data.redirect); // Redirect to the teachers list page or wherever you need
+                navigate(`/${genericPath}/teachers`); // Redirect to the teachers list page or wherever you need
             }, 2000);
         } catch (err) {
             console.log(err);

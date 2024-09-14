@@ -51,9 +51,8 @@ const Select = ({ label, name, value, options, onChange }) => (
 
 
 const NewTeacher = () => {
-    const { records: religions, isLoading: religionsLoading } = useFetch(`${baseUrl()}/religions`);
-    const { records: genders, isLoading: gendersLoading } = useFetch(`${baseUrl()}/genders`);
-    const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
+    const { records: religions } = useFetch(`${baseUrl()}/religions`);
+    const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
     const { session,currentUserId,genericPath } = useContext(MainContext);
 
@@ -79,12 +78,36 @@ const NewTeacher = () => {
     const [password,setPassword] = useState('');
     const [confirmPassword,setConfirmPassword] = useState('');
 
+    const [error,setError] = useState({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        gender: '',
+        religion: '',
+        nationality: '',
+        placeOfBirth: '',
+        email: '',
+        contactNumber: '',
+        address: '',
+        education: '',
+        schoolGraduated: '',
+        yearGraduated: '',
+        yearsOfExperience: '',
+        joiningDate: '',
+        username: '',
+        password: '',
+        confirmPassword: ''
+    })
+
     const navigate = useNavigate();
 
     const getAge = Math.floor((new Date() - new Date(dateOfBirth).getTime()) / 3.15576e+10);
 
     const addTeacher = async (e) => {
         e.preventDefault();
+
+        
+
 
         const teacherInformation = { 
             firstName,
