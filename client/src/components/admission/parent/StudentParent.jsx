@@ -3,9 +3,9 @@ import { useFetch } from "../../../hooks/useFetch";
 import { MainContext } from '../../../helpers/MainContext';
 import { useContext } from 'react';
 
-const StudentParent = () => {
+const StudentParent = ({ setEnableView }) => {
 
-    const { currStudRec } = useContext(MainContext);
+    const { currStudRec,setCurrStudRec } = useContext(MainContext);
     const id = currStudRec._id;
 
     const { records: parent } = useFetch(`${baseUrl()}/student/parent/${id}`);
@@ -16,12 +16,29 @@ const StudentParent = () => {
                 { renderInformation('Mother',parent.motherName,parent.motherOccupation,parent.motherOffice,parent.motherContact,parent.motherEmail) }
                 { renderInformation('Father',parent.fatherName,parent.fatherOccupation,parent.fatherOffice,parent.fatherContact,parent.fatherEmail) }
                 { renderInformation('Guardian',parent.guardianName,parent.guardianOccupation,parent.guardianOffice,parent.guardianContact,parent.guardianEmail) }
+                
+                <button onClick={() => {
+                    setCurrStudRec(null);
+                    setEnableView(false);
+                    console.log('Close')
+                }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2">
+                    Cancel
+                </button>
             </div>
         )
     }
 
     return (
-        <h1 className="mt-3 text-sm text-red-500">No parent records yet</h1>
+        <>
+            <h1 className="text-xl font-semibold text-red-500 animate-pulse">No parent records yet</h1>
+            <button onClick={() => {
+                setCurrStudRec(null);
+                setEnableView(false);
+                console.log('Close')
+            }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2">
+                Cancel
+            </button>
+        </>
     )
 }
 

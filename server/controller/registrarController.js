@@ -118,7 +118,7 @@ module.exports.add_student = async (req,res) => {
             await Student.findByIdAndDelete(student._id);
             throw userError;  // Rethrow the error to be caught by the outer catch
         }
-        
+
     } catch(err) {
         console.log(err);
 
@@ -724,7 +724,6 @@ module.exports.add_sectioning = async (req,res) => {
 
         // check if student already has academic record
         const academicFound = await Academic.findOne({ studentId, recordStatus: 'Live' }).populate('gradeLevelId studentId');
-        console.log('academic found: ', academicFound);
 
         const withStrands = ['11','12'];
 

@@ -62,45 +62,40 @@ const Admission = () => {
                 </div>
 
                 {currStudRec?._id && (
-                    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 mt-20 p-4 bg-white rounded-lg border border-gray-300 max-h-[80vh] overflow-y-auto shadow-lg z-50 w-3/4">
-                        <div className="flex items-center justify-between mb-3">
-                            <h1 className="font-semibold text-xl text-gray-700 mb-4">
-                                {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
-                            </h1>
-                            <button onClick={() => {
-                                setCurrStudRec(null);
-                                setEnableView(false);
-                            }} className="bg-red-500 text-sm hover:bg-red-600 p-2 text-white rounded-md transition">Cancel</button>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {admissionPages.map((page) => (
-                                <button
-                                    key={page}
-                                    className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+                    // The overlay with black background and opacity
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-40">
+                        {/* The modal */}
+                        <div className="relative top-20 p-4 bg-white rounded-lg border border-gray-300 max-h-[80vh] overflow-y-auto shadow-lg z-50 w-3/4">
+                            <div className="flex items-center justify-between mb-3">
+                                <h1 className="font-semibold text-xl text-gray-700 mb-4">
+                                    {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'} {currentPage}
+                                </h1>
+                                {/* <button
                                     onClick={() => {
-                                        setCurrentPage(page);
+                                        setCurrStudRec(null);
                                         setEnableView(false);
                                     }}
+                                    className="bg-red-500 text-sm hover:bg-red-600 p-2 text-white rounded-md transition"
                                 >
-                                    {page}
-                                </button>
-                            ))}
-                        </div>
+                                    Cancel
+                                </button> */}
+                            </div>
 
-                        {currStudRec?._id ? (
-                            <>
-                                {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} />}
-                                {currentPage === 'Parents' && <StudentParent id={currStudRec._id} />}
-                                {currentPage === 'Information' && <StudentInfo id={currStudRec._id} />}
-                                {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} />}
-                                {currentPage === 'Sibling' && <StudentSibling id={currStudRec} />}
-                            </>
-                        ) : (
-                            <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
-                        )}
+                            {currStudRec?._id ? (
+                                <>
+                                    {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} setEnableView={setEnableView} />}
+                                    {currentPage === 'Parents' && <StudentParent id={currStudRec._id} setEnableView={setEnableView} />}
+                                    {currentPage === 'Information' && <StudentInfo id={currStudRec._id} setEnableView={setEnableView} />}
+                                    {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} setEnableView={setEnableView} />}
+                                    {currentPage === 'Sibling' && <StudentSibling id={currStudRec} setEnableView={setEnableView} />}
+                                </>
+                            ) : (
+                                <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
+                            )}
+                        </div>
                     </div>
                 )}
+
             </div>
 
             <ToastContainer />

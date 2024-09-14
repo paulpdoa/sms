@@ -3,9 +3,9 @@ import { useFetch } from "../../../hooks/useFetch";
 import { useContext } from 'react';
 import { MainContext } from '../../../helpers/MainContext';
 
-const StudentSibling = () => {
+const StudentSibling = ({ setEnableView }) => {
 
-    const { currStudRec } = useContext(MainContext);
+    const { currStudRec,setCurrStudRec } = useContext(MainContext);
 
     const id = currStudRec; 
     
@@ -37,12 +37,27 @@ const StudentSibling = () => {
                         <span className="text-sm truncate">{sibling.studentId?.firstName} {sibling.studentId?.middleName} {sibling.studentId?.lastName}</span>
                     </div>
                 </div>
+
+                <button onClick={() => {
+                    setCurrStudRec(null);
+                    setEnableView(false);
+                }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2">
+                    Cancel
+                </button>
             </div>
         )
     }
 
     return (
-        <h1 className="mt-3 text-sm text-red-500">No sibling records yet</h1>
+        <>
+        <h1 className="text-xl font-semibold text-red-500 animate-pulse">No sibling records yet</h1>
+        <button onClick={() => {
+            setCurrStudRec(null);
+            setEnableView(false);
+        }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2">
+            Cancel
+        </button>
+        </>
     )
 }
 

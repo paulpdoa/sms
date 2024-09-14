@@ -16,7 +16,7 @@ const StudentReqTable = ({ searchQuery }) => {
         { accessorKey: 'studentNo', header: 'Student No.' },
         // { accessorKey: 'registered', header: 'Registered' },
         { accessorKey: 'admitted', header: 'Admitted' },
-        { accessorKey: 'dateRegistered', header: 'Date Registered' },
+        // { accessorKey: 'dateRegistered', header: 'Date Registered' },
         { accessorKey: 'status', header: 'Status' },
         // { accessorKey: 'gradeLevel', header: 'Grade Level' },
         // { accessorKey: 'strand', header: 'Strand' },
@@ -24,23 +24,23 @@ const StudentReqTable = ({ searchQuery }) => {
     ];
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
-    const actions = (student) => (
-        <div className="flex gap-2 items-center">
-            <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
-        </div>
-    );
+    // const actions = (student) => (
+    //     <div className="flex gap-2 items-center">
+    //         <button onClick={() => setViewRecord(student)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">View</button>
+    //     </div>
+    // );
 
-    const formattedStudents = students?.filter(student => student?.academicId?.academicStatus?.toLowerCase() !== 'graduated').map(student => ({
+    const formattedStudents = students?.filter(student => student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && !student?.academicId?.isAdmitted).map(student => ({
         ...student,
-        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         studentNo: student.studentNo || 'Not assigned',
         registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
         admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        dateRegistered: student.dateRegistered ? new Date(student.dateRegistered.split('T')[0]).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        }) : 'Not Registered',
+        // dateRegistered: student.dateRegistered ? new Date(student.dateRegistered.split('T')[0]).toLocaleDateString('en-US', {
+        //     year: 'numeric',
+        //     month: 'long',
+        //     day: 'numeric'
+        // }) : 'Not Registered',
         // gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         // strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',

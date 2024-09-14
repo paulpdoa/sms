@@ -6,6 +6,8 @@ const TeacherAcademic = require('../model/TeacherAcademic');
 const Session = require('../model/SchoolYear');
 const StudentSubject = require('../model/StudentSubject');
 const StudentAttendance = require('../model/StudentAttendance');
+const Section = require('../model/Section');
+const StudentSection = require('../model/Sectioning');
 
 module.exports.get_teacher_dashboard = async(req,res) => {
     const { session } = req.query;
@@ -222,6 +224,42 @@ module.exports.add_students_attendance = async (req, res) => {
         res.status(500).json({ message: 'Error saving attendance records' });
     }
 };
+
+module.exports.get_students_in_section = async(req,res) => {
+    const { userId } = req.params;
+    const { session } = req.query;
+
+    try {
+
+        const currentTeacherUser = await User.findById(userId);
+        if(!currentTeacherUser) {
+            return res.status(404).json({ mssg:'This user is not existing' });
+        }
+
+        const currentTeacher = await Teacher.findById(currentTeacherUser.teacherId);
+        if(!currentTeacher) {
+            return res.status(404).json({ mssg:'This teacher is not existing' });
+        }
+
+        // Get current section of teacher
+        const teacherSection = await Section.findOne({ recordStatus: 'Live', sessionId: session, adviser: currentTeacher._id, status: true }).populate('adviser');
+
+        const currentSection = teacherSection.section;
+
+        // Get all students with the value of current section
+        const studentSections = await StudentSection.find({ sectionId: teacherSection._id }).populate('sectionId studentId');
+        console.log(studentSections);
+
+        await StudentSection.deleteMany({ studentId: null });
+
+        res.status(200).json({ currentSection, studentSections })
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching students' });
+    }
+
+}
 
 
 

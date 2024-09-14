@@ -6,9 +6,9 @@ import { baseUrl } from '../../../baseUrl';
 import { useFetch } from '../../../hooks/useFetch';
 import { MainContext } from '../../../helpers/MainContext';
 
-const SubmittedReq = () => {
+const SubmittedReq = ({ setEnableView }) => {
     const { records: requirements } = useFetch(`${baseUrl()}/requirements`);
-    const { session: schoolYear,currStudRec } = useContext(MainContext);
+    const { session: schoolYear,currStudRec,setCurrStudRec } = useContext(MainContext);
 
     const id = currStudRec._id;
     const { records: admission } = useFetch(`${baseUrl()}/admission/${id}`);
@@ -18,6 +18,7 @@ const SubmittedReq = () => {
     console.log(currStudRec);
 
     const [selectedRequirements, setSelectedRequirements] = useState([]);
+    const [isAdmitted,setIsAdmitted] = useState(currStudRec?.academicId?.isAdmitted);
 
     useEffect(() => {
         if (admission) {
@@ -70,7 +71,7 @@ const SubmittedReq = () => {
         } catch (err) {
             toast.error(err.response?.data?.mssg || 'An error occurred', {
                 position: "top-center",
-                autoClose: 2000,
+                autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -82,7 +83,7 @@ const SubmittedReq = () => {
     };
 
     return (
-        <div className="mt-4 p-4 bg-white shadow-md rounded-md">
+        <div className="mt-4 p-4 bg-white shadow-md rounded-md relative">
             <h2 className="text-xl font-bold text-gray-700 mb-4">Submitted Requirements</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {requirements?.map((record) => (
@@ -97,7 +98,20 @@ const SubmittedReq = () => {
                         />
                     </div>
                 ))}
+
+
+                <div className="flex items-center gap-2 absolute bottom-5 right-5">
+                    <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="admitted">Admitted</label>
+                    <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        type="checkbox"
+                        checked={isAdmitted}
+                        onChange={(e) => setIsAdmitted(e.target.checked)}
+                        disabled
+                    />
+                </div>
             </div>
+
+            
             
             <button 
                 className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 text-white text-sm py-2 px-4 mt-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-500`}
@@ -105,6 +119,12 @@ const SubmittedReq = () => {
                 disabled={isYearDone ? true : false}
             >
                 Submit
+            </button>
+            <button onClick={() => {
+                setCurrStudRec(null);
+                setEnableView(false);
+                }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md ml-2">
+                Cancel
             </button>
             <ToastContainer />
         </div>

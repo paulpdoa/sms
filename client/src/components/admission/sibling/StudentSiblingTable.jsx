@@ -11,7 +11,7 @@ const StudentSiblingTable = ({ setViewRecord,searchQuery }) => {
         { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'studentNo', header: 'Student No.' },
         // { accessorKey: 'registered', header: 'Registered' },
-        { accessorKey: 'dateRegistered', header: 'Date Registered' },
+        // { accessorKey: 'dateRegistered', header: 'Date Registered' },
         { accessorKey: 'status', header: 'Status' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
@@ -26,10 +26,10 @@ const StudentSiblingTable = ({ setViewRecord,searchQuery }) => {
 
     const formattedStudents = students?.filter(student => student.isAdmitted).map(student => ({
         ...student,
-        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         studentNo: student.studentNo || 'Not assigned',
         registered: student.isRegistered ? 'Yes' : 'No',
-        dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
+        // dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',

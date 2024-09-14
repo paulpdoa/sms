@@ -115,8 +115,6 @@ const StudentGrading = () => {
     }));
     const renderedSubjects = new Set();
 
-    console.log(subjectOfTeachers);
-
     const addStudentGrade = async (e) => {
         e.preventDefault();
 
@@ -168,6 +166,8 @@ const StudentGrading = () => {
         }
     }
 
+
+    // Update a students grade
     const updateStudentGrade = async (e) => {
         e.preventDefault();
 
@@ -204,7 +204,7 @@ const StudentGrading = () => {
                         <option className="text-sm" value='' hidden>Select Student</option>
                         { students.length > 0 ? (
                             students?.filter(student => student.academicId?.isRegistered && student?.academicId?.isAdmitted && student?.academicId?.gradeLevelId).map(student => (
-                                <option className="text-sm" value={student._id}>{student.firstName} {student.lastName}</option>
+                                <option key={student._id} className="text-sm" value={student._id}>{student.firstName} {student.lastName}</option>
                             ))
                         ) : (
                             <Link className="text-sm" to='/students'>Add Student</Link>
@@ -224,7 +224,7 @@ const StudentGrading = () => {
                         >   
                             <option className="text-sm" value='' hidden>Select Subject</option>
                             { studentSubjects?.filter(studentSubject => studentSubject.studentId._id === studentId).map(studentSubject => (
-                                    <option value={studentSubject.subjectId._id}>{studentSubject.subjectId.subjectName} - {studentSubject.subjectId.subjectCode}</option>
+                                    <option key={studentSubject._id} value={studentSubject.subjectId._id}>{studentSubject.subjectId.subjectName} - {studentSubject.subjectId.subjectCode}</option>
                             )) }
                         </select>
                     ) : (
@@ -243,7 +243,7 @@ const StudentGrading = () => {
                         >   
                             <option className="text-sm" value='' hidden>Select Grading Category</option>
                             { gradingCategories.map(gradingCategory => (
-                                    <option value={gradingCategory._id}>{gradingCategory.gradingCategory}</option>
+                                    <option key={gradingCategory._id} value={gradingCategory._id}>{gradingCategory.gradingCategory}</option>
                             )) }
                         </select>
                     ) : (
@@ -257,9 +257,12 @@ const StudentGrading = () => {
                     <label className="text-sm" htmlFor="academic period">Academic Period:</label>
                     { studentId ? (
                         <select 
-                            className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
                             onChange={(e) => setAcademicPeriod(e.target.value)}
+                            value={academicPeriod || currentAcademicPeriod}
+                            disabled
                         >   
+                            {console.log(currentAcademicPeriod)}
                             <option className="text-sm" value='' hidden>Select Academic Period</option>
                             { academicPeriods.map(academicPeriod => (
                                 <option key={academicPeriod.id} value={academicPeriod.academicPeriod}>{academicPeriod.academicPeriod}</option>
@@ -382,10 +385,6 @@ const StudentGrading = () => {
             // Set student id after clicking View on table to capture in form
             setStudentId(student._id);
         }
-       
-        
-
-        
     }
 
     const getStudentGrades = (id) => {
@@ -454,7 +453,8 @@ const StudentGrading = () => {
                             <h1 className="font-semibold text-2xl text-gray-700">Grades of {student.firstName} {student.lastName}</h1>
                             <button onClick={() => {
                                 setShowStudentGrades(false);
-                                setShowStudentSubject(true)
+                                setShowStudentSubject(true);
+                                setCurrentAcademicPeriod('');
                             }} className="text-red-500 text-sm hover:text-red-600 cursor-pointer">Close</button>
                         </div>
 
@@ -528,7 +528,7 @@ const StudentGrading = () => {
                                 <div className="flex flex-col mt-1">
                                     <label className="text-sm" htmlFor="academic period">Academic Period:</label>
                                     { studentId ? (
-                                        <select 
+                                        <select
                                             className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
                                             onChange={(e) => setAcademicPeriod(e.target.value)}
                                             value={academicPeriod}
@@ -732,58 +732,31 @@ const StudentGrading = () => {
                                         <p className="text-sm font-semibold">This student doesn't have any grades for the selected subject and academic period.</p>
                                     </div>
                                 ) }
-                            
-
-                                {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                                    {studentGrades?.filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod).length > 0 
-                                        ? studentGrades
-                                            .filter(student => student.studentId._id === studentId && student.subjectId._id === subjectId && student.academicPeriod === currentAcademicPeriod)
-                                            .map(studentGrade => (
-                                                <div 
-                                                onClick={() => console.log(studentGrade)}
-                                                key={studentGrade._id} className="p-4 rounded-lg shadow-md bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out">
-                                                    <h1 className="font-bold text-lg text-gray-800 mb-2">{studentGrade.academicPeriod}</h1>
-                                                    <p className="text-sm text-gray-600 mb-1">
-                                                        <span className="font-medium text-gray-700">{studentGrade.gradingCategoryId?.gradingCategory}</span>: 
-                                                        {studentGrade.studentScore}/{studentGrade.taskTotal}
-                                                    </p>
-                                                    <div className="text-sm text-gray-600 flex flex-col gap-1">
-                                                        <p><span className="font-medium text-gray-700">Passing Score:</span> {studentGrade.passingScore}</p>
-                                                        <p><span className="font-medium text-gray-700">Grade Remarks:</span> {studentGrade.gradeRemark}</p>
-                                                    </div>
-                                                    <p className="text-sm text-gray-600 mt-2"><span className="font-medium text-gray-700">Date Taken:</span> {studentGrade.dateTaken}</p>
-                                                    <p className="text-sm text-gray-600 mt-1"><span className="font-medium text-gray-700">Remarks:</span> {studentGrade.remarks}</p>
-                                                </div>
-                                            ))
-                                        : (
-                                            <div className="col-span-full text-center text-gray-500">
-                                                <p className="text-lg font-semibold">This student doesn't have any grades for the selected subject and academic period.</p>
-                                            </div>
-                                        )
-                                    }
-                                </div> */}
-                                <div className="flex justify-end">
-                                    <button onClick={() => {
-                                        if(!isYearDone && role === 'Teacher') {
-                                            setShowForm(true)
-                                            setShowStudentSubject(false);
-                                        } else {
-                                            // dont allow if not teacher
-                                            toast.error('Your current role is not allowed to perform this action', {
-                                                position: "top-center",
-                                                autoClose: 3000,
-                                                hideProgressBar: true,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: true,
-                                                progress: undefined,
-                                                theme: "colored"
-                                            });
-                                        }
-                                    }} className={`${role !== 'Teacher' ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-gray-100 mt-3`}>
-                                        Add New Student Grades
-                                    </button>
-                                </div>
+                                
+                                { currentAcademicPeriod && (
+                                    <div className="flex justify-end">
+                                        <button onClick={() => {
+                                            if(!isYearDone && role === 'Teacher') {
+                                                setShowForm(true)
+                                                setShowStudentSubject(false);
+                                            } else {
+                                                // dont allow if not teacher
+                                                toast.error('Your current role is not allowed to perform this action', {
+                                                    position: "top-center",
+                                                    autoClose: 3000,
+                                                    hideProgressBar: true,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored"
+                                                });
+                                            }
+                                        }} className={`${role !== 'Teacher' ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-gray-100 mt-3`}>
+                                            Add New Student Grades
+                                        </button>
+                                    </div>
+                                ) }
                             </div>
                             ) }
                         </div>

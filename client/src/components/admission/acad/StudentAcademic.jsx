@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { MainContext } from '../../../helpers/MainContext';
 import { academicStatus as status } from '../../../data/academicStatus.json';
 
-const StudentAcademic = () => {
+const StudentAcademic = ({ setEnableView }) => {
     
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     // const { records: departments } = useFetch(`${baseUrl()}/departments`);
@@ -16,7 +16,7 @@ const StudentAcademic = () => {
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
     
-    const { session: syId,currStudRec,currentUserId: inputter } = useContext(MainContext);
+    const { session: syId,currStudRec,currentUserId: inputter,setCurrStudRec } = useContext(MainContext);
     const id = currStudRec._id;
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
 
@@ -129,16 +129,6 @@ const StudentAcademic = () => {
                         </select>
                     </div>
 
-                    {/* <div className="flex flex-col gap-2">
-                        <label className="font-semibold" htmlFor="department">Department</label>
-                        <select className="p-2 rounded-md outline-none border border-gray-400" onChange={(e) => setDepartment(e.target.value)}>
-                            <option hidden>{student?.academicId?.departmentId?.department ? student?.academicId?.departmentId?.department : 'Not Assigned' }</option>
-                            { departments?.map(department => (
-                                <option key={department._id} value={department._id}>{ department.department }</option>
-                            )) }
-                        </select>
-                    </div> */}
-
                     {(gradeLevel === grade11Id || gradeLevel === grade12Id) && (
                         <div className="flex flex-col gap-2">
                             <label className="font-semibold" htmlFor="strand">Strand</label>
@@ -191,7 +181,13 @@ const StudentAcademic = () => {
                     </div>
                 </div>
 
-                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md w-1/4`}>Submit</button>
+                <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md`}>Submit</button>
+                <button onClick={() => {
+                    setCurrStudRec(null);
+                    setEnableView(false);
+                }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2 ml-2">
+                    Cancel
+                </button>
             </form>
             <ToastContainer />
         </div>
