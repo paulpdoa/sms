@@ -30,8 +30,6 @@ const StudentAcademic = ({ setEnableView }) => {
     const [paymentTermId,setPaymentTermId] = useState('');
     const [academicStatus,setAcademicStatus] = useState('New');
 
-    console.log(status);
-
     const [grade11Id, setGrade11Id] = useState('');
     const [grade12Id, setGrade12Id] = useState('');
 
@@ -110,10 +108,13 @@ const StudentAcademic = ({ setEnableView }) => {
     }
 
     return (
-        <div className="mt-3 text-sm">
+        <div className="mt-3 text-sm bg-white p-5 rounded-md w-1/2">
             <form onSubmit={addAcademic}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
+                { 
+                    <h1 className="text-2xl font-semibold text-gray-700">{currStudRec.firstName} {currStudRec.middleName} {currStudRec.lastName}</h1>
+                }
+                    
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="studentNo">Student Number:</label>
                         <span className="p-2 rounded-md outline-none border border-gray-400 bg-gray-100">{student?.studentNo ?? 'No student number yet'}</span>

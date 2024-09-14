@@ -1,11 +1,17 @@
 import StudentInfoTable from "../../components/admission/info/StudentInfoTable";
+import StudentAcadTable from "../../components/admission/acad/StudentAcadTable";
 import StudentInfo from "../../components/admission/info/StudentInfo";
-import { useContext } from 'react';
+import { useContext,useState } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from "../../components/TabActions";
+import StudentAcademic from "../../components/admission/acad/StudentAcademic";
 
 const Registration = () => {
     const { searchQuery, currStudRec, setCurrStudRec } = useContext(MainContext);
+    const buttonPages = ['Registration', 'Academic'];
+    const [currentPage, setCurrentPage] = useState('Registration');
+
+    const [enableView,setEnableView] = useState(false);
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
@@ -14,10 +20,30 @@ const Registration = () => {
 
     return (
         <main className="p-4 relative">
-            <TabActions title='Registration' noView={true} />
-            <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} />
+            {/* <div className="flex justify"> */}
+                <TabActions title='Registration' noView={true} />
 
-            {currStudRec?._id && (
+                <div className="flex flex-wrap gap-2 mb-4 mt-4">
+                    { buttonPages.map((page) => (
+                        <button
+                            key={page}
+                            className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+                            onClick={() => {
+                                setCurrentPage(page);
+                                setEnableView(false);
+                            }}
+                        >
+                            {page}
+                        </button>
+                    )) }
+                </div>
+            {/* </div> */}
+            
+
+            { currentPage === 'Registration' && <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} /> }
+            { currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} /> }
+
+            {(currStudRec?._id && currentPage === 'Registration') && (
                 <>
                     {/* Backdrop */}
                     <div className="fixed inset-0 bg-black opacity-50 z-40"></div>
@@ -42,6 +68,17 @@ const Registration = () => {
                             )}
                         </div>
                     </div>
+                </>
+            )}
+
+            {(currentPage === 'Academic' && currStudRec?._id) && (
+                <>
+                {/* Backdrop */}
+                <div className="fixed inset-0 bg-black opacity-50 z-40"></div>
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+
+                    <StudentAcademic id={currStudRec._id} setEnableView={setEnableView} />
+                </div>
                 </>
             )}
         </main>

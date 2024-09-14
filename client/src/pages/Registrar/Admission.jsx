@@ -16,7 +16,7 @@ import StudentSiblingTable from '../../components/admission/sibling/StudentSibli
 import { MainContext } from '../../helpers/MainContext';
 
 const Admission = () => {
-    const admissionPages = ['Requirements', 'Parents', 'Sibling', 'Academic'];
+    const admissionPages = ['Requirements', 'Parents', 'Sibling'];
     const [currentPage, setCurrentPage] = useState('Requirements');
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
