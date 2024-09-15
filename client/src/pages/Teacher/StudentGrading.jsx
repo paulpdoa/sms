@@ -122,7 +122,7 @@ const StudentGrading = () => {
             studentId,
             subjectId,
             gradingCategoryId,
-            academicPeriod,
+            academicPeriod: currentAcademicPeriod,
             dateTaken,
             dueDate,
             taskTotal,
@@ -130,7 +130,8 @@ const StudentGrading = () => {
             gradeRemark,
             remarks,
             studentScore,
-            session
+            session,
+            role
         }
         studentGradeData.inputter = currentUserId;
         studentGradeData.sessionId = session;

@@ -12,9 +12,14 @@ const TeacherStudentAttendance = () => {
 
     const { currentUserId, searchQuery, session, role } = useContext(MainContext);
 
+    const days = ['Sunday','Monday','Tuesday','Wednedsay','Thursday','Friday','Saturday'];
+
 
     // set the current remark if the student has one
     const [currentRemarks,setCurrentRemarks] = useState('');
+
+    // The day today
+    const currentDay = days[new Date().getDay()];
 
     const [openAttendance,setOpenAttendance] = useState(false);
     const [currentStudent,setCurrentStudent] = useState('');
@@ -182,7 +187,7 @@ const TeacherStudentAttendance = () => {
             </header>
 
             <section className="px-4 mt-5 w-full">
-                <h2 className="text-lg text-gray-700 px-4">{formatDateReadable(currentDate)}</h2>
+                <h2 className="text-lg text-gray-700 px-4">{currentDay}, {formatDateReadable(currentDate)}</h2>
                 <div className="flex items-end justify-between">
                     <TabActions title="Students Attendance" noView={true} />
                     {/* This must filter the table below when changed */}
