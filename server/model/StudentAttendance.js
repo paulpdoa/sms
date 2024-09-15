@@ -15,6 +15,10 @@ const studentAttendanceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },
+    subjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'subject'
+    },
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'student'

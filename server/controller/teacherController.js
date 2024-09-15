@@ -144,8 +144,10 @@ module.exports.add_student_grade = async (req, res) => {
 };
 
 module.exports.get_teacher_student_attendance = async (req, res) => {
-    const { session } = req.query;  
+    const { session,currentDate } = req.query;  
     const { userId } = req.params;
+
+    console.log(currentDate);
 
     try {
         const user = await User.findById(userId);
@@ -155,12 +157,38 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
         const teacherName = `${teacher.firstName} ${teacher.lastName}`;
         
         const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
-        .populate('teacherSubjectId studentId');
+        .populate('teacherSubjectId studentId subjectId');
 
         // Display the students of the current teacher logged in
         const studentsOfTeacher = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
 
-        res.status(200).json({ teacherName, studentsOfTeacher, teacher: teacher._id, teacherStudents });
+        // Extract student IDs from studentsOfTeacher
+        const studentIds = studentsOfTeacher.map(student => student.studentId._id);
+
+        // Get attendance records for the students
+        const studentsAttendance = await StudentAttendance.find({
+            studentId: { $in: studentIds },
+            recordStatus: 'Live',
+            dateToday: currentDate
+        });
+
+        // Combine attendance remarks with students
+        const studentsWithAttendance = studentsOfTeacher.map(student => {
+            const attendance = studentsAttendance.find(a => {
+                console.log(`Comparing ${a.studentId} with ${student.studentId._id}`);
+                return a.studentId.equals(student.studentId._id) && a.subjectId.equals(student.subjectId._id);
+            });
+
+        
+            return {
+                ...student._doc,
+                studentsAttendanceId: attendance ? attendance._id : '',
+                remarks: attendance ? attendance.remarks : 'No remarks'
+            };
+        });
+        
+
+        res.status(200).json({ teacherName, studentsWithAttendance });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'An error occurred while fetching students attendance records' });
@@ -170,46 +198,31 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
 
 
 module.exports.add_students_attendance = async (req, res) => {
-    const { attendanceData, selectedMonth, selectedYear, sessionId, inputter } = req.body;
-
-    console.log('Attendance Data: ',req.body);
-
-    if (!attendanceData || !sessionId || !selectedMonth || !selectedYear || !inputter) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
+    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId } = req.body;
 
     try {
-        const attendanceRecords = [];
-
-        for (const [studentId, attendanceDays] of Object.entries(attendanceData)) {
-            for (const [day, remarks] of Object.entries(attendanceDays)) {
-                const dayNumber = parseInt(day.replace('day', ''));
-                const dateToday = `${selectedYear}-${String(selectedMonth).padStart(2,'0')}-${String(dayNumber).padStart(2,'0')}`
-               
-                console.log(dateToday);
-
-                const attendanceRecord = new StudentAttendance({
-                    dateToday,
-                    remarks,
-                    sessionId,
-                    studentId,
-                    inputter,
-                    recordStatus: 'Live'
-                });
-
-                attendanceRecords.push(attendanceRecord);
-            }
-        }
-
-        const savedRecords = await StudentAttendance.insertMany(attendanceRecords);
-
-        // Respond with the saved records
-        res.status(201).json({ message: 'Attendance records successfully saved', attendanceRecords: savedRecords });
+       await StudentAttendance.create({dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus});
+       res.status(200).json({ mssg: 'Student attendance has been added successfully' });
+       
     } catch (error) {
         console.error('Error saving attendance:', error);
-        res.status(500).json({ message: 'Error saving attendance records' });
+        res.status(500).json({ mssg: 'Error saving attendance records' });
     }
 };
+
+module.exports.edit_students_attendance = async (req,res) => {
+    const { id } = req.params;
+    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId } = req.body;
+
+    try {
+       await StudentAttendance.findByIdAndUpdate(id,{dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus});
+       res.status(200).json({ mssg: 'Student attendance has been updated successfully' });
+       
+    } catch (error) {
+        console.error('Error saving attendance:', error);
+        res.status(500).json({ mssg: 'Error saving attendance records' });
+    }
+}
 
 module.exports.get_students_in_section = async(req,res) => {
     const { userId } = req.params;
