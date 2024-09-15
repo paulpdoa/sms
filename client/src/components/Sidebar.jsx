@@ -79,6 +79,8 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/master/students' },
+                    { name: 'Parents', link: '/master/parents' },
+                    { name: 'Siblings', link: '/master/siblings' },
                     { name: 'Teachers subject', link: '/master/teachers-subject' },
                     {
                         name: 'Enrollment Process',
@@ -178,6 +180,8 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/schooladmin/students' },
+                    { name: 'Parents', link: '/master/parents' },
+                    { name: 'Siblings', link: '/master/siblings' },
                     { name: 'Teachers subject', link: '/schooladmin/teachers-subject' },
                     {
                         name: 'Enrollment Process',
@@ -242,6 +246,8 @@ const initialMenus = [
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Students', link: '/registrar/students' },
+                    { name: 'Parents', link: '/master/parents' },
+                    { name: 'Siblings', link: '/master/siblings' },
                     { name: 'Teachers subject', link: '/registrar/teachers-subject' },
                     {
                         name: 'Enrollment Process',

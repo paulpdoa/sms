@@ -144,37 +144,23 @@ module.exports.add_student_grade = async (req, res) => {
 };
 
 module.exports.get_teacher_student_attendance = async (req, res) => {
-    const { session, month, year } = req.query;  
+    const { session } = req.query;  
     const { userId } = req.params;
 
     try {
         const user = await User.findById(userId);
         const teacher = await Teacher.findById(user.teacherId)
             .populate({ path: 'teacherAcademicId', populate: { path: 'teacherSubjectId' } });
+
+        const teacherName = `${teacher.firstName} ${teacher.lastName}`;
         
         const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
-        .populate('teacherSubjectId studentId')
+        .populate('teacherSubjectId studentId');
 
-        const teacherStudentLists = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
-        
-        // Fixing the start and end of the month calculation
-        const startOfMonth = new Date(year, month, 1);
-        const endOfMonth = new Date(year, parseInt(month) + 1, 0); // Correct end of month
-        console.log('Start Month: ', startOfMonth);
-        console.log('End of Month: ', endOfMonth);
+        // Display the students of the current teacher logged in
+        const studentsOfTeacher = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
 
-        const attendanceData = await StudentAttendance.find({
-            sessionId: session,
-            recordStatus: 'Live',
-            // dateToday: { $gte: startOfMonth, $lte: endOfMonth }
-        });
-        console.log(attendanceData);
-
-        res.status(200).json({
-            teacherStudentLists,
-            teacherName: `${teacher.firstName} ${teacher.lastName}`,
-            attendanceData // Send filtered attendance data
-        });
+        res.status(200).json({ teacherName, studentsOfTeacher, teacher: teacher._id, teacherStudents });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'An error occurred while fetching students attendance records' });
@@ -186,7 +172,7 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
 module.exports.add_students_attendance = async (req, res) => {
     const { attendanceData, selectedMonth, selectedYear, sessionId, inputter } = req.body;
 
-    console.log('Attendance Data: ',req.body.attendanceData);
+    console.log('Attendance Data: ',req.body);
 
     if (!attendanceData || !sessionId || !selectedMonth || !selectedYear || !inputter) {
         return res.status(400).json({ message: 'Missing required fields' });
