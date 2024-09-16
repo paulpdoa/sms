@@ -102,11 +102,11 @@ const App = () => {
 
 
   // This will check if the userToken in cookies has been removed, it will also remove localStorage as well
-  useEffect(() => {
-    if(!userToken) {
-      ['id','currentUserId','session','role','username'].forEach(lclstg => localStorage.removeItem(lclstg));
-    }
-  },[cookies])
+  // useEffect(() => {
+  //   if(!userToken) {
+  //     ['id','currentUserId','session','role','username'].forEach(lclstg => localStorage.removeItem(lclstg));
+  //   }
+  // },[cookies])
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -202,6 +202,10 @@ const App = () => {
             <Route path='/teacher/student-grading' element={<StudentGrading />} />
             <Route path='/teacher/dashboard' element={role === 'Teacher' && <TeacherDashboard />  } />
             <Route path='/teacher/student-attendance' element={<TeacherStudentAttendance />} />
+
+
+            {/* This will accept routes with subject id */}
+            <Route path='/teacher/student-grading/:id' element={<StudentGrading />} />
           </Route>
 
           {/* For student routes */}

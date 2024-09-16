@@ -9,7 +9,7 @@ import MasterTable from "../../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
 import MasterDataForm from '../../components/MasterDataForm';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 
 const StudentGrading = () => {
@@ -23,6 +23,10 @@ const StudentGrading = () => {
     
     const { records: gradingCategories } = useFetch(`${baseUrl()}/grading-categories`);
     const { records: studentGrades } = useFetch(`${baseUrl()}/student-grades`);
+
+    console.log(studentGrades);
+
+    const [subjectSelected,setSubjectSelected] = useState('');
     
     const { searchQuery,showForm,currentUserId,setShowForm, session, role } = useContext(MainContext);
 
@@ -31,8 +35,6 @@ const StudentGrading = () => {
     const currentTeacherId = user?.teacherId;
     // const { records: teacherSubject } = useFetch(`${baseUrl()}/teacher-subject/${currentUserId}`);
     // console.log(teacherSubject);
-
-   
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
 
@@ -75,6 +77,7 @@ const StudentGrading = () => {
 
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
+        { accessorKey: 'subject', header: 'Subject' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'section', header: 'Section' },
         { accessorKey: 'strand', header: 'Strand' }
@@ -106,13 +109,19 @@ const StudentGrading = () => {
     }));
 
     const subjectOfTeachers = studentSubjects?.filter(studentSubj => studentSubj?.teacherSubjectId?.teacherId?._id === currentTeacherId && `${studentSubj.subjectId.subjectName} ${studentSubj.subjectId.subjectCode}` === `${studentSubj?.teacherSubjectId?.subjectId?.subjectName} ${studentSubj?.teacherSubjectId?.subjectId?.subjectCode}`);
-    const subjectOfTeachersData = subjectOfTeachers?.filter(studentSubj => studentSubj.studentId.academicId?.isRegistered && studentSubj.studentId.academicId?.isAdmitted && studentSubj.studentId.academicId.gradeLevelId && studentSubj.studentId.academicId.sectionId).map(studentSubject => ({
+    const subjectOfTeachersData = subjectOfTeachers?.filter(studentSubj => {
+        const filteredStudents = studentSubj.studentId.academicId?.isRegistered && studentSubj.studentId.academicId?.isAdmitted && studentSubj.studentId.academicId.gradeLevelId && studentSubj.studentId.academicId.sectionId;
+        
+        return filteredStudents
+
+    }).map(studentSubject => ({
         ...studentSubject,
-        fullName: `${studentSubject.studentId.firstName} ${studentSubject.studentId.middleName} ${studentSubject.studentId.lastName}`,
+        fullName: ` ${studentSubject.studentId.lastName}, ${studentSubject.studentId.firstName} ${studentSubject.studentId.middleName}`,
+        subject: `${studentSubject.subjectId.subjectName} - ${studentSubject.subjectId.subjectCode}`,
         gradeLevel: `${studentSubject.studentId.academicId.gradeLevelId.gradeLevel}`,
         section: `${studentSubject.studentId.academicId.sectionId?.section}`,
         strand: studentSubject.studentId.academicId.strandId ? `${studentSubject.studentId.academicId.strandId.strand}` : 'Not Applicable'
-    }));
+    })).sort((a,b) => a.studentId.lastName.localeCompare(b.studentId.lastName));
     const renderedSubjects = new Set();
 
     const addStudentGrade = async (e) => {
@@ -342,22 +351,34 @@ const StudentGrading = () => {
                 </div>
 
                 <div className="flex flex-col mt-1">
-                    <label className="text-sm" htmlFor="grade remarks">Grade Remarks:</label>
-                    { studentId ? (
-                        <select 
-                            className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                    <label className="text-sm" htmlFor="grade-remarks">Grade Remarks:</label>
+                    {studentId ? (
+                        <select
+                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
                             onChange={(e) => setGradeRemark(e.target.value)}
+                            disabled
                         >   
-                            <option className="text-sm" value='' hidden>Select Grade Remark</option>
-                            <option value="Passed">Passed</option>
-                            <option value="Failed">Failed</option>
+                            {/* Display a hidden option if studentScore or passingScore is not set */}
+                            {(studentScore === '' || studentScore === undefined || passingScore === '' || passingScore === undefined) && (
+                                <option className="text-sm" value='' hidden>Select Grade Remark</option>
+                            )}
+
+                            {/* Set the remarks depending on the student's score */}
+                            {studentScore !== '' && studentScore !== undefined && passingScore !== '' && passingScore !== undefined ? (
+                                studentScore < passingScore ? (
+                                    <option value="Failed">Failed</option>
+                                ) : (
+                                    <option value="Passed">Passed</option>
+                                )
+                            ) : null}
                         </select>
                     ) : (
                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
                             Please select student first
                         </div>
-                    ) }
+                    )}
                 </div>
+
 
                 <div className="flex flex-col mt-1">
                     <label className="text-sm" htmlFor="remarks">Remarks:</label>
@@ -419,6 +440,7 @@ const StudentGrading = () => {
     return (
         <main className="p-2 relative">
             <TabActions title="Student Grades" noView={true} />
+            
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addStudentGrade,setShowForm,'Fill Student Grades',setStudentId) }
                 <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
@@ -613,23 +635,32 @@ const StudentGrading = () => {
                                 </div>
 
                                 <div className="flex flex-col mt-1">
-                                    <label className="text-sm" htmlFor="grade remarks">Grade Remarks:</label>
-                                    { studentId ? (
-                                        <select 
-                                            className="outline-none p-1 text-sm rounded-md border border-gray-300"
+                                    <label className="text-sm" htmlFor="grade-remarks">Grade Remarks:</label>
+                                    {studentId ? (
+                                        <select
+                                            className="outline-none disabled:font-semibold cursor-not-allowed p-1 text-sm rounded-md border border-gray-300"
                                             onChange={(e) => setGradeRemark(e.target.value)}
-                                            value={gradeRemark}
                                             disabled
                                         >   
-                                            <option className="text-sm" value='' hidden>Select Grade Remark</option>
-                                            <option value="Passed">Passed</option>
-                                            <option value="Failed">Failed</option>
+                                            {/* Display a hidden option if studentScore or passingScore is not set */}
+                                            {(studentScore === '' || studentScore === undefined || passingScore === '' || passingScore === undefined) && (
+                                                <option className="text-sm" value='' hidden>Select Grade Remark</option>
+                                            )}
+
+                                            {/* Set the remarks depending on the student's score */}
+                                            {studentScore !== '' && studentScore !== undefined && passingScore !== '' && passingScore !== undefined ? (
+                                                studentScore < passingScore ? (
+                                                    <option value="Failed">Failed</option>
+                                                ) : (
+                                                    <option value="Passed">Passed</option>
+                                                )
+                                            ) : null}
                                         </select>
                                     ) : (
                                         <div className="outline-none bg-gray-200 cursor-not-allowed p-1 text-sm rounded-md border border-gray-300">
                                             Please select student first
                                         </div>
-                                    ) }
+                                    )}
                                 </div>
 
                                 <div className="flex flex-col mt-1">
