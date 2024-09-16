@@ -364,6 +364,9 @@ const App = () => {
           <Route path='/settings' element={<Settings />} />
         </Route>
 
+        {/* Catch guest dashboard to go to login page */}
+        <Route path='/guest/dashboard' element={<Navigate to='/login' />} />
+
         <Route path="*" element={<ErrorPage />} />
       </Route>
     )

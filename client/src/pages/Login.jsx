@@ -76,7 +76,7 @@ const Login = () => {
             });
 
             setTimeout(() => {
-                setCookie('userToken', data.data.token, { maxAge: 100000 });
+                setCookie('userToken', data.data.token, { path: `/${data.data.role.replace(" ","").toLowerCase()}`,maxAge: 100000 });
                 navigate(data.data.redirect);
             }, 2000);
         } catch (err) {

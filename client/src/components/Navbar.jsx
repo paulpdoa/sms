@@ -1,18 +1,20 @@
 import { useLocation } from "react-router-dom";
-import { FaRegUserCircle } from "react-icons/fa";
 import { HiChevronDown } from "react-icons/hi";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useState } from 'react';
+import { useState,useContext } from 'react';
 import { useCookies } from 'react-cookie';
 import { CiLogout } from "react-icons/ci";
 import { motion, AnimatePresence } from "framer-motion";
+import { MainContext } from "../helpers/MainContext";
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const pathName = 'School Management System';
+
+    const { role } = useContext(MainContext);
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -23,7 +25,6 @@ const Navbar = () => {
         const message = 'Logout successful';
 
         // Clear user data from localStorage
-        ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
 
         toast.success(message, {
             position: "top-center",
@@ -38,7 +39,8 @@ const Navbar = () => {
 
         setTimeout(() => {
             // Remove userToken cookie
-            removeCookie('userToken',{ path: '/' });
+            removeCookie('userToken',{ path: `/${role.replace(" ","").toLowerCase()}` });
+            ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
             navigate('/login');
         }, 2000);
     };

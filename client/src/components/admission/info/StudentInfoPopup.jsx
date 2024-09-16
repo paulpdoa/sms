@@ -30,6 +30,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
     const [academicStatus,setAcademicStatus] = useState(id?.academicId?.academicStatus);
 
+    const buttonPages = ['Information','Academic','Registration','Assistance'];
+    const [currentPage,setCurrentPage] = useState('Information');
+
 
     const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
@@ -99,11 +102,25 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
             <div className="relative bg-white w-full max-w-4xl p-6 rounded-lg shadow-lg h-[90%] overflow-y-auto">
-                <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-700">{id?.firstName} {id?.lastName} Information</h1>
                     <RiCloseLargeFill className="text-3xl text-red-400 cursor-pointer" onClick={() => closeModal(false)} />
                 </div>
 
+                {/* Button Tabs */}
+                <div className="mb-6 mt-3 flex items-center gap-4">
+                    { buttonPages.map(buttonPage => (
+                        <button 
+                            onClick={() => setCurrentPage(buttonPage)} 
+                            className={`${currentPage === buttonPage ? 'bg-blue-500 hover:bg-blue-600 text-gray-100' : 'border-blue-500 hover:bg-blue-500 bg-gray-100 text-gray-800 hover:text-gray-100' } border p-2 rounded-md text-sm transition`}
+                        >
+                            {buttonPage}
+                        </button>
+                    )) } 
+                </div>
+
+                
+                   
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="lastname">Last Name</label>
@@ -283,6 +300,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     </button>
                     
                 </div>
+                   
             </div>
             <ToastContainer />
         </div>
