@@ -17,6 +17,7 @@ const TeacherStudentAttendance = () => {
 
     // set the current remark if the student has one
     const [currentRemarks,setCurrentRemarks] = useState('');
+    const [withRemarks,setWithRemarks] = useState(false);
 
     // The day today
     const currentDay = days[new Date().getDay()];
@@ -75,6 +76,8 @@ const TeacherStudentAttendance = () => {
 
         // Set the current remarks of the student upon viewing
         setCurrentRemarks(studentRecord.remarks)
+        setWithRemarks(studentRecord.remarks === 'No remarks' ? true : false);
+        
         // Set the subject attended by the student
         setSubjectId(studentRecord.subjectId._id);
 
@@ -83,6 +86,7 @@ const TeacherStudentAttendance = () => {
 
         setCurrentStudent(`${studentRecord.studentId.firstName} ${studentRecord.studentId.middleName} ${studentRecord.studentId.lastName}`)
     }
+
 
     const addAttendance = async (e) => {
         e.preventDefault();
@@ -199,9 +203,7 @@ const TeacherStudentAttendance = () => {
                         onChange={(e) => setCurrentDate(e.target.value)} 
                     />
                 </div>
-
                 
-
                 <MasterTable 
                     columns={studentColumns}
                     data={studentsOfTeacher || []}
@@ -223,7 +225,7 @@ const TeacherStudentAttendance = () => {
                                 <p className="text-xs text-gray-500">Add attendance for {formatDateReadable(currentDate)}</p>
                             </div>
 
-                            <form className="grid grid-cols-2 gap-5" onSubmit={!currentRemarks ? addAttendance : updateAttendance}>
+                            <form className="grid grid-cols-2 gap-5" onSubmit={withRemarks ? addAttendance : updateAttendance}>
                                 <input 
                                     type="date" 
                                     className="p-2 border border-gray-300 rounded-md focus:ring-2 ring-blue-500 outline-none" 
@@ -251,9 +253,9 @@ const TeacherStudentAttendance = () => {
                                 
 
                                 <button 
-                                    className={`text-sm ${!currentRemarks ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'} text-gray-100 p-2 rounded-md`}
+                                    className={`text-sm ${withRemarks ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'} text-gray-100 p-2 rounded-md`}
                                 >
-                                    { !currentRemarks ? 'Submit' : 'Update' }
+                                    { withRemarks ? 'Submit' : 'Update' }
                                 </button>
                                 <button 
                                     className="text-gray-100 bg-red-500 hover:bg-red-600 text-sm p-2 rounded-md"
