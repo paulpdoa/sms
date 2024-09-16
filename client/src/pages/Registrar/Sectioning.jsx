@@ -15,10 +15,11 @@ import MasterDataForm from "../../components/MasterDataForm";
 
 const Sectioning = () => {
     const columns = [
-        { accessorKey: 'firstName', header: 'First Name' },
-        { accessorKey: 'lastName', header: 'Last Name' },
+        { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'studentNo', header: 'Student No' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        { accessorKey: 'assessed', header: 'Assessed' },
+        { accessorKey: 'dateAssessed', header: 'Date Assessed' },
         { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'section', header: 'Section' },
         { accessorKey: 'adviser', header: 'Adviser' }
@@ -47,15 +48,20 @@ const Sectioning = () => {
         setSectionId(e.target.value);
     }
 
-    const studentLists = students?.filter(student => student?.academicId?.isEnrolled).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId.isEnrolled).map(student => ({
         ...student,
-        firstName: student.firstName,
-        lastName: student.lastName,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
+        assessed: student?.academicId?.isAssessed ? 'Yes' : 'No',
+        dateAssessed: new Date(student?.academicId?.dateAssessed).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric' 
+        }),
         strand: (student?.academicId?.gradeLevelId?.gradeLevel.includes('11') || student?.academicId?.gradeLevelId?.gradeLevel.includes('12')) ? student?.academicId?.strandId?.strand : 'Not applicable',
         section: student?.academicId?.sectionId?.section || 'Not Assigned',
         adviser: student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
-    }));
+    })).sort((a, b) => a.lastName.localeCompare(b.lastName));
 
     const submitSectioning = async (e) => {
         e.preventDefault();

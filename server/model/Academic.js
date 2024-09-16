@@ -67,6 +67,12 @@ const academicSchema = new mongoose.Schema({
     dateEnrolled: {
         type: String
     },
+    isAssessed: {
+        type: Boolean
+    },
+    dateAssessed: {
+        type: String
+    },
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'

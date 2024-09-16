@@ -332,6 +332,8 @@ module.exports.get_admission_student = async (req,res) => {
     }
 }
 
+const mongoose = require('mongoose');
+
 module.exports.update_student_info = async (req, res) => {
     const { id } = req.params;
     let studentNo = '';
@@ -369,19 +371,40 @@ module.exports.update_student_info = async (req, res) => {
         isRegistered = false;
     }
 
+    const sessionDb = await mongoose.startSession();
+    sessionDb.startTransaction();
+
     try {
-        const studentAcademic = await Academic.findOne({ studentId: id, sessionId: session,recordStatus: 'Live' });
-        console.log('student Academic', studentAcademic);
+        const studentAcademic = await Academic.findOne(
+            { studentId: id, sessionId: session, recordStatus: 'Live' }
+        ).session(sessionDb);
 
         if (!studentAcademic?.isAdmitted) {
+            await sessionDb.abortTransaction();
+            sessionDb.endSession();
             return res.status(404).json({ mssg: 'Please complete students requirements first before adding academic record' });
         }
 
-        const latestStudent = await Student.findOne({ studentNo: { $exists: true }, recordStatus: 'Live' }).sort({ _id: -1 });
-        console.log('Latest Student: ', latestStudent);
+        const latestStudent = await Student.findOne(
+            { studentNo: { $exists: true }, recordStatus: 'Live' },
+            null,
+            { session: sessionDb }
+        ).sort({ _id: -1 });
 
-        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(studentAcademic._id, { isRegistered, passedReportCard, settledArrears, completedClearance, academicStatus, inputter, recordStatus: 'Live' });
-        console.log('New Record: ', studentAcademicNewRecord);
+        const studentAcademicNewRecord = await Academic.findByIdAndUpdate(
+            studentAcademic._id, 
+            { 
+                isRegistered, 
+                passedReportCard, 
+                settledArrears, 
+                completedClearance, 
+                academicStatus, 
+                inputter, 
+                recordStatus: 'Live', 
+                dateRegistered: isRegistered ? new Date() : undefined 
+            }, 
+            { session: sessionDb, new: true }
+        );
 
         const student = await Student.findByIdAndUpdate(
             id,
@@ -404,15 +427,21 @@ module.exports.update_student_info = async (req, res) => {
                 inputter,
                 recordStatus: 'Live'
             },
-            { new: true }
+            { session: sessionDb, new: true }
         );
 
-        const isStudentRegistered = await Student.findById(id);
-        const currentSession = await SchoolYear.findOne({ _id: session, recordStatus: 'Live'});
+        const isStudentRegistered = await Student.findById(id).session(sessionDb);
+        const currentSession = await SchoolYear.findOne(
+            { _id: session, recordStatus: 'Live' }, 
+            null, 
+            { session: sessionDb }
+        );
 
         if (currentSession) {
             currentYear = currentSession.startYear.split('-')[0];
         } else {
+            await sessionDb.abortTransaction();
+            sessionDb.endSession();
             return res.status(404).json({ mssg: 'Session not found' });
         }
 
@@ -425,8 +454,7 @@ module.exports.update_student_info = async (req, res) => {
                     const paddedNumber = plusOne.toString().padStart(4, '0');
                     studentNo = `${currentYear}${paddedNumber}`;
                 } else {
-                    const paddedNumber = '0001';
-                    studentNo = `${currentYear}${paddedNumber}`;
+                    studentNo = `${currentYear}0001`;
                 }
 
                 console.log(`Assigning new student number: ${studentNo}`);
@@ -437,14 +465,22 @@ module.exports.update_student_info = async (req, res) => {
         }
 
         studentName = student.firstName;
-        await student.save();
+        await student.save({ session: sessionDb });
+
+        // Commit the transaction
+        await sessionDb.commitTransaction();
+        sessionDb.endSession();
 
         res.status(200).json({ mssg: `${studentName}'s record has been updated successfully!` });
     } catch (err) {
+        // Rollback the transaction in case of error
+        await sessionDb.abortTransaction();
+        sessionDb.endSession();
         console.log(err);
-        res.status(500).json({ mssg: 'Server error' });
+        res.status(500).json({ mssg: 'An error occurred while updating student information' });
     }
 };
+
 
 // For Academic
 
@@ -1111,12 +1147,10 @@ module.exports.generate_fees = async (req, res) => {
                                 }
                             }
                         }
-
+                        // Update to true isEnrolled if the student has been assessed successfully
+                        await Academic.findOneAndUpdate({ studentId: student._id, sessionId: currYear._id },{ isEnrolled: true, dateAssessed: new Date(), dateEnrolled: new Date(), isAssessed: true });
                     }
                         
-                    // Update to true isEnrolled if the student has been assessed successfully
-                    await Academic.findOneAndUpdate({ studentId: student._id },{ isEnrolled: true });
-
                 }
     
                 res.status(200).json({ mssg: 'Fees for students have been generated successfully' });

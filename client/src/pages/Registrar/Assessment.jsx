@@ -121,16 +121,22 @@ const Assessment = () => {
 
     const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered).map(student => ({
         ...student,
-        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         studentNo: student.studentNo || 'Not assigned',
         registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
         admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        dateRegistered: student.dateRegistered ? student.dateRegistered.split('T')[0] : 'Not Registered',
+        dateRegistered: student.academicId?.dateRegistered ? new Date(student.academicId?.dateRegistered).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric' 
+        }) : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
-    }));
+    })).sort((a, b) => a.lastName.localeCompare(b.lastName));
+
+    
 
     return (
         <main className="p-4 relative overflow-hidden">
@@ -141,21 +147,6 @@ const Assessment = () => {
                     <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-red-500 hover:bg-red-600 text-white p-2 rounded-md`}>Delete Fees</button>
                     <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-4">
-                {admissionPages.map((page) => (
-                    <button
-                        key={page}
-                        className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 text-white' : 'border border-gray-300 text-gray-700'}`}
-                        onClick={() => {
-                            setCurrentPage(page);
-                            setEnableView(false);
-                        }}
-                    >
-                        {page}
-                    </button>
-                ))}
             </div>
 
 

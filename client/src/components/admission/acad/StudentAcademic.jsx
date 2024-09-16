@@ -179,12 +179,12 @@ const StudentAcademic = ({ setEnableView }) => {
                 </div>
 
                 <button disabled={isYearDone} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm p-2 mt-5 rounded-md`}>Submit</button>
-                <button onClick={() => {
+                {/* <button onClick={() => {
                     setCurrStudRec(null);
                     setEnableView(false);
                 }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md mt-2 ml-2">
                     Cancel
-                </button>
+                </button> */}
             </form>
             <ToastContainer />
         </div>

@@ -13,11 +13,11 @@ const StudentReqTable = ({ searchQuery }) => {
 
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
-        { accessorKey: 'studentNo', header: 'Student No.' },
+        // { accessorKey: 'studentNo', header: 'Student No.' },
         // { accessorKey: 'registered', header: 'Registered' },
         { accessorKey: 'admitted', header: 'Admitted' },
         // { accessorKey: 'dateRegistered', header: 'Date Registered' },
-        { accessorKey: 'status', header: 'Status' },
+        // { accessorKey: 'status', header: 'Status' },
         // { accessorKey: 'gradeLevel', header: 'Grade Level' },
         // { accessorKey: 'strand', header: 'Strand' },
         { accessorKey: 'nationality', header: 'Nationality' },
@@ -33,22 +33,15 @@ const StudentReqTable = ({ searchQuery }) => {
     const formattedStudents = students?.filter(student => student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && !student?.academicId?.isAdmitted).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
-        studentNo: student.studentNo || 'Not assigned',
+        // studentNo: student.studentNo || 'Not assigned',
         registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
         admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        // dateRegistered: student.dateRegistered ? new Date(student.dateRegistered.split('T')[0]).toLocaleDateString('en-US', {
-        //     year: 'numeric',
-        //     month: 'long',
-        //     day: 'numeric'
-        // }) : 'Not Registered',
-        // gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
-        // strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
-        status: student.status    
-    }));
+        // status: student.status    
+    })).sort((a, b) => a.lastName.localeCompare(b.lastName));
 
     return (
-        <MasterTable columns={columns} data={formattedStudents} viewRecord={setViewRecord} searchQuery={searchQuery} /> 
+        <MasterTable columns={columns} data={formattedStudents || []} viewRecord={setViewRecord} searchQuery={searchQuery} /> 
     )
 }
 

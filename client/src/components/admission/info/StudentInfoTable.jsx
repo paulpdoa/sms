@@ -13,7 +13,7 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
 
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
-        { accessorKey: 'status', header: 'Status' },
+        // { accessorKey: 'status', header: 'Status' },
         { accessorKey: 'isAdmitted', header: 'Admitted' },
         { accessorKey: 'dateAdmitted', header: 'Date Admitted' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
@@ -48,15 +48,18 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
 
     const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted).map(student => ({
         ...student,
-        fullName: `${student.firstName} ${student.middleName} ${student.lastName}`,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
         isAdmitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        dateAdmitted: student?.academicId?.dateAdmitted
-        // action: actions(student)
-    }));
+        dateAdmitted: new Date(student?.academicId?.dateAdmitted).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric' 
+        })
+    })).sort((a, b) => a.lastName.localeCompare(b.lastName));
     
 
     return (

@@ -11,8 +11,7 @@ import { MainContext } from "../../helpers/MainContext";
 
 const SubjectAssigning = () => {
     const columns = [
-        { accessorKey: 'firstName', header: 'First Name' },
-        { accessorKey: 'lastName', header: 'Last Name' },
+        { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'studentNo', header: 'Student No' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'strand', header: 'Strand' },
@@ -46,15 +45,14 @@ const SubjectAssigning = () => {
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
 
-    const studentLists = students?.filter(student => student?.academicId?.isEnrolled).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isEnrolled && student.studentNo).map(student => ({
         ...student,
-        firstName: student.firstName,
-        lastName: student.lastName,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: (student?.academicId?.gradeLevelId?.gradeLevel.includes('11') || student?.academicId?.gradeLevelId?.gradeLevel.includes('12')) ? student?.academicId?.strandId?.strand : 'Not applicable',
         section: student?.academicId?.sectionId?.section || 'Not Assigned',
         adviser: student?.academicId?.sectionId?.adviser ? `${student?.academicId?.sectionId?.adviser?.firstName} ${student?.academicId?.sectionId?.adviser?.lastName}` : 'Not Assigned'
-    }));
+    })).sort((a,b) => a.lastName.localeCompare(b.lastName));
 
     const formatTime = (time) => {
         const [hours, minutes] = time.split(':');
