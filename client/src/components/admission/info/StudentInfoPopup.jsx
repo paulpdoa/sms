@@ -4,9 +4,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
-import { RiCloseLargeFill } from "react-icons/ri";
 import { MainContext } from '../../../helpers/MainContext';
 import { academicStatus as academicStatuses } from '../../../data/academicStatus.json';
+import { genders } from '../../../data/genders.json';
 
 
 const StudentInfoPopup = ({ id, closeModal }) => {
@@ -30,15 +30,12 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
     const [academicStatus,setAcademicStatus] = useState(id?.academicId?.academicStatus);
 
-    const buttonPages = ['Information','Academic','Registration','Assistance'];
-    const [currentPage,setCurrentPage] = useState('Information');
 
-
-    const { records: genders } = useFetch(`${baseUrl()}/genders`);
+    // const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
 
-    const { session } = useContext(MainContext);
+    const { session,role } = useContext(MainContext);
 
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone ? true : false;
@@ -61,12 +58,13 @@ const StudentInfoPopup = ({ id, closeModal }) => {
             email,
             status,
             lrn,
-            passedReportCard,
-            settledArrears,
-            completedClearance,
+            // passedReportCard,
+            // settledArrears,
+            // completedClearance,
             academicStatus,
             session,
-            isRegistered
+            role
+            // isRegistered
         }
 
         try {
@@ -100,27 +98,8 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     }
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
-            <div className="relative bg-white w-full max-w-4xl p-6 rounded-lg shadow-lg h-[90%] overflow-y-auto">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-700">{id?.firstName} {id?.lastName} Information</h1>
-                    <RiCloseLargeFill className="text-3xl text-red-400 cursor-pointer" onClick={() => closeModal(false)} />
-                </div>
-
-                {/* Button Tabs */}
-                <div className="mb-6 mt-3 flex items-center gap-4">
-                    { buttonPages.map(buttonPage => (
-                        <button 
-                            onClick={() => setCurrentPage(buttonPage)} 
-                            className={`${currentPage === buttonPage ? 'bg-blue-500 hover:bg-blue-600 text-gray-100' : 'border-blue-500 hover:bg-blue-500 bg-gray-100 text-gray-800 hover:text-gray-100' } border p-2 rounded-md text-sm transition`}
-                        >
-                            {buttonPage}
-                        </button>
-                    )) } 
-                </div>
-
-                
-                   
+        <div>
+            <div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="lastname">Last Name</label>
@@ -154,9 +133,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                         <select className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             onChange={(e) => setGender(e.target.value)}
                         >
-                            <option hidden>{id?.sex?.gender ? id?.sex?.gender : 'Select gender'}</option>
+                            <option hidden>{id.sex ? id.sex : 'Select gender'}</option>
                             { genders?.map(gender => (
-                                <option key={gender._id} value={gender._id}>{gender.gender}</option>
+                                <option key={gender._id} value={gender.name}>{gender.name}</option>
                             )) }
                         </select>
                     </div>
@@ -254,7 +233,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
+                {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
                     <div className="flex flex-col">
                         <label className="mb-2 text-sm font-semibold text-gray-600" htmlFor="passedReportCard">Passed Report Card</label>
                         <input className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -289,7 +268,7 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                         onChange={(e) => setIsRegistered(e.target.checked)}
                         disabled
                     />
-                </div>
+                </div> */}
 
                 <div className="flex gap-2 items-center justify-end mt-4">
                     <button onClick={!isYearDone && submitInfo} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-opacity-50`}>

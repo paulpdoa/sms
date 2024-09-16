@@ -16,8 +16,7 @@ const StudentInfo = () => {
     if (student.isAdmitted) {
         return (
             <>
-            <div className="mt-3 p-6 bg-white shadow-md rounded-md overflow-hidden">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Student Information</h2>
+            <div className="mt-3 p-6 bg-white rounded-md overflow-hidden">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col">
                         <label className="font-semibold text-sm text-gray-600">Last Name:</label>

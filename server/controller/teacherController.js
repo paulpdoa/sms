@@ -198,7 +198,7 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
 
 
 module.exports.add_students_attendance = async (req, res) => {
-    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId } = req.body;
+    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId,comment } = req.body;
 
     try {
        await StudentAttendance.create({dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus});

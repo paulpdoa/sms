@@ -108,12 +108,8 @@ const StudentAcademic = ({ setEnableView }) => {
     }
 
     return (
-        <div className="mt-3 text-sm bg-white p-5 rounded-md w-1/2">
+        <div className="text-sm bg-white p-5 rounded-md w-full">
             <form onSubmit={addAcademic}>
-                { 
-                    <h1 className="text-2xl font-semibold text-gray-700">{currStudRec.firstName} {currStudRec.middleName} {currStudRec.lastName}</h1>
-                }
-                    
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div className="flex flex-col gap-2">
                         <label className="font-semibold" htmlFor="studentNo">Student Number:</label>

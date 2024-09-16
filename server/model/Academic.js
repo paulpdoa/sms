@@ -52,11 +52,20 @@ const academicSchema = new mongoose.Schema({
     isRegistered: {
         type: Boolean,
     },
+    dateRegistered: {
+        type: String
+    },
     isAdmitted: {
         type: Boolean
     },
+    dateAdmitted: {
+        type:String
+    },
     isEnrolled: {
         type: Boolean
+    },
+    dateEnrolled: {
+        type: String
     },
     inputter: {
         type: mongoose.Schema.Types.ObjectId,
