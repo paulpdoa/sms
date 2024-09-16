@@ -283,11 +283,11 @@ module.exports.add_admission = async (req, res) => {
 
         if (allRequirementsMet) {
             if (studentAcademicExist) {
-                const foundAcademic = await Academic.findByIdAndUpdate(studentAcademicExist._id, { isAdmitted: true, sessionId: schoolYear });
+                const foundAcademic = await Academic.findByIdAndUpdate(studentAcademicExist._id, { isAdmitted: true, sessionId: schoolYear, dateAdmitted: new Date() });
                 console.log('Found Academic Record:', foundAcademic);
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: foundAcademic._id });
             } else { // if student academic not existing, create new record
-                const academic = await Academic.create({ studentId, isAdmitted: true, sessionId: schoolYear, recordStatus: 'Live' });
+                const academic = await Academic.create({ studentId, isAdmitted: true, sessionId: schoolYear, recordStatus: 'Live', dateAdmitted: new Date() });
                 await Student.findByIdAndUpdate(studentId, { isAdmitted: true, dateAdmitted: new Date(), academicId: academic._id });
                 console.log('Creating academic')
             }

@@ -14,8 +14,6 @@ const StudentRegistration = ({ id }) => {
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
     
     const { session,role } = useContext(MainContext);
-
-    console.log(id);
     
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone ? true : false;
@@ -66,7 +64,7 @@ const StudentRegistration = ({ id }) => {
     return (
         <>
         <div className="grid grid-cols-1 mb-4">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 w-[25%] justify-between">
                 <label className="text-sm font-semibold text-gray-600" htmlFor="passedReportCard">Passed Report Card</label>
                 <input className="p-2 cursor-pointer border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     type="checkbox"
@@ -74,7 +72,7 @@ const StudentRegistration = ({ id }) => {
                     onChange={(e) => setPassedReportCard(e.target.checked)}
                 />
             </div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 w-[25%] justify-between">
                 <label className="text-sm font-semibold text-gray-600" htmlFor="settledArrears">Settled Arrears</label>
                 <input className="p-2 border cursor-pointer rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     type="checkbox"
@@ -82,7 +80,7 @@ const StudentRegistration = ({ id }) => {
                     onChange={(e) => setSettledArrears(e.target.checked)}
                 />
             </div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 w-[25%] justify-between">
                 <label className="text-sm font-semibold text-gray-600" htmlFor="completedClearance">Completed Clearance</label>
                 <input className="p-2 border cursor-pointer rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     type="checkbox"
