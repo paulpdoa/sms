@@ -32,7 +32,7 @@ const TeacherDashboard = () => {
 
             {/* Subject for today */}
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your subjects class today</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">My Classes Today</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                     { records?.teacherSubjects?.filter(ts => ts.daySchedule.includes(records?.todayValue)).length > 0 ? (
@@ -68,7 +68,7 @@ const TeacherDashboard = () => {
          
             {/* All Subjects assigned to a teacher */}
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to You</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">My Class Schedule/s</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     { records?.teacherSubjects?.length > 0 ? (
                         records?.teacherSubjects?.map((teacherSubject, index) => (
