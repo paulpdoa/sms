@@ -37,9 +37,10 @@ const jwt = require('jsonwebtoken');
 
 const maxAge = 3 * 24 * 24 * 60;
 const createToken = (token) => {
-    return jwt.sign({ token }, process.env.SECRET, {
-        expiresIn: maxAge
-    })
+    return jwt.sign({ token }, process.env.SECRET)
+    // {
+    //     expiresIn: maxAge
+    // }
 };
 
 const recordStatus = 'Live';
@@ -1317,16 +1318,6 @@ module.exports.edit_user = async (req, res) => {
 module.exports.user_login = async (req,res) => {
 
     const { username,password,session } = req.body;
-
-    // const userRoles = [
-    //     { role: 'Super Admin', path: '/master/dashboard' },
-    //     { role: 'Teacher', path: '/teacher/dashboard' },
-    //     { role: 'Student', path: '/student/dashboard' },
-    //     { role: 'Finance', path:'/finance/dashboard' },
-    //     { role: 'Parent', path: '/parent/dashboard' },
-    //     { role: 'Registrar', path: '/registrar/dashboard' },
-    //     { role: 'School Admin', path: '/schooladmin/dashboard' }
-    // ]
 
     const userRoles = [];
 

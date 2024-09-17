@@ -143,6 +143,40 @@ module.exports.add_student_grade = async (req, res) => {
     }
 };
 
+module.exports.edit_student_grade = async (req,res) => {
+
+    const { id } = req.params;
+
+    const {
+        studentId,
+        subjectId,
+        gradingCategoryId,
+        academicPeriod,
+        dateTaken,
+        dueDate,
+        taskTotal,
+        passingScore,
+        gradeRemark,
+        remarks,
+        studentScore,
+        inputter
+    } = req.body;
+
+    if(taskTotal < 1 || passingScore < 0 || studentScore < 0) {
+        return res.status(400).json({ mssg: 'Scores cannot be a negative number' });
+    }
+
+    try {
+        await StudentGrade.findByIdAndUpdate(id,{ studentId,subjectId,gradingCategoryId,academicPeriod,dateTaken,dueDate,taskTotal,passingScore,gradeRemark,remarks,studentScore,inputter });
+        res.status(200).json({ mssg: 'Grade has been updated successfully' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating students grade' });
+    }
+
+}
+
+
 module.exports.get_teacher_student_attendance = async (req, res) => {
     const { session,currentDate } = req.query;  
     const { userId } = req.params;
@@ -261,4 +295,27 @@ module.exports.get_students_in_section = async(req,res) => {
 }
 
 
+module.exports.get_teacher_loggedin_subject = async (req,res) => {
 
+    const { userId } = req.params;
+    const { session } = req.query;
+
+    try {
+        const currentUser = await User.findById(userId);
+        if(!currentUser) {
+            res.status(404).json({ mssg: 'This user is not existing' });
+        }
+
+        const currentSubjects = await TeacherSubject.find({ teacherId: currentUser.teacherId, sessionId: session,recordStatus: 'Live' })
+        .populate('subjectId teacherId roomNumberId')
+        if(!currentSubjects) {
+            res.status(404).json({ mssg: 'This teacher is not existing' });
+        }
+
+        res.status(200).json(currentSubjects);
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching teachers subject' });
+    }
+}

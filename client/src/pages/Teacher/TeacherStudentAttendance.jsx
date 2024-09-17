@@ -65,6 +65,8 @@ const TeacherStudentAttendance = () => {
         setSubjectId(studentRecord.subjectId._id);
         setStudentsAttendanceId(studentRecord.studentsAttendanceId);
         setCurrentStudent(`${studentRecord.studentId.firstName} ${studentRecord.studentId.middleName} ${studentRecord.studentId.lastName}`);
+        setRemarks(studentRecord.remarks);
+        setComment(studentRecord.comment);
     };
 
     const handleAttendanceSubmit = async (e, action) => {
@@ -81,11 +83,17 @@ const TeacherStudentAttendance = () => {
             role,
         };
 
+        console.log(attendanceInformation);
+
         if (!remarks || !currentDate) {
             setError({
                 remarks: remarks ? '' : 'Remarks cannot be empty',
                 currentDate: currentDate ? '' : 'Current date cannot be empty',
             });
+
+            setTimeout(() => {
+                setError({ remarks: '', currentDate: '' });
+            },3000)
             return;
         }
 
@@ -156,7 +164,7 @@ const TeacherStudentAttendance = () => {
                             <form className="grid gap-4" onSubmit={(e) => handleAttendanceSubmit(e, withRemarks ? 'add' : 'update')}>
                                 <select
                                     value={currentRemarks || ''} 
-                                    className="p-3 border border-gray-300 rounded-md focus:ring-2 ring-blue-500 outline-none"
+                                    className={`p-3 border rounded-md focus:ring-2 ring-blue-500 outline-none ${error.remarks ? 'border-red-500' : 'border-gray-300'} `}
                                     onChange={(e) => {
                                         setRemarks(e.target.value);
                                         setCurrentRemarks(e.target.value);
@@ -167,15 +175,17 @@ const TeacherStudentAttendance = () => {
                                         <option key={remark.id} value={remark.value}>{remark.value}</option>
                                     ))}
                                 </select>
+                                {error.remarks && <span className="text-xs text-red-500">{error.remarks}</span>}
 
                                 <input
                                     className="p-3 border border-gray-300 rounded-md focus:ring-2 ring-blue-500 outline-none" 
                                     type="text" 
                                     placeholder="Leave a comment..."
                                     onChange={(e) => setComment(e.target.value)} 
+                                    value={comment || ''}
                                 />
 
-                                {error.remarks && <span className="text-xs text-red-500">{error.remarks}</span>}
+                                
 
                                 <div className="flex space-x-4">
                                     <button 

@@ -23,6 +23,10 @@ export const MainProvider = ({ children }) => {
   const role = localStorage.getItem('role') || 'Guest';
   const isFreshYear = localStorage.getItem('isFreshYear');
 
+  // For setting teachers current selectedSubject
+  const [teacherSubjectSelected,setTeacherSubjectSelected] = useState('');
+  const [teacherSectionSelected,setTeacherSectionSelected] = useState('');
+
   const genericPath = role === 'Super Admin' ? 'master' : role.replace(" ","").toLowerCase();
 
   return (
@@ -39,7 +43,11 @@ export const MainProvider = ({ children }) => {
       isFreshYear,
       currStudRec,
       setCurrStudRec,
-      genericPath
+      genericPath,
+      teacherSubjectSelected,
+      setTeacherSubjectSelected,
+      teacherSectionSelected,
+      setTeacherSectionSelected
     }}>
       {children}
     </MainContext.Provider>

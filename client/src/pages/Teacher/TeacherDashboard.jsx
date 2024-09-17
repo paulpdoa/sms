@@ -11,7 +11,7 @@ import MasterDataForm from "../../components/MasterDataForm";
 import { useNavigate } from 'react-router-dom';
 
 const TeacherDashboard = () => {
-    const { session, currentUserId } = useContext(MainContext);
+    const { session, currentUserId,setTeacherSubjectSelected } = useContext(MainContext);
     const { records } = useFetch(`${baseUrl()}/teacher-dashboard/${currentUserId}`);
 
     const navigate = useNavigate();
@@ -25,12 +25,13 @@ const TeacherDashboard = () => {
 
     const handleAttendance = subjectId => {
         console.log(subjectId);
+        
 
     }
 
     const handleGrading = subjectId => {
-        console.log(subjectId);
-        navigate(`/teacher/student-grading/${subjectId._id}`);
+        setTeacherSubjectSelected(subjectId._id);
+        navigate(`/teacher/student-grading`);
     }
 
     return (
@@ -71,7 +72,7 @@ const TeacherDashboard = () => {
                                     <div className="flex space-x-4">
                                         <button
                                             className="bg-indigo-500 text-white px-4 py-2 rounded-md shadow hover:bg-indigo-700"
-                                            onClick={() => handleAttendance(teacherSubject.subjectId)}>
+                                            onClick={() => handleAttendance(teacherSubject)}>
                                             Attendance
                                         </button>
                                         <button
