@@ -139,11 +139,11 @@ const handleOtherFeesChange = (e) => {
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
                 <label htmlFor="other fees">Other Fees:</label>
                 <input 
                     onChange={handleOtherFeesChange}
-                    className="p-1 outline-none focus:ring-2 focus:ring-blue-500 rounded-md border-gray-300 border"
+                    className="p-1 outline-none focus:ring-2 focus:ring-blue-500 rounded-md border-gray-300 border w-[20%]"
                     type="number" 
                 />
             </div>
