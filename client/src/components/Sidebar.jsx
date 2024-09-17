@@ -355,9 +355,14 @@ const initialMenus = [
                 link: '/finance/dashboard'
             },
             {
-                name: 'Payment Schedule',
+                name: 'Statement Of Accounts',
                 icon: <RiSecurePaymentLine />,
-                link: '/finance/payment-schedule'
+                link: '/finance/soa'
+            },
+            {
+                name: 'Account Payments',
+                icon: <RiSecurePaymentLine />,
+                link: '/finance/account-payment'
             }
         ]
     }

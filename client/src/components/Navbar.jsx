@@ -24,13 +24,7 @@ const Navbar = () => {
         setIsLoggingOut(true);
         const message = 'Logout successful';
 
-        // Clear user data from localStorage
-        let path = '';
-        if(role === 'Super Admin') {
-            path = '/master'
-        } else {
-            path = role.replace(" ","").toLowerCase()
-        }
+       
         toast.success(message, {
             position: "top-center",
             autoClose: 1000,
@@ -39,15 +33,14 @@ const Navbar = () => {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-            theme: "colored"
+            theme: "colored",
+            onClose: () => {
+                // Remove userToken cookie
+                removeCookie('userToken', { path: '/' });
+                ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
+                navigate('/login');
+            }
         });
-
-        setTimeout(() => {
-            // Remove userToken cookie
-            removeCookie('userToken',{ path: path });
-            ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
-            navigate('/login');
-        }, 2000);
     };
 
     return (

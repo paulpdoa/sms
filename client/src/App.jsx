@@ -89,6 +89,7 @@ import FinanceLayout from "./layouts/FinanceLayout";
 import ParentLayout from "./layouts/ParentLayout";
 import SchoolAdminLayout from "./layouts/SchoolAdminLayout";
 import ErrorPage from "./pages/ErrorPage";
+import FinanceAccountPayment from "./pages/Finance/FinanceAccountPayment";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -227,7 +228,8 @@ const App = () => {
           {/* For Finance Routes */}
           <Route element={<FinanceLayout />}>
             <Route path='/finance/dashboard' element={<FinanceDashboard />} />
-            <Route path='/finance/payment-schedule' element={<FinancePaymentSchedule />} />
+            <Route path='/finance/soa' element={<FinancePaymentSchedule />} />
+            <Route path='/finance/account-payment' element={<FinanceAccountPayment />} />
           </Route>
 
           {/* Registrar Route */}
