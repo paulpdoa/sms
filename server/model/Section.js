@@ -31,7 +31,7 @@ const sectionSchema = new mongoose.Schema({
     
 }, { timestamps: true })
 
-sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId,inputter) {
+sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, status, sessionId,inputter,recordStatus) {
     const exists = await this.find({ sessionId,status: true });
 
     const filteredSections = exists.map(exist => ({
@@ -51,7 +51,7 @@ sectionSchema.statics.addSection = async function(section, gradeLevel, adviser, 
         throw new Error('Grade level must not be empty');
     }
 
-    const newSection = await this.create({ section, gradeLevel, adviser, status, sessionId });
+    const newSection = await this.create({ section, gradeLevel, adviser, status, sessionId,inputter,recordStatus });
     return newSection;
 };
 

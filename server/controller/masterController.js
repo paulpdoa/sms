@@ -37,10 +37,10 @@ const jwt = require('jsonwebtoken');
 
 const maxAge = 3 * 24 * 24 * 60;
 const createToken = (token) => {
-    return jwt.sign({ token }, process.env.SECRET)
-    // {
-    //     expiresIn: maxAge
-    // }
+    return jwt.sign({ token }, process.env.SECRET,{
+        expiresIn: maxAge
+    })
+    
 };
 
 const recordStatus = 'Live';
@@ -1356,7 +1356,7 @@ module.exports.user_login = async (req,res) => {
             userDestination = '/master/school-year';
         }
 
-        res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token,data: login,role: roleDetail.userRole,redirect: userDestination });
+        res.status(200).json({ mssg: `Login successful, welcome ${username}!`, token, data: login, role: roleDetail.userRole, redirect: userDestination });
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: err.message });

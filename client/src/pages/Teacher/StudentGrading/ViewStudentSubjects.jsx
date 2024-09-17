@@ -1,6 +1,6 @@
 import MasterTable from '../../../components/MasterTable';
 
-const ViewStudentSubjects = ({ role,student,setStudent,setShowStudentSubject,setCurrentTabSubject,subjectOfTeachers,academicPeriods,studentGrades,currentAcademicPeriod,renderedSubjects,currentTabSubject,getStudentGrades,studentId,subjectId,setCurrentAcademicPeriod,gradeColumns,studentGradeData,searchQuery,viewEditStudentGrade,isYearDone,setShowForm }) => {
+const ViewStudentSubjects = ({ role,student,setStudent,setShowStudentSubject,setCurrentTabSubject,subjectOfTeachers,academicPeriods,studentGrades,currentAcademicPeriod,renderedSubjects,currentTabSubject,getStudentGrades,studentId,subjectId,setCurrentAcademicPeriod,gradeColumns,studentGradeData,searchQuery,viewEditStudentGrade,isYearDone,setShowForm,studentSubjects }) => {
     
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

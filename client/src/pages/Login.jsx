@@ -75,8 +75,15 @@ const Login = () => {
                 theme: 'colored'
             });
 
+            let path = '';
+            if(data.data.role === 'Super Admin') {
+                path = '/'
+            } else {
+                path = data.data.role.replace(" ","").toLowerCase()
+            }
+
             setTimeout(() => {
-                setCookie('userToken', data.data.token, { path: `/${data.data.role.replace(" ","").toLowerCase()}`,maxAge: 100000 });
+                setCookie('userToken', data.data.token, { path: path, maxAge: 100000 });
                 navigate(data.data.redirect);
             }, 2000);
         } catch (err) {

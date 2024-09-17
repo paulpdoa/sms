@@ -24,9 +24,7 @@ const TeacherDashboard = () => {
     };
 
     const handleAttendance = subjectId => {
-        console.log(subjectId);
-        
-
+        navigate(`/teacher/student-attendance`);
     }
 
     const handleGrading = subjectId => {
@@ -36,12 +34,12 @@ const TeacherDashboard = () => {
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
-            <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
+            {/* <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.teacherName}!</h1>
-            </header>
+            </header> */}
 
             {/* Subject for today */}
-            <section className="w-full px-7 mt-8">
+            <section className="w-full px-7 py-3">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-6">My Classes Today</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {records?.teacherSubjects?.filter(ts => ts.daySchedule.includes(records?.todayValue)).length > 0 ? (

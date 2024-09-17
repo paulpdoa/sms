@@ -27,6 +27,9 @@ const studentAttendanceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    comment: {
+        type: String
+    },
     recordStatus: requiredString
 }, { timestamps: true })
 

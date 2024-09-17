@@ -181,8 +181,6 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
     const { session,currentDate } = req.query;  
     const { userId } = req.params;
 
-    console.log(currentDate);
-
     try {
         const user = await User.findById(userId);
         const teacher = await Teacher.findById(user.teacherId)
@@ -191,7 +189,12 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
         const teacherName = `${teacher.firstName} ${teacher.lastName}`;
         
         const teacherStudents = await StudentSubject.find({ recordStatus: 'Live', sessionId: session })
-        .populate('teacherSubjectId studentId subjectId');
+        .populate({ path: 'studentId', populate: {
+            path: 'academicId', populate: {
+                path: 'sectionId'
+            }
+        } })
+        .populate('teacherSubjectId subjectId');
 
         // Display the students of the current teacher logged in
         const studentsOfTeacher = teacherStudents.filter(student => student.teacherSubjectId.teacherId.equals(teacher._id));
@@ -217,7 +220,8 @@ module.exports.get_teacher_student_attendance = async (req, res) => {
             return {
                 ...student._doc,
                 studentsAttendanceId: attendance ? attendance._id : '',
-                remarks: attendance ? attendance.remarks : 'No remarks'
+                remarks: attendance ? attendance.remarks : 'No remarks',
+                comment: attendance && attendance.comment
             };
         });
         
@@ -235,7 +239,7 @@ module.exports.add_students_attendance = async (req, res) => {
     const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId,comment } = req.body;
 
     try {
-       await StudentAttendance.create({dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus});
+       await StudentAttendance.create({dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus,comment});
        res.status(200).json({ mssg: 'Student attendance has been added successfully' });
        
     } catch (error) {
@@ -246,10 +250,10 @@ module.exports.add_students_attendance = async (req, res) => {
 
 module.exports.edit_students_attendance = async (req,res) => {
     const { id } = req.params;
-    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId } = req.body;
-
+    const { dateToday,remarks,sessionId,studentId,inputter,recordStatus, subjectId,comment } = req.body;
+    
     try {
-       await StudentAttendance.findByIdAndUpdate(id,{dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus});
+       await StudentAttendance.findByIdAndUpdate(id,{dateToday,remarks,sessionId,studentId,subjectId,inputter,recordStatus,comment});
        res.status(200).json({ mssg: 'Student attendance has been updated successfully' });
        
     } catch (error) {
@@ -303,13 +307,13 @@ module.exports.get_teacher_loggedin_subject = async (req,res) => {
     try {
         const currentUser = await User.findById(userId);
         if(!currentUser) {
-            res.status(404).json({ mssg: 'This user is not existing' });
+           return res.status(404).json({ mssg: 'This user is not existing' });
         }
 
         const currentSubjects = await TeacherSubject.find({ teacherId: currentUser.teacherId, sessionId: session,recordStatus: 'Live' })
         .populate('subjectId teacherId roomNumberId')
         if(!currentSubjects) {
-            res.status(404).json({ mssg: 'This teacher is not existing' });
+           return res.status(404).json({ mssg: 'This teacher is not existing' });
         }
 
         res.status(200).json(currentSubjects);
@@ -317,5 +321,29 @@ module.exports.get_teacher_loggedin_subject = async (req,res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching teachers subject' });
+    }
+}
+
+
+// Get current section of logged in teacher 
+module.exports.get_teacher_loggedin_section = async (req,res) => {
+    const { userId } = req.params;
+    const { session } = req.query;
+
+    try {   
+        const currentUser = await User.findById(userId);
+        if(!currentUser) {
+           return res.status(404).json({ mssg: 'This user is not existing' });
+        }
+
+        const teacherSection = await Section.find({ adviser: currentUser.teacherId, recordStatus: 'Live' });
+        if(!teacherSection) {
+            return res.status(404).json({ mssg: 'This teacher does not have any sections yet' });
+        }
+
+        res.status(200).json(teacherSection);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching section of logged in teacher' });
     }
 }

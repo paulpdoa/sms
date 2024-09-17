@@ -9,7 +9,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const TeacherStudentAttendance = () => {
-    const { currentUserId, searchQuery, session, role } = useContext(MainContext);
+    const { currentUserId, searchQuery, session, role, teacherSubjectSelected, setTeacherSubjectSelected, teacherSectionSelected, setTeacherSectionSelected } = useContext(MainContext);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const [currentRemarks, setCurrentRemarks] = useState('');
@@ -18,13 +18,20 @@ const TeacherStudentAttendance = () => {
     const [currentStudent, setCurrentStudent] = useState('');
     const [studentsAttendanceId, setStudentsAttendanceId] = useState('');
     const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
-    const { records } = useFetch(`${baseUrl()}/teacher-student-attendance/${currentUserId}?currentDate=${currentDate}`);
     const [studentId, setStudentId] = useState('');
     const [remarks, setRemarks] = useState('');
     const [subjectId, setSubjectId] = useState('');
     const [comment,setComment] = useState('');
 
     const [error, setError] = useState({ remarks: '', currentDate: '' });
+
+    const { records } = useFetch(`${baseUrl()}/teacher-student-attendance/${currentUserId}?currentDate=${currentDate}`);
+    // For getting subjects of teacher
+    const { records: subjectsOfTeacher } = useFetch(`${baseUrl()}/teachers-subject/${currentUserId}`);
+
+    // For getting sections of teacher
+    const { records: sectionsOfTeacher } = useFetch(`${baseUrl()}/teacher-loggedin-section/${currentUserId}`);
+    console.log(sectionsOfTeacher)
 
     const remarkSelections = [
         { id: 1, value: 'Present' },
@@ -47,15 +54,39 @@ const TeacherStudentAttendance = () => {
     const studentColumns = [
         { accessorKey: 'fullName', header: 'Full Name' },
         { accessorKey: 'subject', header: 'Subject' },
+        { accessorKey: 'section', header: 'Section' },
         { accessorKey: 'remarks', header: 'Remarks', editable: true, selectOptions: ['Present', 'Absent', 'Late', 'Other'].map(reason => ({ value: reason, label: reason })) },
     ];
 
-    const studentsOfTeacher = records?.studentsWithAttendance?.map(student => ({
+    const studentsOfTeacher = records?.studentsWithAttendance?.filter(student => {
+        const subjectOfTeacher = student?.subjectId?._id === teacherSubjectSelected;
+        const sectionOfTeacher = student.studentId.academicId.sectionId._id === teacherSectionSelected;
+    
+       // If both subject and section are selected, filter by both
+        if (teacherSubjectSelected && teacherSectionSelected) {
+            return subjectOfTeacher && sectionOfTeacher; // Both conditions must pass
+        }
+
+        // If only subject is selected, filter by subject
+        if (teacherSubjectSelected) {
+            return subjectOfTeacher;
+        }
+
+        // If only section is selected, filter by section
+        if (teacherSectionSelected) {
+            return sectionOfTeacher;
+        }
+    
+        // If no subject is selected, only check filteredStudents
+        return student;
+    }).map(student => ({
         ...student,
         fullName: `${student.studentId.lastName}, ${student.studentId.firstName} ${student.studentId.middleName}`,
+        section: `${student.studentId.academicId.sectionId.section}`,
         subject: `${student.subjectId.subjectName} - ${student.subjectId.subjectCode}`,
         remarks: student.remarks,
     }));
+    console.log(studentsOfTeacher);
 
     const viewStudentRecord = (studentRecord) => {
         setOpenAttendance(true);
@@ -126,21 +157,76 @@ const TeacherStudentAttendance = () => {
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
-            <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
+            {/* <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.teacherName}!</h1>
-            </header>
+            </header> */}
 
-            <section className="px-6 mt-8 w-full">
+            <section className="px-6 py-3 w-full">
                 <h2 className="text-lg text-gray-700">{currentDay}, {formatDateReadable(currentDate)}</h2>
+
                 <div className="flex items-end justify-between mt-4">
                     <TabActions title="Students Attendance" noView={true} />
-                    <input 
-                        type="date" 
-                        className="p-2 border border-gray-300 rounded-md focus:ring-2 ring-blue-500 outline-none" 
-                        value={currentDate}
-                        max={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => setCurrentDate(e.target.value)} 
-                    />
+
+                    <div className="flex items-center gap-3 mb-2">
+                        { role === 'Teacher' && (
+                            subjectsOfTeacher && (
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-sm" htmlFor="subject">My Subjects:</label>
+                                    <select
+                                        onChange={(e) => setTeacherSubjectSelected(e.target.value)}
+                                        value={teacherSubjectSelected}
+                                        className="p-2 focus:ring-2 focus:ring-blue-500 border-gray-300 border rounded-md outline-none"
+                                    >
+                                        <option hidden value="">Select subject</option>
+                                        { subjectsOfTeacher.map(teacherSubject => (
+                                            <option 
+                                                value={teacherSubject.subjectId._id} 
+                                                key={teacherSubject.subjectId._id}
+                                            >
+                                                {teacherSubject.subjectId.subjectName} - {teacherSubject.subjectId.subjectCode}
+                                            </option>
+                                        )) }
+                                        <option value="" >Clear</option>
+                                    </select>
+                                </div>
+                            ) 
+                        ) }
+
+                        { role === 'Teacher' && (
+                            sectionsOfTeacher && (
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-sm" htmlFor="section">My Section:</label>
+                                    <select
+                                        onChange={(e) => setTeacherSectionSelected(e.target.value)}
+                                        value={teacherSectionSelected}
+                                        className="p-2 focus:ring-2 focus:ring-blue-500 border-gray-300 border rounded-md outline-none"
+                                    >
+                                        <option hidden value="">Select section</option>
+                                        { sectionsOfTeacher.map(teacherSection => (
+                                            <option 
+                                                value={teacherSection._id} 
+                                                key={teacherSection._id}
+                                            >
+                                                {teacherSection.section}
+                                            </option>
+                                        )) }
+                                        <option value="" >Clear</option>
+                                    </select>
+                                </div>
+                            ) 
+                        ) } 
+
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm" htmlFor="filter date">Filter date:</label>
+                            <input 
+                                type="date" 
+                                className="p-2 border border-gray-300 rounded-md focus:ring-2 ring-blue-500 outline-none" 
+                                value={currentDate}
+                                max={new Date().toISOString().split('T')[0]}
+                                onChange={(e) => setCurrentDate(e.target.value)} 
+                            />
+                        </div>
+                    </div>
                 </div>
                 
                 <MasterTable 
@@ -184,9 +270,7 @@ const TeacherStudentAttendance = () => {
                                     onChange={(e) => setComment(e.target.value)} 
                                     value={comment || ''}
                                 />
-
                                 
-
                                 <div className="flex space-x-4">
                                     <button 
                                         type="submit"

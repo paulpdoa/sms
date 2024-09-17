@@ -25,7 +25,12 @@ const Navbar = () => {
         const message = 'Logout successful';
 
         // Clear user data from localStorage
-
+        let path = '';
+        if(role === 'Super Admin') {
+            path = '/master'
+        } else {
+            path = role.replace(" ","").toLowerCase()
+        }
         toast.success(message, {
             position: "top-center",
             autoClose: 1000,
@@ -39,7 +44,7 @@ const Navbar = () => {
 
         setTimeout(() => {
             // Remove userToken cookie
-            removeCookie('userToken',{ path: `/${role.replace(" ","").toLowerCase()}` });
+            removeCookie('userToken',{ path: path });
             ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
             navigate('/login');
         }, 2000);

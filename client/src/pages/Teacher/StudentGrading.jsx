@@ -497,20 +497,23 @@ const StudentGrading = () => {
 
             { role === 'Teacher' && (
                 teacherSubjects && (
-                    <select
-                        onChange={(e) => setTeacherSubjectSelected(e.target.value)}
-                        value={teacherSubjectSelected}
-                        className="p-2 ring-2 focus:ring-blue-500 rounded-md outline-none"
-                    >
-                        { teacherSubjects.map(teacherSubject => (
-                            <option 
-                                value={teacherSubject.subjectId._id} 
-                                key={teacherSubject.subjectId._id}
-                            >
-                                {teacherSubject.subjectId.subjectName} - {teacherSubject.subjectId.subjectCode}
-                            </option>
-                        )) }
-                    </select>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm" htmlFor="subject">My Subjects:</label>
+                        <select
+                            onChange={(e) => setTeacherSubjectSelected(e.target.value)}
+                            value={teacherSubjectSelected}
+                            className="p-2 focus:ring-2 border-gray-300 border focus:ring-blue-500 rounded-md outline-none"
+                        >
+                            { teacherSubjects.map(teacherSubject => (
+                                <option 
+                                    value={teacherSubject.subjectId._id} 
+                                    key={teacherSubject.subjectId._id}
+                                >
+                                    {teacherSubject.subjectId.subjectName} - {teacherSubject.subjectId.subjectCode}
+                                </option>
+                            )) }
+                        </select>
+                    </div>
                 ) 
             ) }
             </div>
