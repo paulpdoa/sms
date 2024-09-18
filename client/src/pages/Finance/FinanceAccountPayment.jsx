@@ -8,13 +8,16 @@ import TabActions from "../../components/TabActions";
 const FinanceAccountPayment = () => {
   const { currentUserId, searchQuery } = useContext(MainContext);
 
-  const { records } = useFetch(`${baseUrl()}/finance-payment-schedule/${currentUserId}`);
+  const { records } = useFetch(`${baseUrl()}/finance-account-payment/${currentUserId}`);
+  const { records: fees } = useFetch(`${baseUrl()}/manage-fees`);
+
   const [isStudentPaymentModalVisible, setIsStudentPaymentModalVisible] = useState(false);
   const [studentPayments, setStudentPayments] = useState([]);
   const [currentStudentName, setCurrentStudentName] = useState("");
   const [totalPayment, setTotalPayment] = useState(0);
 
   const [otherFees, setOtherFees] = useState(0); // Track the current value of Other Fees
+
 
 // Handle changes to Other Fees input
 const handleOtherFeesChange = (e) => {
@@ -72,6 +75,7 @@ const handleOtherFeesChange = (e) => {
       }),
     }));
 
+
   // Handle student payment modal visibility and data loading
   const handleStudentPayments = (student) => {
     const studentName = `${student.firstName} ${student.middleName} ${student.lastName}`;
@@ -81,6 +85,11 @@ const handleOtherFeesChange = (e) => {
     setStudentPayments(payments || []);
     setTotalPayment(0); // Reset total payment for new student
     setIsStudentPaymentModalVisible(true);
+
+
+    // Filter fees based on strand, nationality, gradelevel, 
+    console.log(fees);
+    console.log(student);
 
   };
 

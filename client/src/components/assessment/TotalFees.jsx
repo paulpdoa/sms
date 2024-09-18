@@ -9,9 +9,9 @@ const TotalFees = ({ record }) => {
 
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
-            fee.gradeLevelId?._id === gradeLevel &&
-            fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
-            fee?.manageFeeId !== undefined
+            // fee.gradeLevelId?._id === gradeLevel &&
+            // fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
+            fee?.manageFeeId
         );
     });
     console.log(filteredFeeLists);

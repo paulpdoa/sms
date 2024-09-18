@@ -42,8 +42,17 @@ const studentPaymentSchema = new mongoose.Schema({
     totalPaymentAmount: {
         type: Number
     },
+    totalTextbookAmount: {
+        type: Number
+    },
+    totalMiscAmount: {
+        type: Number
+    },
     payEveryAmount: {
         type: Number
+    },
+    isPaid: { // This will be used to update the status if the parent has been paid already
+        type: Boolean
     },
     recordStatus: requiredString
 }, { timestamps: true })

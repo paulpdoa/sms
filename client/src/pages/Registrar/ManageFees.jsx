@@ -77,12 +77,13 @@ const ManageFees = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: setTimeout(() => {
+                    navigate(-1);
+                }, 2000)
             });
 
-            setTimeout(() => {
-                navigate(-1);
-            }, 2000)
+           
         } catch (err) {
             console.log(err);
             toast.error(err.response.data.mssg, {

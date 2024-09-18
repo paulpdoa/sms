@@ -29,7 +29,7 @@ module.exports.get_finance_dashboard = async (req,res) => {
 }
 
 module.exports.get_finance_payment_schedule = async(req,res) => {
-
+    // Get the total textbook, tuition fee, and miscellaneous amounts   
    
     const { session } = req.query;
     const { userId } = req.params;
@@ -95,8 +95,15 @@ module.exports.get_finance_account_payments = async (req, res) => {
         }
         financeName = `${finance.firstName} ${finance.middleName} ${finance.lastName}`;
 
-        const students = await Student.find({ recordStatus: 'Live' }).populate({
-            path: 'academicId', populate: { path: 'gradeLevelId' }
+        const students = await Student.find({ recordStatus: 'Live' })
+        .populate({
+            path: 'academicId',
+            populate: [
+                { path: 'gradeLevelId' },  // Separate populate for gradeLevelId
+                { path: 'strandId' },      // Separate populate for strandId
+                { path: 'sectionId' },     // Separate populate for sectionId
+                { path: 'paymentTermId' }  // Separate populate for paymentTermId
+            ]
         });
         if (!students) {
             return res.status(404).json({ mssg: 'Student information is not existing' });
@@ -116,34 +123,43 @@ module.exports.get_finance_account_payments = async (req, res) => {
         if (!studentPayments) {
             return res.status(404).json({ mssg: 'Student payments is not existing' });
         }
+        console.log(studentPayments);
 
         // Grouping payments by studentId and summing textbook amounts
-        const studentPaymentLists = studentPayments.reduce((acc, studentPayment) => {
-            const studentId = studentPayment.studentId;
-            const bookAmount = studentPayment.textBookId ? studentPayment.textBookId.bookAmount : 0;
-            const miscellaneousAmount = studentPayment?.manageFeeId?.feeDescription?.feeCateg?.category === 'Miscellaneous' 
-            ? studentPayment.manageFeeId.amount : 0; 
+        // const studentPaymentLists = studentPayments.reduce((acc, studentPayment) => {
+        //     const studentId = studentPayment.studentId;
+        //     const bookAmount = studentPayment.textBookId ? studentPayment.textBookId.bookAmount : 0;
+        //     const miscellaneousAmount = studentPayment?.manageFeeId?.feeDescription?.feeCateg?.category === 'Miscellaneous' 
+        //     ? studentPayment.manageFeeId.amount : 0; 
+        //     const tuitionFeeAmount = studentPayment?.manageFeeId?.feeDescription?.feeCateg?.category === 'Tuition Fee' 
+        //     ? studentPayment.manageFeeId.amount : 0;
+
+        //     const paymentScheduleId = studentPayment.paymentScheduleId ? studentPayment.paymentScheduleId : null
             
 
-            if (!acc[studentId]) {
-                acc[studentId] = {
-                    ...studentPayment._doc, // Copy the studentPayment data
-                    textbookTotalAmount: bookAmount, // Initialize total amount with the book amount
-                    miscTotalAmount: miscellaneousAmount
-                };
-            } else {
-                // If the student already exists in the accumulator, add the book amount
-                acc[studentId].textbookTotalAmount += bookAmount;
-                acc[studentId].miscTotalAmount += miscellaneousAmount;  
-            }
+        //     if (!acc[studentId]) {
+        //         acc[studentId] = {
+        //             ...studentPayment._doc, // Copy the studentPayment data
+        //             textbookTotalAmount: bookAmount, // Initialize total amount with the book amount
+        //             miscTotalAmount: miscellaneousAmount,
+        //             tuitionTotalAmount: tuitionFeeAmount,
+        //             paymentScheduleId: paymentScheduleId
+        //         };
+        //     } else {
+        //         // If the student already exists in the accumulator, add the book amount
+        //         acc[studentId].textbookTotalAmount += bookAmount;
+        //         acc[studentId].miscTotalAmount += miscellaneousAmount;  
+        //         acc[studentId].tuitionTotalAmount += tuitionFeeAmount;  
+        //         acc[studentId].paymentScheduleId = paymentScheduleId;  
+        //     }
 
-            return acc;
-        }, {});
+        //     return acc;
+        // }, {});
 
         // Convert the result back into an array
-        const studentPaymentArray = Object.values(studentPaymentLists);
+        // const studentPaymentArray = Object.values(studentPaymentLists);
 
-        res.status(200).json({ financeName, students: studentFilteredLists, studentPayments: studentPaymentArray });
+        res.status(200).json({ financeName, students: studentFilteredLists, studentPayments });
     } catch (err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching finance dashboard details' });
@@ -154,5 +170,5 @@ module.exports.get_finance_account_payments = async (req, res) => {
 // For payments
 
 module.exports.add_finance_payment = async(req,res) => {
-    
+
 }

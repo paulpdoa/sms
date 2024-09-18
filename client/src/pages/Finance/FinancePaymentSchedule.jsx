@@ -15,8 +15,8 @@ const FinancePaymentSchedule = () => {
     const [studentPayments, setStudentPayments] = useState([]);
     const [studentViewed, setStudentViewed] = useState('');
 
-    const studentViewButtons = ['Payment Schedules', 'Textbooks', 'Total Fees'];
-    const [currentSelectedButton, setCurrentSelectedButton] = useState('Payment Schedules');
+    const studentViewButtons = ['Book Amount', 'Miscellaneous Amount', 'Tuition Fee Amount'];
+    const [currentSelectedButton, setCurrentSelectedButton] = useState('');
 
     // Columns for Student List
     const columns = [
@@ -30,10 +30,11 @@ const FinancePaymentSchedule = () => {
         gradeLevel: `${student?.academicId?.gradeLevelId?.gradeLevel}`
     })).sort((a, b) => a.lastName.localeCompare(b.lastName));
 
-    // For Payment Schedules
+    // For Tuition Fee
     const paymentScheduleColumns = [
         { accessorKey: 'paymentDate', header: 'Payment Date' },
         { accessorKey: 'payEveryAmount', header: 'Amount Payable' },
+        { accessorKey: 'isPaid', header: 'Paid' }
     ];
     const paymentScheduleData = studentPayments?.filter(studentPayment => studentPayment.paymentScheduleId)?.map(paymentSchedule => ({
         ...paymentSchedule,
@@ -41,48 +42,53 @@ const FinancePaymentSchedule = () => {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
-        }) 
+        }),
+        isPaid: paymentSchedule?.isPaid ? 'Yes' : 'No'
     }));
-
-    const totalPaymentScheduleAmount = paymentScheduleData?.reduce((total, payment) => total + payment.payEveryAmount, 0);
-
+    
     // For Textbooks
     const textbookColumns = [
         { accessorKey: 'textBookId.bookTitle', header: 'Book Title' },
         { accessorKey: 'textBookId.bookCode', header: 'Book Code' },
-        { accessorKey: 'textBookId.bookAmount', header: 'Book Amount' }
+        { accessorKey: 'textBookId.bookAmount', header: 'Book Amount' },
+        { accessorKey: 'isPaid', header: 'Paid' }
     ];
     const textbookData = studentPayments?.filter(studentPayment => studentPayment.textBookId)?.map(textbook => ({
         ...textbook,
+        isPaid: textbook.isPaid ? 'Yes' : 'No'
     }));
-
-    const totalTextbookAmount = textbookData?.reduce((total, textbook) => total + textbook.textBookId.bookAmount, 0);
 
     // For Total Fees
     const feeColumns = [
         { accessorKey: 'description', header: 'Description' },
         { accessorKey: 'feeCode', header: 'Fee Code' },
         { accessorKey: 'feeCategory', header: 'Fee Category' },
-        { accessorKey: 'manageFeeId.amount', header: 'Amount' }
+        { accessorKey: 'manageFeeId.amount', header: 'Amount' },
+        { accessorKey: 'isPaid', header: 'Paid' }
+        
     ];
-    const feeData = studentPayments?.filter(studentPayment => studentPayment.manageFeeId)?.map(fee => ({
+    const feeData = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC')?.map(fee => ({
         ...fee,
         description: fee.manageFeeId.feeDescription.description,
         feeCode: fee.manageFeeId.feeDescription.code,
-        feeCategory: fee.manageFeeId.feeDescription.feeCateg.category
+        feeCategory: fee.manageFeeId.feeDescription.feeCateg.category,
+        isPaid: fee?.isPaid ? 'Yes' : 'No'
     }));
-
-    const totalFeeAmount = feeData?.reduce((total, fee) => total + fee.manageFeeId.amount, 0);
 
     const viewStudentPayments = (studentRecord) => {
         const studentId = studentRecord?._id;
 
         // Current name of student being viewed
         setStudentViewed(`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`);
-
         setShowStudentPayments(true); // Show student payment modal
         setStudentPayments(records?.studentPayments?.filter(student => student.studentId === studentId));
     };
+
+
+    // Setting amounts after the viewStudentPayments has been clicked
+    const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
+    const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
+    const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'TUF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
@@ -103,54 +109,84 @@ const FinancePaymentSchedule = () => {
             {showStudentPayments && (
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-                        <h2 className="font-bold text-gray-700 text-2xl">Payments of {studentViewed}</h2>
+                        {currentSelectedButton === '' && (
+                            <div className="flex flex-col items-center justify-center absolute w-full">
+                                <div className="bg-red-100 border border-red-400 text-red-600 px-4 py-3 rounded-lg shadow-md animate-bounce">
+                                    <p className="text-xl font-medium">⚠️ Please select a card to view payment details</p>
+                                </div>
+                            </div>
+                        )}
+                        <div className="border-b border-gray-300 py-2 flex items-center justify-between">
+                            <div>
+                                <h2 className="font-bold text-gray-700 text-2xl">{studentViewed}</h2>
+                                <p className="text-gray-500">Statement Of Account</p>
+                            </div>
 
-                        {/* Buttons for View Selection */}
-                        <div className="my-3 flex gap-2 items-center">
-                            {studentViewButtons.map((button, key) => (
-                                <button
-                                    onClick={() => setCurrentSelectedButton(button)}
-                                    className={`${button === currentSelectedButton ? 'bg-blue-500 text-gray-100 hover:bg-blue-600' : 'border-blue-500 text-blue-500'} border p-2 rounded-md hover:bg-blue-600 hover:text-gray-100 transition text-sm`}
-                                    key={key}
-                                >
-                                    {button}
-                                </button>
-                            ))}
+                            <button
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                                onClick={() => {
+                                    setShowStudentPayments(false)
+                                    setCurrentSelectedButton('');
+                                }}
+                            >
+                                Cancel
+                            </button>
                         </div>
 
-                        {/* For Payment Schedules */}
-                        {currentSelectedButton === 'Payment Schedules' && (
-                            <>
-                                <MasterTable
-                                    columns={paymentScheduleColumns}
-                                    data={paymentScheduleData || []}
-                                    searchQuery={searchQuery}
-                                    disableAction={true}
-                                />
-                                <div className="mt-4 text-right font-bold text-xl text-blue-600">
-                                    <span className="text-gray-800">Total Amount: </span>Php. {totalPaymentScheduleAmount.toFixed(2)}
+                        <div className="mt-6">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div onClick={() => setCurrentSelectedButton('Book Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
+                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Book Amount</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php. {totalBookAmount.toFixed(2)}</p>
                                 </div>
-                            </>
-                        )}
 
-                        {/* For Textbooks */}
-                        {currentSelectedButton === 'Textbooks' && (
-                            <>
-                                <MasterTable
-                                    columns={textbookColumns}
-                                    data={textbookData || []}
-                                    searchQuery={searchQuery}
-                                    disableAction={true}
-                                />
-                                <div className="mt-4 text-right font-bold text-xl text-blue-600">
-                                    <span className="text-gray-800">Total Amount: </span>Php. {totalTextbookAmount.toFixed(2)}
+                                <div onClick={() => setCurrentSelectedButton('Miscellaneous Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
+                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Miscellaneous Amount</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php. { totalMiscAmount.toFixed(2) }</p>
                                 </div>
-                            </>
-                        )}
 
-                        {/* For Total Fees */}
-                        {currentSelectedButton === 'Total Fees' && (
-                            <>
+                                <div onClick={() => setCurrentSelectedButton('Tuition Fee Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
+                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Tuition Fee Amount</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php. { totalTuitionFeeAmount.toFixed(2) }</p>
+                                </div>
+                            </div>
+                            
+                            {/* Modal will open upon hover */}
+                            {/* For textbooks */}
+                            { currentSelectedButton === 'Book Amount'&& (
+                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                                    <TabActions title="Remaining Book Amount" noView={true} />
+                                    <MasterTable
+                                        columns={textbookColumns}
+                                        data={textbookData || []}
+                                        searchQuery={searchQuery}
+                                        disableAction={true}
+                                    />
+                                    <p className="text-2xl font-bold text-blue-600 mt-5">
+                                        Total: <span className="text-xl">Php. {totalBookAmount.toFixed(2)}</span>
+                                    </p>
+                                </div>
+                            ) }
+
+                             {/* For Tuition Fees */}
+                             {currentSelectedButton === 'Tuition Fee Amount' && (
+                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                                    <TabActions title="Remaining Tuition Fee Amount" noView={true} />
+                                    <MasterTable
+                                        columns={paymentScheduleColumns}
+                                        data={paymentScheduleData || []}
+                                        searchQuery={searchQuery}
+                                        disableAction={true}
+                                    />
+                                    <p className="text-2xl font-bold text-blue-600 mt-5">
+                                        Total: <span className="text-xl">Php. {totalTuitionFeeAmount.toFixed(2)}</span>
+                                    </p>
+                                </div>
+                             )}
+
+                             {currentSelectedButton === 'Miscellaneous Amount' && (
+                             <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                                <TabActions title="Remaining Miscellaneous Amount" noView={true} />
                                 <MasterTable
                                     columns={feeColumns}
                                     data={feeData || []}
@@ -158,17 +194,12 @@ const FinancePaymentSchedule = () => {
                                     disableAction={true}
                                 />
                                 <div className="mt-4 text-right font-bold text-xl text-blue-600">
-                                    <span className="text-gray-800">Total Amount: </span>Php. {totalFeeAmount.toFixed(2)}
+                                    <span className="text-gray-800">Total Amount: </span>Php. {totalMiscAmount.toFixed(2)}
                                 </div>
-                            </>
-                        )}
+                             </div>
+                             )}
 
-                        <button
-                            className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                            onClick={() => setShowStudentPayments(false)}
-                        >
-                            Cancel
-                        </button>
+                        </div>
                     </div>
                 </div>
             )}

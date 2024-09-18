@@ -986,52 +986,69 @@ module.exports.generate_fees = async (req, res) => {
                     if(student?.academicId?.isRegistered && student?.academicId?.isAdmitted) {
 
                         let totalPaymentAmount = 0; // Initialize total amount for each student
+                        let totalTextbookAmount = 0;
+                        let totalMiscAmount = 0;
+
                         console.log('Creating payment fees for : ' + student.firstName);
                         for (const fee of manageFees) {
-                            console.log('Fee :', fee._id);
-                            // Check if the fee matches the current year, student's grade level, and nationality code
-                            const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
-                            const matchesGradeLevel = fee.gradeLevelId?.gradeLevel.toLowerCase() === student.academicId.gradeLevelId.gradeLevel.toLowerCase();
-                            const matchesNationality = !fee.nationality || fee.nationality.toLowerCase() === (student?.academicId?.studentId?.nationality?.nationality === 'Filipino' ? 'local' : 'foreigner')
-                            
-                            // console.log('Fee Conditions: ', {
-                            //     matchesSchoolYear,
-                            //     matchesGradeLevel,
-                            //     matchesNationality
-                            // })
+                            console.log('Fee Category Found:', fee.feeDescription?.code);
+                        
+                            // Corrected condition to include only Miscellaneous and Tuition Fee (case-insensitive)
+                            const code = fee.feeDescription?.code?.toLowerCase(); // Convert to lowercase for consistent comparison
+                            // if (category === 'miscellaneous' || category === 'tuition fee') {
+                                console.log('Processing Fee Category:', code);
+                        
+                                // Check if the fee matches the current year, student's grade level, and nationality code
+                                const matchesStrand = fee?.strandId?.strand.toLowerCase() === student?.academicId?.strandId?.strand.toLowerCase();
+                                const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
+                                const matchesGradeLevel = fee.gradeLevelId?.gradeLevel.toLowerCase() === student?.academicId?.gradeLevelId?.gradeLevel.toLowerCase();
+                                const matchesNationality = !fee.nationality || fee.nationality.toLowerCase() === (student?.academicId?.studentId?.nationality?.nationality === 'Filipino' ? 'local' : 'foreigner');
+                        
+                                if (matchesSchoolYear && matchesGradeLevel && matchesNationality && matchesStrand) {
+                                    const paymentInfo = {
+                                        sessionId: currYear._id,
+                                        studentId: student._id,
+                                        gradeLevelId: student.academicId.gradeLevelId._id,
+                                        feeCodeId: fee.feeDescription._id,
+                                        manageFeeId: fee._id,
+                                        amount: fee.amount,
+                                        recordStatus: 'Live',
+                                        totalMiscAmount
+                                    };
+                        
+                                    // Ensure that the uniqueness check is more precise by including more fields (e.g., studentId, sessionId, feeCodeId, and manageFeeId)
+                                    const existingPayment = await StudentPayment.findOne({
+                                        sessionId: currYear._id,
+                                        studentId: student._id,
+                                        feeCodeId: fee.feeDescription._id, // Ensure the fee code matches
+                                        manageFeeId: fee._id, // Ensure the manage fee matches
+                                        gradeLevelId: student.academicId.gradeLevelId._id, // Ensure grade level matches
+                                        recordStatus: 'Live', // Only consider 'Live' records
+                                        totalMiscAmount // Added miscellaneous fees on record
+                                    });
+                        
+                                    // If no payment exists, create a new payment
+                                    if (!existingPayment) {
+                                        await StudentPayment.create(paymentInfo);
+                                        if (code === 'tuf') {
+                                            totalPaymentAmount += fee.amount; // Accumulate the fee amount
+                                        }
 
-                            if(matchesSchoolYear && matchesGradeLevel && matchesNationality) {
-                                // console.log('Matching Fee:', {
-                                //     studentName: student.firstName,
-                                //     feeSyId: fee.sessionId._id,
-                                //     currYearId: currYear._id,
-                                //     feeGradeLevelId: fee.gradeLevelId._id,
-                                //     studentGradeLevelId: student.academicId.gradeLevelId._id,
-                                //     feeNationalityCodeId: fee.nationalityCodeId?._id,
-                                //     studentNationalityCodeId: student.nationality?.nationalityCode,
-                                //     manageFeeId: fee._id,
-                                //     amount: fee.amount // Add amount to the log
-                                // });
-        
-                                const paymentInfo = {
-                                    sessionId: currYear._id,
-                                    studentId: student._id,
-                                    gradeLevelId: student.academicId.gradeLevelId._id,
-                                    feeCodeId: fee.feeDescription._id,
-                                    manageFeeId: fee._id,
-                                    amount: fee.amount, // Add amount to the payment info,
-                                    recordStatus: 'Live'
-                                };
-        
-                                const existingPayment = await StudentPayment.findOne(paymentInfo);
-        
-                                if (!existingPayment) {
-                                    await StudentPayment.create(paymentInfo);
-                                    totalPaymentAmount += fee.amount; // Accumulate the fee amount
-                                    console.log(`Added fee amount: ${fee.amount}, Total Payment Amount: ${totalPaymentAmount}`);
+                                        if(code === 'msc') {
+                                            console.log('Adding miscellaneous fee');
+                                            totalMiscAmount += fee.amount
+                                        }
+                                        
+                                        console.log(`Added fee amount: ${fee.amount}, Total Payment Amount: ${totalPaymentAmount}`);
+                                    } else {
+                                        console.log(`Duplicate payment found for student: ${student.firstName}, fee: ${fee.feeDescription._id}`);
+                                    }
                                 }
-                            }
+                            // }
+                        
+                            // }
                         }
+                            
         
                         for (const textbook of textbooks) { 
                             const matchesSchoolYear = textbook.sessionId._id.equals(currYear._id);
@@ -1059,14 +1076,17 @@ module.exports.generate_fees = async (req, res) => {
                                     gradeLevelId: student.academicId.gradeLevelId._id,
                                     textBookId: textbook._id,
                                     bookAmount: textbook.bookAmount, // Add bookAmount to the textbook info
-                                    recordStatus: 'Live'
+                                    recordStatus: 'Live',
+                                    totalTextbookAmount
                                 };
         
                                 const existingTextbook = await StudentPayment.findOne(studentTextbook);
         
                                 if (!existingTextbook) {
                                     await StudentPayment.create(studentTextbook);
-                                    totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
+                                    // Commenting out total payment amount due to requirements
+                                    totalTextbookAmount += textbook.bookAmount;
+                                    // totalPaymentAmount += textbook.bookAmount; // Accumulate the book amount
                                     console.log(`Added book amount: ${textbook.bookAmount}, Total Payment Amount: ${totalPaymentAmount}`);
                                 }   
                             }
@@ -1091,6 +1111,7 @@ module.exports.generate_fees = async (req, res) => {
                                     studentId: student._id,
                                     gradeLevelId: student.academicId.gradeLevelId._id,
                                     paymentScheduleId: paymentSchedule._id,
+                                    // Tuition fee 
                                     totalPaymentAmount, // Include the total amount in the payment schedule info
                                     payEveryAmount: totalPaymentAmount / student.academicId.paymentTermId.installmentBy,
                                     recordStatus: 'Live'
@@ -1206,8 +1227,24 @@ module.exports.get_student_payments = async (req,res) => {
                 { path: 'discountId' }
             ]
         })
-        .populate('sessionId gradeLevelId feeCodeId manageFeeId paymentScheduleId');
+        .populate({ path: 'feeCodeId',
+            populate: [
+                { path: 'feeCateg' }
+            ]
+         })
+        .populate('sessionId gradeLevelId manageFeeId paymentScheduleId');
         res.status(200).json(studPayments);
+
+        // await StudentPayment.find({ recordStatus: 'Live', sessionId: session })
+        // .populate({ path: 'paymentScheduleId', populate: {
+        //     path: 'paymentTermId'
+        // } })
+        // .populate({ path: 'manageFeeId', populate: {
+        //     path: 'feeDescription', populate: {
+        //         path: 'feeCateg'
+        //     }
+        // } })
+        // .populate('feeCodeId gradeLevelId textBookId studentDiscountId')
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg:'An error occured while fetching student payments' });

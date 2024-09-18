@@ -64,11 +64,12 @@ const EditManageFee = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: setTimeout(() => {
+                    navigate(`/${genericPath}/manage-fees`)
+                }, 2000)            
             });
-            setTimeout(() => {
-                navigate(`/${genericPath}/manage-fees`)
-            }, 2000);
+            
         } catch (err) {
             console.log(err);
             setIsLoading(false);

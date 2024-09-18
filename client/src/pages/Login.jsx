@@ -26,9 +26,7 @@ const Login = () => {
         if(cookies.userToken) {
             if(role === 'Super Admin') {
                 navigate('/master/dashboard');
-            } else {
-                navigate(`/${role.replace(" ","").toLowerCase()}/dashboard`);
-            }
+            } 
         } else {
             navigate('/login');
         }
@@ -87,10 +85,10 @@ const Login = () => {
             //     path = data.data.role.replace(" ","").toLowerCase()
             // }
 
-            setTimeout(() => {
-                setCookie('userToken', data.data.token, { path: path, maxAge: 100000 });
-                navigate(data.data.redirect);
-            }, 2000);
+            // setTimeout(() => {
+            //     setCookie('userToken', data.data.token, { path: path, maxAge: 100000 });
+            //     navigate(data.data.redirect);
+            // }, 2000);
         } catch (err) {
             toast.error(err.response.data.mssg, {
                 position: 'top-center',

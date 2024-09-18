@@ -119,7 +119,7 @@ const Assessment = () => {
         }
     };
 
-    const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered).map(student => ({
+    const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId?.gradeLevelId).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         studentNo: student.studentNo || 'Not assigned',
@@ -150,7 +150,7 @@ const Assessment = () => {
             </div>
 
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
+            <   div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
 
                 <div className="rounded-md h-fit">
                     <MasterTable columns={columns} data={formattedStudents} viewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
@@ -165,7 +165,7 @@ const Assessment = () => {
                         <div className="bg-white w-full h-full md:w-3/4 md:h-[90%] p-4 rounded-lg border border-gray-300 shadow-lg overflow-y-auto">
                             <div className="flex items-center justify-between mb-3">
                                 <h1 className="font-semibold text-2xl text-gray-700">
-                                    {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s` : 'Student'}
+                                    {currStudRec ? `${currStudRec.firstName} ${currStudRec.lastName}'s Generated Fees` : 'Student'}
                                 </h1>
                                 <button onClick={() => {
                                     setCurrStudRec(null)

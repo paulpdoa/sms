@@ -37,6 +37,12 @@ const Navbar = () => {
             onClose: () => {
                 // Remove userToken cookie
                 removeCookie('userToken', { path: '/' });
+                removeCookie('userToken', { path: '/master' });
+                removeCookie('userToken', { path: '/finance' });
+                removeCookie('userToken', { path: '/guest' });
+                removeCookie('userToken', { path: '/registrar' });
+                removeCookie('userToken', { path: '/student' });
+                removeCookie('userToken', { path: '/teacher' });
                 ['userToken', 'username', 'role', 'id', 'session', 'user', 'isFreshYear'].forEach(item => localStorage.removeItem(item));
                 navigate('/login');
             }
