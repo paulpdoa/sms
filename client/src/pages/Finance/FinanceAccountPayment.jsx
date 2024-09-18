@@ -85,12 +85,6 @@ const handleOtherFeesChange = (e) => {
     setStudentPayments(payments || []);
     setTotalPayment(0); // Reset total payment for new student
     setIsStudentPaymentModalVisible(true);
-
-
-    // Filter fees based on strand, nationality, gradelevel, 
-    console.log(fees);
-    console.log(student);
-
   };
 
   // Student table actions
@@ -126,48 +120,72 @@ const handleOtherFeesChange = (e) => {
         <MasterTable columns={studentColumns} data={studentData || []} searchQuery={searchQuery} actions={actions} />
       </section>
 
-      {/* Student Payments Modal */}
-      {isStudentPaymentModalVisible && (
+
+      {/* Students Payment Modal */}
+      { isStudentPaymentModalVisible && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-            <h2 className="font-bold text-gray-700 text-2xl mb-4">Payments of {currentStudentName}</h2>
+            <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
+                <div className="border-b border-gray-300 py-2 flex items-center justify-between">
+                  <div>
+                      <h2 className="font-bold text-gray-700 text-2xl">{currentStudentName}</h2>
+                      <p className="text-gray-500">Account Payments</p>
+                  </div>
 
-            <MasterTable
-              columns={paymentScheduleColumns}
-              data={paymentScheduleData || []}
-              searchQuery={searchQuery}
-              disableAction={true}
-            />
-
-            <div className="flex justify-between items-center mt-4">
-              <label htmlFor="amountToPay" className="text-lg font-semibold">
-                Total Amount to Pay: <span className="text-blue-600">Php. {totalPayment.toFixed(2)}</span>
-              </label>
-              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
-                Proceed to Payment
-              </button>
+                  <button
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+                      onClick={() => {
+                          setIsStudentPaymentModalVisible(false)
+                      }}
+                  >
+                    Cancel
+                </button>
+              </div>
             </div>
-
-            <div className="flex flex-col gap-2">
-                <label htmlFor="other fees">Other Fees:</label>
-                <input 
-                    onChange={handleOtherFeesChange}
-                    className="p-1 outline-none focus:ring-2 focus:ring-blue-500 rounded-md border-gray-300 border w-[20%]"
-                    type="number" 
-                />
-            </div>
-
-            <button
-              className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-              onClick={() => setIsStudentPaymentModalVisible(false)}
-            >
-              Close
-            </button>
-          </div>
         </div>
       )}
+      
     </main>
   );
 };
 
 export default FinanceAccountPayment;
+{/* Student Payments Modal */}
+// {isStudentPaymentModalVisible && (
+//   <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+//     <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
+//       <h2 className="font-bold text-gray-700 text-2xl mb-4">Payments of {currentStudentName}</h2>
+
+//       <MasterTable
+//         columns={paymentScheduleColumns}
+//         data={paymentScheduleData || []}
+//         searchQuery={searchQuery}
+//         disableAction={true}
+//       />
+
+//       <div className="flex justify-between items-center mt-4">
+//         <label htmlFor="amountToPay" className="text-lg font-semibold">
+//           Total Amount to Pay: <span className="text-blue-600">Php. {totalPayment.toFixed(2)}</span>
+//         </label>
+//         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
+//           Proceed to Payment
+//         </button>
+//       </div>
+
+//       <div className="flex flex-col gap-2">
+//           <label htmlFor="other fees">Other Fees:</label>
+//           <input 
+//               onChange={handleOtherFeesChange}
+//               className="p-1 outline-none focus:ring-2 focus:ring-blue-500 rounded-md border-gray-300 border w-[20%]"
+//               type="number" 
+//           />
+//       </div>
+
+//       <button
+//         className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+//         onClick={() => setIsStudentPaymentModalVisible(false)}
+//       >
+//         Close
+//       </button>
+//     </div>
+//   </div>
+// )}

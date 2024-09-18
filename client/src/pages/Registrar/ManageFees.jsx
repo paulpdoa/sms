@@ -83,7 +83,7 @@ const ManageFees = () => {
                 }, 2000)
             });
 
-           
+            
         } catch (err) {
             console.log(err);
             toast.error(err.response.data.mssg, {
@@ -141,8 +141,11 @@ const ManageFees = () => {
 
     return (
         <main className="p-2 relative">
-            <div className="flex justify-between items-center">
-                <Searchbar onSearch={setSearchQuery} />
+            <div className="flex justify-between bg-white p-4 rounded-lg">
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-3xl font-bold text-gray-800">Manage Fees</h1>
+                    <Searchbar onSearch={setSearchQuery} />
+                </div>
                 <div className="flex items-center gap-2">
                     { recordsWithoutInputter.length < 1 ? 
                     <button disabled={(isYearDone && !isLoading) ? true : false} onClick={() => automateFees(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600`}>

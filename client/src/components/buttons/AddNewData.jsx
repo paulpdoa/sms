@@ -4,34 +4,33 @@ import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useLocation } from 'react-router-dom';
 
-const AddNewData = ({ label,onShow }) => {
-
-    const { session,isFreshYear } = useContext(MainContext);
+const AddNewData = ({ label, onShow }) => {
+    const { session, isFreshYear } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
-    const isYearDone = schoolYear?.isYearDone
-
-    
-
+    const isYearDone = schoolYear?.isYearDone;
     const location = useLocation();
     const isSchoolYearPage = location.pathname.includes('school-year');
 
+    const buttonStyles = "flex items-center gap-2 text-gray-100 p-3 rounded-md text-sm transition-colors duration-200";
+    const enabledStyles = "bg-blue-500 hover:bg-blue-600";
+    const disabledStyles = "bg-gray-400 cursor-not-allowed";
+
+    const renderButton = (isDisabled, label) => (
+        <button
+            disabled={isDisabled}
+            onClick={() => onShow(prevVal => !prevVal)}
+            className={`${buttonStyles} ${isDisabled ? disabledStyles : enabledStyles}`}
+        >
+            {`Add New ${label}`}
+        </button>
+    );
+
     return (
         <>
-            { (isFreshYear && isSchoolYearPage) && (
-                <button disabled={isFreshYear ? false : true} onClick={() => onShow(prevVal => !prevVal)} className={`cursor-pointer flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md text-sm`}>
-                    { `Add New ${label}` }
-                </button>
-            )}
-
-            { (!isYearDone && isFreshYear === null && !isSchoolYearPage) ? (
-                <button disabled={isYearDone ? true : false} onClick={() => onShow(prevVal => !prevVal)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-gray-100 p-2 rounded-md text-sm`}>
-                    { `Add New ${label}` }
-                </button>
-            ) : (
-                ''
-            ) }
+            {isFreshYear && isSchoolYearPage && renderButton(false, label)}
+            {!isYearDone && isFreshYear === null && !isSchoolYearPage && renderButton(isYearDone, label)}
         </>
-    )
-}
+    );
+};
 
 export default AddNewData;

@@ -183,9 +183,9 @@ const SchoolYear = () => {
         <main className="p-2 relative">
             <TabActions title="School Year" />
             {/* Show this button when the school year viewed is still ongoing */}
-            <div className="flex justify-end px-4">
+            <div className="flex justify-end px-4 absolute right-0 top-16">
                 { (!isYearDone && !isFreshYear) && 
-                <button onClick={() => setCloseYear(true)} className={`bg-red-500 hover:bg-red-600 text-gray-100 p-2 rounded-md`}>
+                <button onClick={() => setCloseYear(true)} className={`bg-red-500 hover:bg-red-600 text-gray-100 p-2 rounded-md cursor-pointer`}>
                     Close School Year
                 </button>
                 }

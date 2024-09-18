@@ -4,6 +4,7 @@ import { useContext, useState } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
+import Warning from '../../components/Warning';
 
 const FinancePaymentSchedule = () => {
 
@@ -15,7 +16,6 @@ const FinancePaymentSchedule = () => {
     const [studentPayments, setStudentPayments] = useState([]);
     const [studentViewed, setStudentViewed] = useState('');
 
-    const studentViewButtons = ['Book Amount', 'Miscellaneous Amount', 'Tuition Fee Amount'];
     const [currentSelectedButton, setCurrentSelectedButton] = useState('');
 
     // Columns for Student List
@@ -110,11 +110,7 @@ const FinancePaymentSchedule = () => {
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
                         {currentSelectedButton === '' && (
-                            <div className="flex flex-col items-center justify-center absolute w-full">
-                                <div className="bg-red-100 border border-red-400 text-red-600 px-4 py-3 rounded-lg shadow-md animate-bounce">
-                                    <p className="text-xl font-medium">⚠️ Please select a card to view payment details</p>
-                                </div>
-                            </div>
+                            <Warning message={'Please select a card to view payment details'} />
                         )}
                         <div className="border-b border-gray-300 py-2 flex items-center justify-between">
                             <div>
@@ -123,7 +119,7 @@ const FinancePaymentSchedule = () => {
                             </div>
 
                             <button
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
                                 onClick={() => {
                                     setShowStudentPayments(false)
                                     setCurrentSelectedButton('');

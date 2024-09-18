@@ -1,4 +1,4 @@
-import { useState,useEffect,useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { MainContext } from '../helpers/MainContext';
 import { baseUrl } from '../baseUrl';
 import axios from 'axios';
@@ -9,7 +9,6 @@ import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -18,23 +17,16 @@ const Login = () => {
     const [cookies, setCookie] = useCookies(['userToken']);
     const [error, setError] = useState({ username: '', password: '', session: '' });
     const navigate = useNavigate();
-
     const { role } = useContext(MainContext);
 
-    // Don't allow user to go back if he has userToken
+    // Prevents navigation if user is already logged in
     useEffect(() => {
-        if(cookies.userToken) {
-            if(role === 'Super Admin') {
-                navigate('/master/dashboard');
-            } 
+        if (cookies.userToken) {
+            role === 'Super Admin' ? navigate('/master/dashboard') : navigate('/');
         } else {
             navigate('/login');
         }
-    },[role])
-
-
-    const schoolName = 'Name Of School';
-    const logoPath = '/schoolLogo/school-logo-filler.png';
+    }, [role, cookies, navigate]);
 
     const loginUser = async (e) => {
         e.preventDefault();
@@ -42,63 +34,36 @@ const Login = () => {
         if (!username) setError((prev) => ({ ...prev, username: 'Username cannot be empty' }));
         if (!password) setError((prev) => ({ ...prev, password: 'Password cannot be empty' }));
         if (!schoolYear) setError((prev) => ({ ...prev, session: 'Session cannot be empty' }));
+
         setTimeout(() => {
             setError({ username: '', password: '', session: '' });
-        },3000)
+        }, 3000);
 
         if (!username || !password || !schoolYear) return;
 
         try {
-            const data = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
-            
-            localStorage.setItem('role', data.data.role);
-            localStorage.setItem('username', data.data.data.username);
-            localStorage.setItem('id', data.data.data._id);
+            const { data } = await axios.post(`${baseUrl()}/user-login`, { username, password, session: schoolYear });
 
+            localStorage.setItem('role', data.role);
+            localStorage.setItem('username', data.data.username);
+            localStorage.setItem('id', data.data._id);
 
-            if(schoolYear === 'true') {
-                localStorage.setItem('isFreshYear', true)
-            } else {
-                localStorage.setItem('session', schoolYear);
-            }
+            schoolYear === 'true' ? localStorage.setItem('isFreshYear', true) : localStorage.setItem('session', schoolYear);
 
-            toast.success(data.data.mssg, {
+            toast.success(data.mssg, {
                 position: 'top-center',
                 autoClose: 1000,
                 hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored',
                 onClose: () => {
-                    // Remove userToken cookie
-                    setCookie('userToken', data.data.token, { path: '/', maxAge: 100000 });
-                    navigate(data.data.redirect);
-                }
+                    setCookie('userToken', data.token, { path: '/', maxAge: 100000 });
+                    navigate(data.redirect);
+                },
             });
-
-            // let path = '';
-            // if(data.data.role === 'Super Admin') {
-            //     path = '/'
-            // } else {
-            //     path = data.data.role.replace(" ","").toLowerCase()
-            // }
-
-            // setTimeout(() => {
-            //     setCookie('userToken', data.data.token, { path: path, maxAge: 100000 });
-            //     navigate(data.data.redirect);
-            // }, 2000);
         } catch (err) {
-            toast.error(err.response.data.mssg, {
+            toast.error(err.response?.data.mssg || 'Login failed', {
                 position: 'top-center',
                 autoClose: 3000,
                 hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true, 
-                draggable: true,
-                progress: undefined,
-                theme: 'colored'
             });
         }
     };
@@ -108,77 +73,82 @@ const Login = () => {
         navigate('/new-student');
     };
 
+    const renderError = (fieldError) => fieldError && <span className="text-red-500 text-xs">{fieldError}</span>;
+
     return (
-        <main className="bg-gray-200 h-screen flex justify-center items-center">
-            <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-2xl overflow-hidden max-w-4xl w-full">
+        <main className="bg-gray-100 h-screen flex justify-center items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full">
                 {/* Login Form */}
-                <form onSubmit={loginUser} className="bg-white p-10 flex flex-col justify-center">
-                    <h1 className="text-2xl font-semibold text-gray-700 mb-5">Login</h1>
-                    
-                    <div className="flex flex-col gap-1">
-                        <label className="text-gray-700 text-sm">Username</label>
+                <form onSubmit={loginUser} className="bg-white p-8 md:p-12 flex flex-col justify-center">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-6">Login</h1>
+
+                    {/* Username Input */}
+                    <div className="mb-4">
+                        <label className="text-gray-600 text-sm">Username</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className={`border ${error.username ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
+                            className={`w-full border ${error.username ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
-                        {error.username && <span className="text-red-500 text-xs">{error.username}</span>}
+                        {renderError(error.username)}
                     </div>
 
-                    <div className="flex flex-col gap-1 mt-3 relative">
-                        <label className="text-gray-700 text-sm">Password</label>
+                    {/* Password Input */}
+                    <div className="mb-4 relative">
+                        <label className="text-gray-600 text-sm">Password</label>
                         <input
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className={`border ${error.password ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
+                            className={`w-full border ${error.password ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-2 top-8 bg-transparent text-gray-500 text-xs"
+                            className="absolute right-3 top-9 text-gray-600 text-xs"
                         >
                             {showPassword ? 'Hide' : 'Show'}
                         </button>
-                        {error.password && <span className="text-red-500 text-xs">{error.password}</span>}
+                        {renderError(error.password)}
                     </div>
 
-                    <div className="flex flex-col gap-1 mt-3">
-                        <label className="text-gray-700 text-sm">Session</label>
+                    {/* Session Selector */}
+                    <div className="mb-6">
+                        <label className="text-gray-600 text-sm">Session</label>
                         <select
                             value={schoolYear}
                             onChange={(e) => setSchoolYear(e.target.value)}
-                            className={`border ${error.session ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md bg-transparent text-sm focus:ring-2 outline-none`}
+                            className={`w-full border ${error.session ? 'border-red-500' : 'border-gray-300'} p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         >
                             <option hidden>Select session</option>
                             {schoolYears.map((sy) => (
                                 <option key={sy._id} value={sy._id}>
-                                    {`${sy.startYear.split('-')[0]}-${sy.endYear.split('-')[0]}`} {sy.isYearDone && 'Done'}
+                                    {`${sy.startYear.split('-')[0]}-${sy.endYear.split('-')[0]}`} {sy.isYearDone && '(Done)'}
                                 </option>
                             ))}
-                            <option value={true}>Create new school year</option>
+                            <option value="true">Create new school year</option>
                         </select>
-                        {error.session && <span className="text-red-500 text-xs">{error.session}</span>}
+                        {renderError(error.session)}
                     </div>
 
-                    <button className="bg-blue-500 text-sm hover:bg-blue-600 w-full p-2 rounded-md text-white cursor-pointer mt-5">Login</button>
+                    {/* Login Button */}
+                    <button className="bg-blue-500 text-white text-sm py-2 rounded-md w-full hover:bg-blue-600 transition-all">Login</button>
                 </form>
 
-                {/* Right Side - School Logo and Information */}
-                <div className="bg-blue-500 flex items-center justify-center flex-col p-10 text-white">
-                    <img className="mb-4 w-32 h-32" src={logoPath} alt="School Logo" />
-                    <h1 className="text-xl font-semibold">Welcome to {schoolName}</h1>
+                {/* Right Side - School Info */}
+                <div className="bg-blue-500 flex flex-col justify-center items-center p-10 text-white">
+                    <img className="mb-6 w-32 h-32" src="/schoolLogo/school-logo-filler.png" alt="School Logo" />
+                    <h2 className="text-2xl font-semibold">Welcome to Name Of School</h2>
                     <p className="mt-2 text-sm">Manage your school's activities effectively.</p>
                     <button
                         onClick={signUpNewStudent}
-                        className="mt-5 bg-white text-blue-500 px-4 py-2 rounded-md text-sm hover:bg-gray-200"
+                        className="mt-6 bg-white text-blue-500 px-4 py-2 rounded-md text-sm hover:bg-gray-200 transition-all"
                     >
                         Register as a Student
                     </button>
                 </div>
             </div>
-
             <ToastContainer />
         </main>
     );
