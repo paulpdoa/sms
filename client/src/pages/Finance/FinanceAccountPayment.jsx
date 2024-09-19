@@ -4,12 +4,12 @@ import { useContext, useState } from "react";
 import { MainContext } from "../../helpers/MainContext";
 import MasterTable from "../../components/MasterTable";
 import TabActions from "../../components/TabActions";
+import PaymentModal from "./PaymentModal";
 
 const FinanceAccountPayment = () => {
   const { currentUserId, searchQuery } = useContext(MainContext);
 
   const { records } = useFetch(`${baseUrl()}/finance-account-payment/${currentUserId}`);
-  const { records: fees } = useFetch(`${baseUrl()}/manage-fees`);
 
   const [isStudentPaymentModalVisible, setIsStudentPaymentModalVisible] = useState(false);
   const [studentPayments, setStudentPayments] = useState([]);
@@ -18,6 +18,19 @@ const FinanceAccountPayment = () => {
 
   const [otherFees, setOtherFees] = useState(0); // Track the current value of Other Fees
 
+  // For current selection of checkbox for payments
+  const [currentPaymentScreen,setCurrentPaymentScreen] = useState([]);
+  const handlePaymentScreenChange = (screen) => {
+    setCurrentPaymentScreen((prev) => {
+      if (prev.includes(screen)) {
+        // If the screen already exists, remove it
+        return prev.filter((s) => s !== screen);
+      } else {
+        // If the screen doesn't exist, add it
+        return [...prev, screen];
+      }
+    });
+  }
 
 // Handle changes to Other Fees input
 const handleOtherFeesChange = (e) => {
@@ -47,7 +60,71 @@ const handleOtherFeesChange = (e) => {
     { accessorKey: "pay", header: "Pay" },
     { accessorKey: "paymentDate", header: "Payment Date" },
     { accessorKey: "payEveryAmount", header: "Amount Payable" },
+    { accessorKey: 'isPaid', header: 'Paid' }
   ];
+  // Textbook columns
+  const textbookColumn = [
+    { accessorKey: "pay", header: "Pay" },
+    { accessorKey: 'textBookId.bookTitle', header: 'Book Title' },
+    { accessorKey: 'textBookId.bookCode', header: 'Book Code' },
+    { accessorKey: 'textBookId.bookAmount', header: 'Book Amount' },
+    { accessorKey: 'isPaid', header: 'Paid' }
+  ];
+  // Miscellaneous column
+  const miscellaneousColumn = [
+    { accessorKey: 'pay', header: 'Pay' },
+    { accessorKey: 'description', header: 'Description'},
+    { accessorKey: 'code', header: 'Code' },
+    { accessorKey: 'amount', header: 'Amount' },
+    { accessorKey: 'isPaid', header: 'Paid' }
+  ]
+
+  const miscellaneousData = studentPayments
+    ?.filter(payment => payment.manageFeeId?.feeDescription?.code === 'MSC')
+    ?.map(payment => ({
+      ...payment,
+      description: payment.manageFeeId.feeDescription.description,
+      code: payment.manageFeeId.feeDescription.code,
+      amount: payment.manageFeeId.amount,
+      isPaid: payment.isPaid ? 'Yes' : 'No',
+      pay: (
+        <input
+          disabled={payment.isPaid ? true : false}
+          type="checkbox"
+          onChange={(e) => {
+            const amount = payment.payEveryAmount;
+            console.log(payment);
+            if (e.target.checked) {
+              setTotalPayment((prev) => prev + amount);
+            } else {
+              setTotalPayment((prev) => prev - amount);
+            }
+          }}
+        />
+      ),
+    }))
+  
+  const textbookData = studentPayments
+    ?.filter(payment => payment.textBookId)
+    ?.map(payment => ({
+      ...payment,
+      pay: (
+        <input
+          disabled={payment.isPaid ? true : false}
+          type="checkbox"
+          onChange={(e) => {
+            const amount = payment.payEveryAmount;
+            console.log(payment);
+            if (e.target.checked) {
+              setTotalPayment((prev) => prev + amount);
+            } else {
+              setTotalPayment((prev) => prev - amount);
+            }
+          }}
+        />
+      ),
+      isPaid: payment.isPaid ? 'Yes' : 'No'
+    }))
 
   // Mapping payment schedules
   const paymentScheduleData = studentPayments
@@ -57,6 +134,7 @@ const handleOtherFeesChange = (e) => {
       pay: (
         <input
           type="checkbox"
+          disabled={payment.isPaid ? true : false}
           onChange={(e) => {
             const amount = payment.payEveryAmount;
             console.log(payment);
@@ -73,6 +151,7 @@ const handleOtherFeesChange = (e) => {
         month: "long",
         day: "numeric",
       }),
+      isPaid: payment.isPaid ? 'Yes' : 'No'
     }));
 
 
@@ -87,13 +166,18 @@ const handleOtherFeesChange = (e) => {
     setIsStudentPaymentModalVisible(true);
   };
 
+  // Setting amounts after the viewStudentPayments has been clicked
+  const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
+  const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
+  const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'TUF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
+
   // Student table actions
   const actions = (student) => (
     <button
       onClick={() => handleStudentPayments(student)}
       className="bg-blue-500 hover:bg-blue-600 rounded-md p-2 text-white w-full"
     >
-      View Payments
+      Pay Now
     </button>
   );
 
@@ -109,6 +193,7 @@ const handleOtherFeesChange = (e) => {
   }
 
 
+
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col items-center">
       <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
@@ -119,73 +204,30 @@ const handleOtherFeesChange = (e) => {
         <TabActions title="Account Payments" noView={true} />
         <MasterTable columns={studentColumns} data={studentData || []} searchQuery={searchQuery} actions={actions} />
       </section>
-
-
       {/* Students Payment Modal */}
       { isStudentPaymentModalVisible && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-                <div className="border-b border-gray-300 py-2 flex items-center justify-between">
-                  <div>
-                      <h2 className="font-bold text-gray-700 text-2xl">{currentStudentName}</h2>
-                      <p className="text-gray-500">Account Payments</p>
-                  </div>
-
-                  <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
-                      onClick={() => {
-                          setIsStudentPaymentModalVisible(false)
-                      }}
-                  >
-                    Cancel
-                </button>
-              </div>
-            </div>
-        </div>
+        <PaymentModal 
+          totalBookAmount={totalBookAmount}
+          totalMiscAmount={totalMiscAmount}
+          totalTuitionFeeAmount={totalTuitionFeeAmount}
+          currentStudentName={currentStudentName}
+          setIsStudentPaymentModalVisible={setIsStudentPaymentModalVisible}
+          handlePaymentScreenChange={handlePaymentScreenChange}
+          currentPaymentScreen={currentPaymentScreen}
+          paymentScheduleColumns={paymentScheduleColumns}
+          paymentScheduleData={paymentScheduleData}
+          textbookColumn={textbookColumn}
+          textbookData={textbookData}
+          miscellaneousColumn={miscellaneousColumn}
+          miscellaneousData={miscellaneousData}
+          searchQuery={searchQuery}
+        />
       )}
-      
     </main>
   );
 };
 
 export default FinanceAccountPayment;
-{/* Student Payments Modal */}
-// {isStudentPaymentModalVisible && (
-//   <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-//     <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-//       <h2 className="font-bold text-gray-700 text-2xl mb-4">Payments of {currentStudentName}</h2>
 
-//       <MasterTable
-//         columns={paymentScheduleColumns}
-//         data={paymentScheduleData || []}
-//         searchQuery={searchQuery}
-//         disableAction={true}
-//       />
 
-//       <div className="flex justify-between items-center mt-4">
-//         <label htmlFor="amountToPay" className="text-lg font-semibold">
-//           Total Amount to Pay: <span className="text-blue-600">Php. {totalPayment.toFixed(2)}</span>
-//         </label>
-//         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
-//           Proceed to Payment
-//         </button>
-//       </div>
 
-//       <div className="flex flex-col gap-2">
-//           <label htmlFor="other fees">Other Fees:</label>
-//           <input 
-//               onChange={handleOtherFeesChange}
-//               className="p-1 outline-none focus:ring-2 focus:ring-blue-500 rounded-md border-gray-300 border w-[20%]"
-//               type="number" 
-//           />
-//       </div>
-
-//       <button
-//         className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-//         onClick={() => setIsStudentPaymentModalVisible(false)}
-//       >
-//         Close
-//       </button>
-//     </div>
-//   </div>
-// )}

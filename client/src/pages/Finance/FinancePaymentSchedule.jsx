@@ -159,7 +159,7 @@ const FinancePaymentSchedule = () => {
                                         disableAction={true}
                                     />
                                     <p className="text-2xl font-bold text-blue-600 mt-5">
-                                        Total: <span className="text-xl">Php. {totalBookAmount.toFixed(2)}</span>
+                                        <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php. {totalBookAmount.toFixed(2)}</span>
                                     </p>
                                 </div>
                             ) }
@@ -175,7 +175,7 @@ const FinancePaymentSchedule = () => {
                                         disableAction={true}
                                     />
                                     <p className="text-2xl font-bold text-blue-600 mt-5">
-                                        Total: <span className="text-xl">Php. {totalTuitionFeeAmount.toFixed(2)}</span>
+                                    <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php. {totalTuitionFeeAmount.toFixed(2)}</span>
                                     </p>
                                 </div>
                              )}
