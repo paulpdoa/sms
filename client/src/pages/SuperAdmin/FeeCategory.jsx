@@ -39,23 +39,22 @@ const FeeCategory = () => {
             toast.success(newData.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -71,23 +70,22 @@ const FeeCategory = () => {
             toast.success(removeFeeCategory.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
@@ -104,23 +102,22 @@ const FeeCategory = () => {
             toast.success(newFeeCateg.data.mssg, {
                 position: "top-center",
                 autoClose: 1000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
             toast.error(err.response.data.mssg, {
                 position: "top-center",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,

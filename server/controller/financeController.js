@@ -104,7 +104,8 @@ module.exports.get_finance_account_payments = async (req, res) => {
                 { path: 'sectionId' },     // Separate populate for sectionId
                 { path: 'paymentTermId' }  // Separate populate for paymentTermId
             ]
-        });
+        })
+        .populate('nationality')
         if (!students) {
             return res.status(404).json({ mssg: 'Student information is not existing' });
         }

@@ -878,7 +878,8 @@ module.exports.automate_fees = async (req, res) => {
                 amount: 0,
                 nationality: 'Local',
                 sessionId: session,
-                inputter 
+                inputter,
+                recordStatus: 'Live'
             });
 
             if (isSenior) {
@@ -887,7 +888,6 @@ module.exports.automate_fees = async (req, res) => {
                         await ManageFee.create({
                             ...manageFeesInfo(fee),
                             strandId: strand._id,
-                            recordStatus:'Live'
                         });
                     }
                 }
@@ -994,7 +994,7 @@ module.exports.generate_fees = async (req, res) => {
                             console.log('Fee Category Found:', fee.feeDescription?.code);
                         
                             // Corrected condition to include only Miscellaneous and Tuition Fee (case-insensitive)
-                            const code = fee.feeDescription?.code?.toLowerCase(); // Convert to lowercase for consistent comparison
+                            const code = fee.feeDescription?.feeCateg?.code?.toLowerCase(); // Convert to lowercase for consistent comparison
                             // if (category === 'miscellaneous' || category === 'tuition fee') {
                                 console.log('Processing Fee Category:', code);
                         
@@ -1030,7 +1030,7 @@ module.exports.generate_fees = async (req, res) => {
                                     // If no payment exists, create a new payment
                                     if (!existingPayment) {
                                         await StudentPayment.create(paymentInfo);
-                                        if (code === 'tuf') {
+                                        if (code === 'tf') {
                                             totalPaymentAmount += fee.amount; // Accumulate the fee amount
                                         }
 

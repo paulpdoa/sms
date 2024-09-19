@@ -14,30 +14,17 @@ const FinanceAccountPayment = () => {
   const [isStudentPaymentModalVisible, setIsStudentPaymentModalVisible] = useState(false);
   const [studentPayments, setStudentPayments] = useState([]);
   const [currentStudentName, setCurrentStudentName] = useState("");
+  const [currentStudent,setCurrentStudent] = useState({});
   const [totalPayment, setTotalPayment] = useState(0);
 
   const [otherFees, setOtherFees] = useState(0); // Track the current value of Other Fees
-
-  // For current selection of checkbox for payments
-  const [currentPaymentScreen,setCurrentPaymentScreen] = useState([]);
-  const handlePaymentScreenChange = (screen) => {
-    setCurrentPaymentScreen((prev) => {
-      if (prev.includes(screen)) {
-        // If the screen already exists, remove it
-        return prev.filter((s) => s !== screen);
-      } else {
-        // If the screen doesn't exist, add it
-        return [...prev, screen];
-      }
-    });
-  }
-
-// Handle changes to Other Fees input
-const handleOtherFeesChange = (e) => {
-    const newValue = parseFloat(e.target.value) || 0; // Parse the new input value or set it to 0
-    setTotalPayment((prev) => prev - otherFees + newValue); // Subtract the old value and add the new one
-    setOtherFees(newValue); // Update the state with the new value
-};
+  
+  // Handle changes to Other Fees input
+  const handleOtherFeesChange = (e) => {
+      const newValue = parseFloat(e.target.value) || 0; // Parse the new input value or set it to 0
+      setTotalPayment((prev) => prev - otherFees + newValue); // Subtract the old value and add the new one
+      setOtherFees(newValue); // Update the state with the new value
+  };
 
   // Student Table Columns
   const studentColumns = [
@@ -55,105 +42,7 @@ const handleOtherFeesChange = (e) => {
     }))
     .sort((a, b) => a.lastName.localeCompare(b.lastName));
 
-  // Payment Schedule Columns
-  const paymentScheduleColumns = [
-    { accessorKey: "pay", header: "Pay" },
-    { accessorKey: "paymentDate", header: "Payment Date" },
-    { accessorKey: "payEveryAmount", header: "Amount Payable" },
-    { accessorKey: 'isPaid', header: 'Paid' }
-  ];
-  // Textbook columns
-  const textbookColumn = [
-    { accessorKey: "pay", header: "Pay" },
-    { accessorKey: 'textBookId.bookTitle', header: 'Book Title' },
-    { accessorKey: 'textBookId.bookCode', header: 'Book Code' },
-    { accessorKey: 'textBookId.bookAmount', header: 'Book Amount' },
-    { accessorKey: 'isPaid', header: 'Paid' }
-  ];
-  // Miscellaneous column
-  const miscellaneousColumn = [
-    { accessorKey: 'pay', header: 'Pay' },
-    { accessorKey: 'description', header: 'Description'},
-    { accessorKey: 'code', header: 'Code' },
-    { accessorKey: 'amount', header: 'Amount' },
-    { accessorKey: 'isPaid', header: 'Paid' }
-  ]
-
-  const miscellaneousData = studentPayments
-    ?.filter(payment => payment.manageFeeId?.feeDescription?.code === 'MSC')
-    ?.map(payment => ({
-      ...payment,
-      description: payment.manageFeeId.feeDescription.description,
-      code: payment.manageFeeId.feeDescription.code,
-      amount: payment.manageFeeId.amount,
-      isPaid: payment.isPaid ? 'Yes' : 'No',
-      pay: (
-        <input
-          disabled={payment.isPaid ? true : false}
-          type="checkbox"
-          onChange={(e) => {
-            const amount = payment.payEveryAmount;
-            console.log(payment);
-            if (e.target.checked) {
-              setTotalPayment((prev) => prev + amount);
-            } else {
-              setTotalPayment((prev) => prev - amount);
-            }
-          }}
-        />
-      ),
-    }))
   
-  const textbookData = studentPayments
-    ?.filter(payment => payment.textBookId)
-    ?.map(payment => ({
-      ...payment,
-      pay: (
-        <input
-          disabled={payment.isPaid ? true : false}
-          type="checkbox"
-          onChange={(e) => {
-            const amount = payment.payEveryAmount;
-            console.log(payment);
-            if (e.target.checked) {
-              setTotalPayment((prev) => prev + amount);
-            } else {
-              setTotalPayment((prev) => prev - amount);
-            }
-          }}
-        />
-      ),
-      isPaid: payment.isPaid ? 'Yes' : 'No'
-    }))
-
-  // Mapping payment schedules
-  const paymentScheduleData = studentPayments
-    ?.filter((payment) => payment.paymentScheduleId)
-    ?.map((payment) => ({
-      ...payment,
-      pay: (
-        <input
-          type="checkbox"
-          disabled={payment.isPaid ? true : false}
-          onChange={(e) => {
-            const amount = payment.payEveryAmount;
-            console.log(payment);
-            if (e.target.checked) {
-              setTotalPayment((prev) => prev + amount);
-            } else {
-              setTotalPayment((prev) => prev - amount);
-            }
-          }}
-        />
-      ),
-      paymentDate: new Date(payment.paymentScheduleId.dateSchedule).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-      isPaid: payment.isPaid ? 'Yes' : 'No'
-    }));
-
 
   // Handle student payment modal visibility and data loading
   const handleStudentPayments = (student) => {
@@ -164,12 +53,13 @@ const handleOtherFeesChange = (e) => {
     setStudentPayments(payments || []);
     setTotalPayment(0); // Reset total payment for new student
     setIsStudentPaymentModalVisible(true);
+    setCurrentStudent(student);
   };
 
   // Setting amounts after the viewStudentPayments has been clicked
   const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
-  const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
-  const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'TUF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
+  const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
+  const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'TF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
   // Student table actions
   const actions = (student) => (
@@ -206,22 +96,19 @@ const handleOtherFeesChange = (e) => {
       </section>
       {/* Students Payment Modal */}
       { isStudentPaymentModalVisible && (
+        <>
+        <button>Clear Selection</button>
         <PaymentModal 
           totalBookAmount={totalBookAmount}
           totalMiscAmount={totalMiscAmount}
           totalTuitionFeeAmount={totalTuitionFeeAmount}
           currentStudentName={currentStudentName}
           setIsStudentPaymentModalVisible={setIsStudentPaymentModalVisible}
-          handlePaymentScreenChange={handlePaymentScreenChange}
-          currentPaymentScreen={currentPaymentScreen}
-          paymentScheduleColumns={paymentScheduleColumns}
-          paymentScheduleData={paymentScheduleData}
-          textbookColumn={textbookColumn}
-          textbookData={textbookData}
-          miscellaneousColumn={miscellaneousColumn}
-          miscellaneousData={miscellaneousData}
           searchQuery={searchQuery}
+          studentPayments={studentPayments}
+          currentStudent={currentStudent}
         />
+        </>
       )}
     </main>
   );

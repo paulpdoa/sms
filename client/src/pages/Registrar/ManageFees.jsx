@@ -113,12 +113,11 @@ const ManageFees = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored"
+                theme: "colored",
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err);
             toast.update(toastId, {

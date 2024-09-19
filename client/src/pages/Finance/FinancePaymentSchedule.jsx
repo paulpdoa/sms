@@ -67,7 +67,7 @@ const FinancePaymentSchedule = () => {
         { accessorKey: 'isPaid', header: 'Paid' }
         
     ];
-    const feeData = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC')?.map(fee => ({
+    const feeData = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC')?.map(fee => ({
         ...fee,
         description: fee.manageFeeId.feeDescription.description,
         feeCode: fee.manageFeeId.feeDescription.code,
@@ -87,8 +87,8 @@ const FinancePaymentSchedule = () => {
 
     // Setting amounts after the viewStudentPayments has been clicked
     const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
-    const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
-    const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.code === 'TUF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
+    const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
+    const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'TF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
