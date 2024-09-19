@@ -6,7 +6,7 @@ import { useFetch } from '../hooks/useFetch';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmationPopup from './ConfirmationPopup';
 
-const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions, onShow }) => {
+const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit, disableAction,onOpenPopup,isLoading = false,viewRecord, actions, onShow,disableCountList }) => {
     const [editId, setEditId] = useState(null);
     const [editValues, setEditValues] = useState({});
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -161,11 +161,13 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
         <>
             <div className="sm:rounded-lg">
                 <div className="flex flex-col justify-between">
-                    <div className="flex items-center gap-2 pb-2 px-4">
-                        <span className="text-gray-500 text-sm">Display</span>
-                        <input className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300" value={rowsPerPage} type="number" onChange={(e) => setRowsPerPage(e.target.value)} />
-                        <span className="text-gray-500 text-sm">result/s</span>
-                    </div>
+                    { !disableCountList && (
+                        <div className="flex items-center gap-2 pb-2 px-4">
+                            <span className="text-gray-500 text-sm">Display</span>
+                            <input className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300" value={rowsPerPage} type="number" onChange={(e) => setRowsPerPage(e.target.value)} />
+                            <span className="text-gray-500 text-sm">result/s</span>
+                        </div>
+                    ) } 
                     
                 </div>
 

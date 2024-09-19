@@ -35,3 +35,28 @@ body {
   width: 100%;
   scroll-behavior: smooth;
 }
+
+/* Payment Modal */
+/* Keyframe animation to "shoot" towards the top-right corner */
+@keyframes shoot-to-view-payments {
+  0% {
+      transform: translate(0, 0);
+      opacity: 1;
+  }
+  100% {
+      transform: translate(1500px, -900px); /* Adjust based on the button's position */
+      opacity: 0;
+  }
+}
+
+.fee-animation {
+  position: absolute;
+  bottom: 50px;
+  left: 50px; /* Adjust the starting position */
+  padding: 10px;
+  background-color: blue;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  animation: shoot-to-view-payments 1s forwards;
+}

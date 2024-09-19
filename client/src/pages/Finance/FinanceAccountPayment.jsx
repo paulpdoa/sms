@@ -72,15 +72,7 @@ const FinanceAccountPayment = () => {
   );
 
 
-  const postPayment = async (e) => {
-    e.preventDefault();
-
-    try {
-
-    } catch(err) {
-        console.log(err);
-    }
-  }
+ 
 
 
 

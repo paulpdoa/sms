@@ -3,6 +3,8 @@ import MasterTable from "../../components/MasterTable";
 import { useState } from 'react';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from '../../baseUrl';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PaymentModal = ({
     totalTuitionFeeAmount,
@@ -23,14 +25,17 @@ const PaymentModal = ({
     // Set the total payment of parent
     const [totalPayment,setTotalPayment] = useState(0);
 
+    // Temporary storage for additional fee
+    const [addtlFee,setAddtlFee] = useState({});
+
     // Push here all records to be paid by parent
     const [paymentRecords,setPaymentRecords] = useState([]);
 
-
-    console.log(paymentRecords);
-
     // For current selection of checkbox for payments
     const [currentPaymentScreen,setCurrentPaymentScreen] = useState([]);
+
+    // For temporary container of fee after submission
+    const [currentFeeId,setCurrentFeeId] = useState('');
 
     const handlePaymentScreenChange = (screen) => {
         setCurrentPaymentScreen((prev) => {
@@ -146,7 +151,7 @@ const PaymentModal = ({
             } else {
                 setTotalPayment((prev) => prev - amount);
                 setPaymentRecords((prev) => {
-                return prev.filter((pay) => pay !== payment);
+                    return prev.filter((pay) => pay !== payment);
                 });
             }
             }}
@@ -160,9 +165,89 @@ const PaymentModal = ({
         isPaid: payment.isPaid ? 'Yes' : 'No'
     }));
 
-    // console.log(manageFees?.filter(fee => fee.nationality.charAt(0) === currentStudent.natiionality.nationalityCode));
-    console.log(currentStudent)
+    // For additional fees function
+    const handleAdditionalFee = (feeId) => {
+        setAddtlFee(manageFees.find(fee => fee._id === feeId));
+        setCurrentFeeId(feeId);
+    }
 
+    const [animationTriggered, setAnimationTriggered] = useState(false); // Track animation state
+
+    // Handle adding additional fee to payments
+    // const addAdditionalFeeToPayment = () => {
+    //     if (!currentFeeId) return;
+
+    //     const selectedFee = manageFees.find(fee => fee._id === currentFeeId);
+
+    //     // Add selected fee to paymentRecords
+    //     setPaymentRecords((prev) => [...prev, selectedFee]);
+
+    //     // Trigger animation
+    //     setAnimationTriggered(true);
+
+    //     // Clear the selected fee after adding it
+    //     setTimeout(() => {
+    //         setCurrentFeeId('');
+    //         setAnimationTriggered(false); // Reset the animation state after it completes
+    //     }, 1000); // 1 second delay for animation
+    // };
+
+
+    // // Setting the payment record with new value from additional fee
+    const addAdditionalFeeToPayment = () => {
+        setPaymentRecords((prev) => {
+            // Ensure prev is an array
+            const updatedPrev = Array.isArray(prev) ? prev : [];
+    
+            // Check if addtlFee is already in paymentRecords
+            if (updatedPrev.includes(addtlFee)) {
+                toast.error(`${addtlFee?.feeDescription?.description} is already in payment lists`, {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored"
+                });
+                return updatedPrev;  // Return the previous state without changes
+            } else {
+                // toast.success(`${addtlFee?.feeDescription?.description} added successfully`, {
+                //     position: "top-center",
+                //     autoClose: 3000,
+                //     hideProgressBar: true,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "colored"
+                // });
+                setAnimationTriggered(true);
+
+                // Clear the selected fee after adding it
+                setTimeout(() => {
+                    setCurrentFeeId('');
+                    setAnimationTriggered(false); // Reset the animation state after it completes
+                }, 1000); // 1 second delay for animation
+                return [...updatedPrev, addtlFee];  // Add the new fee
+            }
+        });
+
+        setCurrentFeeId('');
+    }
+
+
+    const postPayment = async (e) => {
+        e.preventDefault();
+    
+        try {
+    
+        } catch(err) {
+            console.log(err);
+        }
+      }
+    
 
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -211,6 +296,7 @@ const PaymentModal = ({
                 data={paymentScheduleData}
                 searchQuery={searchQuery}
                 disableAction={true}
+                disableCountList={true}
               />
             )}
   
@@ -226,6 +312,7 @@ const PaymentModal = ({
                 data={miscellaneousData}
                 searchQuery={searchQuery}
                 disableAction={true}
+                disableCountList={true}
               />
             )}
   
@@ -241,6 +328,7 @@ const PaymentModal = ({
                 data={textbookData}
                 searchQuery={searchQuery}
                 disableAction={true}
+                disableCountList={true}
               />
             )}
             <div className="py-4 flex flex-col gap-2">
@@ -261,9 +349,11 @@ const PaymentModal = ({
                 ) : (
                     <div className="flex gap-2 items-center">
                         <select
+                            value={currentFeeId}
+                            onChange={(e) => handleAdditionalFee(e.target.value)}
                             className="p-2 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm border border-gray-300"
                         >   
-                            <option>Select fees</option>
+                            <option hidden>Select fees</option>
                             { manageFees?.filter(fee => {
                                 const filterByStudent = fee.feeDescription?.feeCateg?.code === 'ADF' && 
                                 (fee.nationality.charAt(0) === currentStudent.nationality.nationalityCode) &&
@@ -274,10 +364,24 @@ const PaymentModal = ({
                             }).map((fee) => (
                                 <option key={fee._id} value={fee._id}>{fee.feeDescription.description}</option>
                             )) }
+                            <option value="">N/A</option>
                         </select>
-                        <button className="p-2 rounded-md text-sm bg-blue-500 hover:bg-blue-600 text-gray-100">Add to payments</button>
+                        { currentFeeId && (
+                            <button 
+                                onClick={addAdditionalFeeToPayment}
+                                className="p-2 rounded-md text-sm bg-blue-500 hover:bg-blue-600 text-gray-100"
+                            >
+                                Add to payments
+                            </button>
+                        ) }
                     </div>
                 ) }
+                {/* Animation when fee is added */}
+                { animationTriggered && (
+                    <div className="fee-animation">
+                        <span>Check here</span>
+                    </div>
+                )}
             </div>
 
           </section>
@@ -302,19 +406,36 @@ const PaymentModal = ({
             <ViewPaymentModal 
                 paymentRecords={paymentRecords}
                 setViewPayment={setViewPayment}
+                searchQuery={searchQuery}
             />
         ) }
+        <ToastContainer />
       </div>
     );
   };
 
-export default PaymentModal;
+export default PaymentModal;    
 
 
-const ViewPaymentModal = ({ paymentRecords,setViewPayment }) => {
+const ViewPaymentModal = ({ paymentRecords,setViewPayment,searchQuery }) => {
+
+
+    const paymentRecordColumn = [
+        { accessorKey: 'description', header: 'Description' },
+        { accessorKey: 'amount', header: 'Amount' }
+    ]
+
+    const paymentRecordData = paymentRecords?.map((payment) => ({
+        ...payment,
+        description: payment.manageFeeId?.feeDescription?.description || payment?.description || payment?.feeDescription?.description || (payment?.paymentScheduleId && `Tuition Fee ${payment.paymentScheduleId.dateSchedule}`) || payment?.textBookId?.bookTitle || 'No Description',
+        amount: payment.amount || payment.manageFeeId?.amount || payment?.payEveryAmount || payment?.textBookId?.bookAmount || 0
+    }));
+
+    const totalPaymentAmount = paymentRecordData.reduce((total,payment) => total + payment.amount ,0);
+
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-md w-[50%] relative p-6 overflow-y-auto h-auto min-h-fit">
+            <div className="bg-white rounded-md w-[50%] relative p-6 overflow-y-auto h-[50%] min-h-fit">
                 <div className="border-b border-gray-300 py-2 flex items-center justify-between">
                     <div>
                         <h2 className="font-bold text-gray-700 text-2xl">Payments Selected</h2>
@@ -329,6 +450,18 @@ const ViewPaymentModal = ({ paymentRecords,setViewPayment }) => {
                         </button>
                     </div>
                 </div>
+
+                <MasterTable 
+                    searchQuery={searchQuery}
+                    columns={paymentRecordColumn}
+                    data={paymentRecordData}
+                    disableAction={true}
+                    disableCountList={true}
+                />
+
+            <h1 className="font-bold text-lg text-gray-700 mt-3">
+              Total Amount to be Paid: Php. { totalPaymentAmount.toFixed(2) }
+            </h1>
             </div>
             
         </div>
