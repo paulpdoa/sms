@@ -5,6 +5,7 @@ import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
 import Warning from '../../components/Warning';
+import { jsPDF } from "jspdf";
 
 const FinancePaymentSchedule = () => {
 
@@ -84,6 +85,27 @@ const FinancePaymentSchedule = () => {
         setStudentPayments(records?.studentPayments?.filter(student => student.studentId === studentId));
     };
 
+    const generatePDF = (e) => {
+        e.preventDefault();
+        
+        const doc = new jsPDF();
+
+        // Adding a title
+        doc.text('Statement of Account', 20, 10);
+        doc.text(`Student: ${studentViewed}`, 20, 20);
+
+        // Loop through the student payment details and add them to the PDF
+        studentPayments.forEach((payment, index) => {
+            const y = 30 + index * 10; // Adjust the y position dynamically
+            doc.text(`Payment ${index + 1}: ${payment.payEveryAmount || payment.textBookId?.bookAmount || payment.manageFeeId?.amount}`, 20, y);
+            doc.text(`Date: ${payment.paymentScheduleId?.dateSchedule || ''}`, 120, y);
+            doc.text(`Paid: ${payment.isPaid ? 'Yes' : 'No'}`, 180, y);
+        });
+
+        // Save the PDF
+        doc.save(`${studentViewed}_Statement_Of_Account.pdf`);
+    };
+
 
     // Setting amounts after the viewStudentPayments has been clicked
     const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId && !studentPayment.isPaid).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
@@ -121,7 +143,7 @@ const FinancePaymentSchedule = () => {
                             <div className="flex items-center gap-2">
                                 <button
                                     className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm"
-                                    onClick={() => alert('Download PDF file')}
+                                    onClick={generatePDF}
                                 >
                                     Download as PDF
                                 </button>
