@@ -2,6 +2,9 @@ const StudentPayment = require('../model/StudentPayment');
 const Student = require('../model/Students');
 const User = require('../model/Users');
 const Finance = require('../model/Finance');
+const PaymentTransaction = require('../model/PaymentTransaction');
+
+const crypto = require('crypto');
 
 module.exports.get_finance_dashboard = async (req,res) => {
 
@@ -124,7 +127,6 @@ module.exports.get_finance_account_payments = async (req, res) => {
         if (!studentPayments) {
             return res.status(404).json({ mssg: 'Student payments is not existing' });
         }
-        console.log(studentPayments);
 
         // Grouping payments by studentId and summing textbook amounts
         // const studentPaymentLists = studentPayments.reduce((acc, studentPayment) => {
@@ -170,6 +172,65 @@ module.exports.get_finance_account_payments = async (req, res) => {
 
 // For payments
 
-module.exports.add_finance_payment = async(req,res) => {
+module.exports.add_finance_payment = async (req, res) => {
+    const { cleanupPaymentsData: paymentRecords } = req.body;
 
+    console.log('Payment Records: ' , paymentRecords);
+
+    try {
+        for (const payment of paymentRecords) {
+            const studentPaymentExist = await StudentPayment.findById(payment._id);
+
+            // Generate reference code
+            const referenceCode = crypto.randomBytes(3).toString('hex').toUpperCase() + '-' + Date.now();
+
+            if (studentPaymentExist) {
+                console.log('Posting payment to table');
+                await PaymentTransaction.create({
+                    sessionId: payment.sessionId,
+                    inputter: payment.inputter,
+                    studentPaymentId: payment._id,
+                    amountPaid: payment.amount,
+                    referenceCode: referenceCode,
+                    recordStatus: 'Live',
+                    studentId: payment.studentId
+                });
+
+                await StudentPayment.findByIdAndUpdate(payment._id, { isPaid: true, inputter: payment.inputter });
+                console.log('Student Payment record has been paid');
+            } else {
+                // Additional fees, no studentPaymentId
+                await PaymentTransaction.create({
+                    sessionId: payment.sessionId,
+                    inputter: payment.inputter,
+                    amountPaid: payment.amount,
+                    referenceCode: referenceCode,
+                    recordStatus: 'Live',
+                    studentId: payment.studentId
+                });
+            }
+        }
+
+        res.status(200).json({ mssg: 'Payment has been posted' });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while posting payment transactions' });
+    }
+};
+
+module.exports.get_finance_payment_transactions = async (req,res) => {
+    const { session } = req.query;
+
+    try {
+        const paymentTransactions = await PaymentTransaction.find({ sessionId: session, recordStatus: 'Live' });
+        if(!paymentTransactions) {
+            return res.status(404).json({ mssg: 'Payment transaction is not existing' });
+        }
+
+        res.status(200).json(paymentTransactions);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching payment transactions' });
+    }
 }

@@ -8,6 +8,7 @@ import { useCookies } from 'react-cookie';
 import { CiLogout } from "react-icons/ci";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainContext } from "../helpers/MainContext";
+import { useSnackbar } from 'notistack';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Navbar = () => {
     const pathName = 'School Management System';
 
     const { role } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -22,18 +24,16 @@ const Navbar = () => {
 
     const userLogout = () => {
         setIsLoggingOut(true);
-        const message = 'Logout successful';
+        const message = `Logout successful`;
 
-       
-        toast.success(message, {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
+        enqueueSnackbar(message, { 
+            variant: 'success',
+            anchorOrigin: {
+                vertical: 'top',
+                horizontal: 'center',
+            },
+            autoHideDuration: 2000,
+            preventDuplicate: true,
             onClose: () => {
                 // Remove userToken cookie
                 removeCookie('userToken', { path: '/' });

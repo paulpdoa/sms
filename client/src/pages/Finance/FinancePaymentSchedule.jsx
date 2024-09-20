@@ -86,9 +86,9 @@ const FinancePaymentSchedule = () => {
 
 
     // Setting amounts after the viewStudentPayments has been clicked
-    const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
-    const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
-    const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'TF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
+    const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId && !studentPayment.isPaid).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
+    const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC' && !studentPayment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0)
+    const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.paymentScheduleId && !studentPayment.isPaid).reduce((total,payment) => total + payment.payEveryAmount,0);
 
     return (
         <main className="bg-gray-100 min-h-screen flex flex-col items-center">
@@ -118,15 +118,23 @@ const FinancePaymentSchedule = () => {
                                 <p className="text-gray-500">Statement Of Account</p>
                             </div>
 
-                            <button
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
-                                onClick={() => {
-                                    setShowStudentPayments(false)
-                                    setCurrentSelectedButton('');
-                                }}
-                            >
-                                Cancel
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm"
+                                    onClick={() => alert('Download PDF file')}
+                                >
+                                    Download as PDF
+                                </button>
+                                <button
+                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+                                    onClick={() => {
+                                        setShowStudentPayments(false)
+                                        setCurrentSelectedButton('');
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
 
                         <div className="mt-6">

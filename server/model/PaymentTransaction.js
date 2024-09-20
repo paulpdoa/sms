@@ -17,6 +17,14 @@ const paymentTransactionSchema = new mongoose.Schema({
     balanceAmount: {
         type: Number
     },
+    studentPaymentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'studentPayment'
+    },
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'student'
+    },
     inputter: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user'

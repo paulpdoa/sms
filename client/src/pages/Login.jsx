@@ -7,7 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../hooks/useFetch';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-
+import { useSnackbar } from 'notistack';
+ 
 const Login = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
     const [username, setUsername] = useState('');
@@ -18,6 +19,8 @@ const Login = () => {
     const [error, setError] = useState({ username: '', password: '', session: '' });
     const navigate = useNavigate();
     const { role } = useContext(MainContext);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     // Prevents navigation if user is already logged in
     useEffect(() => {
@@ -50,20 +53,29 @@ const Login = () => {
 
             schoolYear === 'true' ? localStorage.setItem('isFreshYear', true) : localStorage.setItem('session', schoolYear);
 
-            toast.success(data.mssg, {
-                position: 'top-center',
-                autoClose: 1000,
-                hideProgressBar: true,
+            enqueueSnackbar(`Hi ${data.data.username}! Welcome to SMS`, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
                 onClose: () => {
                     setCookie('userToken', data.token, { path: '/', maxAge: 100000 });
                     navigate(data.redirect);
-                },
+                }
             });
+            
         } catch (err) {
-            toast.error(err.response?.data.mssg || 'Login failed', {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: true,
+            enqueueSnackbar(err.response?.data.mssg || 'Login failed', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };

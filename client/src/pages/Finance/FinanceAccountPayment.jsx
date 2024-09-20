@@ -57,9 +57,9 @@ const FinanceAccountPayment = () => {
   };
 
   // Setting amounts after the viewStudentPayments has been clicked
-  const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
-  const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC').reduce((total,payment) => total + payment.manageFeeId.amount,0)
-  const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'TF').reduce((total,payment) => total + payment.manageFeeId.amount,0);
+  const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId && !studentPayment.isPaid).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
+  const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC' && !studentPayment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0)
+  const totalTuitionFeeAmount = studentPayments?.filter(studentPayment => studentPayment?.paymentScheduleId && !studentPayment.isPaid).reduce((total,payment) => total + payment?.payEveryAmount,0);
 
   // Student table actions
   const actions = (student) => (

@@ -3,8 +3,9 @@ import MasterTable from "../../components/MasterTable";
 import { useState } from 'react';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { useSnackbar } from 'notistack';
+
 
 const PaymentModal = ({
     totalTuitionFeeAmount,
@@ -16,6 +17,9 @@ const PaymentModal = ({
     studentPayments,
     currentStudent
   }) => {
+
+    const { enqueueSnackbar } = useSnackbar();
+
 
     const { records: manageFees } = useFetch(`${baseUrl()}/manage-fees`);
 
@@ -47,6 +51,17 @@ const PaymentModal = ({
                 return [...prev, screen];
             }
         });
+
+        if(screen === 'Miscellaneous Fee') {
+            const payments = miscellaneousData.map(payment => payment); // Get the payment objects
+            if (currentPaymentScreen.includes('Miscellaneous Fee')) {
+                // Remove all Miscellaneous payments from paymentRecords
+                setPaymentRecords(prev => prev.filter(record => record.manageFeeId?.feeDescription?.feeCateg?.code !== 'MSC'));
+            } else {
+                // Add all Miscellaneous payments to paymentRecords
+                setPaymentRecords(prev => [...prev, ...payments.filter(payment => !prev.includes(payment))]);
+            }
+        }
     };
     
 
@@ -76,35 +91,36 @@ const PaymentModal = ({
 
     const miscellaneousData = studentPayments
     ?.filter(payment => payment.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC')
-    ?.map(payment => ({
+    ?.map(payment => {
+        const isPaymentRecorded = paymentRecords.some(record => record._id === payment._id);
+
+        return {
         ...payment,
         description: payment.manageFeeId.feeDescription.description,
         code: payment.manageFeeId.feeDescription?.feeCateg?.code,
         amount: payment.manageFeeId.amount,
         isPaid: payment.isPaid ? 'Yes' : 'No',
         pay: (
-        <input
-            checked={paymentRecords.includes(payment)} // ensure checked state persists
-            disabled={payment.isPaid ? true : false}
+            <input
             type="checkbox"
+            checked={isPaymentRecorded}  // dynamically set checked state
+            disabled={payment.isPaid}   // disable if payment is already made
             onChange={(e) => {
-            const amount = payment.payEveryAmount;
-            if (e.target.checked) {
+                if (e.target.checked) {
+                // Add payment to paymentRecords
                 setPaymentRecords((prev) => [...prev, payment]);
-                setTotalPayment((prev) => prev + amount);
-            } else {
-                setTotalPayment((prev) => prev - amount);
-                setPaymentRecords((prev) => {
-                if(prev.includes(payment)) {
-                    return prev.filter((pay) => pay !== payment)
+                } else {
+                // Remove payment from paymentRecords if unchecked
+                setPaymentRecords((prev) =>
+                    prev.filter(record => record._id !== payment._id)
+                );
                 }
-                })
-            }
             }}
-        />
+            />
         ),
-    }))
-  
+        };
+    });
+
     const textbookData = studentPayments
         ?.filter(payment => payment.textBookId)
         ?.map(payment => ({
@@ -112,9 +128,9 @@ const PaymentModal = ({
         pay: (
             <input
             checked={paymentRecords.includes(payment)} // ensure checked state persists
-            disabled={payment.isPaid ? true : false}
+            disabled={payment.isPaid}
             type="checkbox"
-            onChange={(e) => {
+            onChange={(e) => { 
                 const amount = payment.payEveryAmount;
                 if (e.target.checked) {
                 setPaymentRecords((prev) => [...prev, payment]);
@@ -142,7 +158,7 @@ const PaymentModal = ({
         <input
             type="checkbox"
             checked={paymentRecords.includes(payment)} // ensure checked state persists
-            disabled={payment.isPaid ? true : false}
+            disabled={payment.isPaid}
             onChange={(e) => {
             const amount = payment.payEveryAmount;
             if (e.target.checked) {
@@ -198,31 +214,20 @@ const PaymentModal = ({
         setPaymentRecords((prev) => {
             // Ensure prev is an array
             const updatedPrev = Array.isArray(prev) ? prev : [];
-    
             // Check if addtlFee is already in paymentRecords
             if (updatedPrev.includes(addtlFee)) {
-                toast.error(`${addtlFee?.feeDescription?.description} is already in payment lists`, {
-                    position: "top-center",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored"
+                enqueueSnackbar(`${addtlFee.feeDescription.description} is already in payment list`, { 
+                    variant: 'error',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 2000,
+                    preventDuplicate: true
                 });
                 return updatedPrev;  // Return the previous state without changes
             } else {
-                // toast.success(`${addtlFee?.feeDescription?.description} added successfully`, {
-                //     position: "top-center",
-                //     autoClose: 3000,
-                //     hideProgressBar: true,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "colored"
-                // });
+                
                 setAnimationTriggered(true);
 
                 // Clear the selected fee after adding it
@@ -239,12 +244,51 @@ const PaymentModal = ({
 
 
     const postPayment = async (e) => {
-        e.preventDefault();
-    
+        e.preventDefault(); 
+        console.log(paymentRecords);
+
+        // Clean the data being passed
+        const cleanupPaymentsData = paymentRecords?.map(payment => ({
+            _id: payment._id,
+            sessionId: payment.sessionId,
+            description: payment.description,
+            feeCodeId: payment.feeCodeId,
+            gradeLevelId: payment.gradeLevelId,
+            manageFeeId: payment.manageFeeId,
+            studentId: payment.studentId,
+            paymentScheduleId: payment.paymentScheduleId,
+            feeDescription: payment.feeDescription,
+            textBookId: payment.textBookId,
+            recordStatus: payment.recordStatus,
+            inputter: payment.inputter,
+            amount: payment?.payEveryAmount || payment?.amount || payment?.textBookId?.bookAmount || payment?.manageFeeId?.amount || 0
+        })) 
+        
         try {
-    
+            const data = await axios.post(`${baseUrl()}/add-finance-payment`, {cleanupPaymentsData});
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
+            });
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
       }
     
@@ -262,12 +306,12 @@ const PaymentModal = ({
                     onClick={() => setViewPayment(true)}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
                 >
-                    View Payments
+                    View Payments Selected
                 </button>
                 <button
                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
                     onClick={() => {
-                        // setPaymentRecords([]); // Set to empty after pressing cancel
+                        setPaymentRecords([]); // Set to empty after pressing cancel
                         setIsStudentPaymentModalVisible(false);
                     }}
                     >
@@ -394,7 +438,7 @@ const PaymentModal = ({
             { paymentRecords.length > 0 && (
                 <button
                     className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md text-sm"
-                    onClick={() => console.log('Proceed with Payment')}
+                    onClick={postPayment}
                 >
                     Pay Now
                 </button>
@@ -409,7 +453,6 @@ const PaymentModal = ({
                 searchQuery={searchQuery}
             />
         ) }
-        <ToastContainer />
       </div>
     );
   };
@@ -418,7 +461,6 @@ export default PaymentModal;
 
 
 const ViewPaymentModal = ({ paymentRecords,setViewPayment,searchQuery }) => {
-
 
     const paymentRecordColumn = [
         { accessorKey: 'description', header: 'Description' },
