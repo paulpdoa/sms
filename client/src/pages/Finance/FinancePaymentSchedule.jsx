@@ -203,7 +203,7 @@ const FinancePaymentSchedule = () => {
                                         searchQuery={searchQuery}
                                         disableAction={true}
                                     />
-                                    <div className="mt-4 text-right font-bold text-xl text-blue-600">
+                                    <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                         <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalBookAmount)}</span>
                                     </div>
                                 </div>
@@ -219,7 +219,7 @@ const FinancePaymentSchedule = () => {
                                         searchQuery={searchQuery}
                                         disableAction={true}
                                     />
-                                    <div className="mt-4 text-right font-bold text-xl text-blue-600">
+                                    <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                         <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalTuitionFeeAmount)}</span>
                                     </div>
                                 </div>
@@ -234,7 +234,7 @@ const FinancePaymentSchedule = () => {
                                     searchQuery={searchQuery}
                                     disableAction={true}
                                 />
-                                <div className="mt-4 text-right font-bold text-xl text-blue-600">
+                                <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                     <span className="text-gray-800">Total Amount: </span>Php {numberFormatter(totalMiscAmount)}
                                 </div>
                              </div>

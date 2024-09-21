@@ -90,6 +90,7 @@ import ParentLayout from "./layouts/ParentLayout";
 import SchoolAdminLayout from "./layouts/SchoolAdminLayout";
 import ErrorPage from "./pages/ErrorPage";
 import FinanceAccountPayment from "./pages/Finance/FinanceAccountPayment";
+import PaymentHistoryTransaction from "./pages/Finance/PaymentHistoryTransaction";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
@@ -230,6 +231,7 @@ const App = () => {
             <Route path='/finance/dashboard' element={<FinanceDashboard />} />
             <Route path='/finance/soa' element={<FinancePaymentSchedule />} />
             <Route path='/finance/account-payment' element={<FinanceAccountPayment />} />
+            <Route path='/finance/payment-history' element={<PaymentHistoryTransaction />} />
           </Route>
 
           {/* Registrar Route */}

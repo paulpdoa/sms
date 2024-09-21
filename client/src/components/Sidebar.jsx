@@ -11,9 +11,9 @@ import { baseUrl } from '../baseUrl';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RiSecurePaymentLine } from "react-icons/ri";
-import { MdOutlineDashboardCustomize } from "react-icons/md";
+import { } from "react-icons/md";
 import { MdCoPresent } from "react-icons/md";
-import { MdGrade } from "react-icons/md";
+import { MdGrade,MdOutlineWorkHistory,MdOutlineDashboardCustomize } from "react-icons/md";
 
 const initialMenus = [
     {
@@ -363,6 +363,11 @@ const initialMenus = [
                 name: 'Account Payments',
                 icon: <RiSecurePaymentLine />,
                 link: '/finance/account-payment'
+            },
+            { 
+                name: 'Payment History',
+                icon: <MdOutlineWorkHistory />,
+                link: '/finance/payment-history'
             }
         ]
     }

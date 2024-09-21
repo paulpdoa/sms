@@ -128,40 +128,6 @@ module.exports.get_finance_account_payments = async (req, res) => {
             return res.status(404).json({ mssg: 'Student payments is not existing' });
         }
 
-        // Grouping payments by studentId and summing textbook amounts
-        // const studentPaymentLists = studentPayments.reduce((acc, studentPayment) => {
-        //     const studentId = studentPayment.studentId;
-        //     const bookAmount = studentPayment.textBookId ? studentPayment.textBookId.bookAmount : 0;
-        //     const miscellaneousAmount = studentPayment?.manageFeeId?.feeDescription?.feeCateg?.category === 'Miscellaneous' 
-        //     ? studentPayment.manageFeeId.amount : 0; 
-        //     const tuitionFeeAmount = studentPayment?.manageFeeId?.feeDescription?.feeCateg?.category === 'Tuition Fee' 
-        //     ? studentPayment.manageFeeId.amount : 0;
-
-        //     const paymentScheduleId = studentPayment.paymentScheduleId ? studentPayment.paymentScheduleId : null
-            
-
-        //     if (!acc[studentId]) {
-        //         acc[studentId] = {
-        //             ...studentPayment._doc, // Copy the studentPayment data
-        //             textbookTotalAmount: bookAmount, // Initialize total amount with the book amount
-        //             miscTotalAmount: miscellaneousAmount,
-        //             tuitionTotalAmount: tuitionFeeAmount,
-        //             paymentScheduleId: paymentScheduleId
-        //         };
-        //     } else {
-        //         // If the student already exists in the accumulator, add the book amount
-        //         acc[studentId].textbookTotalAmount += bookAmount;
-        //         acc[studentId].miscTotalAmount += miscellaneousAmount;  
-        //         acc[studentId].tuitionTotalAmount += tuitionFeeAmount;  
-        //         acc[studentId].paymentScheduleId = paymentScheduleId;  
-        //     }
-
-        //     return acc;
-        // }, {});
-
-        // Convert the result back into an array
-        // const studentPaymentArray = Object.values(studentPaymentLists);
-
         res.status(200).json({ financeName, students: studentFilteredLists, studentPayments });
     } catch (err) {
         console.log(err);
@@ -179,6 +145,11 @@ module.exports.add_finance_payment = async (req, res) => {
         const referenceCode = crypto.randomBytes(3).toString('hex').toUpperCase() + '-' + Date.now();
         for (const payment of paymentRecords) {
             console.log('Payment Amount: ', payment.amount)
+
+            // split the numbers into a real number before inserting to the table
+            // const convertedToNumber = Number((payment.amount).split('.')[0]);
+
+            
             const studentPaymentExist = await StudentPayment.findById(payment._id);
             // Generate reference code
             if (studentPaymentExist) {
