@@ -19,8 +19,8 @@ const PaymentModal = ({
     currentStudent
   }) => {
 
-    const { enqueueSnackbar } = useSnackbar();
-    const { numberFormatter } = useContext(MainContext);
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
+    const { numberFormatter,snackbarKey } = useContext(MainContext);
 
     const { records: manageFees } = useFetch(`${baseUrl()}/manage-fees`);
 
@@ -254,6 +254,7 @@ const PaymentModal = ({
         })) 
 
         try {
+            closeSnackbar(snackbarKey('Processing payments, please wait'));
             const data = await axios.post(`${baseUrl()}/add-finance-payment`, {cleanupPaymentsData});
             enqueueSnackbar(data.data.mssg, { 
                 variant: 'success',
@@ -269,6 +270,7 @@ const PaymentModal = ({
             });
         } catch(err) {
             console.log(err);
+            closeSnackbar(snackbarKey());
             enqueueSnackbar(err.response.data.mssg, { 
                 variant: 'error',
                 anchorOrigin: {

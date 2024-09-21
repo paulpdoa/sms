@@ -36,6 +36,14 @@ body {
   scroll-behavior: smooth;
 }
 
+/* Login background */
+.login-bg {
+  background-image: url('../../public/loginImage/default_login.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 /* Payment Modal */
 /* Keyframe animation to "shoot" towards the top-right corner */
 @keyframes shoot-to-view-payments {

@@ -8,7 +8,7 @@ import { useFetch } from '../hooks/useFetch';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
- 
+
 const Login = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
     const [username, setUsername] = useState('');
@@ -88,8 +88,11 @@ const Login = () => {
     const renderError = (fieldError) => fieldError && <span className="text-red-500 text-xs">{fieldError}</span>;
 
     return (
-        <main className="bg-gray-100 h-screen flex justify-center items-center">
-            <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full">
+        <main className="relative h-screen flex justify-center items-center bg-cover bg-center login-bg">
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black opacity-50"></div>
+
+            <div className="relative grid grid-cols-1 md:grid-cols-2 bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full z-10">
                 {/* Login Form */}
                 <form onSubmit={loginUser} className="bg-white p-8 md:p-12 flex flex-col justify-center">
                     <h1 className="text-3xl font-bold text-gray-800 mb-6">Login</h1>

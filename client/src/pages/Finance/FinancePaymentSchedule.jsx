@@ -7,6 +7,7 @@ import TabActions from "../../components/TabActions";
 import Warning from '../../components/Warning';
 import { jsPDF } from "jspdf";
 import { useSnackbar } from "notistack";
+import html2canvas from "html2canvas";
 
 const FinancePaymentSchedule = () => {
 
@@ -90,22 +91,36 @@ const FinancePaymentSchedule = () => {
         setStudentPayments(records?.studentPayments?.filter(student => student.studentId === studentId));
     };
 
-    const generatePDF = (e) => {
+    // PDF Generation Function
+    const generatePDF = async (e) => {
         e.preventDefault();
 
-        const doc = new jsPDF();
+        const input = document.getElementById('student-payments-content');  // ID of the content you want to capture
 
-        // Adding a title
-        doc.text('Statement of Account', 20, 10);
-        doc.text(`Student: ${studentViewed}`, 20, 20);
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(input);
+        const imgData = canvas.toDataURL('image/png');
 
-        // Loop through the student payment details and add them to the PDF
-        studentPayments.forEach((payment, index) => {
-            const y = 30 + index * 10; // Adjust the y position dynamically
-            doc.text(`Payment ${index + 1}: ${payment.payEveryAmount || payment.textBookId?.bookAmount || payment.manageFeeId?.amount}`, 20, y);
-            doc.text(`Date: ${payment.paymentScheduleId?.dateSchedule || ''}`, 120, y);
-            doc.text(`Paid: ${payment.isPaid ? 'Yes' : 'No'}`, 180, y);
-        });
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        const imgWidth = 210;  // A4 width in mm
+        const pageHeight = 295;  // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // Add the image data to the PDF
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Add additional pages if content overflows
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
 
         // Save the PDF
         doc.save(`${studentViewed}_Statement_Of_Account.pdf`);
@@ -174,7 +189,7 @@ const FinancePaymentSchedule = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6">
+                        <div id='student-payments-content' className="mt-6">
                             <div className="grid grid-cols-3 gap-4">
                                 <div onClick={() => setCurrentSelectedButton('Book Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
                                     <h2 className="text-sm font-semibold text-gray-700">Textbooks</h2>

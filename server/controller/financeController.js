@@ -202,3 +202,65 @@ module.exports.get_finance_payment_transactions = async (req,res) => {
         res.status(500).json({ mssg: 'An error occurred while fetching payment transactions' });
     }
 }
+
+// For payment history
+module.exports.get_finance_payment_history = async(req,res) => {
+    const { session } = req.query;
+    const { userId } = req.params;
+
+    let financeName = '';
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ mssg: 'User is not existing' });
+        }
+
+        const finance = await Finance.findById(user.financeId);
+        if (!finance) {
+            return res.status(404).json({ mssg: 'Finance information is not existing' });
+        }
+        financeName = `${finance.firstName} ${finance.middleName} ${finance.lastName}`;
+
+        const students = await Student.find({ recordStatus: 'Live' })
+        .populate({
+            path: 'academicId',
+            populate: [
+                { path: 'gradeLevelId' },  // Separate populate for gradeLevelId
+                { path: 'strandId' },      // Separate populate for strandId
+                { path: 'sectionId' },     // Separate populate for sectionId
+                { path: 'paymentTermId' }  // Separate populate for paymentTermId
+            ]
+        })
+        .populate('nationality')
+        if (!students) {
+            return res.status(404).json({ mssg: 'Student information is not existing' });
+        }
+
+        const studentFilteredLists = students.filter(student => 
+            student.academicId?.isAdmitted && student.academicId?.isRegistered && 
+            student.academicId?.isEnrolled && student?.academicId?.isAssessed && 
+            student?.academicId?.gradeLevelId
+        );
+
+        const studentPayments = await StudentPayment.find({ recordStatus: 'Live', sessionId: session })
+            .populate({ path: 'paymentScheduleId', populate: { path: 'paymentTermId' } })
+            .populate({ path: 'manageFeeId', populate: { path: 'feeDescription', populate: { path: 'feeCateg' } } })
+            .populate('feeCodeId gradeLevelId textBookId studentDiscountId');
+
+        if (!studentPayments) {
+            return res.status(404).json({ mssg: 'Student payments is not existing' });
+        }
+
+        const paymentTransactions = await PaymentTransaction.find({ recordStatus: 'Live', sessionId: session })
+        .populate('studentId studentPaymentId');
+        if(!paymentTransactions) { 
+            return res.status(404).json({ mssg: 'Payment transaction is not existing' });
+        }
+
+        res.status(200).json({ financeName, students: studentFilteredLists, studentPayments,paymentTransactions });
+
+    } catch(err) {
+        console.log(err);
+    }
+}
