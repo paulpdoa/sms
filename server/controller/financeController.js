@@ -175,15 +175,12 @@ module.exports.get_finance_account_payments = async (req, res) => {
 module.exports.add_finance_payment = async (req, res) => {
     const { cleanupPaymentsData: paymentRecords } = req.body;
 
-    console.log('Payment Records: ' , paymentRecords);
-
     try {
+        const referenceCode = crypto.randomBytes(3).toString('hex').toUpperCase() + '-' + Date.now();
         for (const payment of paymentRecords) {
+            console.log('Payment Amount: ', payment.amount)
             const studentPaymentExist = await StudentPayment.findById(payment._id);
-
             // Generate reference code
-            const referenceCode = crypto.randomBytes(3).toString('hex').toUpperCase() + '-' + Date.now();
-
             if (studentPaymentExist) {
                 console.log('Posting payment to table');
                 await PaymentTransaction.create({

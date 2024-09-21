@@ -6,10 +6,12 @@ import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
 import Warning from '../../components/Warning';
 import { jsPDF } from "jspdf";
+import { useSnackbar } from "notistack";
 
 const FinancePaymentSchedule = () => {
 
-    const { currentUserId, searchQuery } = useContext(MainContext);
+    const { currentUserId, searchQuery, numberFormatter } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const { records } = useFetch(`${baseUrl()}/finance-payment-schedule/${currentUserId}`);
     const [showStudentPayments, setShowStudentPayments] = useState(false);
@@ -39,6 +41,7 @@ const FinancePaymentSchedule = () => {
     ];
     const paymentScheduleData = studentPayments?.filter(studentPayment => studentPayment.paymentScheduleId)?.map(paymentSchedule => ({
         ...paymentSchedule,
+        payEveryAmount: numberFormatter(paymentSchedule.payEveryAmount),
         paymentDate: new Date(paymentSchedule?.paymentScheduleId?.dateSchedule).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -51,11 +54,12 @@ const FinancePaymentSchedule = () => {
     const textbookColumns = [
         { accessorKey: 'textBookId.bookTitle', header: 'Book Title' },
         { accessorKey: 'textBookId.bookCode', header: 'Book Code' },
-        { accessorKey: 'textBookId.bookAmount', header: 'Book Amount' },
+        { accessorKey: 'bookAmount', header: 'Book Amount' },
         { accessorKey: 'isPaid', header: 'Paid' }
     ];
     const textbookData = studentPayments?.filter(studentPayment => studentPayment.textBookId)?.map(textbook => ({
         ...textbook,
+        bookAmount: numberFormatter(textbook.textBookId.bookAmount),
         isPaid: textbook.isPaid ? 'Yes' : 'No'
     }));
 
@@ -64,7 +68,7 @@ const FinancePaymentSchedule = () => {
         { accessorKey: 'description', header: 'Description' },
         { accessorKey: 'feeCode', header: 'Fee Code' },
         { accessorKey: 'feeCategory', header: 'Fee Category' },
-        { accessorKey: 'manageFeeId.amount', header: 'Amount' },
+        { accessorKey: 'amount', header: 'Amount' },
         { accessorKey: 'isPaid', header: 'Paid' }
         
     ];
@@ -73,7 +77,8 @@ const FinancePaymentSchedule = () => {
         description: fee.manageFeeId.feeDescription.description,
         feeCode: fee.manageFeeId.feeDescription.code,
         feeCategory: fee.manageFeeId.feeDescription.feeCateg.category,
-        isPaid: fee?.isPaid ? 'Yes' : 'No'
+        isPaid: fee?.isPaid ? 'Yes' : 'No',
+        amount: numberFormatter(fee.manageFeeId.amount)
     }));
 
     const viewStudentPayments = (studentRecord) => {
@@ -87,7 +92,7 @@ const FinancePaymentSchedule = () => {
 
     const generatePDF = (e) => {
         e.preventDefault();
-        
+
         const doc = new jsPDF();
 
         // Adding a title
@@ -104,6 +109,16 @@ const FinancePaymentSchedule = () => {
 
         // Save the PDF
         doc.save(`${studentViewed}_Statement_Of_Account.pdf`);
+
+        enqueueSnackbar('File has been successfully generated', { 
+            variant: 'success',
+            anchorOrigin: {
+                vertical: 'top',
+                horizontal: 'center',
+            },
+            autoHideDuration: 2000,
+            preventDuplicate: true
+        });
     };
 
 
@@ -162,18 +177,18 @@ const FinancePaymentSchedule = () => {
                         <div className="mt-6">
                             <div className="grid grid-cols-3 gap-4">
                                 <div onClick={() => setCurrentSelectedButton('Book Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
-                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Book Amount</h2>
-                                    <p className="text-2xl font-bold text-blue-600">Php. {totalBookAmount.toFixed(2)}</p>
+                                    <h2 className="text-sm font-semibold text-gray-700">Textbooks</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php {numberFormatter(totalBookAmount)}</p>
                                 </div>
 
                                 <div onClick={() => setCurrentSelectedButton('Miscellaneous Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
-                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Miscellaneous Amount</h2>
-                                    <p className="text-2xl font-bold text-blue-600">Php. { totalMiscAmount.toFixed(2) }</p>
+                                    <h2 className="text-sm font-semibold text-gray-700">Miscellaneous</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php { numberFormatter(totalMiscAmount) }</p>
                                 </div>
 
                                 <div onClick={() => setCurrentSelectedButton('Tuition Fee Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
-                                    <h2 className="text-sm font-semibold text-gray-700">Remaining Tuition Fee Amount</h2>
-                                    <p className="text-2xl font-bold text-blue-600">Php. { totalTuitionFeeAmount.toFixed(2) }</p>
+                                    <h2 className="text-sm font-semibold text-gray-700">Tuition</h2>
+                                    <p className="text-2xl font-bold text-blue-600">Php { numberFormatter(totalTuitionFeeAmount) }</p>
                                 </div>
                             </div>
                             
@@ -181,38 +196,38 @@ const FinancePaymentSchedule = () => {
                             {/* For textbooks */}
                             { currentSelectedButton === 'Book Amount'&& (
                                 <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
-                                    <TabActions title="Remaining Book Amount" noView={true} />
+                                    <TabActions title="Textbooks" noView={true} />
                                     <MasterTable
                                         columns={textbookColumns}
                                         data={textbookData || []}
                                         searchQuery={searchQuery}
                                         disableAction={true}
                                     />
-                                    <p className="text-2xl font-bold text-blue-600 mt-5">
-                                        <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php. {totalBookAmount.toFixed(2)}</span>
-                                    </p>
+                                    <div className="mt-4 text-right font-bold text-xl text-blue-600">
+                                        <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalBookAmount)}</span>
+                                    </div>
                                 </div>
                             ) }
 
                              {/* For Tuition Fees */}
                              {currentSelectedButton === 'Tuition Fee Amount' && (
                                 <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
-                                    <TabActions title="Remaining Tuition Fee Amount" noView={true} />
+                                    <TabActions title="Tuition" noView={true} />
                                     <MasterTable
                                         columns={paymentScheduleColumns}
                                         data={paymentScheduleData || []}
                                         searchQuery={searchQuery}
                                         disableAction={true}
                                     />
-                                    <p className="text-2xl font-bold text-blue-600 mt-5">
-                                    <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php. {totalTuitionFeeAmount.toFixed(2)}</span>
-                                    </p>
+                                    <div className="mt-4 text-right font-bold text-xl text-blue-600">
+                                        <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalTuitionFeeAmount)}</span>
+                                    </div>
                                 </div>
                              )}
 
                              {currentSelectedButton === 'Miscellaneous Amount' && (
                              <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
-                                <TabActions title="Remaining Miscellaneous Amount" noView={true} />
+                                <TabActions title="Miscellaneous" noView={true} />
                                 <MasterTable
                                     columns={feeColumns}
                                     data={feeData || []}
@@ -220,7 +235,7 @@ const FinancePaymentSchedule = () => {
                                     disableAction={true}
                                 />
                                 <div className="mt-4 text-right font-bold text-xl text-blue-600">
-                                    <span className="text-gray-800">Total Amount: </span>Php. {totalMiscAmount.toFixed(2)}
+                                    <span className="text-gray-800">Total Amount: </span>Php {numberFormatter(totalMiscAmount)}
                                 </div>
                              </div>
                              )}

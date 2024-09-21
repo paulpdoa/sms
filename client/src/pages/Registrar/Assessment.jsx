@@ -1,6 +1,4 @@
 import React, { useState, useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from '../../components/Searchbar';
 import TotalFees from '../../components/assessment/TotalFees'
 import axios from 'axios';
@@ -11,6 +9,7 @@ import Assistance from '../../components/assessment/Assistance';
 import MasterTable from '../../components/MasterTable';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const Assessment = () => {
 
@@ -22,7 +21,9 @@ const Assessment = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const { session, currentUserId, role } = useContext(MainContext);
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
+
+    const { session, currentUserId, role,snackbarKey } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone ? true : false;
 
@@ -48,72 +49,76 @@ const Assessment = () => {
     const generateFees = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        const toastId = toast.loading('Creating fees, please wait...');
-
+        
         try {
             const { data } = await axios.post(`${baseUrl()}/generate-fees`, { session, role });
             setIsLoading(false);
-            toast.update(toastId, {
-                render: data.mssg,
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                onClose: () => {
+            
+            // Close the loading snackbar after success
+            closeSnackbar(snackbarKey('Assigning fees to students, please wait'));
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
                     window.location.reload()
                 }
             });
+
+            
         } catch (err) {
             console.log(err.response.data.mssg);
-            toast.update(toastId, {
-                render: err.response.data.mssg,
-                type: "error",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            // Close the loading snackbar after error
+            closeSnackbar(snackbarKey());
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
+
+            
             setIsLoading(false)
         }
 
     }
 
     const deleteGeneratedFees = async () => {
+
         try {
             const { data } = await axios.delete(`${baseUrl()}/delete-student-payments`, { data: { session, role } });
-            toast.success(data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            
+            closeSnackbar(snackbarKey('Deleting generated fees, please wait'));
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(snackbarKey())
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -202,7 +207,6 @@ const Assessment = () => {
                     </>
                 )}
             </div>
-            <ToastContainer />
         </main>
     );
 };

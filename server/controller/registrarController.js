@@ -898,7 +898,7 @@ module.exports.automate_fees = async (req, res) => {
             }
         }
 
-        res.status(200).json({ message: 'Fees have been automatically created' });
+        res.status(200).json({ mssg: 'Fees has been generated successfully' });
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'An error occurred while automating fees' });
@@ -1274,7 +1274,14 @@ module.exports.get_student_payment_detail = async (req,res) => {
                 { path: 'discountId' }
             ]
         })
-        .populate('sessionId gradeLevelId feeCodeId manageFeeId paymentScheduleId');
+        .populate({ path: 'manageFeeId',
+            populate: [
+                { path: 'feeDescription', populate: [
+                    { path: 'feeCateg' }
+                ] }
+            ]
+         })
+        .populate('sessionId gradeLevelId feeCodeId paymentScheduleId');
         res.status(200).json(studentPayments);
     } catch(err) {
         console.log(err);

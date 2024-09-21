@@ -10,14 +10,16 @@ import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationPopup from '../../components/ConfirmationPopup';
+import { useSnackbar } from 'notistack';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
-    const { searchQuery, setSearchQuery,genericPath, role,session,currentUserId } = useContext(MainContext);
+    const { searchQuery, setSearchQuery,genericPath, role,session,currentUserId, snackbarKey } = useContext(MainContext);
     const navigate = useNavigate();
     const [openPopup,setOpenPopup] = useState(false);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
     const columns = [
         {
@@ -69,68 +71,62 @@ const ManageFees = () => {
     const deleteManagedFees = async (id) => {
         try {
             const removeManageFee = await axios.put(`${baseUrl()}/manage-fee/${id}`, { role, recordStatus: 'Deleted' });
-            toast.success(removeManageFee.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                onClose: setTimeout(() => {
+            enqueueSnackbar(removeManageFee.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
                     navigate(-1);
-                }, 2000)
+                }
             });
-
             
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
 
     const automateFees = async (isReset) => {
-        const toastId = toast.loading("Generating fees, please do not leave the page...");
 
         try {
             const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset,inputter: currentUserId });
-            toast.update(toastId, {
-                render: data.mssg,
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                onClose: () => {
+            closeSnackbar(snackbarKey('Generating fees, please wait'))
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
                     window.location.reload();
                 }
             });
+            
         } catch (err) {
             console.log(err);
-            toast.update(toastId, {
-                render: "An error occurred while generating fees",
-                type: "error",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(snackbarKey())
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while generating fees', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             
         }

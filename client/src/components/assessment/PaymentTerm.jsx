@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { baseUrl } from '../../baseUrl';
 import { useFetch } from '../../hooks/useFetch';
+import MasterTable from '../MasterTable';
+import { MainContext } from '../../helpers/MainContext'; 
 
 const PaymentTerm = ({ record }) => {
+
     const [loading, setLoading] = useState(true);
     const { records: studentPayments, loading: fetchLoading } = useFetch(`${baseUrl()}/student-payment/${record?._id}`);
+
+    const { searchQuery } = useContext(MainContext);
+    console.log(studentPayments)
 
     useEffect(() => {
         setLoading(fetchLoading);
@@ -14,23 +20,35 @@ const PaymentTerm = ({ record }) => {
     const natlCode = record?.nationality.toLowerCase();
     const strandId = record?.academicId?.strandId?._id;
 
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+
     const filteredFeeLists = studentPayments?.filter(fee => {
         return (
             fee.gradeLevelId?._id === gradeLevel &&
             fee?.studentId?.nationality?.nationality?.toLowerCase() === natlCode &&
             fee?.studentId?.academicId?.strandId === strandId &&
-            fee?.paymentScheduleId !== undefined
+            fee?.paymentScheduleId !== undefined    
         );
-    });
+    }).map(payment => ({
+        ...payment,
+        schedule: formatDate(payment.paymentScheduleId?.dateSchedule),
+        amount: (payment.payEveryAmount || 0).toFixed(2),
+        isPaid: payment.isPaid ? 'Yes' : 'No'
+    }));
 
-    console.log(filteredFeeLists);
+    const columns = [
+        { accessorKey: 'schedule', header: 'Payment Date' },
+        { accessorKey: 'amount', header: 'Amount' },
+        { accessorKey: 'isPaid', header: 'Paid' }
+    ]
 
-    const totalAmount = filteredFeeLists?.reduce((sum, fee) => sum + (fee?.payEveryAmount || 0), 0);
-
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-    };
+    const totalAmount = studentPayments?.filter(payment => {
+        return !payment.isPaid && payment.paymentScheduleId
+    })?.reduce((sum, fee) => sum + (fee?.payEveryAmount || 0), 0);
+    
 
     return (
         <div className="mt-6 p-4 bg-white rounded-lg overflow-hidden">
@@ -38,32 +56,19 @@ const PaymentTerm = ({ record }) => {
                 <div className="text-center text-gray-700">Loading...</div>
             ) : (
                 <>
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Payment Schedule</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm text-left text-gray-700">
-                        <thead className="border-b bg-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Payment Schedule</th>
-                                <th className="px-4 py-3">Amount Due</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredFeeLists?.map((fee, index) => (
-                                <tr key={index} className="border-b">
-                                    <td className="px-4 py-3">{formatDate(fee?.paymentScheduleId?.dateSchedule)}</td>
-                                    <td className="px-4 py-3">{(fee?.payEveryAmount || 0).toFixed(2)}</td>
-                                </tr>
-                            ))}
-                            {filteredFeeLists.length > 0 &&
-                                <tr className="font-bold border-t">
-                                    <td className="px-4 py-3 text-right">Total:</td>
-                                    <td className="px-4 py-3 text-right">{totalAmount?.toFixed(2)}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    {filteredFeeLists.length < 1 && <h2 className="text-sm text-red-500 p-2 animate-pulse">Nothing to display here</h2>}
-                </div>
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-6">Tuition Fee Payments</h2>
+                    <MasterTable       
+                        data={filteredFeeLists}
+                        columns={columns}
+                        searchQuery={searchQuery}
+                        disableAction={true}
+                        disableCountList={true}
+                    />
+                    <div className="mt-3">
+                        <p className="font-semibold text-gray-800 text-lg">Remaining Amount: 
+                            <span className="text-blue-500"> Php. {totalAmount.toFixed(2)}</span>
+                        </p>
+                    </div>
                 </>
             )}
         </div>

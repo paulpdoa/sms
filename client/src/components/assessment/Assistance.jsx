@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { baseUrl } from '../../baseUrl';
 import { useFetch } from '../../hooks/useFetch';
+import MasterTable from '../MasterTable';
+import { MainContext } from '../../helpers/MainContext';
 
 const Assistance = ({ record }) => {
     const [loading, setLoading] = useState(true);
     const { records: studentPayments, loading: fetchLoading } = useFetch(`${baseUrl()}/student-payment/${record?._id}`);
+
+    const { searchQuery } = useContext(MainContext);
 
     useEffect(() => {
         setLoading(fetchLoading);
@@ -21,7 +25,20 @@ const Assistance = ({ record }) => {
             fee?.studentId?.academicId?.strandId === strandId &&
             fee?.studentDiscountId !== undefined
         );
-    });
+    }).map(discount => ({
+        ...discount,
+        discountType: discount.studentDiscountId.discountId.discountType,
+        discountCode: discount.studentDiscountId.discountId.discountCode,
+        discountAmount: (discount.studentDiscountId.discountId.amount || 0).toFixed(2)
+    }));
+
+    const columns = [
+        { accessorKey: 'discountType', header: 'Discount Type' },
+        { accessorKey: 'discountCode', header: 'Discount Code' },
+        { accessorKey: 'discountAmount', header: 'Discount Amount' }
+    ];
+
+    const totalAmount = filteredFeeLists.reduce((total,discount) => total + discount.studentDiscountId.discountId.amount,0)
 
     return (
         <div className="mt-6 p-4 bg-white rounded-lg overflow-hidden">
@@ -30,32 +47,17 @@ const Assistance = ({ record }) => {
             ) : (
                 <>
                 <h2 className="text-2xl font-semibold text-gray-700 mb-6">Student Discounts</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm text-left text-gray-700">
-                        <thead className="border-b bg-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Discount Type</th>
-                                <th className="px-4 py-3">Discount Code</th>
-                                <th className="px-4 py-3">Discount Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredFeeLists?.map((fee, index) => (
-                                <tr key={index} className="border-b">
-                                    <td className="px-4 py-3">{fee?.studentDiscountId?.discountId?.discountType}</td>
-                                    <td className="px-4 py-3">{fee?.studentDiscountId?.discountId?.discountCode}</td>
-                                    <td className="px-4 py-3 text-right">{fee?.studentDiscountId?.discountId?.amount}</td>
-                                </tr>
-                            ))}
-                            {/* {filteredFeeLists.length > 0 &&
-                                <tr className="font-bold border-t">
-                                    <td colSpan="2" className="px-4 py-3 text-right">Total:</td>
-                                    <td className="px-4 py-3 text-right">{totalAmount?.toFixed(2)}</td>
-                                </tr>
-                            } */}
-                        </tbody>
-                    </table>
-                    {filteredFeeLists.length < 1 && <h2 className="text-sm text-red-500 p-2 animate-pulse">Nothing to display here</h2>}
+                <MasterTable 
+                    data={filteredFeeLists}
+                    columns={columns}
+                    searchQuery={searchQuery}
+                    disableAction={true}
+                    disableCountList={true}
+                />
+                <div className="mt-3">
+                    <p className="font-semibold text-gray-800 text-lg">Remaining Amount: 
+                        <span className="text-blue-500"> Php. {totalAmount?.toFixed(2)}</span>
+                    </p>
                 </div>
                 </>
             )}

@@ -3,6 +3,7 @@ import React, { createContext, useState } from 'react';
 import { baseUrl } from '../baseUrl';
 import { useFetch } from '../hooks/useFetch';
 import { useCookies } from 'react-cookie';
+import { useSnackbar } from 'notistack';
 
 export const MainContext = createContext();
 
@@ -29,6 +30,36 @@ export const MainProvider = ({ children }) => {
 
   const genericPath = role === 'Super Admin' ? 'master' : role.replace(" ","").toLowerCase();
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const snackbarKey = (message) => {
+    return enqueueSnackbar(message || '', { 
+        variant: 'info',
+        anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center',
+        },
+        persist: true,
+        preventDuplicate: true
+    });
+  }  
+
+
+  const numberFormatter = (number, decimalPlaces = 2) => {
+    // Use toFixed to round the number and ensure it has decimal places
+    const roundedNumber = Number(number).toFixed(decimalPlaces);
+    
+    // Split the rounded number into integer and decimal parts
+    const [integerPart, decimalPart] = roundedNumber.split('.');
+  
+    // Format the integer part with commas
+    const formattedInteger = new Intl.NumberFormat().format(integerPart);
+  
+    // Return the formatted integer and decimal parts together
+    return `${formattedInteger}.${decimalPart}`;
+  };
+  
+
   return (
     <MainContext.Provider value={{ 
       searchQuery,
@@ -47,7 +78,9 @@ export const MainProvider = ({ children }) => {
       teacherSubjectSelected,
       setTeacherSubjectSelected,
       teacherSectionSelected,
-      setTeacherSectionSelected
+      setTeacherSectionSelected,
+      snackbarKey,
+      numberFormatter
     }}>
       {children}
     </MainContext.Provider>

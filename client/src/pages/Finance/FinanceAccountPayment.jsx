@@ -7,7 +7,7 @@ import TabActions from "../../components/TabActions";
 import PaymentModal from "./PaymentModal";
 
 const FinanceAccountPayment = () => {
-  const { currentUserId, searchQuery } = useContext(MainContext);
+  const { currentUserId, searchQuery, numberFormatter } = useContext(MainContext);
 
   const { records } = useFetch(`${baseUrl()}/finance-account-payment/${currentUserId}`);
 
@@ -70,11 +70,6 @@ const FinanceAccountPayment = () => {
       Pay Now
     </button>
   );
-
-
- 
-
-
 
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col items-center">

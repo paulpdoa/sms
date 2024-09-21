@@ -1,5 +1,5 @@
 const express = require('express');
-const { get_finance_dashboard, get_finance_payment_schedule, get_finance_account_payments, add_finance_payment } = require('../controller/financeController');
+const { get_finance_dashboard, get_finance_payment_schedule, get_finance_account_payments, add_finance_payment, get_finance_payment_transactions } = require('../controller/financeController');
 const route = express.Router();
 const { allowUserView } = require('../middleware/middlewares');
 
@@ -15,5 +15,6 @@ route.get('/finance-account-payment/:userId', get_finance_account_payments);
 
 // Payments
 route.post('/add-finance-payment', add_finance_payment);
+route.get('/payment-transactions', get_finance_payment_transactions);
 
 module.exports = route;
