@@ -1,6 +1,3 @@
-import Searchbar from "../../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,11 +5,8 @@ import { useState, useContext } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import ConfirmationPopup from "../../components/ConfirmationPopup";
 import MasterTable from "../../components/MasterTable";
-
-const columns = [
-    { accessorKey: 'paymentTermId.term', header: 'Payment Term' },
-    { accessorKey: 'dateSchedule', header: 'Payment Schedule' }
-];
+import { useSnackbar } from 'notistack';
+import TabActions from "../../components/TabActions";
 
 const PaymentSchedule = () => {
 
@@ -21,85 +15,86 @@ const PaymentSchedule = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);
 
-    const { session, role,currentUserId } = useContext(MainContext);
+    const { session, role,currentUserId,snackbarKey, dateFormatter} = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
+
+    const columns = [
+        { accessorKey: 'paymentTermId.term', header: 'Payment Term' },
+        { accessorKey: 'dateSchedule', header: 'Payment Schedule' }
+    ];
+
+    const scheduleData = records?.map(schedule => ({
+        ...schedule,
+        dateSchedule: dateFormatter(schedule.dateSchedule)
+    }))
 
     const generatePaymentSchedule = async (isReset) => {
         setIsLoading(true);
-        const toastId = toast.loading('Creating payment schedule, please wait...');
+
+        const loading = snackbarKey('Creating payment schedule, please wait...')
 
         try {
+            
             const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { session, role, isReset, currentUserId });
             setIsLoading(false);
-            toast.update(toastId, {
-                render: data.mssg,
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(loading);
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
             setIsLoading(false);
-            toast.update(toastId, {
-                render: "An error occurred while generating payment schedules",
-                type: "error",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(snackbarKey());
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while generating payment schedules', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
 
     return (
         <main className="p-2">
-            <div className="flex flex-col my-2 gap-2 bg-white rounded-lg p-4">
-                <h1 className="text-3xl font-bold text-gray-800">Payment Schedule</h1>
-                <div className="flex items-center w-full justify-between gap-2">
-                    <Searchbar onSearch={setSearchQuery} />
-
-                    {records.length < 1 ?
-                        <button onClick={() => !isYearDone && generatePaymentSchedule(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>
-                            {isLoading ? 'Loading...' : 'Generate Payment Schedule'}
-                        </button>
-                        :
-                        // If the user tried to re-generate payment schedule, create a function where it will delete the contents of PaymentSchedule table and generate new schedule
-                        <button onClick={() => !isYearDone && setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>
-                            {isLoading ? 'Loading...' : 'Re-generate Payment Schedule'}
-                        </button>
-                    }
-                </div>
+            <div className="flex justify-between items-center">
+                <TabActions title="Payment Schedule" noView={true} />
+                {records.length < 1 ?
+                    <button onClick={() => !isYearDone && generatePaymentSchedule(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md w-1/4`}>
+                        {isLoading ? 'Loading...' : 'Generate Payment Schedule'}
+                    </button>
+                    :
+                    // If the user tried to re-generate payment schedule, create a function where it will delete the contents of PaymentSchedule table and generate new schedule
+                    <button onClick={() => !isYearDone && setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md w-1/4`}>
+                        {isLoading ? 'Loading...' : 'Re-generate Payment Schedule'}
+                    </button>
+                }
             </div>
 
             <div className="mt-5">
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable
                         columns={columns}
-                        data={records}
+                        data={scheduleData}
                         searchQuery={searchQuery}
                         disableAction={true}
                         isLoading={loading}
                     />
                 </div>
             </div>
-            <ToastContainer />
-
-
             {/* Popup goes here */}
             {openPopup &&
                 <ConfirmationPopup

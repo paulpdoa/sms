@@ -11,6 +11,7 @@ import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationPopup from '../../components/ConfirmationPopup';
 import { useSnackbar } from 'notistack';
+import TabActions from '../../components/TabActions';
 
 const ManageFees = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/manage-fees`);
@@ -111,7 +112,7 @@ const ManageFees = () => {
                 },
                 autoHideDuration: 2000,
                 preventDuplicate: true,
-                onClose: () =>{
+                onClose: () => {
                     window.location.reload();
                 }
             });
@@ -136,23 +137,24 @@ const ManageFees = () => {
 
     return (
         <main className="p-2 relative">
-            <div className="flex justify-between bg-white p-4 rounded-lg">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-3xl font-bold text-gray-800">Manage Fees</h1>
-                    <Searchbar onSearch={setSearchQuery} />
-                </div>
-                <div className="flex items-center gap-2">
-                    { recordsWithoutInputter.length < 1 ? 
-                    <button disabled={(isYearDone && !isLoading) ? true : false} onClick={() => automateFees(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600`}>
+            <div className="flex items-center">
+                <TabActions title="Manage Fees" redirect='create-fees' />
+                { recordsWithoutInputter.length < 1 ? 
+                    <button 
+                        disabled={(isYearDone && !isLoading) ? true : false} 
+                        onClick={() => automateFees(false)} 
+                        className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-customView text-white p-2 rounded-md hover:bg-customHighlight text-sm w-44 justify-center`}
+                    >
                         Generate Fees
                     </button>
                     :
-                    <button disabled={(isYearDone && !isLoading) ? true : false} onClick={() => setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-blue-500 text-gray-100 p-2 rounded-md hover:bg-blue-600`}>
+                    <button 
+                        disabled={(isYearDone && !isLoading) ? true : false} 
+                        onClick={() => setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-customView text-white p-2 rounded-md hover:bg-customHighlight text-sm w-44 justify-center`}
+                    >
                         Re-generate Fees
-                    </button>
-                    }
-                    <ManageFeeBtn />
-                </div>
+                    </button> 
+                }
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
@@ -165,14 +167,14 @@ const ManageFees = () => {
                     isLoading={isLoading}
                 />
             </div>
-            <ToastContainer />
-             {/* Popup goes here */}
-             {openPopup &&
+            {/* Popup goes here */}
+            { openPopup &&
                 <ConfirmationPopup
                     message={'Are you sure you want to regenerate fees? This will affect fees generated in the system'}
                     onConfirm={() => automateFees(true)}
                     onClose={() => setOpenPopup(false)}
-                />}
+                />
+            }
         </main>
     )
 }

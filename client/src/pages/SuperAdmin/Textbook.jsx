@@ -1,15 +1,12 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import { useState,useContext } from 'react';
+import { useContext } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
-import AddTextbookBtn from "../../components/buttons/AddTextbookBtn";
 import { useNavigate } from 'react-router-dom';
+import TabActions from "../../components/TabActions";
+import { useSnackbar } from 'notistack';
 
 const Textbook = () => {
 
@@ -19,6 +16,7 @@ const Textbook = () => {
     const navigate = useNavigate();
 
     const { role,currentUserId,genericPath,setSearchQuery,searchQuery,session } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
        
@@ -55,22 +53,29 @@ const Textbook = () => {
     const deleteTextbook = async (id) => {
         try {
             const removeTextbook = await axios.put(`${baseUrl()}/textbook/${id}`,{ role,recordStatus: 'Deleted' });
-            toast.success(removeTextbook.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(removeTextbook.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg  || 'An error occurred while deleting text book records', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -92,13 +97,7 @@ const Textbook = () => {
     return (
         <main className="p-2">
             {/* <DateTime /> */}
-            <div className="flex flex-col mx-4 my-2 gap-2">
-                <h1 className="text-2xl text-gray-700 font-bold">Text book</h1>
-                <div className="flex justify-between w-full gap-2">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddTextbookBtn />
-                </div>
-            </div>
+            <TabActions title="Textbooks" redirect={'new-textbook'} />
 
             <div className="gap-2 mt-5">
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
@@ -113,7 +112,6 @@ const Textbook = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

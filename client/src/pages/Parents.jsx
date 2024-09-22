@@ -1,7 +1,3 @@
-import DateTime from "../components/DateTime";
-import Searchbar from "../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
@@ -10,6 +6,8 @@ import { useContext } from "react";
 import { MainContext } from '../helpers/MainContext';
 import MasterTable from '../components/MasterTable';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from "notistack";
+import TabActions from "../components/TabActions";
 
 const columns = [
     {
@@ -35,37 +33,34 @@ const Parents = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/parents`);
     const { searchQuery,setSearchQuery,role,currentUserId,genericPath } = useContext(MainContext);
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const deleteParent = async (id) => {
         try {
             const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ role,recordStatus: 'Deleted' });
-            toast.success(removeParent.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeParent.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-            
         }
     }
 
@@ -80,15 +75,7 @@ const Parents = () => {
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
-            <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Parents</h1>
-                <div className="flex items-center justify-between mt-3">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddParentBtn />
-                </div>
-            </div>
-
+            <TabActions title="Parents" redirect='new-parent' />
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
@@ -99,7 +86,6 @@ const Parents = () => {
                     isLoading={isLoading}
                 />
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

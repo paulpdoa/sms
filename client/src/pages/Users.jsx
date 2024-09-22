@@ -1,14 +1,12 @@
-import Searchbar from "../components/Searchbar";
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import { useState,useContext } from 'react';
+import { useContext } from 'react';
 import MasterTable from "../components/MasterTable";
 import { MainContext } from "../helpers/MainContext";
-import AddUserBtn from '../components/buttons/AddUserBtn';
+import { useSnackbar } from 'notistack';
+import TabActions from '../components/TabActions';
 
 const Users = () => {
 
@@ -17,6 +15,7 @@ const Users = () => {
     const navigate = useNavigate();
 
     const { role: userRole,currentUserId,searchQuery,setSearchQuery,genericPath } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     
     const columns = [
@@ -33,31 +32,28 @@ const Users = () => {
     const deleteUser = async (id) => {
         try {
             const removeUser = await axios.put(`${baseUrl()}/user/${id}`,{ role: userRole, recordStatus: 'Deleted' });
-            toast.success(removeUser.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeUser.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -72,10 +68,7 @@ const Users = () => {
 
     return (
         <main className="p-2">
-            <div className="flex justify-between w-full gap-2 p-2">
-                <h1 className="text-2xl text-customHighlight font-bold">User</h1>
-                <AddUserBtn />
-            </div>
+            <TabActions title="Users" redirect="new-user" />
 
             <div className="gap-2 mt-5">
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
@@ -89,7 +82,6 @@ const Users = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

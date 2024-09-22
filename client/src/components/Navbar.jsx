@@ -60,18 +60,18 @@ const Navbar = () => {
                     <Searchbar onSearch={setSearchQuery} />
                 </div>
                 <div className="relative">
-                    {/* <HiChevronDown
+                    <HiChevronDown
                         className="text-3xl text-gray-700 cursor-pointer transition-transform transform hover:scale-110"
                         onClick={() => setShowDropdown(!showDropdown)}
-                    /> */}
-                    <button
+                    />
+                    {/* <button
                         onClick={userLogout}
                         className="text-sm text-gray-700 w-full py-2 rounded-lg transition-colors flex items-center gap-2 hover:underline"
                     >
-                        {/* <CiLogout className="text-gray-700 font-bold text-xl" />  */}
+                        <CiLogout className="text-gray-700 font-bold text-xl" /> 
                         Logout
-                    </button>  
-                    {/* <AnimatePresence>
+                    </button>   */}
+                    <AnimatePresence>
                         {showDropdown && (
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -88,7 +88,7 @@ const Navbar = () => {
                                 </button>
                             </motion.div>
                         )}
-                    </AnimatePresence> */}
+                    </AnimatePresence>
                 </div>
             </nav>
         </>

@@ -14,6 +14,7 @@ import StudentParentTable from '../../components/admission/parent/StudentParentT
 import StudentSibling from '../../components/admission/sibling/StudentSibling';
 import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
 import { MainContext } from '../../helpers/MainContext';
+import TabActions from '../../components/TabActions';
 
 const Admission = () => {
     const admissionPages = ['Requirements', 'Parents', 'Sibling'];
@@ -34,10 +35,8 @@ const Admission = () => {
 
     return (
         <main className="p-4 relative overflow-hidden">
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-2xl text-gray-700 font-bold">Admission</h1>
-                <Searchbar onSearch={handleSearch} />
-            </div>
+            <TabActions title="Admission" noView={true} />
+            
             {/* <div className="flex flex-wrap gap-2 mb-4">
                 {admissionPages.map((page) => (
                     <button

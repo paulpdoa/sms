@@ -10,6 +10,7 @@ import MasterTable from '../../components/MasterTable';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
+import TabActions from '../../components/TabActions';
 
 const Assessment = () => {
 
@@ -49,13 +50,14 @@ const Assessment = () => {
     const generateFees = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+
+        const loading = snackbarKey('Assigning fees to students, please wait')
         
         try {
+            // Close the loading snackbar after success
             const { data } = await axios.post(`${baseUrl()}/generate-fees`, { session, role });
             setIsLoading(false);
-            
-            // Close the loading snackbar after success
-            closeSnackbar(snackbarKey('Assigning fees to students, please wait'));
+            closeSnackbar(loading);
             enqueueSnackbar(data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
@@ -144,18 +146,16 @@ const Assessment = () => {
 
     return (
         <main className="p-4 relative overflow-hidden">
-            <div className="flex justify-between mx-4 my-2 items-center">
-                <h1 className="text-2xl text-gray-700 font-bold">Assessment</h1>
+            <div className="flex flex-col mx-4 my-2 items-end">
+                <TabActions title="Assessment"  />
                 <div className="flex items-center gap-2">
-                    <Searchbar onSearch={handleSearch} />
-                    <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-red-500 hover:bg-red-600 text-white p-2 rounded-md`}>Delete Fees</button>
-                    <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
+                    <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customCancel hover:bg-red-600 text-white p-2 rounded-md`}>Delete Fees</button>
+                    <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
 
 
-            <   div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
-
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
                 <div className="rounded-md h-fit">
                     <MasterTable columns={columns} data={formattedStudents} viewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
                 </div>

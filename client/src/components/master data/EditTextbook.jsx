@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { MainContext } from "../../helpers/MainContext";
+import { useSnackbar } from "notistack";
 
 const EditTextbook = () => {
 
@@ -15,6 +16,7 @@ const EditTextbook = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
 
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [bookCode, setBookCode] = useState('');
     const [bookTitle, setBookTitle] = useState('');
@@ -58,30 +60,27 @@ const EditTextbook = () => {
 
         try {
             const newData = await axios.patch(`${baseUrl()}/textbook/${id}`, bookInfo);
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/text-books`);
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/text-books`);
-            }, 2000)
         } catch (err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating textbook record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -99,10 +98,10 @@ const EditTextbook = () => {
                     { isGrade11Or12 && renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', true) }
                 </div>
 
-                <button type="submit" className="bg-blue-500 text-white text-sm p-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <button type="submit" className="bg-customView text-white text-sm p-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     Update Textbook
                 </button>
-                <button onClick={() => navigate(-1)} type="button" className="bg-red-500 text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
+                <button onClick={() => navigate(-1)} type="button" className="bg-customCancel text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
             </form>
             <ToastContainer />
         </main>

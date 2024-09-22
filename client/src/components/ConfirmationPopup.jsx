@@ -7,13 +7,13 @@ const ConfirmationPopup = ({ onConfirm,onClose,message }) =>{
                 <div className="flex justify-center space-x-4">
                 <button
                     onClick={() => onConfirm(true)}
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="px-4 py-2 bg-customSubmit text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
                 >
                     Yes
                 </button>
                 <button
                     onClick={onClose}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                    className="px-4 py-2 bg-customCancel text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
                 >
                     No
                 </button>

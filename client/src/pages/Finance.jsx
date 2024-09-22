@@ -1,19 +1,17 @@
 import { useContext } from 'react';
-import AddTeacherBtn from "../components/buttons/AddTeacherBtn";
-import Searchbar from "../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
 import { MainContext } from '../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 import MasterTable from '../components/MasterTable';
-import AddFinanceBtn from '../components/buttons/AddFinanceBtn';
+import { useSnackbar } from 'notistack';
+import TabActions from '../components/TabActions';
 
 const Finance = () => {
     const { records: financeLists, isLoading } = useFetch(`${baseUrl()}/finance`);
-    const { searchQuery,setSearchQuery,role } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,dateFormatter } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
 
@@ -27,45 +25,35 @@ const Finance = () => {
     const financeData = financeLists?.map(fl => ({
         ...fl,
         fullName: `${fl.firstName} ${fl.middleName} ${fl.lastName}`,
-        birthDate: new Date(fl.dateOfBirth).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
+        birthDate: dateFormatter(fl.dateOfBirth)
     }));
 
-    console.log(financeData);
-
-   
 
     const deleteFinance = async (id) => {
         try {
             const removeFinance = await axios.put(`${baseUrl()}/finance/${id}`, { role,recordStatus: 'Deleted' });
-            toast.success(removeFinance.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeFinance.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting finance record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -74,15 +62,7 @@ const Finance = () => {
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
-            <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Finance</h1>
-                <div className="flex items-center justify-between mt-3">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddFinanceBtn />
-                </div>
-            </div>
-
+            <TabActions title="Finance" redirect="new-finance" />
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
@@ -93,7 +73,6 @@ const Finance = () => {
                     isLoading={isLoading}
                 />
             </div> 
-            <ToastContainer />          
         </main>
     );
 };

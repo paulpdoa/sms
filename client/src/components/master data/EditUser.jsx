@@ -1,14 +1,11 @@
-import DateTime from "../DateTime";
 import { useParams,useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from "../../baseUrl";
 import { useState,useEffect,useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { MainContext } from "../../helpers/MainContext";
 import { useCookies } from 'react-cookie';
-
+import { useSnackbar } from "notistack";
 
 const EditUser = () => {
     const { id } = useParams();
@@ -16,6 +13,7 @@ const EditUser = () => {
     const { records: userRoles } = useFetch(`${baseUrl()}/user-roles`);
     const [cookies, setCookie, removeCookie] = useCookies(['userToken']); // Importing removeCookie
 
+    const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
 
@@ -78,44 +76,42 @@ const EditUser = () => {
                 inputter: currentUserId,
                 isAllowedToLogin
             });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    // Set the local storage if the user updated his role
+                    // localStorage.setItem('role',userRole);
+                    // console.log(currentRole);
+                    
+                    // Logout the user after updating his profile
+                    if(user._id === currentUserId) {
+                        setTimeout(() => {
+                            ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
+                            removeCookie('userToken',{ path: '/login' });
+                        },2000)
+                    } else {
+                        setTimeout(() => {
+                            navigate(`/${genericPath}/users`);
+                        }, 2000);
+                    }
+                }
             });
-
-            // Set the local storage if the user updated his role
-            // localStorage.setItem('role',userRole);
-            // console.log(currentRole);
-            
-            // Logout the user after updating his profile
-            if(user._id === currentUserId) {
-                setTimeout(() => {
-                    ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
-                    removeCookie('userToken',{ path: '/login' });
-                },2000)
-            } else {
-                setTimeout(() => {
-                    navigate(`/${genericPath}/users`);
-                }, 2000);
-            }
-            
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.error, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.error || 'An error occurred while updating user record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -145,12 +141,11 @@ const EditUser = () => {
                     {renderInput('confirmPassword', 'Confirm Password', confirmPassword, setConfirmPassword, 'password')}
                 </div>
 
-                <button type="submit" className="bg-blue-500 text-white text-sm p-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+                <button type="submit" className="bg-customView text-white text-sm p-3 rounded-md hover:bg-customHighlight focus:outline-none focus:ring-2 focus:ring-blue-400">
                     Update User
                 </button>
-                <button onClick={() => navigate(-1)} type="button" className="bg-red-500 text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
+                <button onClick={() => navigate(-1)} type="button" className="bg-customCancel text-white text-sm p-3 ml-3 rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
             </form>
-            <ToastContainer />
         </main>
     )
 }

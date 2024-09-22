@@ -1,14 +1,14 @@
 import { useContext } from 'react';
 import AddTeacherBtn from "../components/buttons/AddTeacherBtn";
 import Searchbar from "../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
 import { MainContext } from '../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
 import MasterTable from '../components/MasterTable';
+import { useSnackbar } from 'notistack';
+import TabActions from '../components/TabActions';
 
 const columns = [
     {
@@ -39,9 +39,10 @@ const columns = [
 
 const Teachers = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/teachers`);
-    const { searchQuery,setSearchQuery,role,genericPath } = useContext(MainContext);
+    const { searchQuery,setSearchQuery,role,genericPath, dateFormatter } = useContext(MainContext);
 
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const recordsWithoutInputter = records.map(record => ({
         ...record,
@@ -52,41 +53,34 @@ const Teachers = () => {
             _id: record?.nationality?._id,
             nationality: record?.nationality?.nationality || 'Not Assigned'
         },
-        dateOfBirth: new Date(record.dateOfBirth).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        })
+        dateOfBirth: dateFormatter(record.dateOfBirth)
     }))
 
     const deleteTeacher = async (id) => {
         try {
             const removeTeacher = await axios.put(`${baseUrl()}/teacher/${id}`, { role,recordStatus: 'Deleted' });
-            toast.success(removeTeacher.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeTeacher.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting teacher record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -95,14 +89,7 @@ const Teachers = () => {
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
-            <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Teachers</h1>
-                <div className="flex items-center justify-between mt-3">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddTeacherBtn />
-                </div>
-            </div>
+            <TabActions title="Teacher" redirect="new-teacher" />
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
@@ -114,7 +101,6 @@ const Teachers = () => {
                     isLoading={isLoading}
                 />
             </div> 
-            <ToastContainer />          
         </main>
     );
 };

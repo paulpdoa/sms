@@ -214,7 +214,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                             { !isLoading ? (
                                 currentRows.length > 0 ? (
                                     currentRows.map((record) => (
-                                        <tr key={record._id} className="bg-white border-b hover:bg-gray-100">
+                                        <tr key={record._id} className="bg-white border-b hover:bg-customHighlight hover:text-white">
                                             {columns.map(column => (
                                                 <td key={column.accessorKey} className="px-6 py-4">
                                                     {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
@@ -268,13 +268,13 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                     { !actions ? (
                                                         !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
                                                             <>
-                                                                <button onClick={() => handleSaveClick(record._id)} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">Save</button>
-                                                                <button onClick={handleCancelClick} className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                                                                <button onClick={() => handleSaveClick(record._id)} className="bg-customSubmit text-white px-4 py-2 rounded-md mr-2">Save</button>
+                                                                <button onClick={handleCancelClick} className="bg-customCancel text-white px-4 py-2 rounded-md mr-2">Cancel</button>
                                                             </>
                                                         ) : (
                                                             <>  
                                                                 {/* { onUpdate !== undefined &&  */}
-                                                                    <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-blue-500 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
+                                                                    <button onClick={() => goToEdit ? goToEdit(record._id) : (!isYearDone && handleEditClick(record) )} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-customView hover:bg-blue-600 text-white px-4 py-2 rounded-md mr-2`}>Edit</button>
                                                                 {/* }                                                             */}
                                                                 <button onClick={() => {
                                                                     // !isYearDone && handleDeleteClick(record._id)
@@ -283,7 +283,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                         setDeleteRecId(record._id);
                                                                         setIsForDelete(true)
                                                                     }
-                                                                }} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-red-500 text-white px-4 py-2 rounded-md`}>Delete</button>
+                                                                }} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-customCancel text-white px-4 py-2 rounded-md`}>Delete</button>
                                                             </>
                                                         ) : 
                                                         <button onClick={() => {
@@ -293,7 +293,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                             } else {
                                                                 viewRecord(record)
                                                             }
-                                                        }} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">View</button>
+                                                        }} className="bg-customSubmit shadow-sm text-white px-4 py-2 rounded-md mr-2">View</button>
                                                     ) : 
                                                         actions(record)
                                                     }
@@ -321,65 +321,65 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
             </div>
 
             {filteredData?.length > rowsPerPage && (
-                        <div className="flex justify-between items-center w-full py-3 px-6 bg-white border-t border-gray-200">
-                            <div className="text-sm text-gray-700">
-                                Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                                >
-                                    Previous
-                                </button>
+                <div className="flex justify-between items-center w-full py-3 px-6 bg-white border-t border-gray-200">
+                    <div className="text-sm text-gray-700">
+                        Showing {indexOfFirstRow + 1} to {indexOfLastRow} of {filteredData.length} results
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-customView hover:text-customHighlight'}`}
+                        >
+                            Previous
+                        </button>
 
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => currentPage > 1 && paginate(currentPage - 1)}
-                                        className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                                    >
-                                        { currentPage > 1 && currentPage - 1 }
-                                    </button>
-                                    <button
-                                        className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
-                                    >
-                                        { currentPage }
-                                    </button>
-                                    { currentPage !== totalPages && (
-                                        <button
-                                            onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
-                                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
-                                        >
-                                            { currentPage > 1 && currentPage + 1 }
-                                        </button>
-                                    ) }
-                                </div>
-                                {/* <AnimatePresence mode="wait">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                        <motion.button
-                                            key={page}
-                                            onClick={() => paginate(page)}
-                                            initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
-                                            transition={{ duration: 0.3 }}
-                                            className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
-                                        >
-                                            {page}
-                                        </motion.button>
-                                    ))}
-                                </AnimatePresence> */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+                                className={`text-sm ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-customView hover:text-customHighlight'}`}
+                            >
+                                { currentPage > 1 && currentPage - 1 }
+                            </button>
+                            <button
+                                className={`text-sm text-white bg-blue-500 px-3 py-1 rounded-sm hover:bg-blue-600`}
+                            >
+                                { currentPage }
+                            </button>
+                            { currentPage !== totalPages && (
                                 <button
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                                    onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
+                                    className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-customView hover:text-customHighlight'}`}
                                 >
-                                    Next
+                                    { currentPage > 1 && currentPage + 1 }
                                 </button>
-                            </div>
+                            ) }
                         </div>
-                    )}
+                        {/* <AnimatePresence mode="wait">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <motion.button
+                                    key={page}
+                                    onClick={() => paginate(page)}
+                                    initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
+                                    transition={{ duration: 0.3 }}
+                                    className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
+                                >
+                                    {page}
+                                </motion.button>
+                            ))}
+                        </AnimatePresence> */}
+                        <button
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`text-sm ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-customView hover:text-customHighlight'}`}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
             
             {/* <div className="pagination mt-4 flex justify-center items-center">
                 <button

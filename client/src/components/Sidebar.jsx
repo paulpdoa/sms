@@ -422,7 +422,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <div className="bg-gray-900 shadow-sm border-b border-gray-700 p-3 flex items-center justify-between gap-2">
                         <h1 className="font-semibold text-3xl text-white">SMS</h1>
                         <div className="flex items-center gap-2">
-                            <span className="font-normal text-xs text-white">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
+                            <span className="font-semibold text-xs p-1 rounded-full text-sidebarBg bg-dashboardYellow">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
                             <button onClick={toggleSidebar} className="text-white hover:scale-110 hover:transition">
                                 <MdClose size={24} />
                             </button>

@@ -11,7 +11,7 @@ const MasterDataForm = (form, onAdd, onClose,formTitle,setStudentId) => (
         <div className="flex justify-end space-x-3">
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-500 text-white text-sm rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+            className="px-6 py-2 bg-customView text-white text-sm rounded-lg shadow hover:bg-customHighlight focus:outline-none focus:ring focus:ring-blue-300"
           >
             Submit
           </button>
@@ -25,7 +25,7 @@ const MasterDataForm = (form, onAdd, onClose,formTitle,setStudentId) => (
                 onClose(false)
               }
             }}
-            className="px-6 py-2 bg-red-500 text-white rounded-lg text-sm shadow hover:bg-red-600 focus:outline-none focus:ring focus:ring-gray-300"
+            className="px-6 py-2 bg-customCancel text-white rounded-lg text-sm shadow hover:bg-red-600 focus:outline-none focus:ring focus:ring-gray-300"
           >
             Cancel
           </button>

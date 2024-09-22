@@ -116,8 +116,8 @@ const Dashboard = () => {
     labels: ['Local', 'International'],
     datasets: [{
       data: [nationalityCounts.local, nationalityCounts.foreign],
-      backgroundColor: ['#4BC0C0', '#FF9F40'],
-      hoverBackgroundColor: ['#4BC0C0', '#FF9F40'],
+      backgroundColor: ['#97C95C', '#FFC720'],
+      hoverBackgroundColor: ['#97C95C', '#FFC720'],
     }],
   };
 
@@ -126,7 +126,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Student Grade Levels',
       data: Object.entries(gradeLevelCounts).map(([, count]) => count * 10), // Scale counts by 10
-      backgroundColor: ['#4BC0C0', '#FF9F40', '#9966FF'],
+      backgroundColor: ['#97C95C', '#FFC720', '#2190F6'],
     }],
   };
 

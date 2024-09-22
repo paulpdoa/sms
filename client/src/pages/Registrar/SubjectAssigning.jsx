@@ -8,6 +8,7 @@ import TabActions from '../../components/TabActions';
 import MasterTable from "../../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
+import { useSnackbar } from 'notistack';
 
 const SubjectAssigning = () => {
     const columns = [
@@ -28,10 +29,10 @@ const SubjectAssigning = () => {
         { accessorKey: 'days', header: 'Scheduled Days' }
     ]
     
-    
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
-    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role } = useContext(MainContext);
+    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role, snackbarKey } = useContext(MainContext);
 
     const { records: studentSubjects } = useFetch(`${baseUrl()}/student-subjects`);
     
@@ -45,7 +46,7 @@ const SubjectAssigning = () => {
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
 
-    const studentLists = students?.filter(student => student?.academicId?.isEnrolled && student.studentNo).map(student => ({
+    const studentLists = students?.filter(student => student?.academicId?.isEnrolled && student.studentNo && student?.academicId?.gradeLevelId).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
@@ -79,39 +80,34 @@ const SubjectAssigning = () => {
 
     // Subject assigning function
     const assignSubjects = async () => {
-        const toastId = toast.loading('Please wait while assigning subjects to students');
+        const loading = snackbarKey('Please wait while assigning subjects to students');
 
         try {
             const data = await axios.get(`${baseUrl()}/assign-subjects-student?session=${currentSession}&currentUserId=${currentUserId}`);
-            toast.update(toastId, {
-                render: data.data.mssg,
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(loading)
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.update(toastId, {
-                render: err.response.data.mssg,
-                type: "error",
-                isLoading: false,
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(snackbarKey())
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while assigning subjects', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -122,7 +118,7 @@ const SubjectAssigning = () => {
                 <TabActions title="Assign Subject to Students" noView={true} />
                 <button
                     onClick={!isYearDone && assignSubjects}
-                    className="bg-blue-500 p-2 rounded-md text-gray-200 text-sm hover:bg-blue-600 mb-2">
+                    className="bg-customView p-2 rounded-md text-gray-200 text-sm hover:bg-customHighlight mb-2 min-w-fit">
                     Assign Subjects
                 </button>   
             </div>

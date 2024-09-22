@@ -12,7 +12,8 @@ export default {
         customSubmit: "#97C95C",
         sidebarBg: "#1F2937",
         sidebarHighlight: "#2190F6",
-        customHighlight: "#2190F6" 
+        customHighlight: "#2190F6", 
+        dashboardYellow: "#FFC720"
       }
     },
   },

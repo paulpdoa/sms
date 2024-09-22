@@ -1,16 +1,14 @@
 import AddStudentBtn from "../components/buttons/AddStudentBtn";
-import DateTime from "../components/DateTime";
 import Searchbar from "../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
 import { useContext } from "react";
 import { MainContext } from '../helpers/MainContext';
-import ReusableTable from '../components/ReusableTable';
 import MasterTable from "../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import TabActions from "../components/TabActions";
 
 const columns = [
     {
@@ -51,37 +49,36 @@ const Students = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/students`);
     const { searchQuery,setSearchQuery,session,role,genericPath } = useContext(MainContext);
+
+    const { enqueueSnackbar } = useSnackbar();
     
     const navigate = useNavigate();
     
     const deleteStudent = async (id) => {
         try {
             const removeStudent = await axios.put(`${baseUrl()}/student/${id}`, { role,session,recordStatus: 'Deleted' });
-            toast.success(removeStudent.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeStudent.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting student record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -103,13 +100,8 @@ const Students = () => {
 
     return (
         <main className="p-2">
-            <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Students</h1>
-                <div className="flex items-center justify-between mt-3">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddStudentBtn />
-                </div>
-            </div>
+            
+            <TabActions title="Student" redirect="new-student" />
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
@@ -121,7 +113,6 @@ const Students = () => {
                     isLoading={isLoading}
                 />
             </div>
-            <ToastContainer />
         </main>
     )
 }

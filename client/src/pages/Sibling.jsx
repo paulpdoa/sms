@@ -9,8 +9,8 @@ import AddSiblingBtn from "../components/buttons/AddSiblingBtn";
 import MasterTable from '../components/MasterTable';
 import { MainContext } from '../helpers/MainContext';
 import { useContext } from 'react';
-
-
+import { useSnackbar } from 'notistack';
+import TabActions from "../components/TabActions";
 
 const Sibling = () => {
 
@@ -18,6 +18,7 @@ const Sibling = () => {
     const { searchQuery,setSearchQuery,role,genericPath } = useContext(MainContext);
 
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
         {
@@ -34,8 +35,6 @@ const Sibling = () => {
         }
     ];
 
-    console.log(records);
-
     const siblingData = records?.map(sibling => ({
         ...sibling,
         fullName: `${sibling.firstName} ${sibling.middleName} ${sibling.lastName}`,
@@ -45,31 +44,28 @@ const Sibling = () => {
     const deleteSibling = async (id) => {
         try {
             const removeSibling = await axios.put(`${baseUrl()}/sibling/${id}`,{ role,recordStatus:'Deleted' });
-            toast.success(removeSibling.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeSibling.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting sibling record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -78,14 +74,7 @@ const Sibling = () => {
 
     return (
         <main className="p-2">
-            <div className="mx-4 my-2">
-                <h1 className="text-2xl text-gray-700 font-semibold">Sibling</h1>
-                <div className="flex items-center justify-between mt-3">
-                    <Searchbar onSearch={setSearchQuery} />
-                    <AddSiblingBtn />
-                </div>
-            </div>
-
+            <TabActions title="Sibling" redirect="new-sibling" />
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">
                 <MasterTable 
                     columns={columns}
