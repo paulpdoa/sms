@@ -187,7 +187,7 @@ const FinancePaymentSchedule = () => {
                                         setCurrentSelectedButton('');
                                     }}
                                 >
-                                    Cancel
+                                    Close
                                 </button>
                             </div>
                         </div>
@@ -213,7 +213,7 @@ const FinancePaymentSchedule = () => {
                             {/* Modal will open upon hover */}
                             {/* For textbooks */}
                             { currentSelectedButton === 'Book Amount'&& (
-                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                     <TabActions title="Textbooks" noView={true} />
                                     <MasterTable
                                         columns={textbookColumns}
@@ -224,12 +224,13 @@ const FinancePaymentSchedule = () => {
                                     <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                         <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalBookAmount)}</span>
                                     </div>
+                                    <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                                 </div>
                             ) }
 
                              {/* For Tuition Fees */}
                              {currentSelectedButton === 'Tuition Fee Amount' && (
-                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                                <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                     <TabActions title="Tuition" noView={true} />
                                     <MasterTable
                                         columns={paymentScheduleColumns}
@@ -240,11 +241,12 @@ const FinancePaymentSchedule = () => {
                                     <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                         <span className="text-gray-800">Total Amount: </span><span className="text-xl">Php {numberFormatter(totalTuitionFeeAmount)}</span>
                                     </div>
+                                    <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                                 </div>
                              )}
 
                              {currentSelectedButton === 'Miscellaneous Amount' && (
-                             <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300">
+                             <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                 <TabActions title="Miscellaneous" noView={true} />
                                 <MasterTable
                                     columns={feeColumns}
@@ -255,6 +257,8 @@ const FinancePaymentSchedule = () => {
                                 <div className="mt-4 text-left font-bold text-xl text-blue-600">
                                     <span className="text-gray-800">Total Amount: </span>Php {numberFormatter(totalMiscAmount)}
                                 </div>
+
+                                <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                              </div>
                              )}
                             {/* Show statement of account form */}

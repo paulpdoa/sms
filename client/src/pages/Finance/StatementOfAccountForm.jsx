@@ -14,7 +14,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
     const totalMiscFee = miscData.filter(payment => !payment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
     return (
-        <div className="p-6 bg-gray-200 h-full mt-5" id="student-payments-content">
+        <div className="p-6 h-full mt-5" id="student-payments-content">
             <section>
                 <div className="py-4 flex items-center gap-2 border-b border-gray-400">
                     <p className="text-gray-800 text-md font-semibold">{ currentStudent.firstName } { currentStudent.middleName } { currentStudent.lastName }</p>
