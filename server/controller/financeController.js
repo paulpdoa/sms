@@ -253,7 +253,13 @@ module.exports.get_finance_payment_history = async(req,res) => {
         }
 
         const paymentTransactions = await PaymentTransaction.find({ recordStatus: 'Live', sessionId: session })
-        .populate('studentId studentPaymentId');
+        .populate('studentId')
+        .populate({ path: 'studentPaymentId', populate: [
+            { path: 'feeCodeId paymentScheduleId textBookId' },
+            { path: 'manageFeeId', populate: [
+                { path: 'feeDescription', populate: 'feeCateg' }
+            ] }
+        ] })
         if(!paymentTransactions) { 
             return res.status(404).json({ mssg: 'Payment transaction is not existing' });
         }

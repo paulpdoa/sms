@@ -4,9 +4,7 @@ import { useContext, useState } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
-import Warning from '../../components/Warning';
-import { jsPDF } from "jspdf";
-import { useSnackbar } from "notistack";
+import PaymentHistoryModal from "./PaymentHistoryModal";
 
 const PaymentHistoryTransaction = () => {
 
@@ -31,23 +29,6 @@ const PaymentHistoryTransaction = () => {
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
         { accessorKey: 'email', header: 'Email' }
     ];
-
-    const paymentHistoryData = paymentTransactions?.map(paymentHistory => ({
-        ...paymentHistory,
-        paymentDate: new Date(paymentHistory.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        }),
-
-    }));
-    const paymentColumns = [
-        { accessorKey: 'referenceCode', header: 'Reference Code' },
-        { accessorKey: 'amountPaid', header: 'Amount Paid' },
-        { accessorKey: 'paymentDate', header: 'Payment Date' }
-    ];
-
-    console.log(paymentHistoryData);
 
     const viewPaymentHistory = (student) => {
         const filteredPaymentHistory = records?.paymentTransactions?.filter(paymentTransaction => paymentTransaction?.studentId?._id === student._id);
@@ -78,45 +59,13 @@ const PaymentHistoryTransaction = () => {
                 />
             </section>
 
+            {/* Show This modal after clicking view */}
             { showHistoryPayment && (
-                <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-                        <div className="border-b border-gray-300 py-2 flex items-center justify-between">
-                            <div>
-                                <div className="flex gap-2 items-center">
-                                    <h2 className="font-bold text-gray-700 text-2xl">{currentStudent.firstName} {currentStudent.middleName} {currentStudent.lastName}</h2>
-                                    <div className="flex items-center gap-2">
-                                        <p className="p-2 rounded-full bg-blue-500 text-gray-100 text-xs">StudNo. { currentStudent.studentNo }</p>
-                                        <p className="p-2 rounded-full bg-blue-500 text-gray-100 text-xs">{ currentStudent.academicId.gradeLevelId.gradeLevel }</p>
-                                        <p className="p-2 rounded-full bg-blue-500 text-gray-100 text-xs">Section: { currentStudent.academicId.sectionId.section }</p>
-                                    </div>
-                                </div>
-                                <p className="text-gray-500">Payment History</p>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <button
-                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
-                                    onClick={() => setShowHistoryPayment(false)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-
-
-                        {/* Show Table Here */}
-                        <MasterTable 
-                            columns={paymentColumns}
-                            data={paymentHistoryData}
-                            searchQuery={searchQuery}
-                            disableAction={true}
-                            disableCountList={true}
-                        />
-
-                    </div>
-                
-                </div>
+                <PaymentHistoryModal 
+                    currentStudent={currentStudent}
+                    setShowHistoryPayment={setShowHistoryPayment}
+                    paymentTransactions={paymentTransactions}
+                />
             ) }
         
         </main>

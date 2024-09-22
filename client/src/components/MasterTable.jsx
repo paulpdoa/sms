@@ -30,7 +30,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
         const queryParams = new URLSearchParams(location.search);
         const savedPage = queryParams.get('page');
         if (savedPage) {
-            setCurrentPage(Number(savedPage));
+            setCurrentPage(Number(savedPage));  
         }
     }, [location.search]);
 

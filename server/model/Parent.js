@@ -65,6 +65,9 @@ const parentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'schoolYear'
     },
+    isEmployee: {
+        type: Boolean
+    },
     recordStatus: requiredString
 }, { timestamps: true })
 
