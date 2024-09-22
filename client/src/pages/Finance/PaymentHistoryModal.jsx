@@ -16,7 +16,7 @@ const PaymentHistoryModal= ({ currentStudent,setShowHistoryPayment,paymentTransa
         description: 
         paymentHistory.studentPaymentId?.manageFeeId?.feeDescription?.feeCateg?.category || 
         paymentHistory.studentPaymentId?.textBookId?.bookTitle ||
-        new Date(paymentHistory.studentPaymentId.paymentScheduleId?.dateSchedule).toLocaleDateString('en-US', {
+        new Date(paymentHistory?.studentPaymentId?.paymentScheduleId?.dateSchedule).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric' 

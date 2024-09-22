@@ -6,8 +6,8 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
     const { dateFormatter,numberFormatter } = useContext(MainContext);
 
     const miscData = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC');
-    const tuitionData = studentPayments?.filter(studentPayment => studentPayment.paymentScheduleId);
-    const textbookData = studentPayments?.filter(studentPayment => studentPayment.textBookId);
+    const tuitionData = studentPayments?.filter(studentPayment => studentPayment?.paymentScheduleId);
+    const textbookData = studentPayments?.filter(studentPayment => studentPayment?.textBookId);
 
     const totalTuitionFee = tuitionData?.filter(payment => !payment.isPaid).reduce((total,payment) => total + payment.payEveryAmount,0);
     const totalTextbookFee = textbookData.filter(payment => !payment.isPaid).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
@@ -37,8 +37,8 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
                     <div className="p-2 bg-gray-100">
                         { tuitionData.map(tuition => (
                             <div className="grid grid-cols-3 indent-5 p-2">
-                                <p className="text-sm">{dateFormatter(tuition.paymentScheduleId.dateSchedule)}</p>
-                                <p className="text-sm">{numberFormatter(tuition.payEveryAmount)}</p>
+                                <p className="text-sm">{dateFormatter(tuition?.paymentScheduleId.dateSchedule)}</p>
+                                <p className="text-sm">{numberFormatter(tuition?.payEveryAmount)}</p>
                                 <p className={`text-sm ${tuition.isPaid ? 'text-green-700' : 'text-red-700'}`}>{ tuition.isPaid ? 'Paid' : 'Not yet paid' }</p>
                             </div>
                         )) }
@@ -54,7 +54,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
                     <div className="p-2 bg-gray-100">
                         { miscData.map(misc => (
                             <div className="grid grid-cols-3 indent-5 p-2">
-                                <p className="text-sm">{misc.manageFeeId.feeDescription.description}</p>
+                                <p className="text-sm">{misc?.manageFeeId.feeDescription.description}</p>
                                 <p className="text-sm">{numberFormatter(misc.manageFeeId.amount)}</p>
                                 <p className={`text-sm ${misc.isPaid ? 'text-green-700' : 'text-red-700'}`}>{ misc.isPaid ? 'Paid' : 'Not yet paid' }</p>
                             </div>

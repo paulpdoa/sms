@@ -212,6 +212,7 @@ module.exports.get_finance_payment_history = async(req,res) => {
     let financeName = '';
 
     try {
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ mssg: 'User is not existing' });

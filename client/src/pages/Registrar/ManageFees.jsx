@@ -101,8 +101,8 @@ const ManageFees = () => {
     const automateFees = async (isReset) => {
 
         try {
-            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset,inputter: currentUserId });
             closeSnackbar(snackbarKey('Generating fees, please wait'))
+            const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset,inputter: currentUserId });
             enqueueSnackbar(data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
