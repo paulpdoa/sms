@@ -68,6 +68,12 @@ const parentSchema = new mongoose.Schema({
     isEmployee: {
         type: Boolean
     },
+    joiningDate: {
+        type: String
+    },
+    resignedDate: {
+        type: String
+    },
     recordStatus: requiredString
 }, { timestamps: true })
 

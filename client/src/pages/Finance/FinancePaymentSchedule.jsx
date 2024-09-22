@@ -8,6 +8,7 @@ import Warning from '../../components/Warning';
 import { jsPDF } from "jspdf";
 import { useSnackbar } from "notistack";
 import html2canvas from "html2canvas";
+import StatementOfAccountForm from "./StatementOfAccountForm";
 
 const FinancePaymentSchedule = () => {
 
@@ -19,6 +20,7 @@ const FinancePaymentSchedule = () => {
 
     const [studentPayments, setStudentPayments] = useState([]);
     const [studentViewed, setStudentViewed] = useState('');
+    const [currentStudent,setCurrentStudent] = useState({});
 
     const [currentSelectedButton, setCurrentSelectedButton] = useState('');
 
@@ -89,6 +91,7 @@ const FinancePaymentSchedule = () => {
         setStudentViewed(`${studentRecord?.firstName} ${studentRecord?.middleName} ${studentRecord?.lastName}`);
         setShowStudentPayments(true); // Show student payment modal
         setStudentPayments(records?.studentPayments?.filter(student => student.studentId === studentId));
+        setCurrentStudent(studentRecord)
     };
 
     // PDF Generation Function
@@ -136,7 +139,6 @@ const FinancePaymentSchedule = () => {
         });
     };
 
-
     // Setting amounts after the viewStudentPayments has been clicked
     const totalBookAmount = studentPayments?.filter(studentPayment => studentPayment.textBookId && !studentPayment.isPaid).reduce((total,payment) => total + payment.textBookId.bookAmount,0);
     const totalMiscAmount = studentPayments?.filter(studentPayment => studentPayment?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC' && !studentPayment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0)
@@ -159,11 +161,12 @@ const FinancePaymentSchedule = () => {
             </section>
 
             {showStudentPayments && (
+                <>
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
-                        {currentSelectedButton === '' && (
+                        {/* {currentSelectedButton === '' && (
                             <Warning message={'Please select a card to view payment details'} />
-                        )}
+                        )} */}
                         <div className="border-b border-gray-300 py-2 flex items-center justify-between">
                             <div>
                                 <h2 className="font-bold text-gray-700 text-2xl">{studentViewed}</h2>
@@ -189,7 +192,7 @@ const FinancePaymentSchedule = () => {
                             </div>
                         </div>
 
-                        <div id='student-payments-content' className="mt-6">
+                        <div className="mt-6">
                             <div className="grid grid-cols-3 gap-4">
                                 <div onClick={() => setCurrentSelectedButton('Book Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
                                     <h2 className="text-sm font-semibold text-gray-700">Textbooks</h2>
@@ -254,11 +257,20 @@ const FinancePaymentSchedule = () => {
                                 </div>
                              </div>
                              )}
-
+                            {/* Show statement of account form */}
+                            <StatementOfAccountForm 
+                                studentPayments={studentPayments}
+                                currentStudent={currentStudent}
+                            />
                         </div>
                     </div>
                 </div>
+                
+                </>
             )}
+
+
+            
         </main>
     );
 };

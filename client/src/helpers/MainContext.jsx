@@ -58,6 +58,14 @@ export const MainProvider = ({ children }) => {
     // Return the formatted integer and decimal parts together
     return `${formattedInteger}.${decimalPart}`;
   };
+
+  const dateFormatter = (date) => {
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric' 
+      })
+  }
   
 
   return (
@@ -80,7 +88,8 @@ export const MainProvider = ({ children }) => {
       teacherSectionSelected,
       setTeacherSectionSelected,
       snackbarKey,
-      numberFormatter
+      numberFormatter,
+      dateFormatter
     }}>
       {children}
     </MainContext.Provider>

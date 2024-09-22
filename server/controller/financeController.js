@@ -51,8 +51,9 @@ module.exports.get_finance_payment_schedule = async(req,res) => {
         financeName = `${finance.firstName} ${finance.middleName} ${finance.lastName}`;
 
         const students = await Student.find({ recordStatus: 'Live' }).populate({ path: 'academicId', populate: {
-            path: 'gradeLevelId'
-        } });
+            path: 'gradeLevelId sectionId'
+        } })
+        .populate('sessionId')
         if(!students) {
             return res.status(404).json({ mssg: 'Student information is not existing' });
         }
