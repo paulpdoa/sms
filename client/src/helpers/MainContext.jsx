@@ -32,6 +32,7 @@ export const MainProvider = ({ children }) => {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  // For loading notification
   const snackbarKey = (message) => {
     return enqueueSnackbar(message || '', { 
         variant: 'info',
@@ -42,7 +43,22 @@ export const MainProvider = ({ children }) => {
         persist: true,
         preventDuplicate: true
     });
-  }  
+  }
+
+  // For success/error notification
+  const snackbarMessage = (message,status,duration) => {
+    return enqueueSnackbar(message || '', { 
+        variant: status,
+        anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center',
+        },
+        persist: true,
+        preventDuplicate: true,
+        autoHideDuration: duration,
+    }); 
+  }
+
 
 
   const numberFormatter = (number, decimalPlaces = 2) => {
@@ -89,7 +105,8 @@ export const MainProvider = ({ children }) => {
       setTeacherSectionSelected,
       snackbarKey,
       numberFormatter,
-      dateFormatter
+      dateFormatter,
+      snackbarMessage
     }}>
       {children}
     </MainContext.Provider>

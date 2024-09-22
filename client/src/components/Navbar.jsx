@@ -1,21 +1,21 @@
 import { useLocation } from "react-router-dom";
 import { HiChevronDown } from "react-icons/hi";
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useState,useContext } from 'react';
 import { useCookies } from 'react-cookie';
 import { CiLogout } from "react-icons/ci";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainContext } from "../helpers/MainContext";
 import { useSnackbar } from 'notistack';
+import TabActions from "./TabActions";
+import Searchbar from "./Searchbar";
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const pathName = 'School Management System';
+    const pathName = 'Welcome to School Management System';
 
-    const { role } = useContext(MainContext);
+    const { setSearchQuery } = useContext(MainContext);
     const { enqueueSnackbar } = useSnackbar();
 
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -52,16 +52,26 @@ const Navbar = () => {
     return (
         <>
             <nav className="w-full bg-gradient-to-r border-b border-gray-300 from-gray-100 to-gray-200 p-3 flex items-center justify-between shadow-md">
-                <h1 className="font-semibold flex items-center gap-2 text-xl text-gray-700 ml-6">
-                    <img className="w-10" src="/schoolLogo/school-logo-filler.png" alt={pathName} />
-                    {pathName}
-                </h1>
+                <div className="flex gap-5 items-center">
+                    <h1 className="font-semibold flex items-center gap-2 text-lg text-gray-700 ml-6">
+                        <img className="w-10" src="/schoolLogo/school-logo-filler.png" alt={pathName} />
+                        {pathName}
+                    </h1>
+                    <Searchbar onSearch={setSearchQuery} />
+                </div>
                 <div className="relative">
-                    <HiChevronDown
+                    {/* <HiChevronDown
                         className="text-3xl text-gray-700 cursor-pointer transition-transform transform hover:scale-110"
                         onClick={() => setShowDropdown(!showDropdown)}
-                    />  
-                    <AnimatePresence>
+                    /> */}
+                    <button
+                        onClick={userLogout}
+                        className="text-sm text-gray-700 w-full py-2 rounded-lg transition-colors flex items-center gap-2 hover:underline"
+                    >
+                        {/* <CiLogout className="text-gray-700 font-bold text-xl" />  */}
+                        Logout
+                    </button>  
+                    {/* <AnimatePresence>
                         {showDropdown && (
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -78,10 +88,9 @@ const Navbar = () => {
                                 </button>
                             </motion.div>
                         )}
-                    </AnimatePresence>
+                    </AnimatePresence> */}
                 </div>
             </nav>
-            <ToastContainer />
         </>
     );
 };

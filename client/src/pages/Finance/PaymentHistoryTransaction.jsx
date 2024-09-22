@@ -50,7 +50,7 @@ const PaymentHistoryTransaction = () => {
             </header>
 
             <section className="w-full px-4 mt-5">
-                <TabActions title="Payment History" noView={true} />
+                <TabActions title="Payment History" noView={true} noSearch={true} />
                 <MasterTable
                     columns={columns}
                     data={studentData || []}

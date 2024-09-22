@@ -416,14 +416,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 exit="closed"
                 variants={sidebarVariants}
                 transition={{ type: 'tween', duration: 0.3 }}
-                className={`inset-0 z-50 w-full max-w-xs h-full bg-gray-800 border-r border-gray-300 shadow-lg ${isOpen ? 'block' : 'hidden'}`}
+                className={`inset-0 z-50 w-full max-w-xs h-full bg-sidebarBg border-r border-gray-300 shadow-lg ${isOpen ? 'block' : 'hidden'}`}
             >
                 <div>
                     <div className="bg-gray-900 shadow-sm border-b border-gray-700 p-3 flex items-center justify-between gap-2">
-                        <h1 className="font-semibold text-3xl text-gray-200">SMS</h1>
+                        <h1 className="font-semibold text-3xl text-white">SMS</h1>
                         <div className="flex items-center gap-2">
-                            <span className="font-normal text-xs text-gray-200">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
-                            <button onClick={toggleSidebar} className="text-gray-200 hover:scale-110 hover:transition">
+                            <span className="font-normal text-xs text-white">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
+                            <button onClick={toggleSidebar} className="text-white hover:scale-110 hover:transition">
                                 <MdClose size={24} />
                             </button>
                         </div>
@@ -431,7 +431,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     
                     <div onClick={() => navigate(`/profile/${currentUserId}`)} className="border border-gray-700 shadow-lg flex items-stretch gap-2 justify-start p-2 m-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-800">
                         <img className="w-16 h-16 rounded-full object-cover" src={ user.profilePictureUrl ? `${baseUrl()}${user.profilePictureUrl}` : '/avatar/avatar.png'} alt="Profile Picture" />
-                        <div className="text-gray-200 flex flex-col">
+                        <div className="text-white flex flex-col">
                             <h2 className="text-md">{currentUser}</h2>
                             <span className="text-xs">{currentRole}</span>
                         </div>
@@ -442,25 +442,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                             <div key={id}>
                                 <li className="px-7 py-3 my-3 flex flex-col gap-2 cursor-pointer">
                                     {menu.link ? (
-                                        <Link to={menu.link} className="flex items-center gap-2 hover:bg-gray-900 p-2">
-                                            <span className="text-gray-200">{menu.icon}</span>
-                                            <span className="text-gray-200">{menu.name}</span>
+                                        <Link to={menu.link} className="flex items-center gap-2 hover:bg-sidebarHighlight p-2">
+                                            <span className="text-white">{menu.icon}</span>
+                                            <span className="text-white">{menu.name}</span>
                                             {menu.subMenus && (
                                                 <MdOutlineKeyboardArrowUp
-                                                    className={`transition-transform duration-300 text-gray-200 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                    className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                                 />
                                             )}
                                         </Link>
                                     ) : (
                                         <button
-                                            className="flex items-center gap-2 p-2 hover:bg-gray-900"
+                                            className="flex items-center gap-2 p-2 hover:bg-sidebarHighlight"
                                             onClick={() => handleToggleDropdown(id)}
                                         >
-                                            <span className="text-gray-200">{menu.icon}</span>
-                                            <span className="text-gray-200">{menu.name}</span>
+                                            <span className="text-white">{menu.icon}</span>
+                                            <span className="text-white">{menu.name}</span>
                                             {menu.subMenus && (
                                                 <MdOutlineKeyboardArrowUp
-                                                    className={`transition-transform duration-300 text-gray-200 ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
+                                                    className={`transition-transform duration-300 text-white ${openDropdown === id ? 'rotate-0' : 'rotate-180'}`}
                                                 />
                                             )}
                                         </button>
@@ -480,17 +480,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                                         <div key={subId}>
                                                             {subMenu.link ? (
                                                                 <Link onClick={() => setShowForm(false)} to={subMenu.link}>
-                                                                    <li className="text-sm py-3 text-gray-200 shadow-sm hover:bg-gray-900 p-2 border-b border-gray-900">{subMenu.name}</li>
+                                                                    <li className="text-sm py-3 text-white shadow-sm hover:bg-sidebarHighlight p-2 border-b border-gray-900">{subMenu.name}</li>
                                                                 </Link>
                                                             ) : (
                                                                 <>
                                                                     <button
-                                                                        className="text-sm py-3 text-gray-200 shadow-sm hover:bg-gray-900 p-2 border-b border-gray-900 w-full text-left flex gap-2 items-center"
+                                                                        className="text-sm py-3 text-white shadow-sm hover:bg-sidebarHighlight p-2 border-b border-gray-900 w-full text-left flex gap-2 items-center"
                                                                         onClick={() => handleToggleSubDropdown(subId)}
                                                                     >
                                                                         {subMenu.name}
                                                                         <MdOutlineKeyboardArrowUp
-                                                                            className={`transition-transform duration-300 text-gray-200 ${openSubDropdown === subId ? 'rotate-0' : 'rotate-180'}`}
+                                                                            className={`transition-transform duration-300 text-white ${openSubDropdown === subId ? 'rotate-0' : 'rotate-180'}`}
                                                                         />
                                                                     </button>
                                                                     <AnimatePresence initial={false}>
@@ -505,7 +505,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                                                                             >
                                                                                 {subMenu.subMenus?.map((sb, key) => (
                                                                                     <Link onClick={() => setShowForm(false)} key={key} to={sb.link}>
-                                                                                        <li className="text-sm py-3 text-gray-200 shadow-sm hover:bg-gray-900 p-2 border-b border-gray-900">{sb.name}</li>
+                                                                                        <li className="text-sm py-3 text-white shadow-sm hover:bg-sidebarHighlight p-2 border-b border-gray-900">{sb.name}</li>
                                                                                     </Link>
                                                                                 ))}
                                                                             </motion.ul>
@@ -525,7 +525,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </ul>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 w-full text-center">
-                    <span className="text-gray-200 text-sm break-words">
+                    <span className="text-white text-sm break-words">
                         {`${schoolYear?.schoolTheme ?? 'No school theme yet'}`}
                     </span>
                 </div>

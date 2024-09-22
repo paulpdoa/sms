@@ -11,9 +11,9 @@ const Searchbar = ({ onSearch }) => {
     };
 
     return (
-        <div className="flex items-center gap-2 overflow-hidden border-gray-300 border bg-white rounded-md">
+        <div className="flex items-center gap-2 overflow-hidden border-gray-300 border bg-white rounded-2xl">
             <input 
-                className="outline-none p-2" 
+                className="outline-none p-2 placeholder:text-sm text-sm" 
                 type="text" 
                 placeholder="Search..." 
                 value={query} 

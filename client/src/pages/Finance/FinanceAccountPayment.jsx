@@ -78,7 +78,7 @@ const FinanceAccountPayment = () => {
       </header>
 
       <section className="w-full px-4 mt-5">
-        <TabActions title="Account Payments" noView={true} />
+        <TabActions title="Account Payments" noView={true} noSearch={true} />
         <MasterTable columns={studentColumns} data={studentData || []} searchQuery={searchQuery} actions={actions} />
       </section>
       {/* Students Payment Modal */}

@@ -20,7 +20,7 @@ const PaymentModal = ({
   }) => {
 
     const { enqueueSnackbar,closeSnackbar } = useSnackbar();
-    const { numberFormatter,snackbarKey } = useContext(MainContext);
+    const { numberFormatter,snackbarKey,snackbarMessage } = useContext(MainContext);
 
     const { records: manageFees } = useFetch(`${baseUrl()}/manage-fees`);
 

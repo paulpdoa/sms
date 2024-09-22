@@ -11,8 +11,8 @@ const AddNewData = ({ label, onShow }) => {
     const location = useLocation();
     const isSchoolYearPage = location.pathname.includes('school-year');
 
-    const buttonStyles = "flex items-center gap-2 text-gray-100 p-3 rounded-md text-sm transition-colors duration-200";
-    const enabledStyles = "bg-blue-500 hover:bg-blue-600";
+    const buttonStyles = "flex items-center gap-2 text-white p-3 rounded-md text-sm transition-colors duration-200";
+    const enabledStyles = "bg-customView hover:bg-customView";
     const disabledStyles = "bg-gray-400 cursor-not-allowed";
 
     const renderButton = (isDisabled, label) => (

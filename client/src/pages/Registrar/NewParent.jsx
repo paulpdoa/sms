@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const NewParent = () => {
     // Fetch records for religions, genders, students, and nationalities
@@ -14,7 +15,8 @@ const NewParent = () => {
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { session,currentUserId,genericPath,snackbarKey } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
 
@@ -44,15 +46,14 @@ const NewParent = () => {
         e.preventDefault();
 
         if(password !== confirmPassword) {
-            return toast.error('Password does not match', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            return enqueueSnackbar('Password does not match', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
             });
         }
 
@@ -82,32 +83,30 @@ const NewParent = () => {
 
         try {
             const data = await axios.post(`${baseUrl()}/parent`, parentInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    navigate(`/${genericPath}/parents`);
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/parents`);
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
             });
+            
         }
     }
 
@@ -115,7 +114,10 @@ const NewParent = () => {
         <main className="p-4">
             
             <form onSubmit={addParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
-                <h1 className="font-bold text-start text-gray-700 text-3xl">Add New Parent</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="font-bold text-start text-gray-700 text-3xl">Add New Parent</h1>
+                    <button className="bg-blue-500 hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm">View Child Added</button>
+                </div>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
@@ -290,6 +292,13 @@ const NewParent = () => {
                             ))}
                         </select>
                     </div>
+
+                    <button 
+                        onClick={() => alert('Add as child')}
+                        className="bg-blue-500 hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
+                    >
+                        Add as child
+                    </button>
                 </section>
 
                 <section>
@@ -298,26 +307,26 @@ const NewParent = () => {
                         <div className="flex flex-col mt-4">
                             <label className="text-sm" htmlFor="username">Username</label>
                             <input
-                                    className="outline-none p-2 rounded-md border border-gray-300"
-                                    type="text"
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="text"
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
                         </div>
                         <div className="flex flex-col mt-4">
                             <label className="text-sm" htmlFor="password">Password</label>
                             <input
-                                    className="outline-none p-2 rounded-md border border-gray-300"
-                                    type="password"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="password"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
                         </div>
                         <div className="flex flex-col mt-4">
                             <label className="text-sm" htmlFor="password">Confirm Password</label>
                             <input
-                                    className="outline-none p-2 rounded-md border border-gray-300"
-                                    type="password"
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                />
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="password"
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
                         </div>
                     </div>
                 </section>

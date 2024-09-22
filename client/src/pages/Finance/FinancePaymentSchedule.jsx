@@ -151,7 +151,7 @@ const FinancePaymentSchedule = () => {
             </header>
 
             <section className="w-full px-4 mt-5">
-                <TabActions title="Statement Of Accounts" noView={true} />
+                <TabActions title="Statement Of Accounts" noView={true} noSearch={true} />
                 <MasterTable
                     columns={columns}
                     data={studentData || []}
@@ -212,7 +212,7 @@ const FinancePaymentSchedule = () => {
                             
                             {/* Modal will open upon hover */}
                             {/* For textbooks */}
-                            { currentSelectedButton === 'Book Amount'&& (
+                            {/* { currentSelectedButton === 'Book Amount'&& (
                                 <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                     <TabActions title="Textbooks" noView={true} />
                                     <MasterTable
@@ -226,10 +226,10 @@ const FinancePaymentSchedule = () => {
                                     </div>
                                     <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                                 </div>
-                            ) }
+                            ) } */}
 
                              {/* For Tuition Fees */}
-                             {currentSelectedButton === 'Tuition Fee Amount' && (
+                             {/* {currentSelectedButton === 'Tuition Fee Amount' && (
                                 <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                     <TabActions title="Tuition" noView={true} />
                                     <MasterTable
@@ -243,9 +243,9 @@ const FinancePaymentSchedule = () => {
                                     </div>
                                     <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                                 </div>
-                             )}
+                             )} */}
 
-                             {currentSelectedButton === 'Miscellaneous Amount' && (
+                             {/* {currentSelectedButton === 'Miscellaneous Amount' && (
                              <div className="bg-white p-4 z-50 rounded-md transition-all ease-in-out duration-300 relative">
                                 <TabActions title="Miscellaneous" noView={true} />
                                 <MasterTable
@@ -260,7 +260,7 @@ const FinancePaymentSchedule = () => {
 
                                 <button className="absolute top-10 right-5 bg-red-500 p-2 rounded-md text-gray-100 text-sm" onClick={() => setCurrentSelectedButton('')}>Close</button>
                              </div>
-                             )}
+                             )} */}
                             {/* Show statement of account form */}
                             <StatementOfAccountForm 
                                 studentPayments={studentPayments}
