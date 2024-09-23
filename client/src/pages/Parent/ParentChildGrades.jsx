@@ -1,13 +1,9 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
-import axios from "axios";
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
-import MasterDataForm from "../../components/MasterDataForm";
 
 const ParentChildGrades = () => {
 
@@ -17,6 +13,10 @@ const ParentChildGrades = () => {
 
     const [subjectViewed,setSubjectViewed] = useState({ currentSubject: '', selectedAcademicPeriod: '1st Grading' });
 
+    const [currentChild,setCurrentChild] = useState('');
+
+    console.log(records?.studentGrades);
+
     const academicPeriods = [
         { id: 1, academicPeriod: '1st Grading' },
         { id: 2, academicPeriod: '2nd Grading' },
@@ -25,25 +25,22 @@ const ParentChildGrades = () => {
     ]
 
     const studentSubjectsColumns = [
-        // { accessorKey: 'student', header: 'Student' },
         { accessorKey: 'subject', header: 'Subject' },
-        // { accessorKey: 'section', header: 'Section' },
         { accessorKey: 'teacher', header: 'Teacher' }
     ]
 
-    const studentSubjects = records?.studentSubjects?.map(studentSubject => ({
+    const studentSubjects = records?.studentSubjects?.filter(student => student.studentId._id === currentChild)?.map(studentSubject => ({
         ...studentSubject,
-        // student: `${studentSubject.studentId.firstName} ${studentSubject.studentId.lastName}`,
         subject: `${studentSubject.subjectId.subjectName} - ${studentSubject.subjectId.subjectCode}`,
         teacher: `${studentSubject.teacherSubjectId.teacherId.firstName} ${studentSubject.teacherSubjectId.teacherId.middleName} ${studentSubject.teacherSubjectId.teacherId.lastName}`
     }));
+
     const viewMyGrades = (record) => {
         setSubjectViewed({ currentSubject: `${record.subjectId.subjectName} - ${record.subjectId.subjectCode}` });
         const gradesPerSubject = records?.studentGrades.filter(sg => sg.subjectId._id === record.subjectId._id);
         console.log(gradesPerSubject);
         setShowGrades(true);
     }
-
 
     const gradesOfSubjectsSelectedColumns = [
         { accessorKey: 'gradingCategoryId.gradingCategory', header: 'Category', editable: true },
@@ -63,10 +60,25 @@ const ParentChildGrades = () => {
         <main className="bg-gray-100 min-h-screen flex flex-col items-center relative">
             <header className="w-full bg-white shadow-md py-6 px-8">
                 <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.parentName}!</h1>
-                <p className="text-sm text-gray-500">Parent of {records?.studentName}</p>
             </header>
+
             <section className="w-full px-4 mt-5">
-                {/* <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your Grades List</h2> */}
+                <h2 className="text-2xl font-bold text-gray-700 px-1 mb-2">Select Child Grade to View</h2>
+                <section className="flex gap-2 items-center justify-start">
+                    { records?.studentLists?.map(student => (
+                        <button
+                            key={student._id}
+                            onClick={() => setCurrentChild(student._id)}
+                            className={`p-2 text-sm rounded-md border transition-all duration-200 focus:ring focus:ring-blue-300
+                                ${currentChild === student._id 
+                                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                                    : 'bg-white text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white'}`}
+                        >
+                            { student.firstName } { student.lastName } 
+                        </button>
+                    )) }
+                </section>
+
                 <TabActions title="Your Grades List" noView={true} />
                 <MasterTable 
                     columns={studentSubjectsColumns}
@@ -76,21 +88,22 @@ const ParentChildGrades = () => {
                 />
             </section>
 
-            {/* Modal for grades popup */}
             { showGrades && (
                 <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-md w-auto relative p-6">
-
                         <h2 className="font-bold text-gray-700 text-2xl">{subjectViewed.currentSubject}</h2>
-                        
+
                         <div className="flex items-center gap-2 mt-2">
                         { academicPeriods.map(academicPeriod => (
                             <button
                                 key={academicPeriod.id}
                                 onClick={() => {
-                                    setSubjectViewed({ selectedAcademicPeriod: academicPeriod.academicPeriod, currentSubject: subjectViewed.currentSubject })
+                                    setSubjectViewed({ selectedAcademicPeriod: academicPeriod.academicPeriod, currentSubject: subjectViewed.currentSubject });
                                 }}
-                                className={`${ subjectViewed.selectedAcademicPeriod === academicPeriod.academicPeriod ? 'bg-blue-500 hover:bg-blue-600 text-gray-100' : 'border text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-gray-100' } p-2 text-sm  rounded-md transition`}
+                                className={`p-2 text-sm rounded-md transition-all duration-200 focus:ring focus:ring-blue-300
+                                    ${subjectViewed.selectedAcademicPeriod === academicPeriod.academicPeriod 
+                                        ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                                        : 'border text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white'}`}
                             >
                                 {academicPeriod.academicPeriod}
                             </button>
@@ -112,12 +125,9 @@ const ParentChildGrades = () => {
                         >
                             Cancel
                         </button>
-                        {/* Modal content goes here */}
                     </div>
                 </div>
             )}
-
-
         </main>
     )
 }

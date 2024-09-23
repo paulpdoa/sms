@@ -1658,7 +1658,7 @@ module.exports.add_parent = async (req,res) => {
             }
         } catch(err) {
             console.log(err);
-            res.status(400).json({ mssg: 'An error occurred while adding parent record' });
+            res.status(400).json({ mssg: err.message });
         }
 }
 

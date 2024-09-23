@@ -3,6 +3,7 @@ const Student = require('../model/Students');
 const StudentSubject = require('../model/StudentSubject');
 const StudentGrade = require('../model/StudentGrade');
 const StudentPayment = require('../model/StudentPayment');
+const StudentAttendance = require('../model/StudentAttendance');
 
 module.exports.get_student_dashboard = async (req,res) => {
     const { session } = req.query;
@@ -120,4 +121,31 @@ module.exports.get_student_payment = async(req,res) => {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching parents child payment schedules' });
     }
+}
+
+module.exports.get_student_attendance = async (req,res) => {
+    const { userId } = req.params;
+    const { session,currentDate } = req.query;
+    let studentName = '';
+    try {
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({ mssg: 'User is not existing' });
+        }
+
+        const student = await Student.findById(user.studentId);
+        if(!student) {
+            return res.status(404).json({ mssg: 'Student is not exitsing' });
+        }
+        studentName = `${student.firstName} ${student.middleName} ${student.lastName}`;
+
+        const attendance = await StudentAttendance.find({ studentId: student._id, recordStatus: 'Live', sessionId: session, dateToday: currentDate });
+        console.log(attendance);
+
+        res.status(200).json({ studentName, attendance });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while fetching students attendance details' });
+    }
+
 }

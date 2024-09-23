@@ -63,7 +63,7 @@ const StudentGrades = () => {
 
             <section className="w-full px-4 mt-5">
                 {/* <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your Grades List</h2> */}
-                <TabActions title="Your Grades List" noView={true} />
+                <TabActions title="My Grades List" noView={true} />
                 <MasterTable 
                     columns={studentSubjectsColumns}
                     data={studentSubjects ?? []}

@@ -307,12 +307,12 @@ const PaymentModal = ({
             <div className="flex items-center gap-2">
                 <button // After clicking this, it will show all selected payments of the customer
                     onClick={() => setViewPayment(true)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+                    className="bg-customView hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
                 >
                     View Payments Selected
                 </button>
                 <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+                    className="bg-customCancel hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
                     onClick={() => {
                         setPaymentRecords([]); // Set to empty after pressing cancel
                         setIsStudentPaymentModalVisible(false);
@@ -418,7 +418,7 @@ const PaymentModal = ({
                             { currentFeeId && (
                                 <button 
                                     onClick={addAdditionalFeeToPayment}
-                                    className="p-2 rounded-md text-sm bg-blue-500 hover:bg-blue-600 text-gray-100"
+                                    className="p-2 rounded-md text-sm bg-customView hover:bg-blue-600 text-gray-100"
                                 >
                                     Add to payments
                                 </button>
@@ -427,7 +427,7 @@ const PaymentModal = ({
 
                         { paymentRecords.length > 0 && (
                             <button
-                                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md text-sm"
+                                className="bg-customSubmit hover:bg-green-600 text-white px-6 py-2 rounded-md text-sm"
                                 onClick={postPayment}
                             >
                                 Pay Now

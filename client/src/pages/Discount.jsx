@@ -1,7 +1,3 @@
-import DateTime from "../components/DateTime";
-import Searchbar from "../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
@@ -10,6 +6,7 @@ import MasterTable from "../components/MasterTable";
 import { MainContext } from "../helpers/MainContext";
 import TabActions from '../components/TabActions';
 import MasterDataForm from "../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Discount = () => {
 
@@ -18,6 +15,8 @@ const Discount = () => {
     const { records: schoolYears } = useFetch(`${baseUrl()}/school-years`);
 
     const { session, currentUserId, role, searchQuery, showForm, setShowForm } = useContext(MainContext);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const [discountType, setDiscountType] = useState('');
     const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -69,40 +68,41 @@ const Discount = () => {
 
         // Also add validation here to not accept incorrect values
         if (updatedData.discountType === '') {
-            toast.error("Discount type is not provided", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount type is not provided", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
+           
             return;
         }
 
         if (updatedData.amount !== null && updatedData.amount < 0) {
-            toast.error("Discount amount cannot be negative", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount amount cannot be negative", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             return;
         }
 
         if (updatedData.discountPercent < 0) {
-            toast.error("Discount percentage cannot be negative", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount percentage cannot be negative", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             return;
         }
@@ -117,29 +117,28 @@ const Discount = () => {
                 inputter: currentUserId,
                 role
             });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating discount record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -147,29 +146,28 @@ const Discount = () => {
     const deleteDiscount = async (id) => {
         try {
             const removeDiscount = await axios.put(`${baseUrl()}/discount/${id}`, { role,recordStatus: 'Deleted' });
-            toast.success(removeDiscount.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(removeDiscount.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating deleting record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -190,40 +188,40 @@ const Discount = () => {
 
         
         if (discountType === '') {
-            toast.error("Discount type is not provided", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount type is not provided", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             return;
         }
 
         if (amount !== null && amount < 0) {
-            toast.error("Discount amount cannot be negative", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount amount cannot be negative", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             return;
         }
 
         if (discountPercentage < 0) {
-            toast.error("Discount percentage cannot be negative", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar("Discount percentage cannot be negative", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             return;
         }
@@ -231,31 +229,29 @@ const Discount = () => {
 
         try {
             const newDiscount = await axios.post(`${baseUrl()}/discount`, discountInfo);
-            toast.success(newDiscount.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(newDiscount.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred whil adding new discount record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-            return;
         }
     };
 
@@ -280,7 +276,7 @@ const Discount = () => {
                 {renderInput('discount type',discountType,'Discount Type', setDiscountType, 'text')}
                 {renderInput('discount percentage',discountPercentage,'Discount Percentage', setDiscountPercentage, 'number', { step: "0.000001" })}
                 {/* Not required */}
-                {renderInput('discount amount',amount,'Discount Amount', setAmount, 'number', { step: "0.000001" },'Leave this empty if n/a')}
+                {renderInput('discount amount',amount,'Discount Amount', setAmount, 'number', { step: "0.000001" })}
                 {renderSelect('discountCode','Discount Category', setDiscountCode, categories, 'Leave this empty if n/a', false)}
                 {/* {renderInput('discount code',discountCode,'Discount Category', setDiscountCode, 'text')} */}
                 {/* Not Required */}
@@ -306,7 +302,6 @@ const Discount = () => {
                     />
                 </div>
             </div>
-            <ToastContainer />
         </main>
     );
 };

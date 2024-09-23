@@ -13,7 +13,10 @@ export default {
         sidebarBg: "#1F2937",
         sidebarHighlight: "#2190F6",
         customHighlight: "#2190F6", 
-        dashboardYellow: "#FFC720"
+        dashboardYellow: "#FFC720",
+        customDisabled: '#BBBBBB',
+        // For Dashboard Graphs
+        
       }
     },
   },

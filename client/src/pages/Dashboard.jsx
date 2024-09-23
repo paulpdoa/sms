@@ -166,7 +166,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="p-6 w-full">
         <header className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">Welcome {localStorage.getItem('username')}!</h1>
+          <h1 className="text-2xl font-bold text-customView">Welcome {localStorage.getItem('username')}!</h1>
         </header>
 
         <section className="grid md:grid-cols-4 gap-6 mb-6">

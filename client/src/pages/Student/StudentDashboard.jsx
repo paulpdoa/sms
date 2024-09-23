@@ -29,7 +29,7 @@ const StudentDashboard = () => {
             </header>
 
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Your Subjects For Today</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">My Subjects For Today</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     { records?.studentSubjects?.teacherSubjectId?.filter(ts => ts.daySchedule.includes(records?.todayValue))?.length > 0 ? (
                         records?.studentSubjects?.map((studentSubject,index) => (
@@ -65,7 +65,7 @@ const StudentDashboard = () => {
             </section>
             
             <section className="w-full px-7 mt-8">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to you</h2>
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6">Subjects Assigned to me</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     { records?.studentSubjects?.length > 0 ? (
                         records?.studentSubjects?.map((studentSubject,index) => (

@@ -153,7 +153,7 @@ const NewParent = () => {
             });
         } catch (err) {
             console.log(err);
-            enqueueSnackbar(err.response.data.mssg, { 
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding parent record', { 
                 variant: 'error',
                 anchorOrigin: {
                     vertical: 'top',

@@ -14,7 +14,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
     const totalMiscFee = miscData.filter(payment => !payment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
     return (
-        <div className="p-6 h-full" id="student-payments-content">
+        <div className="h-full" id="student-payments-content">
             <section>
                 {/* <div className="py-4 flex items-center gap-2 border-b border-gray-400">
                     <p className="text-gray-800 text-md font-semibold">{ currentStudent.firstName } { currentStudent.middleName } { currentStudent.lastName }</p>
@@ -39,7 +39,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
                             <div className="grid grid-cols-3 indent-5 p-2">
                                 <p className="text-sm">{dateFormatter(tuition?.paymentScheduleId.dateSchedule)}</p>
                                 <p className="text-sm">{numberFormatter(tuition?.payEveryAmount)}</p>
-                                <p className={`text-sm ${tuition.isPaid ? 'text-green-700' : 'text-red-700'}`}>{ tuition.isPaid ? 'Paid' : 'Not yet paid' }</p>
+                                <p className={`text-sm ${tuition.isPaid ? 'text-customSubmit' : 'text-customCancel'}`}>{ tuition.isPaid ? 'Paid' : 'Not yet paid' }</p>
                             </div>
                         )) }
                     </div>
@@ -56,7 +56,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
                             <div className="grid grid-cols-3 indent-5 p-2">
                                 <p className="text-sm">{misc?.manageFeeId.feeDescription.description}</p>
                                 <p className="text-sm">{numberFormatter(misc.manageFeeId.amount)}</p>
-                                <p className={`text-sm ${misc.isPaid ? 'text-green-700' : 'text-red-700'}`}>{ misc.isPaid ? 'Paid' : 'Not yet paid' }</p>
+                                <p className={`text-sm ${misc.isPaid ? 'text-customSubmit' : 'text-customCancel'}`}>{ misc.isPaid ? 'Paid' : 'Not yet paid' }</p>
                             </div>
                         )) }
                     </div>
@@ -72,7 +72,7 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
                             <div className="grid grid-cols-3 indent-5 p-2">
                                 <p className="text-sm">{textbook.textBookId.bookTitle} {textbook.textBookId.bookCode}</p>
                                 <p className="text-sm">{numberFormatter(textbook.textBookId.bookAmount)}</p>
-                                <p className={`text-sm ${textbook.isPaid ? 'text-green-700' : 'text-red-700'}`}>{ textbook.isPaid ? 'Paid' : 'Not yet paid' }</p>
+                                <p className={`text-sm ${textbook.isPaid ? 'text-customSubmit' : 'text-customCancel'}`}>{ textbook.isPaid ? 'Paid' : 'Not yet paid' }</p>
                             </div>
                         )) }
                     </div>

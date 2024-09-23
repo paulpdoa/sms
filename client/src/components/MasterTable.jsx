@@ -225,7 +225,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     name={column.accessorKey}
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
-                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit"
+                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit text-black"
                                                                 >
                                                                     <option value={record._id || ''} disabled hidden>
                                                                         { 
@@ -250,7 +250,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     name={column.accessorKey}
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
-                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit"
+                                                                    className="outline-none p-1 rounded-md border border-gray-300 w-fit text-black"
                                                                     type={column.type || ''}
                                                                 />
                                                             )

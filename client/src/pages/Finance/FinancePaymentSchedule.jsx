@@ -175,13 +175,13 @@ const FinancePaymentSchedule = () => {
 
                             <div className="flex items-center gap-2">
                                 <button
-                                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm"
+                                    className="bg-customSubmit hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm"
                                     onClick={generatePDF}
                                 >
                                     Download as PDF
                                 </button>
                                 <button
-                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
+                                    className="bg-customCancel hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm"
                                     onClick={() => {
                                         setShowStudentPayments(false)
                                         setCurrentSelectedButton('');

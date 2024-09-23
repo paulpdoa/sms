@@ -148,11 +148,11 @@ const Login = () => {
                     </div>
 
                     {/* Login Button */}
-                    <button className="bg-blue-500 text-white text-sm py-2 rounded-md w-full hover:bg-blue-600 transition-all">Login</button>
+                    <button className="bg-customView text-white text-sm py-2 rounded-md w-full hover:bg-blue-600 transition-all">Login</button>
                 </form>
 
                 {/* Right Side - School Info */}
-                <div className="bg-blue-500 flex flex-col justify-center items-center p-10 text-white">
+                <div className="bg-customView flex flex-col justify-center items-center p-10 text-white">
                     <img className="mb-6 w-32 h-32" src="/schoolLogo/school-logo-filler.png" alt="School Logo" />
                     <h2 className="text-2xl font-semibold">Welcome to Name Of School</h2>
                     <p className="mt-2 text-sm">Manage your school's activities effectively.</p>
