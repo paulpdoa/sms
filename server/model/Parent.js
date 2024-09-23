@@ -7,11 +7,10 @@ const requiredString = {
 }
 
 const parentSchema = new mongoose.Schema({
-    studentId: {
+    studentId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'student',
-        unique: true
-    },
+    }],
     motherName: {
         type:String
     },

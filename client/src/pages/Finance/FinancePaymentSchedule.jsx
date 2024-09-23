@@ -192,8 +192,8 @@ const FinancePaymentSchedule = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6">
-                            <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            {/* <div className="grid grid-cols-3 gap-4">
                                 <div onClick={() => setCurrentSelectedButton('Book Amount')} className="bg-gray-100 p-4 rounded-md shadow-md transition cursor-pointer hover:-translate-y-1">
                                     <h2 className="text-sm font-semibold text-gray-700">Textbooks</h2>
                                     <p className="text-2xl font-bold text-blue-600">Php {numberFormatter(totalBookAmount)}</p>
@@ -208,7 +208,7 @@ const FinancePaymentSchedule = () => {
                                     <h2 className="text-sm font-semibold text-gray-700">Tuition</h2>
                                     <p className="text-2xl font-bold text-blue-600">Php { numberFormatter(totalTuitionFeeAmount) }</p>
                                 </div>
-                            </div>
+                            </div> */}
                             
                             {/* Modal will open upon hover */}
                             {/* For textbooks */}

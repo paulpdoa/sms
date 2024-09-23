@@ -1,12 +1,11 @@
 import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
+import ViewChildModal from '../../components/parent/ViewChildModal';
 
 const NewParent = () => {
     // Fetch records for religions, genders, students, and nationalities
@@ -41,6 +40,47 @@ const NewParent = () => {
     const [password,setPassword] = useState('');
     const [confirmPassword,setConfirmPassword] = useState('');
 
+    const [isEmployee,setIsEmployee] = useState(false);
+    const [joiningDate,setJoiningDate] = useState('');
+    const [resignedDate,setResignedDate] = useState('');
+
+    // For storage of child added
+    const [addedChildren,setAddedChildren] = useState([]);
+    const [viewChildModal,setViewChildModal] = useState(false);
+
+    const handleAddingChild = () => {
+        setAddedChildren(prev => {
+            const student = students.find(student => student._id === studentId);
+            // Check if the student's _id already exists in addedChildren
+            const alreadyExists = prev.some(child => child._id === student._id);
+            if(alreadyExists) {
+                enqueueSnackbar(`${student.firstName} is already in the record`, { 
+                    variant: 'error',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 2000,
+                    preventDuplicate: true
+                });
+                return [...prev]
+            } else {
+                enqueueSnackbar(`${student.firstName} has been added, please select view on top right`, { 
+                    variant: 'success',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 2000,
+                    preventDuplicate: true
+                });
+                return [...prev, student]
+            }
+        })
+
+        setStudentId('');
+    }
+
     // Function to handle form submission
     const addParent = async (e) => {
         e.preventDefault();
@@ -55,6 +95,18 @@ const NewParent = () => {
                 autoHideDuration: 3000,
                 preventDuplicate: true,
             });
+        }
+
+        if(addedChildren.length < 1) {
+            return enqueueSnackbar('You cannot add a parent without having a student/child in the premise', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+            })
         }
 
         const parentInformation = {
@@ -78,12 +130,16 @@ const NewParent = () => {
             inputter: currentUserId,
             sessionId: session,
             username,
-            password
+            password,
+            addedChildren,
+            isEmployee,
+            joiningDate,
+            resignedDate
         }
 
         try {
             const data = await axios.post(`${baseUrl()}/parent`, parentInformation);
-            enqueueSnackbar(data.mssg, { 
+            enqueueSnackbar(data.data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
                     vertical: 'top',
@@ -112,11 +168,16 @@ const NewParent = () => {
 
     return (
         <main className="p-4">
-            
             <form onSubmit={addParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
                 <div className="flex items-center justify-between">
                     <h1 className="font-bold text-start text-gray-700 text-3xl">Add New Parent</h1>
-                    <button className="bg-blue-500 hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm">View Child Added</button>
+                    <button 
+                        onClick={() => setViewChildModal(true)}
+                        type="button" 
+                        className="bg-blue-500 hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm"
+                    >
+                        View Child Added
+                    </button>
                 </div>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
@@ -275,11 +336,46 @@ const NewParent = () => {
                     </div>
                 </section>
 
+                {/* Employee Information */}
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl">Employee Information</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="guardianName">Working Here</label>
+                            <select
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                onChange={(e) => setIsEmployee(e.target.value)}
+                            >
+                                <option hidden>Select here</option>
+                                <option value={true}>Yes</option>
+                                <option value={false}>No</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="joiningDate">Joining Date</label>
+                            <input
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="date"
+                                onChange={(e) => setJoiningDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="resignedDate">Resigned Date</label>
+                            <input
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="date"
+                                onChange={(e) => setResignedDate(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
                     <div className="flex flex-col mt-4">
                         <label className="text-sm" htmlFor="student">Student Name</label>
                         <select
+                            value={studentId}
                             className="outline-none p-2 rounded-md border border-gray-300"
                             id="student"
                             onChange={(e) => setStudentId(e.target.value)}
@@ -294,8 +390,9 @@ const NewParent = () => {
                     </div>
 
                     <button 
-                        onClick={() => alert('Add as child')}
-                        className="bg-blue-500 hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
+                        type="button"
+                        onClick={handleAddingChild}
+                        className="bg-customView hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
                     >
                         Add as child
                     </button>
@@ -331,14 +428,25 @@ const NewParent = () => {
                     </div>
                 </section>
 
-                <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
+                <button 
+                    className="bg-customHighlight hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate('/parents')} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md cursor-pointer">
+                <button 
+                    onClick={() => navigate(`/${genericPath}/parents`)} 
+                    className="bg-customCancel hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md cursor-pointer"
+                >
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
+
+            { viewChildModal && (
+                <ViewChildModal
+                    setAddedChildren={setAddedChildren}
+                    addedChildren={addedChildren}
+                    onClose={setViewChildModal}
+                />
+            ) }
         </main>
     )
 }

@@ -283,7 +283,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                         setDeleteRecId(record._id);
                                                                         setIsForDelete(true)
                                                                     }
-                                                                }} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-customCancel text-white px-4 py-2 rounded-md`}>Delete</button>
+                                                                }} className={`${!isYearDone ? 'cursor-pointer' : 'cursor-not-allowed'} bg-customCancel hover:bg-red-600 text-white px-4 py-2 rounded-md`}>Delete</button>
                                                             </>
                                                         ) : 
                                                         <button onClick={() => {

@@ -1600,20 +1600,22 @@ module.exports.add_parent = async (req,res) => {
         inputter,
         sessionId,
         username,
-        password
+        password,
+        addedChildren,
+        isEmployee,
+        joiningDate,
+        resignedDate
     } = req.body;
 
         try {  
+
+            // Also include in this function the new field for isEmployee and childrens 
 
             // Create a user record 
             const userRole = await Role.findOne({ userRole: 'Parent', recordStatus: 'Live' });
             if(!userRole) {
                 return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
             }
-
-
-
-            const student = await Student.findById(studentId);
             const parent = await Parent.create({ motherName,
                 fatherName,
                 guardianName,
@@ -1629,28 +1631,31 @@ module.exports.add_parent = async (req,res) => {
                 motherOffice,
                 fatherOffice,
                 guardianOffice,
-                studentId,
                 inputter,
                 sessionId,
-                recordStatus
+                recordStatus,
+                studentId: addedChildren,
+                isEmployee,
+                joiningDate,
+                resignedDate
             });
 
-            const user = await User.create({
-                username,
-                role: userRole._id,
-                parentId: parent._id,
-                recordStatus: 'Live',
-                password,
-                isActive: true,
-                inputter
-            });
-    
-            if(!user) {
-                // Delete the student if user creation fails
-                await Student.findByIdAndDelete(student._id);
+            try {
+                const user = await User.create({
+                    username,
+                    role: userRole._id,
+                    parentId: parent._id,
+                    recordStatus: 'Live',
+                    password,
+                    isActive: true,
+                    inputter
+                });
+                res.status(200).json({ mssg:`Parent record has been added successfully`});
+            } catch(userErr) {
+                console.log(userErr)
+                await Parent.findByIdAndDelete(parent._id);
+                throw userErr
             }
-
-            res.status(200).json({ mssg:`Parent for ${student.firstName} ${student.lastName} has been added to the record`});
         } catch(err) {
             console.log(err);
             res.status(400).json({ mssg: 'An error occurred while adding parent record' });
@@ -1676,7 +1681,10 @@ module.exports.edit_parent = async (req,res) => {
         guardianOffice,
         studentId,
         inputter,
-        sessionId
+        sessionId,
+        isEmployee,
+        resignedDate,
+        joiningDate
     } = req.body;
 
         try {
@@ -1697,7 +1705,10 @@ module.exports.edit_parent = async (req,res) => {
                 guardianOffice,
                 studentId, 
                 inputter,
-                sessionId
+                sessionId,
+                isEmployee,
+                joiningDate,
+                resignedDate
             });
             res.status(200).json({ mssg: `Parent's record has been updated successfully!` });
         } catch(err) {
@@ -1725,7 +1736,7 @@ module.exports.delete_parent = async (req,res) => {
 
     try {
         const parent = await Parent.findByIdAndUpdate(id, { recordStatus }).populate('studentId');
-        res.status(200).json({ mssg: `Parent of ${parent.studentId.firstName} has been deleted in the record successfully` });
+        res.status(200).json({ mssg: `Parent record has been deleted in the record successfully` });
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while deleting parent record' })

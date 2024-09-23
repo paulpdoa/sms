@@ -1,7 +1,6 @@
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
-import AddParentBtn from "../components/buttons/AddParentBtn";
 import { useContext } from "react";
 import { MainContext } from '../helpers/MainContext';
 import MasterTable from '../components/MasterTable';
@@ -23,7 +22,7 @@ const columns = [
         header: 'Guardian Name',
     },
     {
-        accessorKey: 'studentId.fullname',
+        accessorKey: 'students',
         header: 'Student Name',
     }
 ]
@@ -37,7 +36,7 @@ const Parents = () => {
 
     const deleteParent = async (id) => {
         try {
-            const removeParent = await axios.delete(`${baseUrl()}/parent/${id}`,{ role,recordStatus: 'Deleted' });
+            const removeParent = await axios.put(`${baseUrl()}/parent/${id}`,{ role,recordStatus: 'Deleted' });
             enqueueSnackbar(removeParent.data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
@@ -70,8 +69,13 @@ const Parents = () => {
         ...record,
         studentId: {
             fullname: record?.studentId?.firstName + ' ' + record?.studentId?.middleName + ' ' + record?.studentId?.lastName
-        }
+        },
+        students: record.studentId.map((student) => {
+            return `${student.firstName} ${student.middleName} ${student.lastName}`
+        })
     }))
+
+    console.log(recordsWithoutInputter)
 
     return (
         <main className="p-2">

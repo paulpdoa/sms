@@ -14,15 +14,15 @@ const StatementOfAccountForm = ({ currentStudent,studentPayments }) => {
     const totalMiscFee = miscData.filter(payment => !payment.isPaid).reduce((total,payment) => total + payment.manageFeeId.amount,0);
 
     return (
-        <div className="p-6 h-full mt-5" id="student-payments-content">
+        <div className="p-6 h-full" id="student-payments-content">
             <section>
-                <div className="py-4 flex items-center gap-2 border-b border-gray-400">
+                {/* <div className="py-4 flex items-center gap-2 border-b border-gray-400">
                     <p className="text-gray-800 text-md font-semibold">{ currentStudent.firstName } { currentStudent.middleName } { currentStudent.lastName }</p>
                     <p className="text-gray-800 text-md font-semibold">{currentStudent.studentNo}</p>
                     <p className="text-gray-800 text-md font-semibold">{currentStudent.academicId.gradeLevelId.gradeLevel}</p>
                     <p className="text-gray-800 text-md font-semibold">{currentStudent.academicId.sectionId.section}</p>
-                    {/* <p className="rounded-full bg-blue-500 text-gray-100 p-2 text-sm">SY {currentStudent?.academicId?.sessionId?.startYear.split('-')[0]} - { currentStudent?.academicId?.sessionId?.endYear.split('-')[0] }</p> */}
-                </div>
+                    <p className="rounded-full bg-blue-500 text-gray-100 p-2 text-sm">SY {currentStudent?.academicId?.sessionId?.startYear.split('-')[0]} - { currentStudent?.academicId?.sessionId?.endYear.split('-')[0] }</p>
+                </div>   */}
                 <h1 className="text-gray-800 text-2xl font-bold mt-4">Statement Of Account</h1>
                 <span className="text-gray-500 text-sm">Generated on {dateFormatter(new Date())}</span>
             </section>

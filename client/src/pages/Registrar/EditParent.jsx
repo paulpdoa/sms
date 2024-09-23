@@ -1,11 +1,11 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
+import ViewChildModal from '../../components/parent/ViewChildModal';
 
 const EditParent = () => {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ const EditParent = () => {
     const { records: students } = useFetch(`${baseUrl()}/students`);
 
     const { currentUserId,session,genericPath } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [motherName, setMotherName] = useState('');
     const [fatherName, setFatherName] = useState('');
@@ -32,6 +33,14 @@ const EditParent = () => {
     const [guardianOffice, setGuardianOffice] = useState('');
     const [studentId, setStudentId] = useState('');
 
+    const [isEmployee,setIsEmployee] = useState(false);
+    const [joiningDate,setJoiningDate] = useState('');
+    const [resignedDate,setResignedDate] = useState('');
+
+    // For storage of child added
+    const [addedChildren,setAddedChildren] = useState([]);
+    const [viewChildModal,setViewChildModal] = useState(false);
+
     useEffect(() => {
         if (records) {
             setMotherName(records.motherName || '');
@@ -49,9 +58,47 @@ const EditParent = () => {
             setMotherOffice(records.motherOffice || '');
             setFatherOffice(records.fatherOffice || '');
             setGuardianOffice(records.guardianOffice || '');
-            setStudentId(records.studentId || '');
+            setAddedChildren(records?.studentId);
+            setIsEmployee(records?.isEmployee || '');
+            setJoiningDate(records.joiningDate || '');
+            setResignedDate(records?.resignedDate || '')
         }
     }, [records]);
+
+    const handleAddingChild = () => {
+        setAddedChildren(prev => {
+            const student = students.find(student => student._id === studentId);
+            // Check if the student's _id already exists in addedChildren
+            const alreadyExists = prev.some(child => child._id === student._id);
+
+            if(alreadyExists) {
+                enqueueSnackbar(`${student.firstName} is already in the record`, { 
+                    variant: 'error',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 2000,
+                    preventDuplicate: true
+                });
+                return [...prev]
+            } else {
+                enqueueSnackbar(`${student.firstName} has been added, please select view on top right`, { 
+                    variant: 'success',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 2000,
+                    preventDuplicate: true
+                });
+                return [...prev, student]
+            }
+        })
+
+        setStudentId('');
+    }
+
 
     const editParent = async (e) => {
         e.preventDefault();
@@ -72,38 +119,35 @@ const EditParent = () => {
             motherOffice,
             fatherOffice,
             guardianOffice,
-            studentId,
+            studentId: addedChildren,
             inputter: currentUserId,
             sessionId: session
         };
 
         try {
             const data = await axios.patch(`${baseUrl()}/parent/${id}`, parentInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    navigate(`/${genericPath}/parents`);
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/parents`);
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
             });
         }
     };
@@ -143,7 +187,16 @@ const EditParent = () => {
     return (
         <main className="p-4">
             <form onSubmit={editParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
-                <h1 className="font-bold text-start text-gray-700 text-3xl">Edit Parent</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="font-bold text-start text-gray-700 text-3xl">Edit Parent</h1>
+                    <button 
+                        onClick={() => setViewChildModal(true)}
+                        type="button" 
+                        className="bg-customView hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm"
+                    >
+                        View Child Added
+                    </button>
+                </div>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
@@ -178,20 +231,71 @@ const EditParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
-                    {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
+                    <h2 className="text-gray-700 font-bold text-xl">Employee Information</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="guardianName">Working Here</label>
+                            <select
+                                value={isEmployee}
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                onChange={(e) => setIsEmployee(e.target.value)}
+                            >
+                                <option hidden>Select here</option>
+                                <option value={true}>Yes</option>
+                                <option value={false}>No</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="joiningDate">Joining Date</label>
+                            <input
+                                value={joiningDate}
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="date"
+                                onChange={(e) => setJoiningDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-sm" htmlFor="resignedDate">Resigned Date</label>
+                            <input
+                                value={resignedDate}
+                                className="outline-none p-2 rounded-md border border-gray-300"
+                                type="date"
+                                onChange={(e) => setResignedDate(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </section>
 
-                <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
+                    {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
+                    <button 
+                        type="button"
+                        onClick={handleAddingChild}
+                        className="bg-customView hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
+                    >
+                        Add as child
+                    </button>
+                </section>
+
+                <button className="bg-customView hover:bg-blue-600 text-white text-sm p-3 mt-6 rounded-md">
                     Submit
                 </button>
-                <button onClick={() => navigate('/parents')} className="bg-red-500 hover:bg-red-600 ml-2 text-white text-sm p-3 mt-6 rounded-md">
+                <button onClick={() => navigate(`/${genericPath}/parents`)} className="bg-red-500 hover:bg-red-600 ml-2 text-white text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
+            { viewChildModal && (
+                <ViewChildModal
+                    addedChildren={addedChildren}
+                    onClose={setViewChildModal}
+                    setAddedChildren={setAddedChildren}
+                />
+            ) }
         </main>
     );
 };
 
 export default EditParent;
+
+
