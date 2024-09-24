@@ -51,10 +51,33 @@ module.exports.add_teacher = async (req, res) => {
         password,
     } = req.body;
 
-    let profilePictureUrl = '';
+    const teacherInfo = {
+        firstName,
+        middleName,
+        lastName,
+        dateOfBirth,
+        age,
+        sex,
+        religion,
+        nationality,
+        placeOfBirth,
+        email,
+        contactNumber,
+        address,
+        spouseName,
+        spouseCel,
+        education,
+        schoolGraduated,
+        yearGraduated,
+        yearsOfExperience,
+        joiningDate,
+        inputter,
+        sessionId,
+        recordStatus: 'Live'
+    }
 
     if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+        teacherInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
 
     let teacher;
@@ -70,36 +93,12 @@ module.exports.add_teacher = async (req, res) => {
             recordStatus: 'Live'
         });
 
-        if (existingTeacher) {
+        if(existingTeacher) {
             return res.status(400).json({ mssg: 'Teacher with these details already exists' });
         }
 
         // Create the teacher
-        teacher = await Teacher.create({
-            firstName,
-            middleName,
-            lastName,
-            dateOfBirth,
-            age,
-            sex,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            spouseName,
-            spouseCel,
-            education,
-            schoolGraduated,
-            yearGraduated,
-            yearsOfExperience,
-            joiningDate,
-            inputter,
-            sessionId,
-            recordStatus: 'Live',
-            profilePictureUrl
-        });
+        teacher = await Teacher.create(teacherInfo);
 
         const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live' });
 
@@ -174,13 +173,13 @@ module.exports.edit_teacher = async (req,res) => {
 
     const { id } = req.params;
     const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,session: sessionId } = req.body;
-    let profilePictureUrl = '';
-
-    if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+    
+    const teacherInfo = { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,sessionId }
+    if(req.file) {  
+        teacherInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
     try {
-        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,sessionId,profilePictureUrl });
+        await Teacher.findByIdAndUpdate({ _id: id }, teacherInfo);
         res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
     } catch(err) {
         console.log(err);

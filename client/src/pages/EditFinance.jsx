@@ -31,8 +31,11 @@ const EditFinance = () => {
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
 
     const handleFileChange = (e) => {
-        setProfilePicture(e.target.files[0]);
-        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);  // Save the selected file to the state
+            setProfilePictureUrl(URL.createObjectURL(file));  // Create a URL for the selected image
+        }
     };
 
     const { session,currentUserId,genericPath } = useContext(MainContext);
@@ -193,7 +196,7 @@ const EditFinance = () => {
                     <div className="flex gap-2 items-center">
                         <div className="flex justify-center mb-4">
                             <img
-                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                src={profilePictureUrl ? profilePictureUrl : '/avatar/avatar.png'}
                                 alt="Profile"
                                 className="w-24 h-24 rounded-full object-cover"
                             />

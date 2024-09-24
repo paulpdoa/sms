@@ -1602,11 +1602,39 @@ module.exports.add_parent = async (req,res) => {
         sessionId,
         username,
         password,
-        addedChildren,
+        // addedChildren,
         isEmployee,
         joiningDate,
         resignedDate
     } = req.body;
+
+    const parentInfo = { motherName,
+        fatherName,
+        guardianName,
+        motherOccupation,
+        fatherOccupation,
+        guardianOccupation,
+        motherContact,
+        fatherContact,
+        guardianContact,
+        motherEmail,
+        fatherEmail,
+        guardianEmail,
+        motherOffice,
+        fatherOffice,
+        guardianOffice,
+        inputter,
+        sessionId,
+        recordStatus,
+        studentId: JSON.parse(studentId),
+        isEmployee,
+        joiningDate,
+        resignedDate
+    }
+    
+    if(req.file) {
+        parentInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
 
         try {  
 
@@ -1617,29 +1645,7 @@ module.exports.add_parent = async (req,res) => {
             if(!userRole) {
                 return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
             }
-            const parent = await Parent.create({ motherName,
-                fatherName,
-                guardianName,
-                motherOccupation,
-                fatherOccupation,
-                guardianOccupation,
-                motherContact,
-                fatherContact,
-                guardianContact,
-                motherEmail,
-                fatherEmail,
-                guardianEmail,
-                motherOffice,
-                fatherOffice,
-                guardianOffice,
-                inputter,
-                sessionId,
-                recordStatus,
-                studentId: addedChildren,
-                isEmployee,
-                joiningDate,
-                resignedDate
-            });
+            const parent = await Parent.create(parentInfo);
 
             try {
                 const user = await User.create({
@@ -1688,29 +1694,39 @@ module.exports.edit_parent = async (req,res) => {
         joiningDate
     } = req.body;
 
+    console.log(req.body);
+
+    const parentInfo = { motherName,
+        fatherName,
+        guardianName,
+        motherOccupation,
+        fatherOccupation,
+        guardianOccupation,
+        motherContact,
+        fatherContact,
+        guardianContact,
+        motherEmail,
+        fatherEmail,
+        guardianEmail,
+        motherOffice,
+        fatherOffice,
+        guardianOffice,
+        studentId: JSON.parse(studentId), 
+        inputter,
+        sessionId,
+        isEmployee,
+        joiningDate,
+        resignedDate
+    };
+
+    if(req.file) {
+        parentInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
+
+    console.log(parentInfo);
+
         try {
-            await Parent.findByIdAndUpdate({_id: id}, { motherName,
-                fatherName,
-                guardianName,
-                motherOccupation,
-                fatherOccupation,
-                guardianOccupation,
-                motherContact,
-                fatherContact,
-                guardianContact,
-                motherEmail,
-                fatherEmail,
-                guardianEmail,
-                motherOffice,
-                fatherOffice,
-                guardianOffice,
-                studentId, 
-                inputter,
-                sessionId,
-                isEmployee,
-                joiningDate,
-                resignedDate
-            });
+            await Parent.findByIdAndUpdate({_id: id}, parentInfo);
             res.status(200).json({ mssg: `Parent's record has been updated successfully!` });
         } catch(err) {
             console.log(err);
@@ -2176,9 +2192,12 @@ module.exports.add_finance_info = async(req,res) => {
     const { firstName,lastName,middleName,dateOfBirth,gender,religion,nationality,placeOfBirth,email,contactNumber,address,age,session,currentUserId,role,password,username } = req.body;
     let profilePictureUrl = '';
 
+    
+    const financeInformation = {firstName,lastName,middleName,dateOfBirth,sex: gender,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,age,sessionId:session,inputter:currentUserId,recordStatus: 'Live'}
     if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+        financeInformation.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
+
 
     try {
         // Create a user record 
@@ -2187,7 +2206,7 @@ module.exports.add_finance_info = async(req,res) => {
             return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
         }
        
-        const finance = await Finance.create({ firstName,lastName,middleName,dateOfBirth,sex: gender,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,age,sessionId:session,inputter:currentUserId,recordStatus: 'Live',profilePictureUrl });
+        const finance = await Finance.create(financeInformation);
         const user = await User.create({
             username,
             role: userRole._id,
@@ -2225,13 +2244,14 @@ module.exports.edit_finance_info = async(req,res) => {
 
     const { id } = req.params;
     const { firstName,middleName,lastName,dateOfBirth,sex,religion,nationality,placeOfBirth,email,contactNumber,address,session,inputter } = req.body;
-    let profilePictureUrl = '';
+
+    const financeInformation = {firstName,middleName,lastName,dateOfBirth,sex,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,sessionId: session,inputter}
 
     if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+        financeInformation.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
     try {
-        await Finance.findByIdAndUpdate(id,{ firstName,middleName,lastName,dateOfBirth,sex,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,sessionId: session,inputter,profilePictureUrl });
+        await Finance.findByIdAndUpdate(id,financeInformation);
         res.status(200).json({ mssg: `${firstName}'s record has been updated successfully`, redirect: '/finance' });
     } catch(err) {
         console.log(err);

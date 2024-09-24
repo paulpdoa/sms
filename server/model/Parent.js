@@ -73,7 +73,10 @@ const parentSchema = new mongoose.Schema({
     resignedDate: {
         type: String
     },
-    recordStatus: requiredString
+    recordStatus: requiredString,
+    profilePictureUrl: {
+        type: String
+    }
 }, { timestamps: true })
 
 const ParentModel = mongoose.model('parent',parentSchema);

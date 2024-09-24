@@ -222,9 +222,9 @@ route.patch('/fee-code/:id',edit_fee_code);
 route.get('/parents',get_parents);
 route.get('/parent/:id',get_parent_detail);
 route.get('/student/parent/:id',allowUserView(userRoles),get_student_parent);
-route.post('/parent',add_parent);
+route.post('/parent',upload.single('profilePicture'),add_parent);
 route.put('/parent/:id',delete_parent);
-route.patch('/parent/:id',edit_parent);
+route.patch('/parent/:id',upload.single('profilePicture'),edit_parent);
 
 // Sibling
 route.get('/siblings',allowUserView(userRoles),get_siblings);

@@ -32,14 +32,18 @@ const Profile = () => {
             setMiddleName(user.middleName);
             setLastName(user.lastName);
             setUsername(user.username);
-            setProfilePictureUrl(`${user.profilePictureUrl}`);  // assuming you have a URL for the profile picture in user data
+            setProfilePictureUrl(`${baseUrl()}${user.profilePictureUrl}`);  // assuming you have a URL for the profile picture in user data
         }
     }, [user]);
 
     const handleFileChange = (e) => {
-        setProfilePicture(e.target.files[0]);
-        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);  // Save the selected file to the state
+            setProfilePictureUrl(URL.createObjectURL(file));  // Create a URL for the selected image
+        }
     };
+    
 
     const handleProfileUpdate = async () => {
         const formData = new FormData();
@@ -61,7 +65,7 @@ const Profile = () => {
             const response = await axios.patch(`${baseUrl()}/user/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            setProfilePictureUrl(`${baseUrl()}${response.data.profilePictureUrl}`); // assuming response contains the updated URL
+            setProfilePictureUrl(response.data.profilePictureUrl); // assuming response contains the updated URL
 
             enqueueSnackbar(response.data.mssg, { 
                 variant: 'success',
@@ -95,11 +99,11 @@ const Profile = () => {
                 <form onSubmit={(e) => { e.preventDefault(); handleProfileUpdate(); }} className="space-y-4">
                     <h1 className="text-2xl font-semibold mb-6 text-center">Hi, {username}</h1>
                     <div className="flex justify-center mb-4">
-                        <img
-                            src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
-                            alt="Profile"
-                            className="w-24 h-24 rounded-full object-cover"
-                        />
+                    <img
+                        src={profilePictureUrl ? profilePictureUrl : '/avatar/avatar.png'}
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full object-cover"
+                    />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col">

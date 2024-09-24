@@ -56,8 +56,11 @@ const EditStudent = () => {
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
 
     const handleFileChange = (e) => {
-        setProfilePicture(e.target.files[0]);
-        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);  // Save the selected file to the state
+            setProfilePictureUrl(URL.createObjectURL(file));  // Create a URL for the selected image
+        }
     };
 
     useEffect(() => {
@@ -75,7 +78,7 @@ const EditStudent = () => {
             setEmail(records.email || '');
             setContactNumber(records.contactNumber || '');
             setAddress(records.address || '');
-            setProfilePictureUrl(`${records?.profilePictureUrl}` || '')
+            setProfilePictureUrl(`${baseUrl()}${records?.profilePictureUrl}` || '')
         }
     }, [records]);
 
@@ -228,7 +231,7 @@ const EditStudent = () => {
                     <div className="flex gap-2 items-center">
                         <div className="flex justify-center mb-4">
                             <img
-                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                src={profilePictureUrl ? profilePictureUrl : '/avatar/avatar.png'}
                                 alt="Profile"
                                 className="w-24 h-24 rounded-full object-cover"
                             />

@@ -83,11 +83,13 @@ module.exports.get_enrolled_students = async (req, res) => {
 module.exports.add_student = async (req,res) => {
     const { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId,password,confirmPassword,username } = req.body;
     const isAdmitted = false;
-    let profilePictureUrl = '';
 
+    
+    const studentInfo = { firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live' }
     if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+        studentInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
+    
     try {
 
         if(password !== confirmPassword) {
@@ -102,7 +104,7 @@ module.exports.add_student = async (req,res) => {
 
 
         // Will create the user
-        const student = await Student.create({ firstName,middleName,lastName,suffix,dateOfBirth,age,sex,religion,nationality,placeOfBirth,email,contactNumber,address,isAdmitted,inputter,sessionId,recordStatus: 'Live', profilePictureUrl });
+        const student = await Student.create(studentInfo);
         
         // Try creating a user
         try {
@@ -151,10 +153,11 @@ module.exports.edit_student = async(req,res) => {
     const { id } = req.params;
 
     const { firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,currentUserId: inputter,sessionId } = req.body;
-    let profilePictureUrl = '';
+
+    const studentInfo = { firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,inputter,sessionId };
 
     if(req.file) {
-        profilePictureUrl = `/uploads/${req.file.filename}`;
+        studentInfo.profilePictureUrl = `/uploads/${req.file.filename}`;
     }
 
     try {   
@@ -163,7 +166,7 @@ module.exports.edit_student = async(req,res) => {
             return res.status(404).json({ mssg: 'Sorry, this student is not in the record, please try again', redirect: '/students' });
         }
 
-        await Student.findByIdAndUpdate({ _id: id },{ firstName,middleName,lastName,suffix,dateOfBirth,age,gender,religion,nationality,placeOfBirth,email,contactNumber,address,inputter,sessionId,profilePictureUrl });
+        await Student.findByIdAndUpdate({ _id: id },studentInfo);
         res.status(200).json({ mssg: `${firstName} ${lastName}'s record has been updated successfully`, redirect: '/students' });
 
     } catch(err) {

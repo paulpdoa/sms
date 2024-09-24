@@ -43,10 +43,19 @@ const NewParent = () => {
     const [isEmployee,setIsEmployee] = useState(false);
     const [joiningDate,setJoiningDate] = useState('');
     const [resignedDate,setResignedDate] = useState('');
-
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
     // For storage of child added
     const [addedChildren,setAddedChildren] = useState([]);
     const [viewChildModal,setViewChildModal] = useState(false);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);  // Save the selected file to the state
+            setProfilePictureUrl(URL.createObjectURL(file));  // Create a URL for the selected image
+        }
+    };
 
     const handleAddingChild = () => {
         setAddedChildren(prev => {
@@ -109,36 +118,43 @@ const NewParent = () => {
             })
         }
 
-        const parentInformation = {
-            motherName,
-            fatherName,
-            guardianName,
-            motherOccupation,
-            fatherOccupation,
-            guardianOccupation,
-            motherContact,
-            fatherContact,
-            guardianContact,
-            motherEmail,
-            fatherEmail,
-            guardianEmail,
-            motherOffice,
-            fatherOffice,
-            guardianOffice,
-            studentId,
-            session,
-            inputter: currentUserId,
-            sessionId: session,
-            username,
-            password,
-            addedChildren,
-            isEmployee,
-            joiningDate,
-            resignedDate
+        const formData = new FormData();
+        
+        formData.append('motherName', motherName);
+        formData.append('fatherName', fatherName);
+        formData.append('guardianName', guardianName);
+        formData.append('motherOccupation', motherOccupation);
+        formData.append('fatherOccupation', fatherOccupation);
+        formData.append('guardianOccupation', guardianOccupation);
+        formData.append('motherContact', motherContact);
+        formData.append('fatherContact', fatherContact);
+        formData.append('guardianContact', guardianContact);
+        formData.append('motherEmail', motherEmail);
+        formData.append('fatherEmail', fatherEmail);
+        formData.append('guardianEmail', guardianEmail);
+        formData.append('motherOffice', motherOffice);
+        formData.append('fatherOffice', fatherOffice);
+        formData.append('guardianOffice', guardianOffice);
+        formData.append('studentId', JSON.stringify(addedChildren));
+        formData.append('session', session);
+        formData.append('inputter', currentUserId);
+        formData.append('sessionId', session);
+        formData.append('username', username);
+        formData.append('password', password);
+        formData.append('isEmployee', isEmployee);
+        formData.append('joiningDate', joiningDate);
+        formData.append('resignedDate', resignedDate);
+
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
         }
 
         try {
-            const data = await axios.post(`${baseUrl()}/parent`, parentInformation);
+            const data = await axios.post(`${baseUrl()}/parent`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             enqueueSnackbar(data.data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
@@ -389,13 +405,15 @@ const NewParent = () => {
                         </select>
                     </div>
 
-                    <button 
-                        type="button"
-                        onClick={handleAddingChild}
-                        className="bg-customView hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
-                    >
-                        Add as child
-                    </button>
+                    { studentId && (
+                        <button 
+                            type="button"
+                            onClick={handleAddingChild}
+                            className="bg-customView hover:bg-blue-600 text-sm p-2 text-gray-100 rounded-md mt-2"
+                        >
+                            Add as child
+                        </button>
+                    ) }
                 </section>
 
                 <section>
@@ -423,6 +441,26 @@ const NewParent = () => {
                                 className="outline-none p-2 rounded-md border border-gray-300"
                                 type="password"
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl ? profilePictureUrl : '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
                             />
                         </div>
                     </div>
