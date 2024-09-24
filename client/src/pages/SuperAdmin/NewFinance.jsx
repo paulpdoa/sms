@@ -1,12 +1,11 @@
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const Input = ({ label, type, name, value, onChange, disabled = false, required }) => (
     <div className="flex flex-col">
@@ -51,10 +50,13 @@ const Select = ({ label, name, value, options, onChange }) => (
 );
 
 const NewFinance = () => {
+
     const { records: religions, isLoading: religionsLoading } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
 
     const { session, currentUserId, role,genericPath } = useContext(MainContext);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     // State variables
     const [firstName, setFirstName] = useState('');
@@ -71,7 +73,13 @@ const NewFinance = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
 
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+    };
     const navigate = useNavigate();
 
     // Age calculation
@@ -79,79 +87,81 @@ const NewFinance = () => {
 
     const addFinance = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
 
-        const financeInformation = {
-            firstName,
-            lastName,
-            middleName,
-            dateOfBirth,
-            gender,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            age: getAge,
-            session,
-            currentUserId,
-            password,
-            username,
-            role
-        };
+        formData.append('firstName',firstName);
+        formData.append('lastName', lastName);
+        formData.append('middleName', middleName);
+        formData.append('dateOfBirth', dateOfBirth);
+        formData.append('gender',gender);
+        formData.append('religion',religion);
+        formData.append('nationality',nationality);
+        formData.append('placeOfBirth',placeOfBirth);
+        formData.append('email', email);
+        formData.append('contactNumber', contactNumber);
+        formData.append('address',address);
+        formData.append('age', getAge);
+        formData.append('session',session);
+        formData.append('currentUserId', currentUserId);
+        formData.append('password', password);
+        formData.append('username', username);
+        formData.append('role', role);
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
 
         if (password !== confirmPassword) {
-            return toast.error('Passwords do not match', {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored'
-            });
+            return enqueueSnackbar('Passwords do not match', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            }); 
         }
 
         if (password.length < 8) {
-            return toast.error('Password must be at least 8 characters long', {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored'
-            });
+            return enqueueSnackbar('Password must be at least 8 characters long', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            }); 
         }
 
         try {
-            const { data } = await axios.post(`${baseUrl()}/finance`, financeInformation);
-            toast.success(data.mssg, {
-                position: 'top-center',
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored'
+            const { data } = await axios.post(`${baseUrl()}/finance`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/finance`);
-            }, 2000);
+            enqueueSnackbar(data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/finance`);
+                }
+            });
         } catch (err) {
-            toast.error(err.response.data.mssg, {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored'
+            console.log(err);
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -207,6 +217,26 @@ const NewFinance = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 <div className="flex justify-end gap-2 mt-6">
                     <button
                         type="submit"
@@ -223,7 +253,6 @@ const NewFinance = () => {
                     </button>
                 </div>
             </form>
-            <ToastContainer />
         </main>
     );
 };

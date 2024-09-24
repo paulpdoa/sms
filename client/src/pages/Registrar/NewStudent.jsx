@@ -7,13 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
 import { MainContext } from '../../helpers/MainContext';
-
+import { useSnackbar } from 'notistack';
 const NewStudent = () => {
 
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
     const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const suffixes = [
         { value: 'Jr',placeholder: 'Jr' },
@@ -41,7 +42,8 @@ const NewStudent = () => {
     const [password,setPassword] = useState('');
     const [confirmPassword,setConfirmPassword] = useState('');
     const [username,setUsername] = useState('');
-    
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
     const [error,setError] = useState({ firstName: '', lastName: '', suffix: '', dateOfBirth: '', sex: '', religion: '', nationality: '', placeOfBirth: '', email: '', contactNumber: '', address: '', password: '', confirmPassword: '', username: ''});
 
     const calculateAge = (dob) => {
@@ -79,63 +81,69 @@ const NewStudent = () => {
 
         if(!firstName || !lastName || !suffix || !dateOfBirth || !sex || !religion || !nationality || !placeOfBirth || !email || !contactNumber || !address || !password || !confirmPassword || !username) return
 
-        const studentInformation = {
-            firstName,
-            middleName,
-            lastName,
-            suffix,
-            dateOfBirth,
-            age,
-            sex,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            session,
-            currentUserId,
-            sessionId:session
-        };
-
-        studentInformation.password = password;
-        studentInformation.confirmPassword = confirmPassword;
-        studentInformation.username = username;
-
+        // Create a new FormData instance
+        const formData = new FormData();
+        formData.append('firstName',firstName);
+        formData.append('middleName', middleName);
+        formData.append('lastName',lastName);
+        formData.append('suffix',suffix);
+        formData.append('dateOfBirth', dateOfBirth)
+        formData.append('age',age)
+        formData.append('sex', sex)
+        formData.append('religion',religion);
+        formData.append('nationality', nationality)
+        formData.append('placeOfBirth',placeOfBirth)
+        formData.append('email', email)
+        formData.append('contactNumber', contactNumber)
+        formData.append('address', address);
+        formData.append('session',session);
+        formData.append('currentUserId', currentUserId)
+        formData.append('sessionId', session)
+        formData.append('password',password);
+        formData.append('confirmPassword', confirmPassword);
+        formData.append('username', username)
+    
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
         try {
-            const data = await axios.post(`${baseUrl()}/students`, studentInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            const data = await axios.post(`${baseUrl()}/students`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/students`);
-            }, 2000);
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/students`);
+                }
+            });
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
-
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+    };
     return (
         <main className="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
-            <form onSubmit={addStudent} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
+            <form onSubmit={addStudent} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full">
                 <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Add New Student</h1>
 
                 <section>
@@ -161,7 +169,7 @@ const NewStudent = () => {
                         {renderInput("email", "Active Email", email, setEmail, "email",error)}
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="contactNumber">Contact Number</label>
-                            <div className="flex border border-gray-300 rounded-md overflow-hidden focus-within:border-green-500">
+                            <div className="flex border border-gray-300 rounded-md overflow-hidden focus-within:border-blue-500">
                                 <span className="bg-gray-500 p-2 text-gray-100">+63</span>
                                 <input
                                     className={`outline-none p-2 flex-grow border ${error.contactNumber ? 'border-red-500' : 'border-gray-300'}`}
@@ -186,6 +194,26 @@ const NewStudent = () => {
                         {renderInput("confirmPassword", "Confirm Password", confirmPassword, setConfirmPassword, "password",error)}
                     </div>
                 </section>
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
+                    </div>
+                </section>
+
 
                 <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit

@@ -3,15 +3,16 @@ import { useFetch } from '../hooks/useFetch';
 import { baseUrl } from '../baseUrl';
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from '../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const Profile = () => {
     const { id } = useParams();
     const { records: user } = useFetch(`${baseUrl()}/user/${id}`);
     const { currentUserId } = useContext(MainContext);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
     
@@ -31,7 +32,7 @@ const Profile = () => {
             setMiddleName(user.middleName);
             setLastName(user.lastName);
             setUsername(user.username);
-            setProfilePictureUrl(user.profilePictureUrl);  // assuming you have a URL for the profile picture in user data
+            setProfilePictureUrl(`${user.profilePictureUrl}`);  // assuming you have a URL for the profile picture in user data
         }
     }, [user]);
 
@@ -60,35 +61,30 @@ const Profile = () => {
             const response = await axios.patch(`${baseUrl()}/user/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+            setProfilePictureUrl(`${baseUrl()}${response.data.profilePictureUrl}`); // assuming response contains the updated URL
 
-            toast.success(response.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(response.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate('/');
+                }
             });
-            
-            setProfilePictureUrl(response.data.profilePictureUrl); // assuming response contains the updated URL
-
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
-
-        } catch (error) {
+        } catch (err) {
             console.error('Error updating profile:', error);
-            toast.error(error.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -100,39 +96,12 @@ const Profile = () => {
                     <h1 className="text-2xl font-semibold mb-6 text-center">Hi, {username}</h1>
                     <div className="flex justify-center mb-4">
                         <img
-                            src={profilePictureUrl ? `${baseUrl()}${profilePictureUrl}` : '/avatar/avatar.png'}
+                            src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
                             alt="Profile"
                             className="w-24 h-24 rounded-full object-cover"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        {/* <div className="flex flex-col">
-                            <label className="mb-1 font-medium text-gray-700">First Name:</label>
-                            <input
-                                type="text"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <label className="mb-1 font-medium text-gray-700">Middle Name:</label>
-                            <input
-                                type="text"
-                                value={middleName}
-                                onChange={(e) => setMiddleName(e.target.value)}
-                                className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <label className="mb-1 font-medium text-gray-700">Last Name:</label>
-                            <input
-                                type="text"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div> */}
                         <div className="flex flex-col">
                             <label className="mb-1 font-medium text-gray-700">Username:</label>
                             <input
@@ -200,7 +169,6 @@ const Profile = () => {
                     </div>
                 </form>
             </div>
-            <ToastContainer />
         </main>
     );
 };

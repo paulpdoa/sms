@@ -1,17 +1,17 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { genders as genderSelections } from '../../data/genders.json';
+import { useSnackbar } from 'notistack';
 
 const EditStudent = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { records, isLoading } = useFetch(`${baseUrl()}/student/${id}`);
+    const { enqueueSnackbar } = useSnackbar();
 
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
@@ -52,6 +52,13 @@ const EditStudent = () => {
         contactNumber: '',
         address: ''
     });
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
+
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+    };
 
     useEffect(() => {
         if(records) {
@@ -68,6 +75,7 @@ const EditStudent = () => {
             setEmail(records.email || '');
             setContactNumber(records.contactNumber || '');
             setAddress(records.address || '');
+            setProfilePictureUrl(`${records?.profilePictureUrl}` || '')
         }
     }, [records]);
 
@@ -99,7 +107,6 @@ const EditStudent = () => {
         if(!contactNumber) setError(prev => ({ ...prev, contactNumber: 'Contact number cannot be empty' }));
         if(!address) setError(prev => ({ ...prev, address: 'Address cannot be empty' }));
 
-
         setTimeout(() => {
             setError({
                 firstName: '',
@@ -117,59 +124,65 @@ const EditStudent = () => {
         },3000)
 
         if(!firstName || !lastName || !suffix || !dateOfBirth || !sex || !religion || !nationality || !placeOfBirth || !email || !contactNumber || !address) return
-
-        const studentInformation = {
-            firstName,
-            middleName,
-            lastName,
-            suffix,
-            dateOfBirth,
-            age,
-            gender: sex,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            session,
-            currentUserId,
-            role,
-            sessionId: session
-        };
+        // Create a new FormData instance
+        const formData = new FormData();
+        formData.append('firstName',firstName);
+        formData.append('middleName', middleName);
+        formData.append('lastName',lastName);
+        formData.append('suffix',suffix);
+        formData.append('dateOfBirth', dateOfBirth)
+        formData.append('age',age)
+        formData.append('gender', sex)
+        formData.append('religion',religion);
+        formData.append('nationality', nationality)
+        formData.append('placeOfBirth',placeOfBirth)
+        formData.append('email', email)
+        formData.append('contactNumber', contactNumber)
+        formData.append('address', address);
+        formData.append('session',session);
+        formData.append('currentUserId', currentUserId)
+        formData.append('role',role);
+        formData.append('sessionId', session)
+        formData.append('session', session);
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
 
         try {
-            const data = await axios.patch(`${baseUrl()}/student/${id}`, studentInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            const data = await axios.patch(`${baseUrl()}/student/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/students`);
-            }, 2000);
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/students`);
+                }
+            });
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
 
     return (
         <main className="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
-            <form onSubmit={editStudent} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full max-w-3xl">
+            <form onSubmit={editStudent} className="space-y-8 bg-white p-10 rounded-md shadow-lg w-full">
                 <h1 className="font-bold text-start text-gray-700 text-3xl mb-6">Edit Student</h1>
 
                 <section>
@@ -210,14 +223,33 @@ const EditStudent = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate('/students')} className="bg-red-600 text-white text-sm p-3 mt-5 ml-2 rounded-md hover:bg-red-700 transition duration-300">
+                <button type="button" onClick={() => navigate(`/${genericPath}/students`)} className="bg-red-600 text-white text-sm p-3 mt-5 ml-2 rounded-md hover:bg-red-700 transition duration-300">
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

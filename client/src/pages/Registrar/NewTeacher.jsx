@@ -1,12 +1,11 @@
 import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const Input = ({ label, type, name, value, onChange,disabled = false, required }) => (
     <div className="flex flex-col">
@@ -55,6 +54,7 @@ const NewTeacher = () => {
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
     const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [firstName,setFirstName] = useState('');
     const [middleName,setMiddleName] = useState('');
@@ -77,6 +77,8 @@ const NewTeacher = () => {
     const [username,setUsername] = useState('');
     const [password,setPassword] = useState('');
     const [confirmPassword,setConfirmPassword] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
 
     const [error,setError] = useState({
         firstName: '',
@@ -105,78 +107,89 @@ const NewTeacher = () => {
 
     const addTeacher = async (e) => {
         e.preventDefault();
+    
+        // Create a new FormData instance
+        const formData = new FormData();
+    
+        // Append each teacher information field to the form data
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('middleName', middleName);
+        formData.append('dateOfBirth', dateOfBirth);
+        formData.append('gender', gender);
+        formData.append('religion', religion);
+        formData.append('nationality', nationality);
+        formData.append('placeOfBirth', placeOfBirth);
+        formData.append('email', email);
+        formData.append('contactNumber', contactNumber);
+        formData.append('address', address);
+        formData.append('spouseName', spouseName);
+        formData.append('spouseCel', spouseCel);
+        formData.append('education', education);
+        formData.append('schoolGraduated', schoolGraduated);
+        formData.append('yearGraduated', yearGraduated);
+        formData.append('yearsOfExperience', yearsOfExperience);
+        formData.append('joiningDate', joiningDate);
+        formData.append('age', getAge);  // Assuming getAge is a value, not a function
+        formData.append('session', session);
+        formData.append('currentUserId', currentUserId);
+        formData.append('password', password);
+        formData.append('username', username);
 
-        
-
-
-        const teacherInformation = { 
-            firstName,
-            lastName,
-            middleName,
-            dateOfBirth,
-            gender,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            spouseName,
-            spouseCel,
-            education,
-            schoolGraduated,
-            yearGraduated,
-            yearsOfExperience,
-            joiningDate,
-            age: getAge,
-            session,
-            currentUserId,
-            password,
-            username
-        };
-
-        if(password !== confirmPassword) {
-            return toast.error('Password does not match, please try again', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
+    
+        if (password !== confirmPassword) {
+            return enqueueSnackbar('Password does not match, please try again', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
-
+    
         try {
-            const data = await axios.post(`${baseUrl()}/teachers`, teacherInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            // Send the FormData using axios
+            const data = await axios.post(`${baseUrl()}/teachers`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/teachers`);
-            }, 2000);
+    
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/teachers`);
+                }
+            });
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
+    };
+    
+
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
     };
 
     return (
@@ -270,6 +283,25 @@ const NewTeacher = () => {
                         <Input label="Confirm Password" type="password" name="confirmPassword" value={confirmPassword} onChange={setConfirmPassword} />
                     </div>
                 </section>
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
+                    </div>
+                </section>
 
 
                 <div className="flex justify-end gap-2 mt-6">
@@ -288,7 +320,6 @@ const NewTeacher = () => {
                     </button>
                 </div>
             </form>
-            <ToastContainer />
         </main>
     );
 };

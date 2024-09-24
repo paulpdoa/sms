@@ -51,6 +51,11 @@ module.exports.add_teacher = async (req, res) => {
         password,
     } = req.body;
 
+    let profilePictureUrl = '';
+
+    if(req.file) {
+        profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
 
     let teacher;
 
@@ -92,7 +97,8 @@ module.exports.add_teacher = async (req, res) => {
             joiningDate,
             inputter,
             sessionId,
-            recordStatus: 'Live'
+            recordStatus: 'Live',
+            profilePictureUrl
         });
 
         const userRole = await Role.findOne({ userRole: 'Teacher', recordStatus: 'Live' });
@@ -168,9 +174,13 @@ module.exports.edit_teacher = async (req,res) => {
 
     const { id } = req.params;
     const { firstName,middleName,lastName,dateOfBirth,sex,placeOfBirth,nationality,religion,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,session: sessionId } = req.body;
+    let profilePictureUrl = '';
 
+    if(req.file) {
+        profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
     try {
-        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,sessionId });
+        await Teacher.findByIdAndUpdate({ _id: id }, { firstName,middleName,lastName,nationality,religion,dateOfBirth,sex,placeOfBirth,email,contactNumber,address,spouseName,spouseCel,education,schoolGraduated,yearGraduated,yearsOfExperience,joiningDate,inputter,sessionId,profilePictureUrl });
         res.status(200).json({ mssg: `${firstName} ${lastName}'s teacher record has been updated successfully`, redirect:'/teachers' })
     } catch(err) {
         console.log(err);

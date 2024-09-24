@@ -251,14 +251,12 @@ route.post('/grading-category', add_grading_category);
 // Finance
 route.get('/finance', get_finance_info);
 route.get('/finance/:id', get_finance_info_detail);
-route.post('/finance', add_finance_info);
+route.post('/finance',upload.single('profilePicture'),add_finance_info);
 route.put('/finance/:id', delete_finance_info);
-route.patch('/finance/:id', edit_finance_info);
+route.patch('/finance/:id',upload.single('profilePicture') ,edit_finance_info);
 
 // Dashboard
 route.get('/dashboard/:sessionId',get_dashboard_details);
-
-
 
 //For test data
 route.get('/generate-academic-data',generate_academic_students);

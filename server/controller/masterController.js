@@ -1279,6 +1279,7 @@ module.exports.edit_user = async (req, res) => {
     const { userRole: role, username, isActive, password, confirmPassword,isAllowedToLogin } = req.body;
 
     let updatedData = { role, username, isActive, isAllowedToLogin };
+
     
     // If a file is uploaded, add the profile picture URL
     if (req.file) {
@@ -2173,17 +2174,20 @@ module.exports.get_finance_info_detail = async(req,res) => {
 
 module.exports.add_finance_info = async(req,res) => {
     const { firstName,lastName,middleName,dateOfBirth,gender,religion,nationality,placeOfBirth,email,contactNumber,address,age,session,currentUserId,role,password,username } = req.body;
+    let profilePictureUrl = '';
+
+    if(req.file) {
+        profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
 
     try {
-
         // Create a user record 
         const userRole = await Role.findOne({ userRole: 'Finance', recordStatus: 'Live' });
         if(!userRole) {
             return res.status(404).json({ mssg: 'This role is not existing, please contact your administrator' });
         }
-
        
-        const finance = await Finance.create({ firstName,lastName,middleName,dateOfBirth,sex: gender,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,age,sessionId:session,inputter:currentUserId,recordStatus: 'Live' });
+        const finance = await Finance.create({ firstName,lastName,middleName,dateOfBirth,sex: gender,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,age,sessionId:session,inputter:currentUserId,recordStatus: 'Live',profilePictureUrl });
         const user = await User.create({
             username,
             role: userRole._id,
@@ -2197,9 +2201,7 @@ module.exports.add_finance_info = async(req,res) => {
         if(!user) {
             await Finance.findByIdAndDelete(finance._id);
         }
-
         res.status(200).json({ mssg: `${firstName} ${lastName} has been successfully added to the record`, redirect: '/finance' });
-       
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while creating finance information' });
@@ -2223,9 +2225,13 @@ module.exports.edit_finance_info = async(req,res) => {
 
     const { id } = req.params;
     const { firstName,middleName,lastName,dateOfBirth,sex,religion,nationality,placeOfBirth,email,contactNumber,address,session,inputter } = req.body;
+    let profilePictureUrl = '';
 
+    if(req.file) {
+        profilePictureUrl = `/uploads/${req.file.filename}`;
+    }
     try {
-        const finance = await Finance.findByIdAndUpdate(id,{ firstName,middleName,lastName,dateOfBirth,sex,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,sessionId: session,inputter });
+        await Finance.findByIdAndUpdate(id,{ firstName,middleName,lastName,dateOfBirth,sex,religionId: religion,nationalityId: nationality,placeOfBirth,email,contactNumber,address,sessionId: session,inputter,profilePictureUrl });
         res.status(200).json({ mssg: `${firstName}'s record has been updated successfully`, redirect: '/finance' });
     } catch(err) {
         console.log(err);

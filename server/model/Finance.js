@@ -36,6 +36,9 @@ const financeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
     },
+    profilePictureUrl: {
+        type: String
+    },
     recordStatus: requiredString
 
 }, { timestamps: true });

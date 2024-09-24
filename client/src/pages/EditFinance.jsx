@@ -1,12 +1,11 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { genders as genderSelections } from '../data/genders.json';
 import { MainContext } from '../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const EditFinance = () => {
     
@@ -15,6 +14,7 @@ const EditFinance = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/finance/${id}`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -27,6 +27,13 @@ const EditFinance = () => {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
+
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+    };
 
     const { session,currentUserId,genericPath } = useContext(MainContext);
 
@@ -44,6 +51,7 @@ const EditFinance = () => {
             setEmail(records.email);
             setContactNumber(records.contactNumber);
             setAddress(records.address);
+            setProfilePictureUrl(`${baseUrl()}${records?.profilePictureUrl}`);
         }
     }, [records]);
 
@@ -56,49 +64,52 @@ const EditFinance = () => {
     const editFinance = async (e) => {
         e.preventDefault();
 
-        const financeInformation = {
-            firstName,
-            middleName,
-            lastName,
-            dateOfBirth,
-            sex,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            session,
-            inputter: currentUserId
-        };
+        const formData = new FormData();
+        formData.append('firstName',firstName);
+        formData.append('lastName', lastName);
+        formData.append('middleName', middleName);
+        formData.append('dateOfBirth', dateOfBirth);
+        formData.append('sex',sex);
+        formData.append('religion',religion);
+        formData.append('nationality',nationality);
+        formData.append('placeOfBirth',placeOfBirth);
+        formData.append('email', email);
+        formData.append('contactNumber', contactNumber);
+        formData.append('address',address);
+        formData.append('session',session);
+        formData.append('inputter', currentUserId);
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
 
         try {
-            const data = await axios.patch(`${baseUrl()}/finance/${id}`, financeInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            const data = await axios.patch(`${baseUrl()}/finance/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(data.data.redirect); // Redirect to the teachers list page or wherever you need
-            }, 2000);
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}${data.data.redirect}`); // Redirect to the teachers list page or wherever you need
+                }
+            });
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating finance record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -177,12 +188,31 @@ const EditFinance = () => {
                     </div>
                 </section>
 
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={profilePictureUrl || `${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 <div className="flex items-center justify-end gap-2">
                     <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Finance</button>
                     <button type="button" onClick={() => navigate(`/${genericPath}/finance`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
-            <ToastContainer />
         </main>
     );
 };

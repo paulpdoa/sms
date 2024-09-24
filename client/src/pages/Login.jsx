@@ -2,8 +2,6 @@ import { useState, useEffect, useContext } from 'react';
 import { MainContext } from '../helpers/MainContext';
 import { baseUrl } from '../baseUrl';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../hooks/useFetch';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -164,7 +162,6 @@ const Login = () => {
                     </button>
                 </div>
             </div>
-            <ToastContainer />
         </main>
     );
 };

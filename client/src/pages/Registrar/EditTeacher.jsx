@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const EditTeacher = () => {
     
@@ -15,6 +16,7 @@ const EditTeacher = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/teacher/${id}`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -35,9 +37,14 @@ const EditTeacher = () => {
     const [yearsOfExperience, setYearsOfExperience] = useState('');
     const [joiningDate, setJoiningDate] = useState('');
     const [username, setUsername] = useState('');
-
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePictureUrl,setProfilePictureUrl] = useState('');
     const { session,currentUserId,genericPath } = useContext(MainContext);
 
+    const handleFileChange = (e) => {
+        setProfilePicture(e.target.files[0]);
+        setProfilePictureUrl(URL.createObjectURL(e.target.files[0]));
+    };
 
     useEffect(() => {
         if(records) {
@@ -60,6 +67,7 @@ const EditTeacher = () => {
             setYearsOfExperience(records.yearsOfExperience);
             setJoiningDate(records.joiningDate);
             setUsername(records.username);
+            setProfilePictureUrl(`${baseUrl()}${records?.profilePictureUrl}`);
         }
     }, [records]);
 
@@ -71,58 +79,58 @@ const EditTeacher = () => {
 
     const editTeacher = async (e) => {
         e.preventDefault();
-
-        const teacherInformation = {
-            firstName,
-            middleName,
-            lastName,
-            dateOfBirth,
-            sex,
-            religion,
-            nationality,
-            placeOfBirth,
-            email,
-            contactNumber,
-            address,
-            spouseName,
-            spouseCel,
-            education,
-            schoolGraduated,
-            yearGraduated,
-            yearsOfExperience,
-            joiningDate,
-            username,
-            session,
-            inputter: currentUserId
-        };
+        const formData = new FormData();
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('middleName', middleName);
+        formData.append('sex', sex);
+        formData.append('religion', religion);
+        formData.append('nationality', nationality);
+        formData.append('placeOfBirth', placeOfBirth);
+        formData.append('email', email);
+        formData.append('contactNumber', contactNumber);
+        formData.append('address', address);
+        formData.append('spouseName', spouseName);
+        formData.append('spouseCel', spouseCel);
+        formData.append('education', education);
+        formData.append('schoolGraduated', schoolGraduated);
+        formData.append('yearGraduated', yearGraduated);
+        formData.append('yearsOfExperience', yearsOfExperience);
+        formData.append('joiningDate', joiningDate);
+        formData.append('session', session);
+        formData.append('inputter', currentUserId);
+        if(profilePicture) {
+            formData.append('profilePicture', profilePicture)
+        }
 
         try {
-            const data = await axios.patch(`${baseUrl()}/teacher/${id}`, teacherInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            const data = await axios.patch(`${baseUrl()}/teacher/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/teachers`); // Redirect to the teachers list page or wherever you need
-            }, 2000);
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/teachers`);
+                }
+            });
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -223,21 +231,31 @@ const EditTeacher = () => {
                     </div>
                 </section>
 
-                {/* <section>
-                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Credentials</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {renderInput("username", "Username", username, setUsername, "text")}
-                        {renderInput("password", "Password", password, setPassword, "password")}
-                        {renderInput("confirm-password", "Confirm Password", confirmPassword, setConfirmPassword, "password")}
+                <section>
+                    <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Profile Picture:</h2>
+                    <div className="flex gap-2 items-center">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={`${baseUrl()}${profilePictureUrl}` || '/avatar/avatar.png'}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                className="py-2"
+                            />
+                        </div>
                     </div>
-                </section> */}
+                </section>
 
                 <div className="flex items-center justify-end gap-2">
                     <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
                     <button type="button" onClick={() => navigate(`/${genericPath}/teachers`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
-            <ToastContainer />
         </main>
     );
 };

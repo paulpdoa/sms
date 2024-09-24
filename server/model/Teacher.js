@@ -71,7 +71,10 @@ const teacherSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:'schoolYear'
     },
-    recordStatus: requiredString
+    recordStatus: requiredString,
+    profilePictureUrl: {
+        type: String
+    }
 
 }, { timestamps: true });
 

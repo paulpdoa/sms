@@ -1,16 +1,16 @@
 const express = require('express');
 const { get_students, add_student, delete_student, get_student_detail, submit_student_requirements, get_admission, add_admission, get_admission_student, update_student_info, get_academics, add_academic, get_student_academic_detail, get_student_academic, delete_academic, get_discounts, get_discount_detail, add_discount, delete_discount, edit_discount, get_student_discounts, get_student_discount_detail, get_discounts_of_student, delete_student_discount, add_student_discount, get_sectioning, add_sectioning, get_manage_fees, add_manage_fees, get_manage_fee_detail, delete_manage_fee, edit_manage_fee, generate_fees, get_student_payments, get_student_payment_detail, get_payment_schedule, add_payment_schedule, delete_generated_fees, automate_fees, get_enrolled_students, edit_student, assign_subject_to_students, get_student_subjects, get_teacher_subject, add_teacher_subject, delete_teacher_subject, edit_assigned_teacher_subject, get_teacher_subject_details } = require('../controller/registrarController');
 const route = express.Router();
-const { allowUserAction,allowUserView } = require('../middleware/middlewares');
+const { allowUserAction,allowUserView,upload } = require('../middleware/middlewares');
 
 const userRoles = ['Super Admin', 'School Admin', 'Registrar']
 
 // Students
 route.get('/students',allowUserView(userRoles), get_students);
-route.post('/students', add_student);
+route.post('/students',upload.single('profilePicture'), add_student);
 route.put('/student/:id', delete_student);
 route.get('/student/:id',allowUserView(userRoles), get_student_detail);
-route.patch('/student/:id',allowUserAction(userRoles),edit_student);
+route.patch('/student/:id',upload.single('profilePicture'),edit_student);
 route.get('/enrolled/students/:id',get_enrolled_students);
 
 // Admission
