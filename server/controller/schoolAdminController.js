@@ -206,6 +206,12 @@ module.exports.add_strand = async (req,res) => {
     const recordStatus = 'Live';
 
     try {
+
+        const strandExist = await Strand.findOne({ strand, recordStatus, sessionId });
+        if(strandExist) {
+            return res.status(400).json({ mssg:`${strand} is already existing, please choose another strand` })
+        }
+
         const newStrand = await Strand.addStrand(strand,inputter,status,sessionId,recordStatus);
         res.status(200).json({ mssg: `${strand} has been added to the record` });
     } catch(err) {
@@ -243,7 +249,13 @@ module.exports.edit_strand = async (req,res) => {
 
     const { newStrand: strand, inputter,sessionId } = req.body;
 
-    try {   
+    try {  
+        
+        const strandExist = await Strand.findOne({ strand, recordStatus: 'Live', sessionId });
+        if(strandExist) {
+            return res.status(400).json({ mssg:`${strand} is already existing, please choose another strand` })
+        }
+        
         const newStrand = await Strand.findByIdAndUpdate({ _id: id }, { strand, inputter,sessionId });
         res.status(200).json({ mssg: `${newStrand.strand} has been edited successfully!` });
     } catch(err) {

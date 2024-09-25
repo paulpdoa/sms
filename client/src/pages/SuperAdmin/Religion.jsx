@@ -23,7 +23,6 @@ const Religion = () => {
     const addReligion = async (e) => {
         e.preventDefault();
 
-       
         if(!religion) {
             setError(prev => ({ ...prev, religion: 'Religion cannot be empty' }));
             return enqueueSnackbar('Religion is a required field', { 

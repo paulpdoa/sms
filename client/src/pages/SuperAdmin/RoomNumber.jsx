@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,12 +6,15 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const RoomNumber = () => {
 
     const { records: roomNumbers } = useFetch(`${baseUrl()}/room-numbers`);
 
     const [roomNumber,setRoomNumber] = useState('');
+    const [error,setError] = useState({ roomNumber: '' });
+    const { enqueueSnackbar } = useSnackbar();
 
     const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext);
     const [isLoading,setIsLoading] = useState(false);
@@ -25,33 +26,46 @@ const RoomNumber = () => {
     const addRoomNumber = async (e) => {
         e.preventDefault();
 
+        if(!roomNumber) {
+            setError({ roomNumber: 'Room number cannot be empty' });
+            return enqueueSnackbar('Room number is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ roomNumber: '' });
+                }
+            });
+        }
+
         try {
             const data = await axios.post(`${baseUrl()}/room-number`,{ roomNumber,inputter: currentUserId, sessionId: session,role })
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding room number record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -59,31 +73,28 @@ const RoomNumber = () => {
     const updateRoomNumber = async (id,updatedData) => {
         try {
             const data = await axios.patch(`${baseUrl()}/room-number/${id}`, { roomNumber: updatedData.roomNumber,role,sessionId: session });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating room number record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -91,31 +102,28 @@ const RoomNumber = () => {
     const deleteRoomNumber = async (id) => {
         try {
             const data = await axios.put(`${baseUrl()}/room-number/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting room number record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -126,7 +134,8 @@ const RoomNumber = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="room number">Room Number</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="number" onChange={(e) => setRoomNumber(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${error.roomNumber ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setRoomNumber(e.target.value)} />
+                { error.roomNumber && <span className="text-xs text-red-500">{error.roomNumber}</span> }
             </div>
         </>
     )
@@ -150,7 +159,6 @@ const RoomNumber = () => {
                 />
             </div>    
         </div> 
-        <ToastContainer />          
     </main>
     )
 }

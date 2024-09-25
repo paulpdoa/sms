@@ -1,8 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -11,6 +6,7 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Section = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/sections`);
@@ -22,6 +18,7 @@ const Section = () => {
     const [adviser, setAdviser] = useState('');
     // const [department, setDepartment] = useState('');
     const [error,setError] = useState({ section: '', gradeLevel: '', adviser: '' });
+    const { enqueueSnackbar } = useSnackbar();
 
     const { role,searchQuery,showForm,setShowForm,session,currentUserId } = useContext(MainContext);
 
@@ -61,31 +58,28 @@ const Section = () => {
                 session,
                 currentUserId
             });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating section record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -93,31 +87,28 @@ const Section = () => {
     const deleteSection = async (id) => {
         try {
             const removeSection = await axios.put(`${baseUrl()}/section/${id}`, { recordStatus: 'Deleted' });
-            toast.success(removeSection.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeSection.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting section record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -125,43 +116,76 @@ const Section = () => {
     const addSection = async (e) => {
         e.preventDefault();
 
-        if(!section) setError(prev => ({ ...prev, section: 'Section cannot be empty' }));
-        if(!gradeLevel) setError(prev => ({ ...prev, gradeLevel: 'Grade level cannot be empty' }));
-        if(!adviser) setError(prev => ({ ...prev, adviser: 'Adviser cannot be empty' }));
-
-        setTimeout(() => {
-            setError({ section: '', gradeLevel: '', adviser: '' });
-        },3000)
-
-        if(!section || !gradeLevel || !adviser) return
+        if(!section) {
+            setError(prev => ({ ...prev, section: 'Section cannot be empty' }));
+            return enqueueSnackbar('Section is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ section: '' });
+                }
+            });
+        }
+        if(!gradeLevel) {
+            setError(prev => ({ ...prev, gradeLevel: 'Grade level cannot be empty' }));
+            return enqueueSnackbar('Grade level is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ gradeLevel: '' });
+                }
+            });
+        }
+        if(!adviser) {
+            setError(prev => ({ ...prev, adviser: 'Adviser cannot be empty' }));
+            return enqueueSnackbar('Adviser is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ adviser: '' });
+                }
+            });
+        }
 
         try {
             const newSection = await axios.post(`${baseUrl()}/sections`, { section, gradeLevel, adviser, role,sessionId: session,session,currentUserId });
-            toast.success(newSection.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newSection.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000)
         } catch (err) {
             console.log(err)
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding section record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -219,11 +243,9 @@ const Section = () => {
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Section" />
-
+            <TabActions title="Sections" />
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addSection,setShowForm)}
-
                 <div className="relative col-span-2  h-fit">
                     <MasterTable
                         columns={columns}
@@ -235,7 +257,6 @@ const Section = () => {
                     />
                 </div>
             </div>
-            <ToastContainer />
         </main>
     )
 }

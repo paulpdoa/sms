@@ -655,6 +655,11 @@ module.exports.add_sections = async (req,res) => {
     }
 
     try {
+        const sectionExist = await Section.findOne({ section, recordStatus: 'Live', sessionId });
+        if(sectionExist) {
+            return res.status(400).json({ mssg: `${section} is already existing, please choose another section` });
+        }
+
         const newSection = await Section.addSection(section,gradeLevel,adviser,status,sessionId,inputter,recordStatus);
         res.status(200).json({ mssg: `${newSection.section} has been added to the record` });
     } catch(err) {
@@ -706,7 +711,10 @@ module.exports.edit_section = async (req, res) => {
         if (!currentSection) {
             return res.status(404).json({ mssg: 'Section not found' });
         }
-
+        const sectionExist = await Section.findOne({ section, recordStatus: 'Live', sessionId });
+        if(sectionExist) {
+            return res.status(400).json({ mssg: `${section} is already existing, please choose another section` });
+        }
         // Find all sections in the given session excluding the current one
         const currSections = await Section.find({ sessionId, _id: { $ne: id },status: true });
         
@@ -911,7 +919,7 @@ module.exports.delete_live_subject = async(req,res) => {
 module.exports.get_requirements = async (req,res) => {
     const { session } = req.query
     try {
-        const requirements = await Requirement.find({ sessionId: session }).populate('inputter');
+        const requirements = await Requirement.find({ sessionId: session, recordStatus: 'Live' }).populate('inputter');
         res.status(200).json(requirements);
     } catch(err) {
         console.log(err);
@@ -923,6 +931,12 @@ module.exports.add_requirements = async (req,res) => {
     const { requirement,isRequired,currentUserId, session } = req.body
 
     try {
+
+        const reqExist = await Requirement.findOne({ requirement, sessionId: session, recordStatus: 'Live' });
+        if(reqExist) {
+            return res.status(400).json({ mssg: `${requirement} is already existing, please choose another requirement` });
+        }
+
         const newRequirement = await Requirement.create({ requirement,isRequired,inputter: currentUserId,sessionId: session,recordStatus });
         res.status(200).json({ mssg: `${newRequirement.requirement} has been added to the record` });
     } catch(err) {
@@ -947,7 +961,7 @@ module.exports.get_requirement_detail = async (req,res) => {
     const { session } = req.query;
 
     try {
-        const requirementFind = await Requirement.findOne({ _id: id, sessionId: session });
+        const requirementFind = await Requirement.findOne({ _id: id, sessionId: session, recordStatus: 'Live' });
         res.status(200).json(requirementFind);
     } catch(err) {
         console.log(err);
@@ -960,14 +974,13 @@ module.exports.edit_requirement = async (req,res) => {
     const { newRequirement: requirement,newIsRequired: isRequired,currentUserId: inputter, session } = req.body;
 
     try {   
-        const currRequirement = await Requirement.findById(id);
-        // if(currRequirement.requirement !== requirement && currRequirement.isRequired !== isRequired) {
-            const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter, sessionId: session });
-            res.status(200).json({ mssg: `${newRequirement.requirement} has been changed to ${requirement} successfully!` });
-        // } else {
-        //     res.status(400).json({ mssg: `Cannot update ${requirement}, still the same with old value` })
-        // }
-        
+        const reqExist = await Requirement.findOne({ requirement, sessionId: session, recordStatus: 'Live' });
+        if(reqExist) {
+            return res.status(400).json({ mssg: `${requirement} is already existing, please choose another requirement` });
+        }
+
+        const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter, sessionId: session });
+        res.status(200).json({ mssg: `${newRequirement.requirement} has been changed to ${requirement} successfully!` });
     } catch(err) {
         console.log(err);
     }
@@ -1171,7 +1184,7 @@ module.exports.add_school_year = async (req, res) => {
         res.status(200).json({ mssg: `${newSy.startYear} to ${newSy.endYear} has been added to the record` });
     } catch (err) {
         console.error('Error occurred:', err);
-        res.status(500).json({ mssg: 'An unexpected error occurred' });
+        res.status(500).json({ mssg: 'An error occurred while adding new school year' });
     }
 }
 
@@ -1208,6 +1221,7 @@ module.exports.delete_school_year = async (req,res) => {
         res.status(200).json({ mssg: `${schoolYearFind.startYear.split('-')[0]} to ${schoolYearFind.endYear.split('-')[0]} year has ended` });
     } catch(err) {
         console.log(err)
+        res.status(500).json({ mssg: 'An error occurred while deleting school year record'});
     }
 }
 
@@ -1221,7 +1235,7 @@ module.exports.get_school_year_detail = async (req,res) => {
         }
     } catch(err) {
         console.log(err);
-        res.status(500).json({mssg: 'Server error'});
+        res.status(500).json({mssg: 'An error occrred while fetching school year record'});
     }
 }
 
@@ -1260,6 +1274,7 @@ module.exports.close_school_year = async (req,res) => {
         res.status(200).json({ mssg: 'School year has been closed' });
     } catch(err) {
         console.log(err);
+        res.status(500).json({mssg:'An error occurred while closing school year record'});
     }
 }
 
@@ -2137,8 +2152,9 @@ module.exports.add_room_number = async (req,res) => {
     const { roomNumber,inputter,sessionId } = req.body;
 
     try {
-        if(roomNumber < 1) {
-            return res.status(400).json({ mssg: 'Room number cannot be a negative number' });
+        const roomNumberExist = await RoomNumber.findOne({ roomNumber, recordStatus: 'Live', sessionId });
+        if(roomNumberExist) {
+            return res.status(400).json({ mssg: `${roomNumber} is already existing, please choose another room number` });
         }
         
         await RoomNumber.create({ roomNumber,inputter,sessionId,recordStatus: 'Live' });
@@ -2172,6 +2188,11 @@ module.exports.edit_room_number = async (req,res) => {
 
         if(!roomNumber) {
             return res.status(404).json({ mssg: 'Room number cannot be blank' });
+        }
+
+        const roomNumberExist = await RoomNumber.findOne({ roomNumber, recordStatus: 'Live', sessionId });
+        if(roomNumberExist) {
+            return res.status(400).json({ mssg: `${roomNumber} is already existing, please choose another room number` });
         }
 
         await RoomNumber.findByIdAndUpdate(id, { roomNumber,inputter,sessionId });

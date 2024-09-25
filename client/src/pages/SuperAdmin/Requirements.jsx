@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,12 +6,16 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Requirements = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/requirements`);
     const [requirement,setRequirement] = useState('');
-    const [isRequired,setIsRequired] = useState(false);
+    const [isRequired,setIsRequired] = useState('');
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [errors,setErrors] = useState({ requirement: '', isRequired: '' });
 
     const columns = [
         {
@@ -36,31 +38,28 @@ const Requirements = () => {
         
         try {
             const newData = await axios.patch(`${baseUrl()}/requirement/${id}`,{ newRequirement:updatedData.requirement,newIsRequired:isRequired,currentUserId,role, session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating requirement record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }      
@@ -68,66 +67,92 @@ const Requirements = () => {
     const deleteRequirement = async (id) => {
         try {
             const removeRequirement = await axios.put(`${baseUrl()}/requirement/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(removeRequirement.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeRequirement.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting requirement record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
 
     const addRequirement = async (e) => {
         e.preventDefault();
-        try {
-            const newRequirement = await axios.post(`${baseUrl()}/requirements`,{ requirement,isRequired,currentUserId,role });
-            toast.success(newRequirement.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
-            });
 
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
+        if(!requirement) {
+            setErrors(prev => ({...prev, requirement: 'Requirement cannot be empty'}));
+            return enqueueSnackbar('Requirement is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ requirement: '' });
+                }
+            });
+        }
+
+        if(!isRequired) {
+            setErrors(prev => ({...prev,isRequired:'Required cannot be empty'}))
+            return enqueueSnackbar('Is Required is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ isRequired: '' });
+                }
+            });
+        }
+
+        try {
+            const newRequirement = await axios.post(`${baseUrl()}/requirements`,{ requirement,isRequired,currentUserId,role,session });
+            enqueueSnackbar(newRequirement.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
+            });
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding requirement record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-
         }
     }
 
@@ -142,16 +167,20 @@ const Requirements = () => {
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="requirement">Requirement</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setRequirement(e.target.value)} />
+            <input className={`outline-none p-1 rounded-md border ${errors.requirement ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setRequirement(e.target.value)} />
+            { errors.requirement && <span className="text-xs text-red-500">{errors.requirement}</span> }
         </div>
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="isRequired">Required</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setIsRequired(e.target.value)}>
+            <select 
+                className={`outline-none p-1 rounded-md border ${errors.isRequired ? 'border-red-500' : 'border-gray-300'}`}
+                onChange={(e) => setIsRequired(e.target.value)}>
                 <option hidden>Choose if strongly required</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value={true}>Yes</option>
+                <option value={false}>No</option>
             </select>
+            { errors.isRequired && <span className="text-xs text-red-500">{errors.isRequired}</span> }
         </div>
         </>
     )
@@ -175,7 +204,6 @@ const Requirements = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }
