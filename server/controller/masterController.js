@@ -286,6 +286,11 @@ module.exports.add_religion = async (req,res) => {
     const { religion,currentUserId: inputter,sessionId } = req.body
 
     try {
+        const religionExist = await Religion.findOne({ religion, recordStatus: 'Live', sessionId });
+        if(religionExist) {
+            return res.status(400).json({mssg: `${religion} is already existing, please choose another religion`})
+        }
+
         const newReligion = await Religion.create({ religion,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${religion} has been added to the record` });
     } catch(err) {
@@ -322,15 +327,15 @@ module.exports.edit_religion = async (req,res) => {
 
     const { newReligion: religion,currentUserId: inputter,sessionId } = req.body;
 
-    try {   
-        const currReligion = await Religion.findById(id);
-        if(currReligion.religion !== religion) {
-            const newReligion = await Religion.findByIdAndUpdate({ _id: id }, { religion,inputter,sessionId });
-            res.status(200).json({ mssg: `${newReligion.religion} has been changed to ${religion} successfully!` });
-        } else {
-            res.status(400).json({ mssg: `Cannot update ${religion}, still the same with old value` })
-        }
+    try {  
         
+        const religionExist = await Religion.findOne({ religion, recordStatus: 'Live', sessionId });
+        if(religionExist) {
+            return res.status(400).json({mssg: `${religion} is already existing, please choose another religion`})
+        }
+       
+        const newReligion = await Religion.findByIdAndUpdate({ _id: id }, { religion,inputter,sessionId });
+        res.status(200).json({ mssg: `${newReligion.religion} has been changed to ${religion} successfully!` });
     } catch(err) {
         console.log(err);
     }
@@ -353,6 +358,12 @@ module.exports.add_nationality = async (req,res) => {
     const { nationality,nationalityCode,currentUserId: inputter, sessionId } = req.body;
 
     try {
+
+        const natlExist = await Nationality.findOne({ nationality, recordStatus, sessionId });
+        if(natlExist) {
+            return res.status(400).json({ mssg: `${nationality} is already existing, please choose another nationality` });
+        }
+
         await Nationality.create({ nationality,nationalityCode,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${nationality} has been added to the record` });
     } catch(err) {
@@ -391,10 +402,17 @@ module.exports.edit_nationality = async (req,res) => {
     const { newNationality: nationality,newNationalityCode: nationalityCode,currentUserId: inputter,sessionId } = req.body;
     
     try {
+
+        const natlExist = await Nationality.findOne({ nationality, recordStatus, sessionId });
+        if(natlExist) {
+            return res.status(400).json({ mssg: `${nationality} is already existing, please choose another nationality` });
+        }
+
         const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCode,inputter,sessionId });
         res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating nationality record' });
     }
 }
 
@@ -537,6 +555,12 @@ module.exports.add_departments = async (req,res) => {
     const { department,sessionId,currentUserId } = req.body
 
     try {
+
+        const deptExist = await Department.findOne({ department, recordStatus, sessionId });
+        if(deptExist) {
+            return res.status(400).json({ mssg: `${department} is already existing, please choose another department` });
+        }
+        
         const newDepartment = await Department.create({ department,sessionId,inputter: currentUserId, recordStatus });
         res.status(200).json({ mssg: `${newDepartment.department} has been added to the record` });
     } catch(err) {
@@ -573,18 +597,30 @@ module.exports.edit_department = async (req,res) => {
     const { id } = req.params;
 
     const { newDepartment: department, sessionId, currentUserId: inputter } = req.body;
-
-    try {   
-        const currDepartment = await Department.findById(id);
-        if(currDepartment.department !== department) {
-            const newDepartment = await Department.findByIdAndUpdate({ _id: id }, { department,sessionId,inputter });
-            res.status(200).json({ mssg: `${newDepartment.department} has been changed to ${department} successfully!` });
-        } else {
-            res.status(400).json({ mssg: `Cannot update ${department}, still the same with old value` })
+    
+    try {       
+        const currDepartment = await Department.findOne({ _id: id, recordStatus, sessionId });
+        if(!currDepartment) {
+            return res.status(404).json({ mssg: 'Department is not existing' })
         }
+
+        if(currDepartment.department === department) {
+            return res.status(400).json({ mssg: `${department} is already the current department name` });
+        }
+
+        // Check if another department with the same name exists in the same session
+        const deptExist = await Department.findOne({ department, recordStatus: 'Live', sessionId });
+        if (deptExist) {
+            return res.status(400).json({ mssg: `${department} already exists, please choose another department name` });
+        }
+
+        const newDepartment = await Department.findByIdAndUpdate({ _id: id }, { department,sessionId,inputter }, { new: true });
+        res.status(200).json({ mssg: `${newDepartment.department} has been changed to ${department} successfully!` });
+       
         
     } catch(err) {
         console.log(err);
+        res.status(500).json({ mssg: 'An error occurred while updating departments record' })
     }
 }
 
@@ -720,6 +756,12 @@ module.exports.add_grade_levels = async (req,res) => {
     const { gradeLevel,inputter,department,sessionId } = req.body
 
     try {
+
+        const glExist = await GradeLevel.findOne({ gradeLevel: gradeLevel, recordStatus: 'Live' });
+        if(glExist) {
+            return res.status(400).json({ mssg: `${gradeLevel} is already existing, please enter another grade level record` });
+        }
+
         const newGradeLevel = await GradeLevel.create({ gradeLevel,inputter,department,sessionId,recordStatus });
         res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been added to the record` });
     } catch(err) {
@@ -760,13 +802,20 @@ module.exports.edit_grade_level = async (req,res) => {
 
     try {   
         const currGradeLevel = await GradeLevel.findById(id);
-        if(currGradeLevel.gradeLevel !== GradeLevel) {
-            const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel,inputter,department,sessionId });
-            res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been updated successfully!` });
-        } else {
-            res.status(400).json({ mssg: `Cannot update ${gradeLevel}, still the same with old value` })
+
+        if(gradeLevel === currGradeLevel.gradeLevel) {
+            return res.status(400).json({ mssg:`${gradeLevel} is still the same with ${currGradeLevel.gradeLevel}` });
         }
-        
+
+        const glExist = await GradeLevel.findOne({ gradeLevel: gradeLevel, recordStatus: 'Live' });
+        if(glExist) {
+            return res.status(400).json({ mssg: `${gradeLevel} is already existing, please enter another grade level record` });
+        }
+
+       
+        const newGradeLevel = await GradeLevel.findByIdAndUpdate({ _id: id }, { gradeLevel,inputter,department,sessionId });
+        res.status(200).json({ mssg: `${newGradeLevel.gradeLevel} has been updated successfully!` });
+
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while updating grade level' });
@@ -1382,6 +1431,11 @@ module.exports.add_payment_term = async (req,res) => {
 
     try {
 
+        const isPaymentExist = await PaymentTerm.findOne({ term, recordStatus, sessionId });
+        if(isPaymentExist) {
+            return res.status(400).json({ mssg: `${term} is already existing, please choose another term` });
+        }
+
         await PaymentTerm.create({ term,payEvery,installmentBy,inputter,sessionId,recordStatus });
         res.status(200).json({ mssg: `${term} has been added in payment terms record` });
     } catch(err) {
@@ -1421,6 +1475,11 @@ module.exports.edit_payment_term = async (req,res) => {
     const { newPayEvery,newInstallmentBy,currentUserId: inputter,newTerm,sessionId } = req.body;
 
     try {
+        const isPaymentExist = await PaymentTerm.findOne({ term: newTerm, recordStatus: 'Live', sessionId });
+        if(isPaymentExist) {
+            return res.status(400).json({ mssg: `${newTerm} is already existing, please choose another term` });
+        }
+
         const newPaymentTerm = await PaymentTerm.findByIdAndUpdate({ _id:id },{ payEvery: newPayEvery,installmentBy:newInstallmentBy,inputter,term:newTerm,sessionId });
         res.status(200).json({ mssg: `${newPaymentTerm.term} has been updated successfully` });
     } catch(err) {
@@ -1464,7 +1523,18 @@ module.exports.add_fee_category = async (req,res) => {
     const { category,code,inputter,sessionId } = req.body;
 
     try {
-        await FeeCategory.create({ category,code,inputter,sessionId,recordStatus });
+
+        const feeCategExist = await FeeCategory.findOne({ category: category,recordStatus: 'Live', sessionId });
+        if(feeCategExist) {
+            return res.status(400).json({ mssg: `${category} is already existing, please choose another category` });
+        }
+
+        const feeCodeExist = await FeeCategory.findOne({ code,recordStatus: 'Live', sessionId });
+        if(feeCodeExist) {
+            return res.status(400).json({ mssg: `${code} is already existing, please choose another fee code` });
+        }
+
+        await FeeCategory.create({ category,code,inputter,sessionId,recordStatus: 'Live' });
         res.status(200).json({ mssg:`${category} has been added to the record` });
     } catch(err) {
         console.log(err);
@@ -1479,6 +1549,7 @@ module.exports.delete_fee_category = async (req,res) => {
     const { recordStatus } = req.body;
 
     try {
+        
         const feeCategFind = await FeeCategory.findByIdAndUpdate(id, { recordStatus });
         res.status(200).json({ mssg: `${feeCategFind.category} record has been deleted in the record` });
     } catch(err) {
@@ -1494,6 +1565,28 @@ module.exports.edit_fee_category = async (req,res) => {
     
 
     try {
+        const existingCategory = await FeeCategory.findOne({ _id: id, recordStatus: 'Live', sessionId });
+
+        if (!existingCategory) {
+            return res.status(404).json({ mssg: 'Fee category not found' });
+        }
+
+        // Check if category has changed and is duplicated
+        if (category !== existingCategory.category) {
+            const feeCategExist = await FeeCategory.findOne({ category, recordStatus: 'Live', sessionId });
+            if (feeCategExist) { 
+                return res.status(400).json({ mssg: `${category} is already existing, please choose another category` });
+            }
+        }
+
+        // Check if code has changed and is duplicated
+        if (code !== existingCategory.code) {
+            const feeCodeExist = await FeeCategory.findOne({ code, recordStatus: 'Live', sessionId });
+            if (feeCodeExist) {
+                return res.status(400).json({ mssg: `${code} is already existing, please choose another fee code` });
+            }
+        }
+
         const newCategory = await FeeCategory.findByIdAndUpdate({ _id:id },{ category,code,sessionId,inputter });
         res.status(200).json({ mssg: `${newCategory.category} has been updated successfully` });
     } catch(err) {
@@ -1521,6 +1614,17 @@ module.exports.add_fee_code = async (req,res) => {
     const { description,code,inputter,feeCategory,sessionId } = req.body;
 
     try {
+
+        const feeCodeExist = await FeeCode.findOne({ code: code.toUpperCase(), recordStatus: 'Live', sessionId });
+        if(feeCodeExist) {
+            return res.status(400).json({ mssg: `${code.toUpperCase()} is already existing, please choose another code` });
+        }
+
+        const feeDescriptionExist = await FeeCode.findOne({ description, recordStatus: 'Live', sessionId });
+        if(feeDescriptionExist) {
+            return res.status(400).json({ mssg: `${description} is already existing, please choose another code` });
+        }
+
         await FeeCode.create({ description,code: code.toUpperCase(), inputter, feeCateg:feeCategory, sessionId, recordStatus });
         res.status(200).json({ mssg: `${description} has been added to the record` });
     } catch(err) {
@@ -1549,6 +1653,27 @@ module.exports.edit_fee_code = async (req,res) => {
     const { inputter,description,feeCateg,code,sessionId } = req.body;
 
     try {
+
+        const existingFeeCode = await FeeCode.findOne({ _id: id, recordStatus: 'Live', sessionId });
+
+        if(!existingFeeCode) {
+            return res.status(404).json({ mssg: 'Fee code is not existing' });
+        }
+
+        if(code.toUpperCase() !== existingFeeCode.code) {
+            const feeCodeExist = await FeeCode.findOne({ code: code.toUpperCase(), recordStatus: 'Live', sessionId });
+            if(feeCodeExist) {
+                return res.status(400).json({ mssg: `${code.toUpperCase()} is already existing, please choose another code` });
+            }
+        }
+
+        if(description !== existingFeeCode.description) {
+            const feeDescriptionExist = await FeeCode.findOne({ description, recordStatus: 'Live', sessionId });
+            if(feeDescriptionExist) {
+                return res.status(400).json({ mssg: `${description} is already existing, please choose another code` });
+            }
+        }
+
         const newCode = await FeeCode.findByIdAndUpdate({ _id:id },{ feeCateg,code: code.toUpperCase(),description,inputter, sessionId });
         res.status(200).json({ mssg: `${newCode.description} has been updated successfully` });
     } catch(err) {

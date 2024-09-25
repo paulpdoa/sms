@@ -8,8 +8,7 @@ const requiredString = {
 const gradeLevelSchema = new mongoose.Schema({
     gradeLevel: {
         type:String,
-        required:true,
-        unique:true
+        required:true
     },
     department: {
         type: mongoose.Schema.Types.ObjectId,

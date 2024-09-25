@@ -11,11 +11,10 @@ import TabActions from "../../components/TabActions";
 const PaymentSchedule = () => {
 
     const { records,isLoading: loading } = useFetch(`${baseUrl()}/payment-schedules`);
-    const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [openPopup, setOpenPopup] = useState(false);
 
-    const { session, role,currentUserId,snackbarKey, dateFormatter} = useContext(MainContext);
+    const { session, role,currentUserId,snackbarKey, dateFormatter,searchQuery} = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone;
     const { enqueueSnackbar,closeSnackbar } = useSnackbar();
@@ -36,7 +35,6 @@ const PaymentSchedule = () => {
         const loading = snackbarKey('Creating payment schedule, please wait...')
 
         try {
-            
             const { data } = await axios.post(`${baseUrl()}/payment-schedule`, { session, role, isReset, currentUserId });
             setIsLoading(false);
             closeSnackbar(loading);
@@ -71,7 +69,7 @@ const PaymentSchedule = () => {
     return (
         <main className="p-2">
             <div className="flex justify-between items-center">
-                <TabActions title="Payment Schedule" noView={true} />
+                <TabActions title="Payment Schedules" noView={true} />
                 {records.length < 1 ?
                     <button onClick={() => !isYearDone && generatePaymentSchedule(false)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md w-1/4`}>
                         {isLoading ? 'Loading...' : 'Generate Payment Schedule'}

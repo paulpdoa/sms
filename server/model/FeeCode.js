@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const requiredString = {
     type: String,
     required: true,
-    unique:true
 }
 
 const feeCodeSchema = new mongoose.Schema({

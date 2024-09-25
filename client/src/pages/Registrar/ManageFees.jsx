@@ -1,11 +1,7 @@
-import React, { useContext,useState } from 'react';
-import Searchbar from "../../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useContext,useState } from 'react';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
-import ManageFeeBtn from '../../components/buttons/ManageFeeBtn';
 import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import { useNavigate } from 'react-router-dom';
@@ -81,7 +77,7 @@ const ManageFees = () => {
                 autoHideDuration: 2000,
                 preventDuplicate: true,
                 onClose: () =>{
-                    navigate(-1);
+                    window.location.reload();
                 }
             });
             
@@ -100,9 +96,11 @@ const ManageFees = () => {
     }
 
     const automateFees = async (isReset) => {
-
+        const loading = snackbarKey('Generating fees, please wait');
+        
         try {
-            closeSnackbar(snackbarKey('Generating fees, please wait'))
+            closeSnackbar(loading);
+
             const { data } = await axios.post(`${baseUrl()}/automate-fees`,{ session,isReset,inputter: currentUserId });
             enqueueSnackbar(data.mssg, { 
                 variant: 'success',

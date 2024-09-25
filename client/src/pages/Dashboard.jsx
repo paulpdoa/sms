@@ -104,7 +104,7 @@ const Dashboard = () => {
    }, [students, academics, enrolledStudents]);
 
   const academicStatusData = {
-    labels: ['New', 'Old', 'Transferred','Returnee', 'Graduated', 'Admitted but did not continue'],
+    labels: ['New', 'Old', 'Transferred','Returnee'],
     datasets: [{
       data: [academicStatusOfStudents.new, academicStatusOfStudents.old, academicStatusOfStudents.transferred,academicStatusOfStudents.returnee, academicStatusOfStudents.graduated, academicStatusOfStudents.admittedButDidNotContinue],
       backgroundColor: ['#36A2EB', '#FF6384','#4BC0C0','#FF9F40','#DC2626'],

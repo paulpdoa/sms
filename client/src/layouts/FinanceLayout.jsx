@@ -28,7 +28,13 @@ const FinanceLayout = () => {
                     autoHideDuration: 3000,
                     preventDuplicate: true,
                     onClose: () => {
+                        removeCookie('userToken', { path: '/' });
+                        removeCookie('userToken', { path: '/master' });
                         removeCookie('userToken', { path: '/finance' });
+                        removeCookie('userToken', { path: '/guest' });
+                        removeCookie('userToken', { path: '/registrar' });
+                        removeCookie('userToken', { path: '/student' });
+                        removeCookie('userToken', { path: '/teacher' });
                         ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
                         navigate('/login');
                     }

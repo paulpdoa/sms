@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,6 +6,7 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const GradingCategory = () => {
 
@@ -15,8 +14,9 @@ const GradingCategory = () => {
 
     const { records: gradingCategories } = useFetch(`${baseUrl()}/grading-categories`);
 
-
     const [gradingCategory,setGradingCategory] = useState('');
+    const [errors,setErrors] = useState({ gradingCategory: '' });
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
         { accessorKey: 'gradingCategory', header: 'Category', editable: true }
@@ -28,41 +28,55 @@ const GradingCategory = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="grading category">Grading Category</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setGradingCategory(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${errors.gradingCategory ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setGradingCategory(e.target.value)} />
+                { errors.gradingCategory && <span className="text-xs text-red-500">{errors.gradingCategory}</span> }
             </div>
         </>
     )
 
     const addGradingCategory = async (e) => {
         e.preventDefault();
-
+        
+        if(!gradingCategory) {
+            setErrors({ gradingCategory: 'Grading category cannot be empty' });
+            return enqueueSnackbar('Grading category is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ gradingCategory: '' });
+                }
+            });
+        }
+        
         try {
             const data = await axios.post(`${baseUrl()}/grading-category`, { gradingCategory, sessionId: currentSession, inputter: currentUserId });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding grade category record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -70,31 +84,28 @@ const GradingCategory = () => {
     const updateGradingCategory = async(id,updatedData) => {
         try {
             const data = await axios.patch(`${baseUrl()}/grading-category/${id}`,{ gradingCategory: updatedData.gradingCategory, inputter: currentUserId });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating grade category record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -102,40 +113,35 @@ const GradingCategory = () => {
     const deleteGradingCategory = async(id) => {
         try {
             const data = await axios.put(`${baseUrl()}/grading-category/${id}`);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-             
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting grade category record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Grading Category" />
-
+            <TabActions title="Grading Categories" />
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addGradingCategory,setShowForm)}
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
@@ -149,7 +155,6 @@ const GradingCategory = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

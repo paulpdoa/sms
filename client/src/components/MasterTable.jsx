@@ -216,7 +216,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                     currentRows.map((record) => (
                                         <tr key={record._id} className="bg-white border-b hover:bg-customHighlight hover:text-white">
                                             {columns.map(column => (
-                                                <td key={column.accessorKey} className="px-6 py-4">
+                                                <td key={column.accessorKey} className="px-6 py-3">
                                                     {(isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
                                                         column.editable ? (
                                                             column.selectOptions ? (
@@ -264,7 +264,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                             ))}
                                             { (isFreshYear === null) && (
                                             !disableAction &&
-                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                <td className="px-6 py-3 whitespace-nowrap">
                                                     { !actions ? (
                                                         !viewRecord ? (isConfirmedEdit ? (editId === record._id && isConfirmedEdit) : (editId === record._id)) ? (
                                                             <>

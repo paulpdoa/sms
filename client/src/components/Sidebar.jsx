@@ -28,8 +28,8 @@ const initialMenus = [
                 name: 'Master Data',
                 icon: <RiAccountPinBoxFill />,
                 subMenus: [
-                    { name: 'Religion', link: '/master/religion' },
-                    { name: 'Nationality', link: '/master/nationality' },
+                    { name: 'Religions', link: '/master/religion' },
+                    { name: 'Nationalities', link: '/master/nationality' },
                     { name: 'Departments', link: '/master/departments' },
                     { name: 'Sections', link: '/master/sections' },
                     // { name: 'Students', link: '/master/students' },
@@ -37,23 +37,23 @@ const initialMenus = [
                     // { name: 'Finance', link: '/master/finance' },
                     // { name: 'Parents', link: '/master/parents' },
                     // { name: 'Siblings', link: '/master/siblings' },
-                    { name: 'Grade Level', link: '/master/grade-levels' },
+                    { name: 'Grade Levels', link: '/master/grade-levels' },
                     { name: 'Requirements', link: '/master/requirements' },
                     { name: 'User Roles', link: '/master/user-roles' },
-                    { name: 'School Year', link: '/master/school-year' },
+                    { name: 'School Years', link: '/master/school-year' },
                     { name: 'Users', link: '/master/users' },
                     { name: 'Strands', link: '/master/strands' },
                     { name: 'Textbooks', link: '/master/text-books' },
                     { name: 'Payment Terms', link: '/master/payment-terms' },
-                    { name: 'Payment Schedule', link: '/master/payment-schedule' },
-                    { name: 'Fee Category', link: '/master/fee-category' },
-                    { name: 'Fee Code', link: '/master/fee-code' },
+                    { name: 'Payment Schedules', link: '/master/payment-schedule' },
+                    { name: 'Fee Categories', link: '/master/fee-category' },
+                    { name: 'Fee Codes', link: '/master/fee-code' },
                     { name: 'Manage Fees', link: '/master/manage-fees' },
-                    { name: 'Discount', link: '/master/discount' },
-                    { name: 'Subject', link: '/master/subjects' },
-                    { name: 'Room Number', link: '/master/room-number' },
-                    { name: 'Grading Category', link: '/master/grading-category' },
-                ]
+                    { name: 'Discounts', link: '/master/discount' },
+                    { name: 'Subjects', link: '/master/subjects' },
+                    { name: 'Room Numbers', link: '/master/room-number' },
+                    { name: 'Grading Categories', link: '/master/grading-category' },
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'School Admin',
@@ -72,9 +72,9 @@ const initialMenus = [
                             { name: 'Assessment', link: '/master/assessment' },
                             { name: 'Sectioning', link: '/master/sectioning' },
                             { name: 'Subject Assigning', link: '/master/subject-assigning' }
-                        ]
+                        ].sort((a, b) => a.name.localeCompare(b.name))
                     }
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'Registrar',
@@ -83,7 +83,7 @@ const initialMenus = [
                     { name: 'Students', link: '/master/students' },
                     { name: 'Parents', link: '/master/parents' },
                     { name: 'Siblings', link: '/master/siblings' },
-                    { name: 'Teachers subject', link: '/master/teachers-subject' },
+                    { name: 'Teachers subjects', link: '/master/teachers-subject' },
                     {
                         name: 'Enrollment Process',
                         subMenus: [
@@ -92,9 +92,9 @@ const initialMenus = [
                             { name: 'Assessment', link: '/master/assessment' },
                             { name: 'Sectioning', link: '/master/sectioning' },
                             { name: 'Subject Assigning', link: '/master/subject-assigning' }
-                        ]
+                        ].sort((a, b) => a.name.localeCompare(b.name))
                     }
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'Teacher',
@@ -131,8 +131,8 @@ const initialMenus = [
                 name: 'Master Data',
                 icon: <RiAccountPinBoxFill />,
                 subMenus: [
-                    { name: 'Religion', link: '/schooladmin/religion' },
-                    { name: 'Nationality', link: '/schooladmin/nationality' },
+                    { name: 'Religions', link: '/schooladmin/religion' },
+                    { name: 'Nationalities', link: '/schooladmin/nationality' },
                     { name: 'Departments', link: '/schooladmin/departments' },
                     { name: 'Sections', link: '/schooladmin/sections' },
                     // { name: 'Students', link: '/schooladmin/students' },
@@ -140,7 +140,7 @@ const initialMenus = [
                     // { name: 'Finance', link: '/schooladmin/finance' },
                     // { name: 'Parents', link: '/schooladmin/parents' },
                     // { name: 'Siblings', link: '/schooladmin/siblings' },
-                    { name: 'Grade Level', link: '/schooladmin/grade-levels' },
+                    { name: 'Grade Levels', link: '/schooladmin/grade-levels' },
                     { name: 'Requirements', link: '/schooladmin/requirements' },
                     { name: 'User Roles', link: '/schooladmin/user-roles' },
                     { name: 'School Year', link: '/schooladmin/school-year' },
@@ -148,15 +148,15 @@ const initialMenus = [
                     { name: 'Strands', link: '/schooladmin/strands' },
                     { name: 'Textbooks', link: '/schooladmin/text-books' },
                     { name: 'Payment Terms', link: '/schooladmin/payment-terms' },
-                    { name: 'Payment Schedule', link: '/schooladmin/payment-schedule' },
-                    { name: 'Fee Category', link: '/schooladmin/fee-category' },
-                    { name: 'Fee Code', link: '/schooladmin/fee-code' },
+                    { name: 'Payment Schedules', link: '/schooladmin/payment-schedule' },
+                    { name: 'Fee Categories', link: '/schooladmin/fee-category' },
+                    { name: 'Fee Codes', link: '/schooladmin/fee-code' },
                     { name: 'Manage Fees', link: '/schooladmin/manage-fees' },
-                    { name: 'Discount', link: '/schooladmin/discount' },
-                    { name: 'Subject', link: '/schooladmin/subjects' },
-                    { name: 'Room Number', link: '/schooladmin/room-number' },
-                    { name: 'Grading Category', link: '/schooladmin/grading-category' },
-                ]
+                    { name: 'Discounts', link: '/schooladmin/discount' },
+                    { name: 'Subjects', link: '/schooladmin/subjects' },
+                    { name: 'Room Numbers', link: '/schooladmin/room-number' },
+                    { name: 'Grading Categories', link: '/schooladmin/grading-category' },
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'School Admin',
@@ -175,9 +175,9 @@ const initialMenus = [
                             { name: 'Assessment', link: '/schooladmin/assessment' },
                             { name: 'Sectioning', link: '/schooladmin/sectioning' },
                             { name: 'Subject Assigning', link: '/schooladmin/subject-assigning' }
-                        ]
+                        ].sort((a, b) => a.name.localeCompare(b.name))
                     }
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'Registrar',
@@ -195,16 +195,16 @@ const initialMenus = [
                             { name: 'Assessment', link: '/schooladmin/assessment' },
                             { name: 'Sectioning', link: '/schooladmin/sectioning' },
                             { name: 'Subject Assigning', link: '/schooladmin/subject-assigning' }
-                        ]
+                        ].sort((a, b) => a.name.localeCompare(b.name))
                     }
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'Teacher',
                 icon: <FaCashRegister />,
                 subMenus: [
                     { name: 'Student Grading', link: '/schooladmin/student-grading' },
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
         ]
     },
@@ -220,30 +220,30 @@ const initialMenus = [
                 name: 'Master Data',
                 icon: <RiAccountPinBoxFill />,
                 subMenus: [
-                    { name: 'Religion', link: '/registrar/religion' },
-                    { name: 'Nationality', link: '/registrar/nationality' },
+                    { name: 'Religions', link: '/registrar/religion' },
+                    { name: 'Nationalities', link: '/registrar/nationality' },
                     { name: 'Departments', link: '/registrar/departments' },
                     { name: 'Sections', link: '/registrar/sections' },
                     // { name: 'Students', link: '/registrar/students' },
                     // { name: 'Teachers', link: '/registrar/teachers' },
                     // { name: 'Parents', link: '/registrar/parents' },
                     // { name: 'Siblings', link: '/registrar/siblings' },
-                    { name: 'Grade Level', link: '/registrar/grade-levels' },
+                    { name: 'Grade Levels', link: '/registrar/grade-levels' },
                     { name: 'Requirements', link: '/registrar/requirements' },
                     { name: 'User Roles', link: '/registrar/user-roles' },
-                    { name: 'School Year', link: '/registrar/school-year' },
+                    { name: 'School Years', link: '/registrar/school-year' },
                     { name: 'Users', link: '/registrar/users' },
                     { name: 'Strands', link: '/registrar/strands' },
                     { name: 'Textbooks', link: '/registrar/text-books' },
                     { name: 'Payment Terms', link: '/registrar/payment-terms' },
-                    { name: 'Payment Schedule', link: '/registrar/payment-schedule' },
-                    { name: 'Fee Category', link: '/registrar/fee-category' },
-                    { name: 'Fee Code', link: '/registrar/fee-code' },
+                    { name: 'Payment Schedules', link: '/registrar/payment-schedule' },
+                    { name: 'Fee Categories', link: '/registrar/fee-category' },
+                    { name: 'Fee Codes', link: '/registrar/fee-code' },
                     { name: 'Manage Fees', link: '/registrar/manage-fees' },
-                    { name: 'Discount', link: '/registrar/discount' },
-                    { name: 'Subject', link: '/registrar/subjects' },
-                    { name: 'Room Number', link: '/registrar/room-number' },
-                ]
+                    { name: 'Discounts', link: '/registrar/discount' },
+                    { name: 'Subjects', link: '/registrar/subjects' },
+                    { name: 'Room Numbers', link: '/registrar/room-number' },
+                ].sort((a, b) => a.name.localeCompare(b.name))
             },
             {
                 name: 'Registrar',
@@ -261,9 +261,9 @@ const initialMenus = [
                             { name: 'Assessment', link: '/registrar/assessment' },
                             { name: 'Sectioning', link: '/registrar/sectioning' },
                             { name: 'Subject Assigning', link: '/registrar/subject-assigning' }
-                        ]
+                        ].sort((a, b) => a.name.localeCompare(b.name))
                     }
-                ]
+                ].sort((a, b) => a.name.localeCompare(b.name))
             }
         ]
     },
@@ -285,7 +285,7 @@ const initialMenus = [
                 icon: <MdCoPresent />,
                 link: '/teacher/student-attendance'
             }
-        ]
+        ].sort((a, b) => a.name.localeCompare(b.name))
     },
     {
         role: 'Student',
@@ -316,7 +316,7 @@ const initialMenus = [
                 //     { name: 'Student Grading', link: '/student-grading' },
                 // ]
             }
-        ]
+        ].sort((a, b) => a.name.localeCompare(b.name))
     },
     {
         role: 'Parent',
@@ -344,7 +344,7 @@ const initialMenus = [
                 //     { name: 'Student Grading', link: '/student-grading' },
                 // ]
             }
-        ]
+        ].sort((a, b) => a.name.localeCompare(b.name))
     },
     {
         role: 'Finance',
@@ -369,7 +369,7 @@ const initialMenus = [
                 icon: <MdOutlineWorkHistory />,
                 link: '/finance/payment-history'
             }
-        ]
+        ].sort((a, b) => a.name.localeCompare(b.name))
     }
 ];
 
@@ -422,7 +422,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <div className="bg-gray-900 shadow-sm border-b border-gray-700 p-3 flex items-center justify-between gap-2">
                         <h1 className="font-semibold text-3xl text-white">SMS</h1>
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold text-xs p-1 rounded-full text-sidebarBg bg-dashboardYellow">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
+                            <span className="font-semibold text-[0.6em] p-1 rounded-full text-sidebarBg bg-dashboardYellow">{ isFreshYear ? 'New Environment' : schoolYear.isYearDone ? `For Viewing (${currentSy})` :  currentSy}</span>
                             <button onClick={toggleSidebar} className="text-white hover:scale-110 hover:transition">
                                 <MdClose size={24} />
                             </button>

@@ -9,7 +9,6 @@ const departmentSchema = new mongoose.Schema({
     department: {
         type:String,
         required:true,
-        unique:true
     },
     inputter: { 
         type: mongoose.Schema.Types.ObjectId, 

@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,12 +6,15 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Department = () => {
 
     const { records,isLoading } = useFetch(`${baseUrl()}/departments`);
     const [department,setDepartment] = useState('');
     const [error,setError] = useState({ department: '' });
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const { role,session,currentUserId,searchQuery,showForm,setShowForm } = useContext(MainContext)
 
@@ -28,31 +29,28 @@ const Department = () => {
     const updateNewDepartment = async (id,updatedData) => {
         try {
             const newData = await axios.patch(`${baseUrl()}/department/${id}`,{ newDepartment: updatedData.department,currentUserId,role,sessionId: session, session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }      
@@ -60,31 +58,28 @@ const Department = () => {
     const deleteDepartment = async (id) => {
         try {
             const removeDepartment = await axios.put(`${baseUrl()}/department/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(removeDepartment.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeDepartment.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -92,39 +87,47 @@ const Department = () => {
     const addDepartment = async (e) => {
         e.preventDefault();
 
-        if(!department) setError(prev => ({...prev, department: 'Department cannot be empty'}));
-        setTimeout(() => {
-            setError({ department: '' });
-        },3000)
-        if(!department) return
+        if(!department) {
+            setError(prev => ({...prev, department: 'Department cannot be empty'}));
+            return enqueueSnackbar('Department is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ department: '' });
+                }
+            });
+        }
 
         try {
             const newDepartment = await axios.post(`${baseUrl()}/departments`,{ department,currentUserId,session,role, sessionId: session });
-            toast.success(newDepartment.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+           
+            enqueueSnackbar(newDepartment.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg, { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -147,7 +150,7 @@ const Department = () => {
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Department" />
+            <TabActions title="Departments" />
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addDepartment,setShowForm)}
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
@@ -161,7 +164,6 @@ const Department = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

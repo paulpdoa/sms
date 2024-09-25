@@ -16,7 +16,13 @@ const RegistrarLayout = () => {
         if(!isLoading) {
             if(role !== 'Registrar') {
                 setTimeout(() => {
+                    removeCookie('userToken', { path: '/' });
+                    removeCookie('userToken', { path: '/master' });
+                    removeCookie('userToken', { path: '/finance' });
+                    removeCookie('userToken', { path: '/guest' });
                     removeCookie('userToken', { path: '/registrar' });
+                    removeCookie('userToken', { path: '/student' });
+                    removeCookie('userToken', { path: '/teacher' });
                     ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
                     navigate('/login');
                 }, 3000); // Delay by 3 seconds to match the toast's autoClose time

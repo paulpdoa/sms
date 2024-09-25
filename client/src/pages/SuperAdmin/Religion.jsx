@@ -26,10 +26,18 @@ const Religion = () => {
        
         if(!religion) {
             setError(prev => ({ ...prev, religion: 'Religion cannot be empty' }));
-            setTimeout(() => {
-                setError({religion: ''});
-            },3000)
-            return;
+            return enqueueSnackbar('Religion is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setError({ religion: '' });
+                }
+            });
         }
 
         try {

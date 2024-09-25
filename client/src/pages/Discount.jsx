@@ -18,6 +18,8 @@ const Discount = () => {
 
     const { enqueueSnackbar } = useSnackbar();
 
+    const [errors,setErrors] = useState({ discountType: '', discountCode: '' });
+
     const [discountType, setDiscountType] = useState('');
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [amount, setAmount] = useState(null);
@@ -115,7 +117,8 @@ const Discount = () => {
                 amount: updatedData.amount,
                 discountCode: updatedData.discountCode,
                 inputter: currentUserId,
-                role
+                role,
+                sessionId: session
             });
             enqueueSnackbar(newData.data.mssg, { 
                 variant: 'success',
@@ -188,7 +191,23 @@ const Discount = () => {
 
         
         if (discountType === '') {
+            setErrors(prev => ({ ...prev, discountType: 'Discount type cannot be empty' }));
             enqueueSnackbar("Discount type is not provided", { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
+            return;
+        }
+
+        if (discountCode === '') {
+            setErrors(prev => ({ ...prev, discountCode: 'Discount code cannot be empty' }));
+
+            enqueueSnackbar("Discount code is not provided", { 
                 variant: 'error',
                 anchorOrigin: {
                     vertical: 'top',
@@ -226,6 +245,9 @@ const Discount = () => {
             return;
         }
         
+        setTimeout(() => {
+            setErrors({ discountType: '', discountCode: '' })
+        },3000)
 
         try {
             const newDiscount = await axios.post(`${baseUrl()}/discount`, discountInfo);
@@ -243,7 +265,7 @@ const Discount = () => {
             });
         } catch (err) {
             console.log(err);
-            enqueueSnackbar(err.response.data.mssg || 'An error occurred whil adding new discount record', { 
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding new discount record', { 
                 variant: 'error',
                 anchorOrigin: {
                     vertical: 'top',
@@ -271,24 +293,22 @@ const Discount = () => {
     const form = () => (
         <>
             <h1 className="font-semibold text-xl text-gray-700">Add New Discount</h1>
-
+    
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {renderInput('discount type',discountType,'Discount Type', setDiscountType, 'text')}
-                {renderInput('discount percentage',discountPercentage,'Discount Percentage', setDiscountPercentage, 'number', { step: "0.000001" })}
-                {/* Not required */}
-                {renderInput('discount amount',amount,'Discount Amount', setAmount, 'number', { step: "0.000001" })}
-                {renderSelect('discountCode','Discount Category', setDiscountCode, categories, 'Leave this empty if n/a', false)}
-                {/* {renderInput('discount code',discountCode,'Discount Category', setDiscountCode, 'text')} */}
-                {/* Not Required */}
-                {renderSelect('gradeLevel', 'Grade Level', setGradeLevel, gradeLevels, 'Leave this empty if n/a', false)}
-                {/* {renderSelect('session', 'School Year', setSchoolYear, schoolYears, 'school year')} */}
+                {/* Pass the correct label value */}
+                {renderInput('discountType', discountType, 'Discount Type', setDiscountType, 'text', {}, '', errors)}
+                {renderInput('discountPercentage', discountPercentage, 'Discount Percentage', setDiscountPercentage, 'number', { step: "0.000001" }, '', errors)}
+                {renderInput('amount', amount, 'Discount Amount', setAmount, 'number', { step: "0.000001" }, '', errors)}
+                {renderSelect('discountCode', 'Discount Category', setDiscountCode, categories, 'Leave this empty if n/a', false, errors)}
+                {renderSelect('gradeLevel', 'Grade Level', setGradeLevel, gradeLevels, 'Leave this empty if n/a', false, errors)}
             </div>
         </>
     );
+    
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Discount" />
+            <TabActions title="Discounts" />
             <div className={`gap-2 mt-5`}>
                 {showForm && MasterDataForm(form, addDiscount, setShowForm)}
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
@@ -308,35 +328,41 @@ const Discount = () => {
 
 export default Discount;
 
-const renderInput = (label, value,description, onChange, inputType, extraProps = {}, placeholder) => (
+const renderInput = (label, value, description, onChange, inputType, extraProps = {}, placeholder, errors) => (
     <div className="flex flex-col mt-2">
         <label className="text-sm" htmlFor={label}>{description}</label>
         <input
+            id={label}  // ensure the input has the correct id
             placeholder={placeholder}
-            className={`outline-none p-1 rounded-md border`}
+            className={`outline-none p-1 rounded-md border ${errors[label] ? 'border-red-500' : 'border-gray-300'}`}
             type={inputType}
             onChange={(e) => onChange(inputType === 'number' ? parseFloat(e.target.value) : e.target.value)}
             {...extraProps}
             value={value}
         />
+        {errors[label] && <span className="text-xs text-red-500">{errors[label]}</span>}
     </div>
 );
 
-const renderSelect = (label, value, onChange, options, placeholder, required = false) => (
+const renderSelect = (label, description, onChange, options, placeholder, required = false, errors) => (
     <div className="flex flex-col mt-2">
-        <label className="text-sm" htmlFor={label}>{value}</label>
+        <label className="text-sm" htmlFor={label}>{description}</label>
         <select
-            className="outline-none p-1 rounded-md border border-gray-300"
+            id={label}  // ensure the select has the correct id
+            className={`outline-none p-1 rounded-md border ${errors[label] ? 'border-red-500' : 'border-gray-300'}`}
             onChange={(e) => onChange(e.target.value)}
             required={required}
         >
-            <option value="" className="text-xs text-gray-200" hidden>{placeholder}</option>
+            <option value="" hidden>{placeholder}</option>
             {options?.map(option => (
                 <option key={option._id} value={option._id}>
-                    {label === 'session' ? `${option.startYear.split('-')[0]}-${option.endYear.split('-')[0]}` : option[label]}
+                    {option.discountCode || option.gradeLevel}
                 </option>
             ))}
-            <option value="">N/A</option>
+            { (label !== 'discountType' || label !== 'discountCode') && <option value="">N/A</option> }
         </select>
+        {errors[label] && <span className="text-xs text-red-500">{errors[label]}</span>}
     </div>
 );
+
+

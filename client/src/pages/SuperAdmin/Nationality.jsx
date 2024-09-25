@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -9,6 +7,7 @@ import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 import { nationalityCodes } from '../../data/nationalityCodes.json';
+import { useSnackbar } from 'notistack';
 
 const Nationality = () => {
 
@@ -16,6 +15,7 @@ const Nationality = () => {
     // const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
     const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
     const [error,setError] = useState({ nationality: '', nationalityCode: '' });
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
         {
@@ -35,36 +35,30 @@ const Nationality = () => {
     const [nationalityCode,setNationalityCode] = useState('');
 
     const updateNewNationality = async (id,updatedData) => {
-        
-      
-
         try {
             const newData = await axios.patch(`${baseUrl()}/nationality/${id}`,{ newNationality:updatedData.nationality,newNationalityCode:updatedData.nationalityCode,currentUserId,role,session,sessionId: session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating nationality record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }        
@@ -72,31 +66,28 @@ const Nationality = () => {
     const deleteNationality = async (id) => {
         try {
             const removeNationality = await axios.put(`${baseUrl()}/nationality/${id}`,{ role,session, recordStatus: 'Deleted' });
-            toast.success(removeNationality.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeNationality.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting nationality record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -104,42 +95,55 @@ const Nationality = () => {
     const addNationality = async (e) => {
         e.preventDefault();
 
-        if(!nationality) setError(prev => ({ ...prev,nationality: 'Nationality cannot be empty' }))
-        if(!nationalityCode) setError(prev => ({ ...prev,nationalityCode: 'Nationality code cannot be empty' }));
+        if(!nationality) {
+            setError(prev => ({ ...prev,nationality: 'Nationality cannot be empty' }))
+            return enqueueSnackbar('Nationality is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
+        }
+        if(!nationalityCode) {
+            setError(prev => ({ ...prev,nationalityCode: 'Nationality code cannot be empty' }));
+            return enqueueSnackbar('Nationality code is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
+        }
 
-        setTimeout(() => {
-            setError({ nationality: '', nationalityCode: '' });
-        },3000)
-
-        if(!nationality || !nationalityCode) return
-        
         try {
             const newNationality = await axios.post(`${baseUrl()}/nationalities`,{ nationality,nationalityCode,currentUserId,role,session,sessionId: session });
-            toast.success(newNationality.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newNationality.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding nationality record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -174,7 +178,7 @@ const Nationality = () => {
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Nationality" />
+            <TabActions title="Nationalities" />
 
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addNationality,setShowForm)}
@@ -189,7 +193,6 @@ const Nationality = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

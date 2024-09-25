@@ -622,6 +622,13 @@ module.exports.add_discount = async (req, res) => {
     }   
 
     try {
+
+        const discountTypeExist = await Discount.findOne({ discountType, recordStatus: 'Live', sessionId });
+        if(discountTypeExist) {
+            return res.status(400).json({ mssg: `${discountType} is already existing, please choose another discount type` });
+        }
+
+
         if(gradeLevelId === '') {
             await Discount.create({ sessionId, discountType, discountPercent, discountCode, inputter,recordStatus: 'Live' });
         } else {
@@ -631,8 +638,9 @@ module.exports.add_discount = async (req, res) => {
     } catch (err) {
         console.log(err);
         if (err.code === 11000) {
-            res.status(400).json({ mssg: `${discountType} has been already added to the record, please create new discount type` });
+            return res.status(400).json({ mssg: `${discountType} has been already added to the record, please create new discount type` });
         }
+        res.status(500).json({ mssg: 'An error occurred while adding new discount record' });
     }
 };
 
@@ -650,24 +658,44 @@ module.exports.delete_discount = async (req,res) => {
     }
 }
 
-module.exports.edit_discount = async (req,res) => {
+module.exports.edit_discount = async (req, res) => {
     const { id } = req.params;
+    const { sessionId, gradeLevelId, discountType, discountPercent, amount, discountCategory, inputter } = req.body;
 
-    const { sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter } = req.body;
-
-
-    if(amount < 0) {
+    // Check if the amount is negative
+    if (amount < 0) {
         return res.status(400).json({ mssg: "Discount amount cannot be negative" });
     }
 
     try {
-        const discount = await Discount.findByIdAndUpdate({_id:id},{ sessionId,gradeLevelId,discountType,discountPercent,amount,discountCategory,inputter });
-        res.status(200).json({ mssg: `${discount.discountType} has been updated successfully!` });
-    } catch(err) {
+        const existingDiscount = await Discount.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if (!existingDiscount) {
+            return res.status(404).json({ mssg: 'Discount does not exist' });
+        }
+
+        console.log(existingDiscount);
+        // Check if discountType has changed and is duplicated in the same session
+        if (discountType !== existingDiscount.discountType) {
+            const discountTypeExist = await Discount.findOne({ discountType, recordStatus: 'Live', sessionId });
+            if (discountTypeExist) {
+                return res.status(400).json({ mssg: `${discountType} already exists, please choose another discount type` });
+            }
+        }
+
+        // If validation passed, proceed with the update
+        const updatedDiscount = await Discount.findByIdAndUpdate(
+            id,
+            { sessionId, gradeLevelId, discountType, discountPercent, amount, discountCategory, inputter },
+            { new: true } // Return the updated document
+        );
+
+        res.status(200).json({ mssg: `${updatedDiscount.discountType} has been updated successfully!` });
+    } catch (err) {
         console.log(err);
-        res.status(500).json({ mssg: 'An error occurred while updating discount record' })
+        res.status(500).json({ mssg: 'An error occurred while updating discount record' });
     }
-}
+};
+
 
 // For Student Discount
 

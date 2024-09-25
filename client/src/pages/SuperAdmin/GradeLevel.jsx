@@ -1,8 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -11,6 +6,7 @@ import MasterTable from '../../components/MasterTable';
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const GradeLevel = () => {
 
@@ -18,6 +14,9 @@ const GradeLevel = () => {
     const { records:departments } = useFetch(`${baseUrl()}/departments`);
     const [gradeLevel,setGradeLevel] = useState('');
     const [department,setDepartment] = useState('');
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [errors,setErrors] = useState({ gradeLevel: '', department: '' });
 
     const { currentUserId, searchQuery,session: sessionId, role,showForm,setShowForm } = useContext(MainContext);
 
@@ -40,31 +39,28 @@ const GradeLevel = () => {
     const updateNewGradeLevel = async (id,updatedData) => {
         try {
             const newData = await axios.patch(`${baseUrl()}/grade-level/${id}`,{ newGradeLevel: updatedData.gradeLevel,inputter: currentUserId,department: updatedData.department._id,role,sessionId });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating grade level record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }      
@@ -72,55 +68,93 @@ const GradeLevel = () => {
     const deleteGradeLevel = async (id) => {
         try {
             const removeGradeLevel = await axios.put(`${baseUrl()}/grade-level/${id}`, { recordStatus: 'Deleted' });
-            toast.success(removeGradeLevel.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeGradeLevel.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting grade level record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
 
     const addGradeLevel = async (e) => {
         e.preventDefault();
+
+
+        if(!gradeLevel) {
+            setErrors(prev => ({...prev,gradeLevel: 'Grade level cannot be empty'}));
+            return enqueueSnackbar('Grade level is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ gradeLevel: '' });
+                }
+            });
+        }
+
+        if(!department) {
+            setErrors(prev => ({...prev,department: 'Department cannot be empty'}));
+            return enqueueSnackbar('Department is a required field', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ department: '' });
+                }
+            });
+        }
+
         try {
             const newGradeLevel = await axios.post(`${baseUrl()}/grade-levels`,{ gradeLevel,inputter: currentUserId,department,role, sessionId });
-            toast.success(newGradeLevel.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newGradeLevel.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding grade level record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -138,17 +172,19 @@ const GradeLevel = () => {
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="grade level">Grade Level</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setGradeLevel(e.target.value)} />
+            <input className={`outline-none p-1 rounded-md border ${errors.gradeLevel ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setGradeLevel(e.target.value)} />
+            { errors.gradeLevel && <span className="text-xs text-red-500">{errors.gradeLevel}</span> }
         </div>
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="department">Department</label>
-            <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setDepartment(e.target.value)}>
+            <select className={`outline-none p-1 rounded-md border ${errors.department ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setDepartment(e.target.value)}>
                 <option hidden>Select department</option>
                 { departments?.map(department => (
                     <option key={department._id} value={department._id}>{ department.department }</option>
                 )) }
             </select>
+            { errors.department && <span className="text-xs text-red-500">{errors.department}</span> }
         </div>
 
         </>
@@ -156,12 +192,9 @@ const GradeLevel = () => {
 
     return (
         <main className="p-2 relative">
-
-            <TabActions title="Grade Level" />
-
+            <TabActions title="Grade Levels" />
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addGradeLevel,setShowForm) }
-
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable
                         columns={columns}
@@ -173,7 +206,6 @@ const GradeLevel = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

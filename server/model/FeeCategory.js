@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const requiredString = {
     type: String,
     required: true,
-    unique: [true, `${this.category} is already existing, please choose another`]
 }
 
 const FeeCategorySchema = new mongoose.Schema({
