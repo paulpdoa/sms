@@ -143,7 +143,7 @@ const RoomNumber = () => {
     return (
         <main className="p-2 relative">
         {/* <DateTime /> */}
-        <TabActions title="Room Number" />
+        <TabActions title="Room Numbers" />
 
         <div className={`gap-2 mt-5`}>
             { showForm && MasterDataForm(form,addRoomNumber,setShowForm)}

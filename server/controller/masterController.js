@@ -328,10 +328,17 @@ module.exports.edit_religion = async (req,res) => {
     const { newReligion: religion,currentUserId: inputter,sessionId } = req.body;
 
     try {  
-        
-        const religionExist = await Religion.findOne({ religion, recordStatus: 'Live', sessionId });
-        if(religionExist) {
-            return res.status(400).json({mssg: `${religion} is already existing, please choose another religion`})
+
+        const currentReligion = await Religion.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!currentReligion) {
+            return res.status(404).json({ mssg: 'Religion is not an existing record' });
+        }
+
+        if(religion !== currentReligion.religion) {
+            const religionExist = await Religion.findOne({ religion, recordStatus: 'Live', sessionId });
+            if(religionExist) {
+                return res.status(400).json({mssg: `${religion} is already existing, please choose another religion`})
+            }
         }
        
         const newReligion = await Religion.findByIdAndUpdate({ _id: id }, { religion,inputter,sessionId });
@@ -403,10 +410,19 @@ module.exports.edit_nationality = async (req,res) => {
     
     try {
 
-        const natlExist = await Nationality.findOne({ nationality, recordStatus, sessionId });
-        if(natlExist) {
-            return res.status(400).json({ mssg: `${nationality} is already existing, please choose another nationality` });
+        const currentNationality = await Nationality.findOne({_id:id,recordStatus:'Live',sessionId});
+        if(!currentNationality) {
+            return res.status(404).json({mssg:'Nationality is not an existing record'});
         }
+
+        if(nationality !== currentNationality.nationality) {
+            const natlExist = await Nationality.findOne({ nationality, recordStatus, sessionId });
+            if(natlExist) {
+                return res.status(400).json({ mssg: `${nationality} is already existing, please choose another nationality` });
+            }
+        }
+
+       
 
         const newNationality = await Nationality.findByIdAndUpdate({ _id: id },{ nationality,nationalityCode,inputter,sessionId });
         res.status(200).json({ mssg: `${newNationality.nationality} has been changed to ${nationality} successfully!` });
@@ -705,17 +721,21 @@ module.exports.edit_section = async (req, res) => {
     const { newSection: section, newGradeLevel: gradeLevel, newAdviser: adviser, sessionId,currentUserId:inputter } = req.body;
 
     try {
-        // Find the section being updated
-        const currentSection = await Section.findById(id);
 
-        if (!currentSection) {
-            return res.status(404).json({ mssg: 'Section not found' });
+
+        const currentSection = await Section.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!currentSection) {
+            return res.status(404).json({ mssg: 'Section is not existing' });
         }
-        const sectionExist = await Section.findOne({ section, recordStatus: 'Live', sessionId });
-        if(sectionExist) {
-            return res.status(400).json({ mssg: `${section} is already existing, please choose another section` });
+        console.log(section,currentSection.section);
+        if(section !== currentSection.section) {
+            const sectionExist = await Section.findOne({ section, recordStatus: 'Live', sessionId });
+            if(sectionExist) {
+                return res.status(400).json({ mssg: `${section} is already existing, please choose another section` });
+            }
         }
-        // Find all sections in the given session excluding the current one
+
+            // Find all sections in the given session excluding the current one
         const currSections = await Section.find({ sessionId, _id: { $ne: id },status: true });
         
         // Convert sections to plain JavaScript objects and map section names to lowercase
@@ -862,10 +882,20 @@ module.exports.add_subject = async(req,res) => {
     const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
 
     if(subjectName === '' || subjectCode === '') {
-        return res.status(500).json({ mssg: `Subject name or subject code cannot be blank` });
+        return res.status(400).json({ mssg: `Subject name or subject code cannot be blank` });
     }
 
     try {
+        const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
+        if(subjectNameExist) {
+            return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
+        }
+
+        const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
+        if(subjectCodeExist) {
+            return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
+        } 
+
         await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
         res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
     } catch(err) {
@@ -892,8 +922,28 @@ module.exports.edit_live_subject = async(req,res) => {
 
     const { id } = req.params;
     const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
-
+    console.log(req.body)
     try {
+
+        const existingSubject = await Subject.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!existingSubject) {
+            return res.status(404).json({ mssg: 'Subject is not existing' });
+        }
+
+        if(subjectName !== existingSubject.subjectName) {
+            const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
+            if(subjectNameExist) {
+                return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
+            }
+        }
+
+        if(subjectCode !== existingSubject.subjectCode) {
+            const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
+            if(subjectCodeExist) {
+                return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
+            } 
+        }
+
         await Subject.findByIdAndUpdate(id,{ subjectName,subjectCode,gradeLevelId,sessionId,inputter });
         res.status(200).json({ mssg: `${subjectName} has been updated successfully`});
     } catch(err) {
@@ -974,10 +1024,20 @@ module.exports.edit_requirement = async (req,res) => {
     const { newRequirement: requirement,newIsRequired: isRequired,currentUserId: inputter, session } = req.body;
 
     try {   
-        const reqExist = await Requirement.findOne({ requirement, sessionId: session, recordStatus: 'Live' });
-        if(reqExist) {
-            return res.status(400).json({ mssg: `${requirement} is already existing, please choose another requirement` });
+
+        const currentRequirement = await Requirement.findOne({ _id: id, sessionId: session, recordStatus: 'Live' });
+        if(!currentRequirement) {
+            return res.status(404).json({ mssg: 'Requirement is not an existing record' });
         }
+
+        if(requirement !== currentRequirement.requirement) {
+            const reqExist = await Requirement.findOne({ requirement, sessionId: session, recordStatus: 'Live' });
+            if(reqExist) {
+                return res.status(400).json({ mssg: `${requirement} is already existing, please choose another requirement` });
+            }
+        }
+
+        
 
         const newRequirement = await Requirement.findByIdAndUpdate({ _id: id }, { requirement,isRequired,inputter, sessionId: session });
         res.status(200).json({ mssg: `${newRequirement.requirement} has been changed to ${requirement} successfully!` });
@@ -1490,9 +1550,17 @@ module.exports.edit_payment_term = async (req,res) => {
     const { newPayEvery,newInstallmentBy,currentUserId: inputter,newTerm,sessionId } = req.body;
 
     try {
-        const isPaymentExist = await PaymentTerm.findOne({ term: newTerm, recordStatus: 'Live', sessionId });
-        if(isPaymentExist) {
-            return res.status(400).json({ mssg: `${newTerm} is already existing, please choose another term` });
+
+        const currentPaymentTerm = await PaymentTerm.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!currentPaymentTerm) {
+            return res.status(404).json({ mssg: 'Payment term is not an existing record' });
+        }
+
+        if(newTerm !== currentPaymentTerm.term) {
+            const isPaymentExist = await PaymentTerm.findOne({ term: newTerm, recordStatus: 'Live', sessionId });
+            if(isPaymentExist) {
+                return res.status(400).json({ mssg: `${newTerm} is already existing, please choose another term` });
+            }
         }
 
         const newPaymentTerm = await PaymentTerm.findByIdAndUpdate({ _id:id },{ payEvery: newPayEvery,installmentBy:newInstallmentBy,inputter,term:newTerm,sessionId });
@@ -2190,9 +2258,16 @@ module.exports.edit_room_number = async (req,res) => {
             return res.status(404).json({ mssg: 'Room number cannot be blank' });
         }
 
-        const roomNumberExist = await RoomNumber.findOne({ roomNumber, recordStatus: 'Live', sessionId });
-        if(roomNumberExist) {
-            return res.status(400).json({ mssg: `${roomNumber} is already existing, please choose another room number` });
+        const currentRoom = await RoomNumber.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!currentRoom) {
+            return res.status(404).json({ mssg: 'Room number is not an existing record' });
+        }
+
+        if(roomNumber !== currentRoom.roomNumber) {
+            const roomNumberExist = await RoomNumber.findOne({ roomNumber, recordStatus: 'Live', sessionId });
+            if(roomNumberExist) {
+                return res.status(400).json({ mssg: `${roomNumber} is already existing, please choose another room number` });
+            }
         }
 
         await RoomNumber.findByIdAndUpdate(id, { roomNumber,inputter,sessionId });
@@ -2285,10 +2360,16 @@ module.exports.edit_grading_category = async (req,res) => {
 
     try {
 
-        const gradingCategoryFound = await GradingCategory.findOne({ gradingCategory,recordStatus: 'Live' });
+        const currentGradingCateg = await GradingCategory.findOne({ _id: id, recordStatus: 'Live' });
+        if(!currentGradingCateg) {
+            return res.status(404).json({ mssg: 'Grading category is not an existing record' });
+        }
 
-        if(gradingCategoryFound) {
-            return res.status(400).json({ mssg: `${gradingCategoryFound.gradingCategory} is already existing, please choose another` });
+        if(gradingCategory !== currentGradingCateg.gradingCategory) {
+            const gradingCategoryFound = await GradingCategory.findOne({ gradingCategory,recordStatus: 'Live' });
+            if(gradingCategoryFound) {
+                return res.status(400).json({ mssg: `${gradingCategoryFound.gradingCategory} is already existing, please choose another` });
+            }
         }
 
         const newGradingCateg = await GradingCategory.findByIdAndUpdate(id, { gradingCategory,inputter });

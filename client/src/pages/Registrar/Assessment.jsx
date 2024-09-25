@@ -1,5 +1,4 @@
-import React, { useState, useContext } from 'react';
-import Searchbar from '../../components/Searchbar';
+import { useState, useContext } from 'react';
 import TotalFees from '../../components/assessment/TotalFees'
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
@@ -43,9 +42,9 @@ const Assessment = () => {
         setEnableView(true);
     };
 
-    const handleSearch = (query) => {
-        setSearchQuery(query);
-    };
+    // const handleSearch = (query) => {
+    //     setSearchQuery(query);
+    // };
 
     const generateFees = async (e) => {
         e.preventDefault();
@@ -76,7 +75,7 @@ const Assessment = () => {
             console.log(err.response.data.mssg);
             // Close the loading snackbar after error
             closeSnackbar(snackbarKey());
-            enqueueSnackbar(err.response.data.mssg, { 
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while generating fees', { 
                 variant: 'error',
                 anchorOrigin: {
                     vertical: 'top',

@@ -46,7 +46,7 @@ export const MainProvider = ({ children }) => {
   }
 
   // For success/error notification
-  const snackbarMessage = (message,status,duration) => {
+  const snackbarMessage = (message, status, action) => {
     return enqueueSnackbar(message || '', { 
         variant: status,
         anchorOrigin: {
@@ -55,9 +55,15 @@ export const MainProvider = ({ children }) => {
         },
         persist: true,
         preventDuplicate: true,
-        autoHideDuration: duration,
+        autoHideDuration: status === 'success' ? 2000 : 3000,
+        onClose: () => {
+          if (reason === 'clickaway') return;  // Handle if snackbar is closed by clicking away
+          if (typeof action === 'function') {
+              action(); // Execute the action (reload or navigate) after closing
+          }
+        }
     }); 
-  }
+  };
 
 
 
@@ -84,6 +90,20 @@ export const MainProvider = ({ children }) => {
   }
   
 
+  // Helper function for showing errors
+  const showError = (field, message, notifMessage, setError) => {
+      setError(prev => ({ ...prev, [field]: message }));
+      enqueueSnackbar(notifMessage, { 
+          variant: 'error',
+          anchorOrigin: { vertical: 'top', horizontal: 'center' },
+          autoHideDuration: 3000,
+          preventDuplicate: true,
+          onClose: () => {
+            setError({ [field]: '' })
+          }
+      });
+  };
+
   return (
     <MainContext.Provider value={{ 
       searchQuery,
@@ -106,7 +126,8 @@ export const MainProvider = ({ children }) => {
       snackbarKey,
       numberFormatter,
       dateFormatter,
-      snackbarMessage
+      snackbarMessage,
+      showError
     }}>
       {children}
     </MainContext.Provider>

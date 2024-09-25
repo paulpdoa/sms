@@ -250,10 +250,17 @@ module.exports.edit_strand = async (req,res) => {
     const { newStrand: strand, inputter,sessionId } = req.body;
 
     try {  
-        
-        const strandExist = await Strand.findOne({ strand, recordStatus: 'Live', sessionId });
-        if(strandExist) {
-            return res.status(400).json({ mssg:`${strand} is already existing, please choose another strand` })
+
+        const currentStrand = await Strand.findOne({ _id:id,recordStatus: 'Live', sessionId });
+        if(!currentStrand) {
+            return res.status(404).json({ mssg: 'Strand is not existing' });
+        }
+
+        if(strand !== currentStrand.strand) {
+            const strandExist = await Strand.findOne({ strand, recordStatus: 'Live', sessionId });
+            if(strandExist) {
+                return res.status(400).json({ mssg:`${strand} is already existing, please choose another strand` })
+            }
         }
         
         const newStrand = await Strand.findByIdAndUpdate({ _id: id }, { strand, inputter,sessionId });

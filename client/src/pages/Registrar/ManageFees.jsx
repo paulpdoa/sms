@@ -18,6 +18,7 @@ const ManageFees = () => {
     const isYearDone = schoolYear.isYearDone;
     const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
+
     const columns = [
         {
             accessorKey: 'gradeLevel.gradeLevel',
@@ -131,6 +132,47 @@ const ManageFees = () => {
         }
     }
 
+    // This will assign again the fees to all students after selecting
+    const generateFees = async (e) => {
+        e.preventDefault();
+
+        const loading = snackbarKey('Re-assigning fees to students, please wait')
+        
+        try {
+            // Close the loading snackbar after success
+            const { data } = await axios.post(`${baseUrl()}/generate-fees`, { session, role });
+            closeSnackbar(loading);
+            enqueueSnackbar(data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
+            });
+
+            
+        } catch (err) {
+            console.log(err.response.data.mssg);
+            // Close the loading snackbar after error
+            closeSnackbar(snackbarKey());
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while generating fees', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
+            setIsLoading(false)
+        }
+    }
+
     const goToEdit = id => navigate(`/${genericPath}/edit-manage-fee/${id}`);
 
     return (
@@ -148,7 +190,7 @@ const ManageFees = () => {
                     :
                     <button 
                         disabled={(isYearDone && !isLoading) ? true : false} 
-                        onClick={() => setOpenPopup(true)} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-customView text-white p-2 rounded-md hover:bg-customHighlight text-sm w-44 justify-center`}
+                        onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} flex items-center gap-2 bg-customView text-white p-2 rounded-md hover:bg-customHighlight text-sm w-44 justify-center`}
                     >
                         Re-generate Fees
                     </button> 

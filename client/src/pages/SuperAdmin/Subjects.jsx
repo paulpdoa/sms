@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -8,49 +6,53 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Subjects = () => {
 
     const [subjectName,setSubjectName] = useState('');
     const [subjectCode,setSubjectCode] = useState('');
     const [gradeLevelId,setGradeLevelId] = useState('');
+    const [errors,setErrors] = useState({ subjectName: '', subjectCode: '', gradeLevelId: '' });
 
     const { records: subjects,isLoading } = useFetch(`${baseUrl()}/subjects`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     // const { records: strands } = useFetch(`${baseUrl()}/strands`);
+    const { enqueueSnackbar } = useSnackbar();
     
-    const { session,currentUserId,setShowForm,searchQuery,showForm,role } = useContext(MainContext);
+    const { session,currentUserId,setShowForm,searchQuery,showForm,role,showError } = useContext(MainContext);
 
     const addSubject = async (e) => {
         e.preventDefault();
 
+        if(!subjectName) return showError('subjectName','Subject name cannot be empty','Subject name is a required field',setErrors)
+        if(!subjectCode) return showError('subjectCode','Subject code cannot be empty', 'Subject code is a required field', setErrors)
+        if(!gradeLevelId) return showError('gradeLevelId', 'Grade level cannot be empty', 'Grade level is a required field', setErrors);
+
         try {   
             const data = await axios.post(`${baseUrl()}/subject`,{subjectName,subjectCode,gradeLevelId,sessionId: session, inputter:currentUserId});
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding subject record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -59,31 +61,29 @@ const Subjects = () => {
         console.log(updatedData);
 
         try {   
-            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,currentUserId,session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,inputter: currentUserId,sessionId:session });
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating subject record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -92,31 +92,28 @@ const Subjects = () => {
 
         try {
             const data = await axios.put(`${baseUrl()}/subject/${id}`,{ role });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting subject record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -135,25 +132,26 @@ const Subjects = () => {
         <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="subject name">Subject</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectName(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${errors.subjectName ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setSubjectName(e.target.value)} />
+                { errors.subjectName && <span className="text-red-500 text-xs">{errors.subjectName}</span> }
             </div>
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="subject code">Subject Code</label>
-                <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setSubjectCode(e.target.value)} />
+                <input className={`outline-none p-1 rounded-md border ${errors.subjectCode ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setSubjectCode(e.target.value)} />
+                { errors.subjectCode && <span className="text-red-500 text-xs">{errors.subjectCode}</span> }
             </div>
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="grade level">Grade Level</label>
-                <select className="outline-none p-1 rounded-md border border-gray-300" onChange={(e) => setGradeLevelId(e.target.value)}>
+                <select className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setGradeLevelId(e.target.value)}>
                     <option hidden>Choose grade level</option>
                     { gradeLevels?.map(gl => (
                         <option key={gl._id} value={gl._id}>{gl.gradeLevel}</option>
                     )) }
                     <option value="">N/A</option>
                 </select>
+                { errors.gradeLevelId && <span className="text-red-500 text-xs">{errors.gradeLevelId}</span> }
             </div>
-
-          
         </div>
         </>
     )
@@ -168,7 +166,6 @@ const Subjects = () => {
             <TabActions title="Subjects" />
             <div className={`gap-2 mt-5`}>
                 { showForm && MasterDataForm(form,addSubject,setShowForm) }
-
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable 
                         columns={columns}
@@ -180,7 +177,6 @@ const Subjects = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }
