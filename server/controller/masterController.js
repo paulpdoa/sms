@@ -50,6 +50,7 @@ module.exports.test_delete_fees = async (req,res) => {
     const { session } = req.query;
 
     try {
+        await StudentPayment.deleteMany({ recordStatus: 'Live', sessionId: session })
         await ManageFee.deleteMany({ recordStatus:'Live', sessionId: session });
         res.status(200).json({ mssg: 'Manage Fees has been deleted successfully' })
     } catch (err) {
