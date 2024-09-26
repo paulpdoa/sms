@@ -145,11 +145,11 @@ const Assessment = () => {
 
     return (
         <main className="p-4 relative overflow-hidden">
-            <div className="flex flex-col mx-4 my-2 items-end">
-                <TabActions title="Assessment"  />
-                <div className="flex items-center gap-2">
-                    <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customCancel hover:bg-red-600 text-white p-2 rounded-md`}>Delete Fees</button>
-                    <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
+            <div className="flex mx-4 my-2 items-center">
+                <TabActions title="Assessment" noView={true} />
+                <div className="flex items-center gap-2 mx-9">
+                    <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customCancel hover:bg-red-600 text-white p-2 rounded-md min-w-fit`}>Delete Fees</button>
+                    <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md min-w-fit`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
 

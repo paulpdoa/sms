@@ -69,7 +69,6 @@ const Users = () => {
     return (
         <main className="p-2">
             <TabActions title="Users" redirect="new-user" />
-
             <div className="gap-2 mt-5">
                 <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
                     <MasterTable 

@@ -45,6 +45,18 @@ const createToken = (token) => {
 
 const recordStatus = 'Live';
 
+// For deleting manage fees / For testing only
+module.exports.test_delete_fees = async (req,res) => {
+    const { session } = req.query;
+
+    try {
+        await ManageFee.deleteMany({ recordStatus:'Live', sessionId: session });
+        res.status(200).json({ mssg: 'Manage Fees has been deleted successfully' })
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 module.exports.update_all_records_live = async (req,res) => {
 
     const recordStatus = 'Live';
@@ -829,15 +841,20 @@ module.exports.edit_grade_level = async (req,res) => {
     const { newGradeLevel: gradeLevel,inputter,department,sessionId } = req.body;
 
     try {   
-        const currGradeLevel = await GradeLevel.findById(id);
+        const currGradeLevel = await GradeLevel.findOne({ _id: id, recordStatus: 'Live' });
+        if(!currGradeLevel) {
+            return res.status(404).json({ mssg: 'Grade level is not an existing record' })
+        }
 
         if(gradeLevel === currGradeLevel.gradeLevel) {
             return res.status(400).json({ mssg:`${gradeLevel} is still the same with ${currGradeLevel.gradeLevel}` });
         }
 
-        const glExist = await GradeLevel.findOne({ gradeLevel: gradeLevel, recordStatus: 'Live' });
-        if(glExist) {
-            return res.status(400).json({ mssg: `${gradeLevel} is already existing, please enter another grade level record` });
+        if(gradeLevel !== currGradeLevel.gradeLevel) {
+            const glExist = await GradeLevel.findOne({ gradeLevel: gradeLevel, recordStatus: 'Live' });
+            if(glExist) {
+                return res.status(400).json({ mssg: `${gradeLevel} is already existing, please enter another grade level record` });
+            }
         }
 
        
@@ -1063,6 +1080,12 @@ module.exports.add_roles = async (req,res) => {
     const status = true
 
     try {
+
+        const currentRole = await Role.findOne({ userRole, recordStatus: 'Live', sessionId });
+        if(currentRole) {
+            return res.status(400).json({ mssg: `${userRole} is already existing, please choose another user role` });
+        }
+
         const newRole = await Role.addRole(userRole,inputter,status,sessionId,recordStatus);
         res.status(200).json({ mssg: `${newRole.userRole} has been added to the record` });
     } catch(err) {
@@ -1103,13 +1126,24 @@ module.exports.edit_role = async (req,res) => {
     const { newUserRole: role,currentUserId: inputter,sessionId } = req.body;
 
     try {   
-        const currRole = await Role.findById(id);
-        if(currRole.role !== role) {
-            const newRole = await Role.findByIdAndUpdate({ _id: id }, { userRole:role,inputter,sessionId });
-            res.status(200).json({ mssg: `${newRole.userRole} has been changed to ${role} successfully!` });
-        } else {
-            res.status(400).json({ mssg: `Cannot update ${role}, still the same with old value` })
+        const currRole = await Role.findOne({ _id: id, recordStatus: 'Live', sessionId });
+        if(!currRole) {
+            return res.status(404).json({ mssg: 'Role is not an existing record' });
         }
+
+        if(role === currRole.userRole) {
+            return res.status(400).json({ mssg: `${role} is still the same with old value` });
+        }
+
+        if(role !== currRole.userRole) {
+            const currentRole = await Role.findOne({ userRole: role, recordStatus: 'Live' });
+            if(currentRole) {
+                return res.status(400).json({ mssg: `${role} is already existing, please choose another user role` });
+            }
+        }
+
+        const newRole = await Role.findByIdAndUpdate({ _id: id }, { userRole:role,inputter,sessionId });
+        res.status(200).json({ mssg: `${newRole.userRole} has been changed to ${role} successfully!` });
     } catch(err) {
         console.log(err);
         res.status(400).json({ mssg: 'An error occurred while updating user roles' });
@@ -1357,6 +1391,12 @@ module.exports.add_user = async (req,res) => {
     const isActive = true
 
     try {
+
+        const currentUser = await User.findOne({ username });
+        if(currentUser) {
+            return res.status(400).json({mssg: `${username} is already an existing user, please choose another username`});
+        }
+
         if(password === confirmPassword) {
             const newUser = await User.create({ role,username,password,isActive,inputter,recordStatus });
             const token = createToken(newUser._id);
@@ -1415,6 +1455,13 @@ module.exports.edit_user = async (req, res) => {
 
         if (!currUser) {
             return res.status(404).json({ mssg: 'User not found' });
+        }
+
+        if(currUser.username !== username) {
+            const currentUser = await User.findOne({ username });
+            if(currentUser) {
+                return res.status(400).json({mssg: `${username} is already an existing user, please choose another username`});
+            }
         }
 
         // Update password only if provided

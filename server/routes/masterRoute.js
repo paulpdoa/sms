@@ -99,7 +99,8 @@ get_finance_info,
 get_finance_info_detail,
 add_finance_info,
 delete_finance_info,
-edit_finance_info} = require('../controller/masterController');
+edit_finance_info,
+test_delete_fees} = require('../controller/masterController');
 
 const requireAuth = require('../middleware/requireAuth');
 const { allowUserView,allowUserAction,upload } = require('../middleware/middlewares');
@@ -108,6 +109,8 @@ const userRoles = ['School Admin', 'Super Admin'];
 
 route.post('/user-login',user_login);
 
+//For deleting manage fees testing
+route.get('/delete-manage-fees', test_delete_fees);
 route.get('/update-to-live-records', update_all_records_live);
 
 // Role

@@ -673,7 +673,6 @@ module.exports.edit_discount = async (req, res) => {
             return res.status(404).json({ mssg: 'Discount does not exist' });
         }
 
-        console.log(existingDiscount);
         // Check if discountType has changed and is duplicated in the same session
         if (discountType !== existingDiscount.discountType) {
             const discountTypeExist = await Discount.findOne({ discountType, recordStatus: 'Live', sessionId });
@@ -872,6 +871,8 @@ module.exports.add_manage_fees = async (req,res) => {
         strandId = undefined
     }
 
+    // Add both foreign and local in this function
+
     try {
         for(let i = 0; i < gradeLevelIds.length; i++) {
             const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
@@ -971,6 +972,8 @@ module.exports.edit_manage_fee = async (req,res) => {
     
 }
 
+
+// To be hidden for future enhancements
 module.exports.generate_fees = async (req, res) => {
     const { session: currentYear } = req.body;
 
@@ -1038,7 +1041,11 @@ module.exports.generate_fees = async (req, res) => {
                                 console.log('Processing Fee Category:', code);
                         
                                 // Check if the fee matches the current year, student's grade level, and nationality code
-                                const matchesStrand = fee?.strandId?.strand.toLowerCase() === student?.academicId?.strandId?.strand.toLowerCase();
+                                // const matchesStrand = fee?.strandId?.strand.toLowerCase() === student?.academicId?.strandId?.strand.toLowerCase();
+                                const matchesStrand = 
+                                (student?.academicId?.gradeLevelId?.gradeLevel.includes('11') || student?.academicId?.gradeLevelId?.gradeLevel.includes('12')) 
+                                    ? fee?.strandId?.strand.toLowerCase() === student?.academicId?.strandId?.strand.toLowerCase()
+                                    : true;
                                 const matchesSchoolYear = fee.sessionId?._id.equals(currYear._id);
                                 const matchesGradeLevel = fee.gradeLevelId?.gradeLevel.toLowerCase() === student?.academicId?.gradeLevelId?.gradeLevel.toLowerCase();
                                 const matchesNationality = !fee.nationality || fee.nationality.toLowerCase() === (student?.academicId?.studentId?.nationality?.nationality === 'Filipino' ? 'local' : 'foreigner');
@@ -1054,6 +1061,8 @@ module.exports.generate_fees = async (req, res) => {
                                         recordStatus: 'Live',
                                         totalMiscAmount
                                     };
+
+                                    console.log(paymentInfo);
                         
                                     // Ensure that the uniqueness check is more precise by including more fields (e.g., studentId, sessionId, feeCodeId, and manageFeeId)
                                     const existingPayment = await StudentPayment.findOne({

@@ -11,7 +11,7 @@ const Input = ({ label, type, name, value, onChange, disabled = false, required 
     <div className="flex flex-col">
         <label className="text-sm mb-1" htmlFor={name}>{label}</label>
         <input
-            className="p-2 rounded-md border border-gray-300"
+            className="p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-cutsomView outline-none"
             type={type}
             id={name}
             name={name}
@@ -54,7 +54,19 @@ const NewFinance = () => {
     const { records: religions, isLoading: religionsLoading } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities, isLoading: nationalitiesLoading } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session, currentUserId, role,genericPath } = useContext(MainContext);
+    const { session, currentUserId, role,genericPath,showError } = useContext(MainContext);
+    const [errors,setErrors] = useState({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        address: '',
+        religion: '',
+        gender: '',
+        nationality: '',
+        username: '',
+        password: '',
+        confirmPassword:'',
+    })
 
     const { enqueueSnackbar } = useSnackbar();
 

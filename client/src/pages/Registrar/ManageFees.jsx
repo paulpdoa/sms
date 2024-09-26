@@ -179,7 +179,8 @@ const ManageFees = () => {
         <main className="p-2 relative">
             <div className="flex items-center">
                 <TabActions title="Manage Fees" redirect='create-fees' />
-                { recordsWithoutInputter.length < 1 ? 
+                    
+                {/* { recordsWithoutInputter.length < 1 ? 
                     <button 
                         disabled={(isYearDone && !isLoading) ? true : false} 
                         onClick={() => automateFees(false)} 
@@ -194,7 +195,7 @@ const ManageFees = () => {
                     >
                         Re-generate Fees
                     </button> 
-                }
+                } */}
             </div>
 
             <div className="relative overflow-x-auto mt-5 sm:rounded-lg">

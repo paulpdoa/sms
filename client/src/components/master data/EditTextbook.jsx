@@ -2,14 +2,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from "../../baseUrl";
 import { useState, useEffect, useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { MainContext } from "../../helpers/MainContext";
 import { useSnackbar } from "notistack";
 
 const EditTextbook = () => {
-
     const { id } = useParams();
     const { records: textbook } = useFetch(`${baseUrl()}/textbook/${id}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
@@ -25,7 +22,9 @@ const EditTextbook = () => {
     const [bookAmount, setBookAmount] = useState('');
     const [schoolYear, setSchoolYear] = useState('');
 
-    const { role, currentUserId, session, genericPath } = useContext(MainContext);
+    const [errors, setErrors] = useState({ bookTitle: '', bookCode: '', bookAmount: '', gradeLevel: '' });
+
+    const { role, currentUserId, session, genericPath, showError } = useContext(MainContext);
 
     useEffect(() => {
         if (textbook) {
@@ -44,6 +43,11 @@ const EditTextbook = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!gradeLevelId) return showError('gradeLevel', 'Grade level cannot be empty', 'Grade level is a required field', setErrors);
+        if (!bookTitle) return showError('bookTitle', 'Book title cannot be empty', 'Book title is a required field', setErrors);
+        if (!bookCode) return showError('bookCode', 'Book code cannot be empty', 'Book code is a required field', setErrors);
+        if (!bookAmount) return showError('bookAmount', 'Book amount cannot be empty', 'Book amount is a required field', setErrors);
 
         const bookInfo = {
             newBookCode: bookCode,
@@ -91,26 +95,25 @@ const EditTextbook = () => {
                 <h1 className="font-bold text-gray-700 text-2xl mb-4">Edit Textbook: {textbook?.bookTitle}</h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                    {renderInput('bookTitle', 'Book Title', bookTitle, setBookTitle, 'text')}
-                    {renderInput('bookCode', 'Book Code', bookCode, setBookCode, 'text')}
-                    {renderInput('bookAmount', 'Book Amount', bookAmount, setBookAmount, 'number', { step: "0.01" })}
-                    {renderSelect('gradeLevel', 'Grade Level', gradeLevelId, setGradeLevelId, gradeLevels, 'Select Grade Level')}
-                    { isGrade11Or12 && renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', true) }
+                    {renderInput('bookTitle', 'Book Title', bookTitle, setBookTitle, 'text', errors.bookTitle)}
+                    {renderInput('bookCode', 'Book Code', bookCode, setBookCode, 'text', errors.bookCode)}
+                    {renderInput('bookAmount', 'Book Amount', bookAmount, setBookAmount, 'number', errors.bookAmount, { step: "0.01" })}
+                    {renderSelect('gradeLevel', 'Grade Level', gradeLevelId, setGradeLevelId, gradeLevels, 'Select Grade Level', errors.gradeLevel)}
+                    {isGrade11Or12 && renderSelect('strand', 'Strand', strandId, setStrandId, strands, 'Select strand', null)}
                 </div>
 
                 <button type="submit" className="bg-customView text-white text-sm p-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     Update Textbook
                 </button>
-                <button onClick={() => navigate(-1)} type="button" className="bg-customCancel text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
+                <button onClick={() => navigate(`/${genericPath}/text-books`)} type="button" className="bg-customCancel text-white text-sm p-3 ml-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Cancel</button>
             </form>
-            <ToastContainer />
         </main>
     )
 }
 
 export default EditTextbook;
 
-const renderInput = (id, label, value, onChange, type, extraProps = {}) => (
+const renderInput = (id, label, value, onChange, type, error, extraProps = {}) => (
     <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 text-sm font-medium mb-2">{label}</label>
         <input
@@ -118,21 +121,21 @@ const renderInput = (id, label, value, onChange, type, extraProps = {}) => (
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
             {...extraProps}
         />
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
 );
 
-const renderSelect = (id, label, value, onChange, options, placeholder, required = false) => (
+const renderSelect = (id, label, value, onChange, options, placeholder, error) => (
     <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 text-sm font-medium mb-2">{label}</label>
         <select
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            required={required}
+            className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
         >
             <option value="" hidden>{placeholder}</option>
             {options?.map((option) => (
@@ -141,5 +144,6 @@ const renderSelect = (id, label, value, onChange, options, placeholder, required
                 </option>
             ))}
         </select>
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
 );

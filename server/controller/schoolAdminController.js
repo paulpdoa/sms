@@ -294,6 +294,16 @@ module.exports.add_textbook = async (req,res) => {
     }
 
     try {
+        const existBookCode = await Textbook.findOne({ bookCode, recordStatus: 'Live', sessionId: session });
+        if(existBookCode) {
+            return res.status(400).json({ mssg: `${bookCode} is already an existing record, please choose another book code` });
+        }
+
+        const existBookTitle = await Textbook.findOne({ bookTitle, recordStatus: 'Live', sessionId: session });
+        if(existBookTitle) {
+            return res.status(400).json({ mssg: `${bookTitle} is already an existing record, please choose another book code` });
+        }
+
         await Textbook.create({ bookCode,bookTitle,bookAmount,gradeLevel,strand,inputter,sessionId: session, status,recordStatus: 'Live' });
         res.status(200).json({ mssg: `${bookTitle} has been added to the record` });
     } catch(err) {
@@ -337,6 +347,26 @@ module.exports.edit_textbook = async (req,res) => {
     const { newBookCode: bookCode,newBookTitle:bookTitle,newBookAmount:bookAmount,newGradeLevel:gradeLevel,newStrand:strand,newInputter:inputter,newSession:session,newSchoolYear:schoolYear } = req.body;
     
     try { 
+
+        const currentTextbook = await Textbook.findOne({ _id: id, recordStatus: 'Live', sessionId: session });
+        if(!currentTextbook) {
+            return res.status(404).json({ mssg: 'Textbook is not an existing record' });
+        }
+
+        if(bookCode !== currentTextbook.bookCode) {
+            const existBookCode = await Textbook.findOne({ bookCode, recordStatus: 'Live', sessionId: session });
+            if(existBookCode) {
+                return res.status(400).json({ mssg: `${bookCode} is already an existing record, please choose another book code` });
+            }
+        }
+
+        if(bookTitle !== currentTextbook.bookTitle) {
+            const existBookTitle = await Textbook.findOne({ bookTitle, recordStatus: 'Live', sessionId: session });
+            if(existBookTitle) {
+                return res.status(400).json({ mssg: `${bookTitle} is already an existing record, please choose another book code` });
+            }
+        }
+        
         if(strand === '') {
             await Textbook.findByIdAndUpdate({ _id: id }, { bookTitle,bookCode,bookAmount,gradeLevel,inputter,sessionId: session,schoolYear });
         } else {

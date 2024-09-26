@@ -15,7 +15,7 @@ const Textbook = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const navigate = useNavigate();
 
-    const { role,currentUserId,genericPath,setSearchQuery,searchQuery,session } = useContext(MainContext);
+    const { role,currentUserId,genericPath,setSearchQuery,searchQuery,session,showError } = useContext(MainContext);
     const { enqueueSnackbar } = useSnackbar();
 
     const columns = [

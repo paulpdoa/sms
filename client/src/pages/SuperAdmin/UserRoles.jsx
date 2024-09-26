@@ -1,8 +1,3 @@
-import DateTime from "../../components/DateTime";
-import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
@@ -11,14 +6,17 @@ import MasterTable from "../../components/MasterTable";
 import { MainContext } from "../../helpers/MainContext";
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
-
+import { useSnackbar } from 'notistack';
 
 const UserRoles = () => {
 
     const { records, isLoading } = useFetch(`${baseUrl()}/user-roles`);
     const [userRole,setUserRole] = useState('');
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [errors,setErrors] = useState({ userRole: '' });
     
-    const { role,currentUserId,searchQuery,showForm,setShowForm,session } = useContext(MainContext);
+    const { role,currentUserId,searchQuery,showForm,setShowForm,session,showError } = useContext(MainContext);
 
     const columns = [
         {
@@ -31,30 +29,27 @@ const UserRoles = () => {
     const updateNewUserRole = async (id,updatedData) => {
         try {
             const newData = await axios.patch(`${baseUrl()}/user-role/${id}`,{ newUserRole:updatedData.userRole,currentUserId,role,sessionId: session });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newData.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating user role record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -63,62 +58,60 @@ const UserRoles = () => {
     const deleteUserRoles = async (id) => {
         try {
             const removeUserRoles = await axios.put(`${baseUrl()}/user-role/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(removeUserRoles.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(removeUserRoles.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting user role record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
 
     const addUserRoles = async (e) => {
         e.preventDefault();
+
+        if(!userRole) return showError('userRole','User role cannot be empty','User role is a required field',setErrors);
+
         try {
             const newUserRoles = await axios.post(`${baseUrl()}/user-roles`,{ userRole,currentUserId,role,sessionId: session });
-            toast.success(newUserRoles.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newUserRoles.data.mssg, { 
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () =>{
+                    window.location.reload()
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding user role record', { 
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -133,7 +126,8 @@ const UserRoles = () => {
 
         <div className="flex flex-col mt-1">
             <label className="text-sm" htmlFor="user role">User Roles</label>
-            <input className="outline-none p-1 rounded-md border border-gray-300" type="text" onChange={(e) => setUserRole(e.target.value)} />
+            <input className={`outline-none p-1 rounded-md border ${errors.userRole ? 'border-red-500' : 'border-gray-300'}`} type="text" onChange={(e) => setUserRole(e.target.value)} />
+            { errors.userRole && <span className="text-red-500 text-xs">{errors.userRole}</span> }
         </div>
         </>
     )
@@ -156,7 +150,6 @@ const UserRoles = () => {
                     />
                 </div>
             </div>
-            <ToastContainer />
         </main>
     )
 }
