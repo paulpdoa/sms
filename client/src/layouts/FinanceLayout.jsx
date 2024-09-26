@@ -2,8 +2,6 @@ import { Outlet,useNavigate } from 'react-router-dom';
 import { useContext, useEffect } from 'react';
 import { MainContext } from '../helpers/MainContext';
 import { useCookies } from 'react-cookie';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useSnackbar } from 'notistack';
 
 const FinanceLayout = () => {
@@ -45,8 +43,6 @@ const FinanceLayout = () => {
 
     return (
         <>
-            {/* Render the ToastContainer here */}
-            <ToastContainer />
             {/* Render the Outlet to display child routes */}
             <Outlet />
         </>

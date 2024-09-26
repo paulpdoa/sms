@@ -29,6 +29,18 @@ const EditFinance = () => {
     const [address, setAddress] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
+    const [errors,setErrors] = useState({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        address: '',
+        religion: '',
+        sex: '',
+        nationality: '',
+        username: '',
+        password: '',
+        confirmPassword:'',
+    })
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -38,7 +50,7 @@ const EditFinance = () => {
         }
     };
 
-    const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { session,currentUserId,genericPath,showError } = useContext(MainContext);
 
 
     useEffect(() => {
@@ -66,6 +78,15 @@ const EditFinance = () => {
 
     const editFinance = async (e) => {
         e.preventDefault();
+
+        if(!firstName) return showError('firstName','First name cannot be empty','First name is a required field',setErrors);
+        if(!lastName) return showError('lastName','Last name cannot be empty', 'Last name is a required field', setErrors);
+        if(!dateOfBirth) return showError('dateOfBirth', 'Date of birth cannot be empty', 'Date of birth is a required field', setErrors);
+        if(!placeOfBirth) return showError('placeOfBirth','Place of birth cannot be empty', 'Place of birth is a required field', setErrors);
+        if(!address) return showError('address', 'Address cannot be empty', 'Address is a required field', setErrors);
+        if(!religion) return showError('religion','Religion cannot be empty', 'Religion is a required field', setErrors);
+        if(!sex) return showError('sex', 'Gender cannot be empty', 'Gender is a required field', setErrors);
+        if(!nationality) return showError('nationality','Nationality cannot be empty', 'Nationality is a required field',setErrors);
 
         const formData = new FormData();
         formData.append('firstName',firstName);
@@ -125,12 +146,12 @@ const EditFinance = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {renderInput("first-name", "First Name", firstName, setFirstName, "text")}
+                        {renderInput("firstName", "First Name", firstName, setFirstName, "text",errors)}
                         {renderInput("middle-name", "Middle Name", middleName, setMiddleName, "text")}
-                        {renderInput("last-name", "Last Name", lastName, setLastName, "text")}
-                        {renderInput("date-of-birth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
-                        {renderInput("place-of-birth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
-                        {renderInput("address", "Address", address, setAddress, "text")}
+                        {renderInput("lastName", "Last Name", lastName, setLastName, "text",errors)}
+                        {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date",errors)}
+                        {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text",errors)}
+                        {renderInput("address", "Address", address, setAddress, "text",errors)}
                         
                         {/* For Gender Selection */}
                         <div className="mb-4">
@@ -146,6 +167,7 @@ const EditFinance = () => {
                                     <option key={option._id} value={option.name}>{option.name}</option>
                                 ))}
                             </select>
+                            { errors.sex && <span className="text-red-500 text-xs">{errors.sex}</span>}
                         </div>
 
                         {/* For Nationality */}
@@ -162,6 +184,7 @@ const EditFinance = () => {
                                     <option key={option._id} value={option._id}>{option.nationality}</option>
                                 ))}
                             </select>
+                            { errors.nationality && <span className="text-red-500 text-xs">{errors.nationality}</span>}
                         </div>
 
                         {/* For Religions*/}
@@ -178,6 +201,7 @@ const EditFinance = () => {
                                     <option key={option._id} value={option._id}>{option.religion}</option>
                                 ))}
                             </select>
+                            { errors.religion && <span className="text-red-500 text-xs">{errors.religion}</span>}
                         </div>
 
                     </div>
@@ -212,15 +236,15 @@ const EditFinance = () => {
                 </section>
 
                 <div className="flex items-center justify-end gap-2">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Finance</button>
-                    <button type="button" onClick={() => navigate(`/${genericPath}/finance`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                    <button type="submit" className="bg-customView hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Finance</button>
+                    <button type="button" onClick={() => navigate(`/${genericPath}/finance`)} className="bg-customCancel hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
         </main>
     );
 };
 
-const renderInput = (id, label, value, onChange, type) => (
+const renderInput = (id, label, value, onChange, type,errors = {}) => (
     <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 mb-2">{label}</label>
         <input
@@ -228,8 +252,9 @@ const renderInput = (id, label, value, onChange, type) => (
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className={`w-full px-3 py-2 border ${errors[id] ? 'border-red-500' : 'border-gray-300'} rounded-md`}
         />
+        { errors[id] && <span className="text-red-500 text-xs">{errors[id]}</span> }
     </div>
 );
 
@@ -240,7 +265,7 @@ const renderSelect = (id, label, value, onChange, options, optionLabel) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className={`w-full px-3 py-2 border ${errors[id] ? 'border-red-500' : 'border-gray-300'} rounded-md`}
             required
         >
             <option value="" hidden>{`Select ${optionLabel}` ?? value}</option>

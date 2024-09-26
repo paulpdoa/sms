@@ -1,11 +1,9 @@
-import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useState } from 'react';
+import { useSnackbar } from 'notistack';
 
 const columns = [
     {
@@ -43,6 +41,7 @@ const PaymentPenalty = () => {
     const [newTerm,setNewTerm] = useState('');
     const [newInstallmentBy,setNewInstallmentBy] = useState('');
     const [newPayEvery,setNewPayEvery] = useState('');
+    const { enqueueSnackbar } = useSnackbar();
 
     const enableEditPaymentTerm = (record) => {
         setUpdatePaymentTerm(!updatePaymentTerm);
@@ -57,35 +56,28 @@ const PaymentPenalty = () => {
     const updateNewPaymentTerm = async (id) => {
         try {
             const newData = await axios.patch(`${baseUrl()}/payment-term/${id}`,{ newTerm,newPayEvery,newInstallmentBy,currentUserId });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newData.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating payment term record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }
 
@@ -93,22 +85,29 @@ const PaymentPenalty = () => {
     const deletePaymentTerm = async (id) => {
         try {
             const removePaymentTerm = await axios.delete(`${baseUrl()}/payment-term/${id}`);
-            toast.success(removePaymentTerm.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(removePaymentTerm.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting payment term record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -116,28 +115,34 @@ const PaymentPenalty = () => {
         e.preventDefault();
         try {
             const newPaymentTerm = await axios.post(`${baseUrl()}/payment-term`,{ term,payEvery,installmentBy,inputter: currentUserId });
-            toast.success(newPaymentTerm.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newPaymentTerm.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding payment term record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
     return (
         <main className="p-2">
-            {/* <DateTime /> */}
             <div className="flex justify-between mx-4 my-2 items-center">
                 <h1 className="text-xl text-green-500 font-bold">Late Payment Penalty</h1>
                 <Searchbar />
@@ -246,7 +251,6 @@ const PaymentPenalty = () => {
                     </table>
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

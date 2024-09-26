@@ -1,8 +1,4 @@
 import React, { useState, useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import DateTime from '../../components/DateTime';
-import Searchbar from '../../components/Searchbar';
 import SubmittedReq from '../../components/admission/reqs/SubmittedReq';
 import StudentParent from '../../components/admission/parent/StudentParent';
 import StudentInfo from '../../components/admission/info/StudentInfo';
@@ -112,8 +108,6 @@ const Admission = () => {
                 )}
 
             </div>
-
-            <ToastContainer />
         </main>
     );
 };

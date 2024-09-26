@@ -1,20 +1,20 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const NewManageFee = () => {
 
     const { records: feeCodes } = useFetch(`${baseUrl()}/fee-codes`);
-    const { session, currentUserId, genericPath } = useContext(MainContext);
+    const { session, currentUserId, genericPath,snackbarKey } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
+    const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
 
@@ -49,68 +49,58 @@ const NewManageFee = () => {
         };
 
         if(amount === 0) {
-            toast.error("Error adding fee. amount cannot be zero", {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar("Error adding fee. amount cannot be zero", {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-
             return;
         }
       
         if(selectedGradeLevels.length < 1) {
-           
-            toast.error("Error adding fee. grade level cannot be empty", {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar("Error adding fee. grade level cannot be empty", {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-
             return;
         }
-        const toastId = toast.loading('Please wait while creating some fees');
+        const loading = snackbarKey('Please wait while creating some fees');
 
         try {
             const { data } = await axios.post(`${baseUrl()}/manage-fee`, feeInformation);
-            toast.update(toastId, {
-                render: data.mssg,
-                type: "success",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                onClose: setTimeout(() => {
+            closeSnackbar(loading)
+            enqueueSnackbar(data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
                     navigate(`/${genericPath}/manage-fees`)
-                }, 2000)
+                }
             });
-            
         } catch (err) {
             console.log(err);
-            toast.update(toastId, {
-                render: 'An error occurred while creating fee',
-                type: "error",
-                isLoading: false,
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            closeSnackbar(snackbarKey());
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while creating fee', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -200,7 +190,6 @@ const NewManageFee = () => {
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

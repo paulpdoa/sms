@@ -1,21 +1,20 @@
 import React, { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { baseUrl } from '../../../baseUrl';
 import { useFetch } from '../../../hooks/useFetch';
 import { MainContext } from '../../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const SubmittedReq = ({ setEnableView }) => {
     const { records: requirements } = useFetch(`${baseUrl()}/requirements`);
     const { session: schoolYear,currStudRec,setCurrStudRec } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
     const id = currStudRec._id;
     const { records: admission } = useFetch(`${baseUrl()}/admission/${id}`);
     const { records: sy } = useFetch(`${baseUrl()}/school-year/${schoolYear}`);
     const isYearDone = sy.isYearDone;
 
-    console.log(currStudRec);
 
     const [selectedRequirements, setSelectedRequirements] = useState([]);
     const [isAdmitted,setIsAdmitted] = useState(currStudRec?.academicId?.isAdmitted);
@@ -54,30 +53,28 @@ const SubmittedReq = ({ setEnableView }) => {
 
             // console.log('Backend response:', response.data); // Log the backend response
 
-            toast.success(response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(response.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
-            toast.error(err.response?.data?.mssg || 'An error occurred', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            console.log(err)
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while submitting student requirement', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -126,7 +123,6 @@ const SubmittedReq = ({ setEnableView }) => {
                 }} className="bg-red-500 text-white text-sm py-2 px-4 hover:bg-red-600 rounded-md ml-2">
                 Cancel
             </button>
-            <ToastContainer />
         </div>
     );
 };

@@ -1,6 +1,4 @@
 import { useState, useEffect,useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import { RiCloseLargeFill } from "react-icons/ri";
@@ -8,12 +6,14 @@ import axios from "axios";
 import MasterTable from '../../MasterTable';
 import { MainContext } from '../../../helpers/MainContext';
 import { FaLaptopHouse } from 'react-icons/fa';
+import { useSnackbar } from 'notistack';
 
 const StudentAssistance = ({ id, closeModal }) => {
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
     const { records: discounts } = useFetch(`${baseUrl()}/discounts`);
     const { records: initialStudentDiscounts } = useFetch(`${baseUrl()}/student-discount/student/${id}`);
-    
+    const { enqueueSnackbar } = useSnackbar();
+
     const columns = [
         { accessorKey: 'schoolYear', header: 'School Year' },
         { accessorKey: 'studentNo', header: 'Student No' },
@@ -77,31 +77,29 @@ const StudentAssistance = ({ id, closeModal }) => {
             const response = await axios.post(`${baseUrl()}/student-discount`, studentDiscount);
             const newDiscount = response.data;
             setStudentDiscounts(prevDiscounts => [...prevDiscounts, newDiscount]);
-            toast.success(newDiscount.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newDiscount.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    closeModal(false)
+                }
             });
-            
-            setTimeout(() => {
-                closeModal(false)
-            },2000)
         } catch (err) {
-            toast.error('Failed to submit discount information.',{
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'Failed to submit discount information.', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
+           
             console.log(err);
         }
         
@@ -125,18 +123,29 @@ const StudentAssistance = ({ id, closeModal }) => {
             const data = await axios.delete(`${baseUrl()}/student-discount/${id}`);
             const newDiscount = data.data;
             setStudentDiscounts(prevDiscounts => prevDiscounts.filter(discount => discount._id !== id));
-            toast.success(newDiscount.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(newDiscount.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    closeModal(false)
+                }
             });
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting student discount record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -252,7 +261,6 @@ const StudentAssistance = ({ id, closeModal }) => {
                     </button>
                 </div>
             </div>
-            <ToastContainer />
         </div>
     );
 };

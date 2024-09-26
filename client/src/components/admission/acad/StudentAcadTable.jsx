@@ -1,15 +1,15 @@
 import { useFetch } from "../../../hooks/useFetch";
 import { baseUrl } from "../../../baseUrl";
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import MasterTable from "../../MasterTable";
 import { useContext } from 'react';
 import { MainContext } from '../../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
 
     // This student will display all students that are not admitted yet
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
         {
@@ -54,29 +54,27 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
     const deleteAcadRecord = async (id) => {
         try {
             const data = await axios.delete(`${baseUrl()}/academic/${id}`);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/siblings`)
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting sibling record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     } 
@@ -108,7 +106,6 @@ const StudentAcadTable = ({ setViewRecord, searchQuery }) => {
     return (
         <>  
             <MasterTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} />
-            <ToastContainer /> 
         </> 
     )
 }

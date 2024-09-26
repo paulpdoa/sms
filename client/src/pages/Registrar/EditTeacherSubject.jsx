@@ -2,16 +2,16 @@ import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useParams,useNavigate } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const EditTeacherSubject = () => {
     const { id } = useParams();
     const { records: teacherSubject } = useFetch(`${baseUrl()}/teacher-subject/${id}`);
 
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [teacherId, setTeacherId] = useState('');
     const [subjectId, setSubjectId] = useState('');
@@ -62,31 +62,27 @@ const EditTeacherSubject = () => {
                 role
             });
 
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/teachers-subject`);                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/teachers-subject`);
-            }, 2000)
         } catch (err) {
             console.log(err);
-            toast.success(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating teachers subject', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -193,19 +189,18 @@ const EditTeacherSubject = () => {
                 </section>
 
                 <button 
-                    className="p-2 bg-blue-500 hover:bg-blue-600 text-gray-100 text-sm rounded-md"
+                    className="p-2 bg-customView hover:bg-blue-600 text-gray-100 text-sm rounded-md"
                 >
                         Update Teacher Subject
                 </button>
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
-                    className="p-2 bg-red-500 ml-2 hover:bg-red-600 text-gray-100 text-sm rounded-md"
+                    onClick={() => navigate(`/${genericPath}/teachers-subject`)}
+                    className="p-2 bg-customCancel ml-2 hover:bg-red-600 text-gray-100 text-sm rounded-md"
                 >
                         Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

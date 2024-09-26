@@ -7,32 +7,32 @@ import { genders as genderSelections } from '../../data/genders.json';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
 
-const Input = ({ label, type, name, value, onChange,disabled = false, required }) => (
+const Input = ({ label, type, name, value, onChange,disabled = false, required,errors = {} }) => (
     <div className="flex flex-col">
         <label className="text-sm mb-1" htmlFor={name}>{label}</label>
         <input
-            className="p-2 rounded-md border border-gray-300"
+            className={`p-2 rounded-md border ${errors[name] ? 'border-red-500' : 'border-gray-300'} outline-none focus:ring-2 focus:ring-customView`}
             type={type}
             id={name}
             name={name}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required={required}
-            disabled={disabled}
+            // required={required}
+            // disabled={disabled}
         />
+        { errors[name] && <span className="text-xs text-red-500">{errors[name]}</span> }
     </div>
 );
 
-const Select = ({ label, name, value, options, onChange }) => (
+const Select = ({ label, name, value, options, onChange, errors }) => (
     <div className="flex flex-col">
         <label className="text-sm mb-1" htmlFor={name}>{label}</label>
         <select
-            className="p-2 rounded-md border border-gray-300"
+            className={`p-2 rounded-md border ${errors[name] ? 'border-red-500' : 'border-gray-300'} outline-none focus:ring-2 focus:ring-customView`}
             id={name}
             name={name}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            required
         >   
             <option value="" hidden>{label}</option>
             {options && options.length > 0 ? (
@@ -45,6 +45,7 @@ const Select = ({ label, name, value, options, onChange }) => (
                 <option disabled>Loading...</option>
             )}
         </select>
+        { errors[name] && <span className="text-xs text-red-500">{errors[name]}</span> }
     </div>
 );
 
@@ -53,7 +54,7 @@ const NewTeacher = () => {
     const { records: religions } = useFetch(`${baseUrl()}/religions`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
 
-    const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { session,currentUserId,genericPath,showError } = useContext(MainContext);
     const { enqueueSnackbar } = useSnackbar();
 
     const [firstName,setFirstName] = useState('');
@@ -80,7 +81,7 @@ const NewTeacher = () => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
 
-    const [error,setError] = useState({
+    const [errors,setErrors] = useState({
         firstName: '',
         lastName: '',
         dateOfBirth: '',
@@ -107,6 +108,26 @@ const NewTeacher = () => {
 
     const addTeacher = async (e) => {
         e.preventDefault();
+
+        // Validate all required fields
+        if (!firstName) return showError('firstName', 'First name cannot be empty', 'First name is a required field', setErrors);
+        if (!lastName) return showError('lastName', 'Last name cannot be empty', 'Last name is a required field', setErrors);
+        if (!dateOfBirth) return showError('dateOfBirth', 'Date of Birth cannot be empty', 'Date of Birth is a required field', setErrors);
+        if (!gender) return showError('gender', 'Gender cannot be empty', 'Gender is a required field', setErrors);
+        if (!religion) return showError('religion', 'Religion cannot be empty', 'Religion is a required field', setErrors);
+        if (!nationality) return showError('nationality', 'Nationality cannot be empty', 'Nationality is a required field', setErrors);
+        if (!placeOfBirth) return showError('placeOfBirth', 'Place of Birth cannot be empty', 'Place of Birth is a required field', setErrors);
+        if (!email) return showError('email', 'Email cannot be empty', 'Email is a required field', setErrors);
+        if (!contactNumber) return showError('contactNumber', 'Contact Number cannot be empty', 'Contact Number is a required field', setErrors);
+        if (!address) return showError('address', 'Address cannot be empty', 'Address is a required field', setErrors);
+        if (!education) return showError('education', 'Education cannot be empty', 'Education is a required field', setErrors);
+        if (!schoolGraduated) return showError('schoolGraduated', 'School Graduated cannot be empty', 'School Graduated is a required field', setErrors);
+        if (!yearGraduated) return showError('yearGraduated', 'Year Graduated cannot be empty', 'Year Graduated is a required field', setErrors);
+        if (!yearsOfExperience) return showError('yearsOfExperience', 'Years of Experience cannot be empty', 'Years of Experience is a required field', setErrors);
+        if (!joiningDate) return showError('joiningDate', 'Joining Date cannot be empty', 'Joining Date is a required field', setErrors);
+        if (!username) return showError('username', 'Username cannot be empty', 'Username is a required field', setErrors);
+        if (!password) return showError('password', 'Password cannot be empty', 'Password is a required field', setErrors);
+        if (!confirmPassword) return showError('confirmPassword', 'Confirm Password cannot be empty', 'Confirm Password is a required field', setErrors);
     
         // Create a new FormData instance
         const formData = new FormData();
@@ -203,10 +224,10 @@ const NewTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <Input label="First Name" type="text" name="firstName" value={firstName} onChange={setFirstName} />
+                        <Input label="First Name" type="text" name="firstName" value={firstName} onChange={setFirstName} errors={errors} />
                         <Input label="Middle Name" type="text" name="middleName" value={middleName} onChange={setMiddleName} />
-                        <Input label="Last Name" type="text" name="lastName" value={lastName} onChange={setLastName} />
-                        <Input label="Date of Birth" type="date" name="dateOfBirth" value={dateOfBirth} onChange={setDateOfBirth} />
+                        <Input label="Last Name" type="text" name="lastName" value={lastName} onChange={setLastName} errors={errors} />
+                        <Input label="Date of Birth" type="date" name="dateOfBirth" value={dateOfBirth} onChange={setDateOfBirth} errors={errors} />
                         <Input label="Age" type="text" name="age" value={isNaN(getAge) ? '' : getAge} disabled={true} />
                         <Select 
                             label="Gender" 
@@ -214,45 +235,49 @@ const NewTeacher = () => {
                             value={gender} 
                             options={genderSelections} 
                             onChange={setGender} 
+                            errors={errors}
                         />
                         <Select 
                             label="Religion" 
                             name="religion"     
                             value={religion} 
                             options={religions} 
-                            onChange={setReligion} 
+                            onChange={setReligion}
+                            errors={errors} 
                         />
                         <Select 
                             label="Nationality" 
                             name="nationality" 
                             value={nationality} 
                             options={nationalities} 
-                            onChange={setNationality} 
+                            onChange={setNationality}
+                            errors={errors}
                         />
 
-                        <Input label="Place of Birth" type="text" name="placeOfBirth" value={placeOfBirth} onChange={setPlaceOfBirth} />
+                        <Input label="Place of Birth" type="text" name="placeOfBirth" value={placeOfBirth} onChange={setPlaceOfBirth} errors={errors} />
                         <Input label="Spouse Name" type="text" name="spouseName" value={spouseName} onChange={setSpouseName} required={false} />
                         <Input label="Spouse Contact Number" type="text" name="spouseCel" value={spouseCel} onChange={setSpouseCel} required={false} />
-                        <Input label="Address" type="text" name="address" value={address} onChange={setAddress} />
+                        <Input label="Address" type="text" name="address" value={address} onChange={setAddress} errors={errors} />
                     </div>
                 </section>
 
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Input label="Active Email" type="email" name="email" value={email} onChange={setEmail} />
+                        <Input label="Active Email" type="email" name="email" value={email} onChange={setEmail} errors={errors} />
                         <div className="flex flex-col">
                             <label className="text-sm mb-1" htmlFor="contact-number">Contact Number</label>
                             <div className="flex items-center border border-gray-300 rounded-md bg-white overflow-hidden">
                                 <span className="bg-gray-500 p-2 text-gray-100">+63</span>
                                 <input
-                                    className="p-2 flex-grow outline-none"
+                                    className={`p-2 flex-grow outline-none ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'} border`}
                                     type="text"
                                     id="contact-number"
                                     name="contactNumber"
                                     value={contactNumber}
                                     onChange={(e) => setContactNumber(e.target.value)}
                                 />
+                                { errors.contactNumber && <span className="text-red-500 text-xs">{errors.contactNumber}</span> } 
                             </div>
                         </div>
                     </div>
@@ -261,10 +286,10 @@ const NewTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Academic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <Input label="Education" type="text" name="education" value={education} onChange={setEducation} />
-                        <Input label="School Graduated" type="text" name="schoolGraduated" value={schoolGraduated} onChange={setSchoolGraduated} />
-                        <Input label="Year Graduated" type="text" name="yearGraduated" value={yearGraduated} onChange={setYearGraduated} />
-                        <Input label="Years of Experience" type="number" name="yearsOfExperience" value={yearsOfExperience} onChange={setYearsOfExperience} />
+                        <Input label="Education" type="text" name="education" value={education} onChange={setEducation} errors={errors} />
+                        <Input label="School Graduated" type="text" name="schoolGraduated" value={schoolGraduated} onChange={setSchoolGraduated} errors={errors} />
+                        <Input label="Year Graduated" type="text" name="yearGraduated" value={yearGraduated} onChange={setYearGraduated} errors={errors} />
+                        <Input label="Years of Experience" type="number" name="yearsOfExperience" value={yearsOfExperience} onChange={setYearsOfExperience} errors={errors} />
                     </div>
                 </section>
 
@@ -281,9 +306,9 @@ const NewTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Teacher User Account</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <Input label="Username" type="text" name="username" value={username} onChange={setUsername} />
-                        <Input label="Password" type="password" name="password" value={password} onChange={setPassword} />
-                        <Input label="Confirm Password" type="password" name="confirmPassword" value={confirmPassword} onChange={setConfirmPassword} />
+                        <Input label="Username" type="text" name="username" value={username} onChange={setUsername} errors={errors} />
+                        <Input label="Password" type="password" name="password" value={password} onChange={setPassword} errors={errors} />
+                        <Input label="Confirm Password" type="password" name="confirmPassword" value={confirmPassword} onChange={setConfirmPassword} errors={errors} />
                     </div>
                 </section>
                 <section>
@@ -316,7 +341,7 @@ const NewTeacher = () => {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/${genericPath}/teachers`)}
                         className="bg-red-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-700 transition duration-200"
                     >
                         Cancel

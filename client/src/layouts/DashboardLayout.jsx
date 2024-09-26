@@ -5,12 +5,13 @@ import Navbar from "../components/Navbar";
 import { MdOutlineMenu } from "react-icons/md";
 import { MainContext } from '../helpers/MainContext';
 import { useCookies } from 'react-cookie';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useSnackbar } from 'notistack';
+
 const DashboardLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const { isFreshYear,role,userToken,username, session } = useContext(MainContext);
     const [cookies, setCookie, removeCookie] = useCookies(['userToken']);
+    const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
 
@@ -24,27 +25,26 @@ const DashboardLayout = () => {
     useEffect(() => {
         if (!isLoading) {
             if (!role || !username) {
-                setTimeout(() => {
-                    removeCookie('userToken', { path: '/' });
-                    removeCookie('userToken', { path: '/master' });
-                    removeCookie('userToken', { path: '/finance' });
-                    removeCookie('userToken', { path: '/guest' });
-                    removeCookie('userToken', { path: '/registrar' });
-                    removeCookie('userToken', { path: '/student' });
-                    removeCookie('userToken', { path: '/teacher' });
-                    ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
-                    navigate('/login');
-                }, 3000); // Delay by 3 seconds to match the toast's autoClose time
-                toast.error('Sorry, you are not allowed to view this page, please login again', {
-                    position: "top-center",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                 });
+                enqueueSnackbar('Sorry, you are not allowed to view this page, please login again', {
+                    variant: 'error',
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center',
+                    },
+                    autoHideDuration: 3000,
+                    preventDuplicate: true,
+                    onClose: () => {
+                        removeCookie('userToken', { path: '/' });
+                        removeCookie('userToken', { path: '/master' });
+                        removeCookie('userToken', { path: '/finance' });
+                        removeCookie('userToken', { path: '/guest' });
+                        removeCookie('userToken', { path: '/registrar' });
+                        removeCookie('userToken', { path: '/student' });
+                        removeCookie('userToken', { path: '/teacher' });
+                        ['id', 'currentUserId', 'session', 'role', 'username'].forEach(lclstg => localStorage.removeItem(lclstg));
+                        navigate('/login');
+                    }
+                });
             }
         }
     }, [role, username, userToken, removeCookie, navigate, isLoading,session]);

@@ -1,10 +1,9 @@
 import { useState,useContext } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
 import { MainContext } from '../../../helpers/MainContext';
-import 'react-toastify/dist/ReactToastify.css';
+import { useSnackbar } from 'notistack';
 
 const StudentRegistration = ({ id }) => {
 
@@ -12,7 +11,8 @@ const StudentRegistration = ({ id }) => {
     const [settledArrears, setSettledArrears] = useState(id?.academicId?.settledArrears);
     const [completedClearance, setCompletedClearance] = useState(id?.academicId?.completedClearance);
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
-    
+    const { enqueueSnackbar } = useSnackbar();
+
     const { session,role } = useContext(MainContext);
     
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
@@ -33,30 +33,28 @@ const StudentRegistration = ({ id }) => {
 
         try {
             const data = await axios.patch(`${baseUrl()}/student/info/${id?._id}`,studentInfo);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while registering student record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -106,7 +104,6 @@ const StudentRegistration = ({ id }) => {
                 Submit
             </button>
         </div>
-        <ToastContainer />
         </>
     )
 }

@@ -2,10 +2,9 @@ import { baseUrl } from "../../../baseUrl";
 import { useFetch } from "../../../hooks/useFetch";
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { MainContext } from '../../../helpers/MainContext';
 import { academicStatus as status } from '../../../data/academicStatus.json';
+import { useSnackbar } from 'notistack';
 
 const StudentAcademic = ({ setEnableView }) => {
     
@@ -15,7 +14,8 @@ const StudentAcademic = ({ setEnableView }) => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: academic } = useFetch(`${baseUrl()}/academics`);
     const { records: paymentTerms } = useFetch(`${baseUrl()}/payment-terms`);
-    
+    const { enqueueSnackbar } = useSnackbar();
+
     const { session: syId,currStudRec,currentUserId: inputter,setCurrStudRec } = useContext(MainContext);
     const id = currStudRec._id;
     const { records: student } = useFetch(`${baseUrl()}/student/${id}`);
@@ -79,29 +79,27 @@ const StudentAcademic = ({ setEnableView }) => {
 
         try {
             const { data } = await axios.post(`${baseUrl()}/academic`, academicInfo);
-            toast.success(data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding academic record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
             console.error(err);
         }
@@ -186,7 +184,6 @@ const StudentAcademic = ({ setEnableView }) => {
                     Cancel
                 </button> */}
             </form>
-            <ToastContainer />
         </div>
     )
 }

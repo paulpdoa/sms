@@ -1,17 +1,13 @@
-import DateTime from "../../components/DateTime";
-import ReusableTable from "../../components/ReusableTable";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useState, useEffect, useContext } from 'react';
-import Searchbar from "../../components/Searchbar";
 import axios from 'axios';
 import TabActions from '../../components/TabActions';
 import MasterTable from "../../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
 import MasterDataForm from "../../components/MasterDataForm";
+import { useSnackbar } from 'notistack';
 
 const Sectioning = () => {
     const columns = [
@@ -35,6 +31,7 @@ const Sectioning = () => {
     const [adviser, setAdviser] = useState('');
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (studentRecord) {
@@ -80,30 +77,28 @@ const Sectioning = () => {
 
         try {
             const data = await axios.post(`${baseUrl()}/sectioning`, sectioningInfo);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while submitting sectioning for students', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -128,7 +123,7 @@ const Sectioning = () => {
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Sectioning" noView={true} />
+            <TabActions title="Sectionings" noView={true} />
             <div className={`gap-2 mt-5`}>
                 {showForm &&
                     (
@@ -160,7 +155,6 @@ const Sectioning = () => {
                     />
                 </div>
             </div>
-            <ToastContainer />
         </main>
     )
 }

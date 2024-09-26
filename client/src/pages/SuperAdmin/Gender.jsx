@@ -1,14 +1,10 @@
-import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const Gender = () => {
 
@@ -19,39 +15,33 @@ const Gender = () => {
     const { records, isLoading } = useFetch(`${baseUrl()}/genders`);
     const [gender,setGender] = useState('');
     const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
+    const { enqueueSnackbar } = useSnackbar();
 
     const updateNewGender = async (id,updatedData) => {
         try {
             const newData = await axios.patch(`${baseUrl()}/gender/${id}`,{ newGender:updatedData.gender,currentUserId,role });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newData.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating gender', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         }
     }
 
@@ -59,22 +49,28 @@ const Gender = () => {
     const deleteGender = async (id) => {
         try {
             const removeGender = await axios.delete(`${baseUrl()}/gender/${id}`,{ data: { role } });
-            toast.success(removeGender.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(removeGender.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting gender', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -82,22 +78,28 @@ const Gender = () => {
         e.preventDefault();
         try {
             const newGender = await axios.post(`${baseUrl()}/genders`,{ gender,inputter: currentUserId, role });
-            toast.success(newGender.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newGender.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding gender', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -135,7 +137,6 @@ const Gender = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

@@ -3,8 +3,6 @@ import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { MainContext } from '../helpers/MainContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export const useFetch = (url) => {
    const [records, setRecords] = useState([]);
@@ -53,16 +51,6 @@ export const useFetch = (url) => {
             // Network or timeout errors
             if (!err.response) {
                setError('Network error, please try again later');
-               // toast.error('Network error, please try again later', {
-               //    position: "top-center",
-               //    autoClose: 3000,
-               //    hideProgressBar: true,
-               //    closeOnClick: true,
-               //    pauseOnHover: true,
-               //    draggable: true,
-               //    progress: undefined,
-               //    theme: "colored",
-               // });
                return;
             }
 
@@ -70,17 +58,6 @@ export const useFetch = (url) => {
             const data = err.response.data;
             setError(data.mssg || 'An error occurred');
             
-            // toast.error(data.mssg || 'An error occurred', {
-            //    position: "top-center",
-            //    autoClose: 3000,
-            //    hideProgressBar: true,
-            //    closeOnClick: true,
-            //    pauseOnHover: true,
-            //    draggable: true,
-            //    progress: undefined,
-            //    theme: "colored",
-            // });
-
             // Redirect if specified in the error response
             if (data.redirect) {
                navigate(data.redirect);

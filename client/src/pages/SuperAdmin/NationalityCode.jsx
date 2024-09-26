@@ -1,14 +1,11 @@
-import DateTime from "../../components/DateTime";
 import Searchbar from "../../components/Searchbar";
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
 import axios from "axios";
 import { useContext, useState } from 'react';
 import MasterTable from "../../components/MasterTable";
 import { MainContext } from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const NationalityCode = () => {
 
@@ -16,6 +13,7 @@ const NationalityCode = () => {
     const [nationality,setNationality] = useState('');
     const [nationalityCode,setNationalityCode] = useState('');
     const { role,currentUserId,searchQuery,setSearchQuery } = useContext(MainContext)
+    const { enqueueSnackbar } = useSnackbar();
 
     const columns = [
         {
@@ -33,37 +31,30 @@ const NationalityCode = () => {
     
 
     const updateNewNationality = async (id,updatedData) => {
-        console.log(updatedData);
         try {
             const newData = await axios.patch(`${baseUrl()}/nationality-code/${id}`,{ newNationality:updatedData.nationality,newNationalityCode:updatedData.nationalityCode,currentUserId,role });
-            toast.success(newData.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newData.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating nationality code', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
             
         }
     }        
@@ -71,22 +62,29 @@ const NationalityCode = () => {
     const deleteNationality = async (id) => {
         try {
             const removeNationality = await axios.delete(`${baseUrl()}/nationality-code/${id}`, { data: { role } });
-            toast.success(removeNationality.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(removeNationality.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting nationality code', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -94,22 +92,29 @@ const NationalityCode = () => {
         e.preventDefault();
         try {
             const newNationality = await axios.post(`${baseUrl()}/nationality-code`,{ nationality,nationalityCode,currentUserId,role });
-            toast.success(newNationality.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
+            enqueueSnackbar(newNationality.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding nationality code', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
+            });
         }
     }
 
@@ -153,7 +158,6 @@ const NationalityCode = () => {
                     />
                 </div>    
             </div> 
-            <ToastContainer />          
         </main>
     )
 }

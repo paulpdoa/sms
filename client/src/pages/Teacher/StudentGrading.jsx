@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useState, useContext } from 'react';
@@ -12,6 +10,7 @@ import MasterDataForm from '../../components/MasterDataForm';
 import { Link, useParams } from 'react-router-dom';
 import ViewStudentGrades from './StudentGrading/ViewStudentGrades';
 import ViewStudentSubjects from './StudentGrading/ViewStudentSubjects';
+import { useSnackbar } from 'notistack';
 
 
 const StudentGrading = () => {
@@ -27,6 +26,7 @@ const StudentGrading = () => {
     const { records: studentGrades } = useFetch(`${baseUrl()}/student-grades`);
 
     const { searchQuery,showForm,currentUserId,setShowForm, session, role, teacherSubjectSelected,setTeacherSubjectSelected } = useContext(MainContext);
+    const { enqueueSnackbar } = useSnackbar();
 
 
     const { records: teacherSubjects } = useFetch(`${baseUrl()}/teachers-subject/${currentUserId}`);
@@ -167,31 +167,28 @@ const StudentGrading = () => {
 
         try {
             const data = await axios.post(`${baseUrl()}/student-grade`,studentGradeData);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding student grade', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -260,31 +257,28 @@ const StudentGrading = () => {
 
         try {
             const data = await axios.patch(`${baseUrl()}/student-grade/${studentGradeId}`,studentGradeData);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating student grade', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -607,7 +601,6 @@ const StudentGrading = () => {
                     setShowForm={setShowForm}
                 />
             ) }
-            <ToastContainer />      
         </main>
     )
 }

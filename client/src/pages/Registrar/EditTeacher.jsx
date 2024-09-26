@@ -1,8 +1,6 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
@@ -36,10 +34,27 @@ const EditTeacher = () => {
     const [yearGraduated, setYearGraduated] = useState('');
     const [yearsOfExperience, setYearsOfExperience] = useState('');
     const [joiningDate, setJoiningDate] = useState('');
-    const [username, setUsername] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
-    const { session,currentUserId,genericPath } = useContext(MainContext);
+    const { session,currentUserId,genericPath, showError } = useContext(MainContext);
+
+    const [errors,setErrors] = useState({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        gender: '',
+        religion: '',
+        nationality: '',
+        placeOfBirth: '',
+        email: '',
+        contactNumber: '',
+        address: '',
+        education: '',
+        schoolGraduated: '',
+        yearGraduated: '',
+        yearsOfExperience: '',
+        joiningDate: ''
+    })
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -69,7 +84,6 @@ const EditTeacher = () => {
             setYearGraduated(records.yearGraduated);
             setYearsOfExperience(records.yearsOfExperience);
             setJoiningDate(records.joiningDate);
-            setUsername(records.username);
             setProfilePictureUrl(`${baseUrl()}${records?.profilePictureUrl}`);
         }
     }, [records]);
@@ -82,6 +96,24 @@ const EditTeacher = () => {
 
     const editTeacher = async (e) => {
         e.preventDefault();
+
+        // Validate all required fields
+        if (!firstName) return showError('firstName', 'First name cannot be empty', 'First name is a required field', setErrors);
+        if (!lastName) return showError('lastName', 'Last name cannot be empty', 'Last name is a required field', setErrors);
+        if (!dateOfBirth) return showError('dateOfBirth', 'Date of Birth cannot be empty', 'Date of Birth is a required field', setErrors);
+        if (!sex) return showError('sex', 'Gender cannot be empty', 'Gender is a required field', setErrors);
+        if (!religion) return showError('religion', 'Religion cannot be empty', 'Religion is a required field', setErrors);
+        if (!nationality) return showError('nationality', 'Nationality cannot be empty', 'Nationality is a required field', setErrors);
+        if (!placeOfBirth) return showError('placeOfBirth', 'Place of Birth cannot be empty', 'Place of Birth is a required field', setErrors);
+        if (!email) return showError('email', 'Email cannot be empty', 'Email is a required field', setErrors);
+        if (!contactNumber) return showError('contactNumber', 'Contact Number cannot be empty', 'Contact Number is a required field', setErrors);
+        if (!address) return showError('address', 'Address cannot be empty', 'Address is a required field', setErrors);
+        if (!education) return showError('education', 'Education cannot be empty', 'Education is a required field', setErrors);
+        if (!schoolGraduated) return showError('schoolGraduated', 'School Graduated cannot be empty', 'School Graduated is a required field', setErrors);
+        if (!yearGraduated) return showError('yearGraduated', 'Year Graduated cannot be empty', 'Year Graduated is a required field', setErrors);
+        if (!yearsOfExperience) return showError('yearsOfExperience', 'Years of Experience cannot be empty', 'Years of Experience is a required field', setErrors);
+        if (!joiningDate) return showError('joiningDate', 'Joining Date cannot be empty', 'Joining Date is a required field', setErrors);
+
         const formData = new FormData();
         formData.append('firstName', firstName);
         formData.append('lastName', lastName);
@@ -146,14 +178,14 @@ const EditTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mb-4">Basic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {renderInput("first-name", "First Name", firstName, setFirstName, "text")}
+                        {renderInput("firstName", "First Name", firstName, setFirstName, "text",errors)}
                         {renderInput("middle-name", "Middle Name", middleName, setMiddleName, "text")}
-                        {renderInput("last-name", "Last Name", lastName, setLastName, "text")}
-                        {renderInput("date-of-birth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date")}
-                        {renderInput("place-of-birth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text")}
+                        {renderInput("lastName", "Last Name", lastName, setLastName, "text",errors)}
+                        {renderInput("dateOfBirth", "Date of Birth", dateOfBirth, handleDateOfBirthChange, "date",errors)}
+                        {renderInput("placeOfBirth", "Place of Birth", placeOfBirth, setPlaceOfBirth, "text",errors)}
                         {renderInput("spouse-name", "Spouse Name", spouseName, setSpouseName, "text")}
                         {renderInput("spouse-cel", "Spouse Contact Number", spouseCel, setSpouseCel, "text")}
-                        {renderInput("address", "Address", address, setAddress, "text")}
+                        {renderInput("address", "Address", address, setAddress, "text",errors)}
                         
                         {/* For Gender Selection */}
                         <div className="mb-4">
@@ -161,14 +193,14 @@ const EditTeacher = () => {
                             <select
                                 value={sex}
                                 onChange={(e) => setSex(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                required
+                                className={`w-full px-3 py-2 border ${errors.sex ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-customView outline-none rounded-md`}
                             >
                                 <option value="" hidden>{`Select gender` ?? sex}</option>
                                 {genderSelections?.map((option) => (
                                     <option key={option._id} value={option.name}>{option.name}</option>
                                 ))}
                             </select>
+                            { errors.sex && <span className="text-red-500 text-xs">{errors.sex}</span> }
                         </div>
 
                         {/* For Nationality */}
@@ -177,14 +209,14 @@ const EditTeacher = () => {
                             <select
                                 value={nationality}
                                 onChange={(e) => setNationality(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                required
+                                className={`w-full px-3 py-2 border ${errors.nationality ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-customView outline-none rounded-md`}
                             >
                                 <option value={nationality || ''} hidden>{nationality ? nationalities?.find(natl => natl._id === nationality)?.nationality : `Select nationality`}</option>
                                 {nationalities?.map((option) => (
                                     <option key={option._id} value={option._id}>{option.nationality}</option>
                                 ))}
                             </select>
+                            { errors.nationality && <span className="text-red-500 text-xs">{errors.nationality}</span> }
                         </div>
 
                         {/* For Religions*/}
@@ -193,14 +225,14 @@ const EditTeacher = () => {
                             <select
                                 value={religion}
                                 onChange={(e) => setReligion(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                required
+                                className={`w-full px-3 py-2 border ${errors.religion ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-customView outline-none rounded-md`}
                             >
                                 <option value={religion || ''} hidden>{ religion ? religions?.find(rel => rel._id === religion)?.religion : 'Select religion'}</option>
                                 {religions?.map((option) => (
                                     <option key={option._id} value={option._id}>{option.religion}</option>
                                 ))}
                             </select>
+                            { errors.religion && <span className="text-red-500 text-xs">{errors.religion}</span> }
                         </div>
 
                     </div>
@@ -209,18 +241,18 @@ const EditTeacher = () => {
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Contact Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {renderInput("email", "Active Email", email, setEmail, "email")}
-                        {renderInput("contact-number", "Contact Number", contactNumber, setContactNumber, "text")}
+                        {renderInput("email", "Active Email", email, setEmail, "email",errors)}
+                        {renderInput("contactNumber", "Contact Number", contactNumber, setContactNumber, "text",errors)}
                     </div>
                 </section>
 
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl mt-6 mb-4">Academic Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderInput("education", "Education", education, setEducation, "text")}
-                        {renderInput("school-graduated", "School Graduated", schoolGraduated, setSchoolGraduated, "text")}
-                        {renderInput("year-graduated", "Year Graduated", yearGraduated, setYearGraduated, "text")}
-                        {renderInput("years-of-experience", "Years of Experience", yearsOfExperience, setYearsOfExperience, "number")}
+                        {renderInput("education", "Education", education, setEducation, "text",errors)}
+                        {renderInput("school-graduated", "School Graduated", schoolGraduated, setSchoolGraduated, "text",errors)}
+                        {renderInput("yearGraduated", "Year Graduated", yearGraduated, setYearGraduated, "text",errors)}
+                        {renderInput("yearsOfExperience", "Years of Experience", yearsOfExperience, setYearsOfExperience, "number",errors)}
                     </div>
                 </section>
 
@@ -255,15 +287,15 @@ const EditTeacher = () => {
                 </section>
 
                 <div className="flex items-center justify-end gap-2">
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white p-2 mt-6 rounded-md">Update Teacher</button>
-                    <button type="button" onClick={() => navigate(`/${genericPath}/teachers`)} className="bg-red-500 hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
+                    <button type="submit" className="bg-customView hover:bg-blue-600 text-white p-2 mt-6 rounded-md text-sm">Update Teacher</button>
+                    <button type="button" onClick={() => navigate(`/${genericPath}/teachers`)} className="bg-customCancel text-sm hover:bg-red-600 text-white p-2 mt-6 rounded-md">Cancel</button>
                 </div>
             </form>
         </main>
     );
 };
 
-const renderInput = (id, label, value, onChange, type) => (
+const renderInput = (id, label, value, onChange, type,errors={}) => (
     <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 mb-2">{label}</label>
         <input
@@ -271,8 +303,9 @@ const renderInput = (id, label, value, onChange, type) => (
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-        />
+            className={`w-full px-3 py-2 border ${errors[id] ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-customView outline-none rounded-md`}
+            />
+            {errors[id] && <span className="text-red-500 text-xs">{errors[id]}</span>}
     </div>
 );
 
@@ -283,8 +316,7 @@ const renderSelect = (id, label, value, onChange, options, optionLabel) => (
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
+            className={`w-full px-3 py-2 border ${errors[id] ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-customView outline-none rounded-md`}
         >
             <option value="" hidden>{`Select ${optionLabel}` ?? value}</option>
             {options?.map((option) => (

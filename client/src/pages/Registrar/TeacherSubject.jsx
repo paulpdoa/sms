@@ -1,5 +1,3 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../hooks/useFetch';
 import { baseUrl } from '../../baseUrl';
 import { useState, useContext } from 'react';
@@ -165,31 +163,29 @@ const TeacherSubject = () => {
         e.preventDefault();
         try {
             const data = await axios.post(`${baseUrl()}/assign-teacher-subject`,{ teacherId,subjectId,roomNumberId,startTime,endTime,inputter: currentUserId, sessionId: currentSession,role,daySchedule });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
 
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while assigning subjects to teacher', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -198,32 +194,28 @@ const TeacherSubject = () => {
 
         try {   
             const data = await axios.patch(`${baseUrl()}/edit-assigned-teacher-subject/${id}`,updatedData);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
-
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating assigned subject', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -232,31 +224,28 @@ const TeacherSubject = () => {
 
         try {
             const data = await axios.put(`${baseUrl()}/assigned-teacher-subject/${id}`,{ recordStatus: 'Deleted' });
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            },2000)
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while deleting assigned subject', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -280,7 +269,6 @@ const TeacherSubject = () => {
                     />
                 </div>
             </div>
-            <ToastContainer />          
         </main>
     )
 }

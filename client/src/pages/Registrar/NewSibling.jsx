@@ -1,26 +1,32 @@
 import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext'; 
+import { useSnackbar } from 'notistack';
 
 const NewSibling = () => {
     const navigate = useNavigate();
     const { records: students } = useFetch(`${baseUrl()}/students`);
+    const { enqueueSnackbar } = useSnackbar();
 
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [studentId, setStudentId] = useState('');
+    const [errors,setErrors] = useState({ firstName: '', lastName: '', email: '', studentId: '' })
 
-    const { currentUserId, session,genericPath } = useContext(MainContext);
+    const { currentUserId, session,genericPath, showError } = useContext(MainContext);
 
     const addSibling = async (e) => {
         e.preventDefault();
+
+        if(!firstName) return showError('firstName', 'First name cannot be empty','First name is a required field',setErrors);
+        if(!lastName) return showError('lastName','Last name cannot be empty','Last name is a required field',setErrors);
+        if(!email) return showError('email','Email cannot be empty', 'Email is a required field', setErrors);
+        if(!studentId) return showError('studentId', 'Student sibling cannot be empty', 'Student sibling is a required field',setErrors);
 
         const siblingInformation = {
             firstName,
@@ -35,32 +41,29 @@ const NewSibling = () => {
         try {
            if(studentId !== '') {
             const data = await axios.post(`${baseUrl()}/sibling`, siblingInformation);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    navigate(`/${genericPath}/siblings`)
+                }
             });
-
-            setTimeout(() => {
-                navigate(`/${genericPath}/siblings`)
-            }, 2000);
            }
         } catch (err) {
             console.error(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while adding sibling record', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -76,35 +79,35 @@ const NewSibling = () => {
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="firstName">First Name</label>
                             <input
-                                className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+                                className={`outline-none p-2 rounded-md border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500`}
                                 type="text"
                                 id="firstName"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                required
                             />
+                            { errors.firstName && <span className="text-red-500 text-xs">{errors.firstName}</span> }
                         </div>
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="middleName">Middle Name</label>
                             <input
-                                className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+                                className={`outline-none p-2 rounded-md border border-gray-300 focus:border-blue-500`}
                                 type="text"
                                 id="middleName"
                                 value={middleName}
                                 onChange={(e) => setMiddleName(e.target.value)}
-                                required
                             />
                         </div>
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="lastName">Last Name</label>
                             <input
-                                className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+                                className={`outline-none p-2 rounded-md border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500`}
                                 type="text"
                                 id="lastName"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                required
                             />
+                            { errors.lastName && <span className="text-red-500 text-xs">{errors.lastName}</span> }
+
                         </div>
                     </div>
                 </section>
@@ -115,22 +118,22 @@ const NewSibling = () => {
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="email">Active Email</label>
                             <input
-                                className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+                                className={`outline-none p-2 rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500`}
                                 type="email"
                                 id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                required
                             />
+                            { errors.email && <span className="text-red-500 text-xs">{errors.email}</span> }
+
                         </div>
                         <div className="flex flex-col">
                             <label className="text-sm font-medium mb-1" htmlFor="student">Student Sibling</label>
                             <select
-                                className="outline-none p-2 rounded-md border border-gray-300 focus:border-green-500"
+                                className={`outline-none p-2 rounded-md border ${errors.studentId ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500`}
                                 id="student"
                                 value={studentId}
                                 onChange={(e) => setStudentId(e.target.value)}
-                                required
                             >
                                 <option value="" hidden>Select sibling</option>
                                 {students?.map(student => (
@@ -139,18 +142,18 @@ const NewSibling = () => {
                                     </option>
                                 ))}
                             </select>
+                            { errors.studentId && <span className="text-red-500 text-xs">{errors.studentId}</span> } 
                         </div>
                     </div>
                 </section>
 
-                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
+                <button className="bg-customView text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300">
                     Submit
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md">
+                <button type="button" onClick={() => navigate(`/${genericPath}/siblings`)} className="bg-red-500 hover:bg-red-600 text-white ml-2 text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

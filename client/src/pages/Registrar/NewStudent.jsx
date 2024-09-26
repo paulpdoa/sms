@@ -1,8 +1,6 @@
 import { useState,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { genders as genderSelections } from '../../data/genders.json';
@@ -219,13 +217,12 @@ const NewStudent = () => {
                     Submit
                 </button>
                 <button type="button" onClick={() => {
-                    navigate(-1)
+                    navigate(`/${genericPath}/students`)
                     localStorage.removeItem('isStudentSignup')
                 }} className="bg-red-500 text-white ml-2 text-sm p-3 mt-6 rounded-md">
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

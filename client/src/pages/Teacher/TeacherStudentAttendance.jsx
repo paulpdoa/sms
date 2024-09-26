@@ -5,8 +5,6 @@ import { MainContext } from '../../helpers/MainContext';
 import MasterTable from '../../components/MasterTable';
 import TabActions from "../../components/TabActions";
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const TeacherStudentAttendance = () => {
     const { currentUserId, searchQuery, session, role, teacherSubjectSelected, setTeacherSubjectSelected, teacherSectionSelected, setTeacherSectionSelected } = useContext(MainContext);
@@ -114,8 +112,6 @@ const TeacherStudentAttendance = () => {
             role,
         };
 
-        console.log(attendanceInformation);
-
         if (!remarks || !currentDate) {
             setError({
                 remarks: remarks ? '' : 'Remarks cannot be empty',
@@ -135,22 +131,27 @@ const TeacherStudentAttendance = () => {
             const method = action === 'add' ? 'post' : 'patch';
             const { data } = await axios[method](url, attendanceInformation);
 
-            toast.success(data.mssg, {
-                position: 'top-center',
-                autoClose: 2000,
-                hideProgressBar: true,
-                theme: 'colored',
+            enqueueSnackbar(data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (err) {
-            toast.error(err.response?.data?.mssg, {
-                position: 'top-center',
-                autoClose: 3000,
-                hideProgressBar: true,
-                theme: 'colored',
+            enqueueSnackbar(err.response.data.mssg, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -291,7 +292,6 @@ const TeacherStudentAttendance = () => {
                     </div>
                 </div>
             )}
-            <ToastContainer />
         </main>
     );
 };

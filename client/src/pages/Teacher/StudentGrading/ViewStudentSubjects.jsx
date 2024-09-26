@@ -88,15 +88,14 @@ const ViewStudentSubjects = ({ role,student,setStudent,setShowStudentSubject,set
                                 setShowForm(true);
                                 setShowStudentSubject(false);
                             } else {
-                                toast.error('Your current role is not allowed to perform this action', {
-                                    position: "top-center",
-                                    autoClose: 3000,
-                                    hideProgressBar: true,
-                                    closeOnClick: true,
-                                    pauseOnHover: true,
-                                    draggable: true,
-                                    progress: undefined,
-                                    theme: "colored"
+                                enqueueSnackbar('Your current role is not allowed to perform this action', {
+                                    variant: 'error',
+                                    anchorOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'center',
+                                    },
+                                    autoHideDuration: 3000,
+                                    preventDuplicate: true
                                 });
                             }
                         }} className={`${role !== 'Teacher' ? 'cursor-not-allowed' : 'cursor-pointer'} text-sm bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-gray-100 mt-3`}>

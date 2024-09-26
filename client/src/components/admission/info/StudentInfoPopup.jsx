@@ -1,6 +1,4 @@
 import { useState,useContext } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from '../../../hooks/useFetch';
 import { baseUrl } from '../../../baseUrl';
 import axios from 'axios';
@@ -69,30 +67,28 @@ const StudentInfoPopup = ({ id, closeModal }) => {
 
         try {
             const data = await axios.patch(`${baseUrl()}/student/info/${id?._id}`,studentInfo);
-            toast.success(data.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(data.data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
+                    window.location.reload();
+                }
             });
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch(err) {
             console.log(err);
-            toast.error(err.response.data.mssg, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating student information', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     }
@@ -274,14 +270,13 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                     <button onClick={!isYearDone && submitInfo} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-opacity-50`}>
                         Submit
                     </button>
-                    <button className="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onClick={() => closeModal(false)}>
+                    <button className="px-6 py-3 bg-customCancel text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onClick={() => closeModal(false)}>
                         Close
                     </button>
                     
                 </div>
                    
             </div>
-            <ToastContainer />
         </div>
     );
 }

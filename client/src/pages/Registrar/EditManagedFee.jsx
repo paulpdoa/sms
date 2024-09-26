@@ -1,11 +1,10 @@
 import { useState, useEffect,useContext } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../../baseUrl';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext} from '../../helpers/MainContext';
+import { useSnackbar } from 'notistack';
 
 const EditManageFee = () => {
     const { id } = useParams();
@@ -16,7 +15,8 @@ const EditManageFee = () => {
     const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { records: nationalityCodes } = useFetch(`${baseUrl()}/nationality-codes`);
     const { records: manageFee } = useFetch(`${baseUrl()}/manage-fee/${id}`);
-    
+    const { enqueueSnackbar } = useSnackbar();
+
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -56,32 +56,29 @@ const EditManageFee = () => {
         try {
             const { data } = await axios.patch(`${baseUrl()}/manage-fee/${id}`, feeInformation);
             setIsLoading(false);
-            toast.success(data.mssg, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                onClose: setTimeout(() => {
+            enqueueSnackbar(data.mssg, {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 2000,
+                preventDuplicate: true,
+                onClose: () => {
                     navigate(`/${genericPath}/manage-fees`)
-                }, 2000)            
+                }
             });
-            
         } catch (err) {
             console.log(err);
             setIsLoading(false);
-            toast.error("Error updating fee. Please try again.", {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored"
+            enqueueSnackbar(err.response.data.mssg || 'An error occurred while updating managed fee', {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                },
+                autoHideDuration: 3000,
+                preventDuplicate: true
             });
         }
     };
@@ -118,14 +115,13 @@ const EditManageFee = () => {
                     </div>
                 </section>
 
-                <button className="bg-blue-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300" disabled={isLoading}>
+                <button className="bg-customView text-white text-sm p-3 mt-5 rounded-md hover:bg-blue-600 transition duration-300" disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Submit'}
                 </button>
-                <button type="button" onClick={() => navigate(-1)} className="ml-2 bg-red-500 text-white text-sm p-3 mt-5 rounded-md hover:bg-red-600 transition duration-300" disabled={isLoading}>
+                <button type="button" onClick={() => navigate(`/${genericPath}/manage-fees`)} className="ml-2 bg-customCancel text-white text-sm p-3 mt-5 rounded-md hover:bg-red-600 transition duration-300" disabled={isLoading}>
                     Cancel
                 </button>
             </form>
-            <ToastContainer />
         </main>
     );
 };

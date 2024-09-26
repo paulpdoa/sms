@@ -1,13 +1,7 @@
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useFetch } from "../../hooks/useFetch";
 import { baseUrl } from "../../baseUrl";
-import axios from "axios";
-import { useContext, useState, useEffect } from 'react';
-import MasterTable from "../../components/MasterTable";
+import { useContext } from 'react';
 import { MainContext } from '../../helpers/MainContext';
-import TabActions from '../../components/TabActions';
-import MasterDataForm from "../../components/MasterDataForm";
 import { useNavigate } from 'react-router-dom';
 
 const TeacherDashboard = () => {
