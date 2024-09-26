@@ -1,5 +1,3 @@
-import AddStudentBtn from "../components/buttons/AddStudentBtn";
-import Searchbar from "../components/Searchbar";
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";

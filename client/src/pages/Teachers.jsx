@@ -1,6 +1,4 @@
 import { useContext } from 'react';
-import AddTeacherBtn from "../components/buttons/AddTeacherBtn";
-import Searchbar from "../components/Searchbar";
 import { useFetch } from "../hooks/useFetch";
 import { baseUrl } from "../baseUrl";
 import axios from "axios";
