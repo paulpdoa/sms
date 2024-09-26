@@ -238,7 +238,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                         }
                                                                     </option>
                                                                     {column.selectOptions.map((option,key) => (
-                                                                        <>
+                                                                        <>  
                                                                             <option key={key} value={option.value}>{option.label}</option>
                                                                         </>
                                                                     ))}

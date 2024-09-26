@@ -221,7 +221,6 @@ const Section = () => {
                 {gradeLevels?.map(gradeLevel => (
                     <option key={gradeLevel._id} value={gradeLevel._id}>{gradeLevel.gradeLevel}</option>
                 ))}
-                <option value="">Leave as blank</option>
             </select>
             { error.gradeLevel && <span className="text-xs text-red-500">{error.gradeLevel}</span> }
         </div>
@@ -234,7 +233,6 @@ const Section = () => {
                 {teachers?.map(teacher => (
                     <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
                 ))}
-                <option value="">Leave as blank</option>
             </select>
             { error.adviser && <span className="text-xs text-red-500">{error.adviser}</span> }
         </div>

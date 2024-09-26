@@ -30,7 +30,7 @@ const AddNewData = ({ label, onShow,redirect }) => {
     return (
         <>
             {isFreshYear && isSchoolYearPage && renderButton(false, label)}
-            {!isYearDone && isFreshYear === null && !isSchoolYearPage && renderButton(isYearDone, label)}
+            {!isYearDone && isFreshYear === null && !isSchoolYearPage && renderButton(isYearDone, label === 'Manage Fees' ? 'Fees' : label)}
         </>
     );
 };
