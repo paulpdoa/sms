@@ -28,6 +28,7 @@ const ManageFees = () => {
             accessorKey: 'strand.strand',
             header: 'Strand',
         },
+        { accessorKey: 'nationality', header: 'Nationality'  },
         {
             accessorKey: 'feeCode.feeCode',
             header: 'Fee Code',

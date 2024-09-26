@@ -863,6 +863,7 @@ module.exports.get_manage_fee_detail = async(req,res) => {
 
 module.exports.add_manage_fees = async (req,res) => {
     let { sessionId, gradeLevelIds, strandId, feeDescription, amount, isApplied,nationality,inputter } = req.body;
+    console.log('Request body: ',req.body);
 
     // Fee Code > fee code + grade level + nationality Code
     // Fee description > fee description + grade level + nationality Code
@@ -871,20 +872,56 @@ module.exports.add_manage_fees = async (req,res) => {
         strandId = undefined
     }
 
+    // gradeLevelIds = Array
+    // strandId = Array
+    // nationality = Array
+
     // Add both foreign and local in this function
 
     try {
-        for(let i = 0; i < gradeLevelIds.length; i++) {
-            const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
 
-            if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,strandId,feeDescription,amount,isApplied, inputter,recordStatus: 'Live'});
-            } else {
-                await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],nationality,feeDescription,amount,isApplied, inputter, recordStatus: 'Live' });
+        for(const natl of nationality) { // Loop through this
+            for(const gradeLevel of gradeLevelIds) {
+                console.log('Grade Level',gradeLevel);
+                const checkGradeLevel = await GradeLevel.findById(gradeLevel);
+                if(checkGradeLevel?.gradeLevel.includes(11) || checkGradeLevel?.gradeLevel.includes(12)) {
+                    for(const strand of strandId) {
+                        await ManageFee.create({ sessionId,gradeLevelId:gradeLevel,nationality: natl,strandId: strand,feeDescription,amount,isApplied, inputter,recordStatus: 'Live'});
+                    }
+                } else {
+                    await ManageFee.create({ sessionId,gradeLevelId:gradeLevel,nationality: natl,feeDescription,amount,isApplied, inputter, recordStatus: 'Live' });
+                }
+    
             }
+            // for(const strand of strandId) {
+            //     for(const gradeLevel of gradeLevelIds) {
+            //         console.log('Grade Level',gradeLevel);
+            //         const checkGradeLevel = await GradeLevel.findById(gradeLevel);
+            //         if(checkGradeLevel?.gradeLevel.includes(11) || checkGradeLevel?.gradeLevel.includes(12)) {
+            //             await ManageFee.create({ sessionId,gradeLevelId:gradeLevel,nationality: natl,strandId: strand,feeDescription,amount,isApplied, inputter,recordStatus: 'Live'});
+            //         } else {
+            //             await ManageFee.create({ sessionId,gradeLevelId:gradeLevel,nationality: natl,feeDescription,amount,isApplied, inputter, recordStatus: 'Live' });
+            //         }
+        
+            //     }
+            // }
 
+            // for(let i = 0; i < gradeLevelIds.length; i++) {
+            //     const checkGradeLevel = await GradeLevel.findById(gradeLevelIds[i]);
+    
+            //     if(checkGradeLevel.gradeLevel.includes(11) || checkGradeLevel.gradeLevel.includes(12)) {
+            //         await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],natl,strandId,feeDescription,amount,isApplied, inputter,recordStatus: 'Live'});
+            //     } else {
+            //         await ManageFee.create({ sessionId,gradeLevelId:gradeLevelIds[i],natl,feeDescription,amount,isApplied, inputter, recordStatus: 'Live' });
+            //     }
+    
+            // }
         }
-        res.status(200).json({mssg: 'Fees has been added to the record'});
+
+        
+
+        
+        res.status(200).json({mssg: 'Fees has been added to the record successfully'});
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error has occurred while creating fees' });
