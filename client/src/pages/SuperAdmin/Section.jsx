@@ -230,8 +230,8 @@ const Section = () => {
                 onChange={(e) => setAdviser(e.target.value)}
             >
                 <option hidden>Select adviser</option>
-                {teachers?.map(teacher => (
-                    <option key={teacher._id} value={teacher._id}>{teacher.firstName} {teacher.middleName} {teacher.lastName}</option>
+                {teachers?.sort((a, b) => a.lastName.localeCompare(b.lastName))?.map(teacher => (
+                    <option key={teacher._id} value={teacher._id}>{teacher.lastName}, {teacher.firstName} {teacher.middleName}</option>
                 ))}
             </select>
             { error.adviser && <span className="text-xs text-red-500">{error.adviser}</span> }

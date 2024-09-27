@@ -6,6 +6,7 @@ import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
 import ViewChildModal from '../../components/parent/ViewChildModal';
+import Dropdown from 'react-dropdown-select';
 
 const EditParent = () => {
     const navigate = useNavigate();
@@ -38,6 +39,12 @@ const EditParent = () => {
     const [resignedDate,setResignedDate] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
     const [profilePictureUrl,setProfilePictureUrl] = useState('');
+
+    // To be used in dropdown
+    const studentOptions = students?.map(student => ({
+        ...student,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}` // Combine the name fields
+    })).sort((a,b) => a.lastName.localeCompare(b.lastName)) || [];
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -210,13 +217,13 @@ const EditParent = () => {
             <form onSubmit={editParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
                 <div className="flex items-center justify-between">
                     <h1 className="font-bold text-start text-gray-700 text-3xl">Edit Parent</h1>
-                    <button 
+                    {/* <button 
                         onClick={() => setViewChildModal(true)}
                         type="button" 
                         className="bg-customView hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm"
                     >
                         View Child Added
-                    </button>
+                    </button> */}
                 </div>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
@@ -286,10 +293,26 @@ const EditParent = () => {
                         </div>
                     </div>
                 </section>
-
+            {/* {
+                console.log(addedChildren)
+            } */}
                 <section>
-                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
-                    {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
+                    <h2 className="text-gray-700 font-bold text-xl">Children:</h2>
+                    <Dropdown
+                        onChange={(selectedItems) => {
+                            setAddedChildren(selectedItems);  // Store the array of selected student objects
+                        }} 
+                        options={studentOptions}
+                        labelField="fullName"
+                        valueField="_id"
+                        multi={true}
+                        searchable={true}
+                        searchBy="firstName"  // Search by first name
+                        selectAll={true}
+                        placeholder="Select children"
+                        values={studentOptions.filter(student => addedChildren.some(child => child._id === student._id))}  // Sync selected values with options                    
+                    />
+                    {/* {renderSelect('student', 'Student Name', studentId, setStudentId, students, 'Select student')}
                     { studentId && (
                         <button 
                             type="button"
@@ -298,7 +321,7 @@ const EditParent = () => {
                         >
                             Add as child
                         </button>
-                    ) }
+                    ) } */}
                 </section>
 
                 <section>
@@ -328,13 +351,13 @@ const EditParent = () => {
                     Cancel
                 </button>
             </form>
-            { viewChildModal && (
+            {/* { viewChildModal && (
                 <ViewChildModal
                     addedChildren={addedChildren}
                     onClose={setViewChildModal}
                     setAddedChildren={setAddedChildren}
                 />
-            ) }
+            ) } */}
         </main>
     );
 };

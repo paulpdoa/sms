@@ -155,6 +155,9 @@ const Subjects = () => {
                     valueField="_id"
                     multi={true}
                     placeholder="Select Grade levels"
+                    searchable={true}
+                    searchBy='gradeLevel'
+                    selectAll={true}
                 />
                 {/* <select className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setGradeLevelId(e.target.value)}>
                     <option hidden>Choose grade level</option>

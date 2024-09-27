@@ -45,7 +45,6 @@ const Select = ({ label, name, value, options, onChange,errors }) => (
             ) : (
                 <option disabled>Loading...</option>
             )}
-            <option value="">N/A</option>
         </select>
         { errors[name] && <span className="text-red-500 text-xs">{errors[name]}</span> }
     </div>

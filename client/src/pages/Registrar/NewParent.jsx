@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
-import ViewChildModal from '../../components/parent/ViewChildModal';
 import Dropdown from 'react-dropdown-select';
 
 const NewParent = () => {
@@ -55,8 +54,6 @@ const NewParent = () => {
     // For storage of child added
     const [addedChildren,setAddedChildren] = useState([]);
     const [viewChildModal,setViewChildModal] = useState(false);
-
-    console.log(addedChildren)
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -196,13 +193,13 @@ const NewParent = () => {
             <form onSubmit={addParent} className="space-y-8 bg-gray-100 shadow-md p-6 rounded-md">
                 <div className="flex items-center justify-between">
                     <h1 className="font-bold text-start text-gray-700 text-3xl">Add New Parent</h1>
-                    <button 
+                    {/* <button 
                         onClick={() => setViewChildModal(true)}
                         type="button" 
                         className="bg-blue-500 hover:bg-blue-600 rounded-md text-gray-100 p-2 text-sm"
                     >
                         View Child Added
-                    </button>
+                    </button> */}
                 </div>
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">Mother's Information</h2>
@@ -411,6 +408,7 @@ const NewParent = () => {
                             searchable={true}
                             searchBy='fullName'
                             selectAll={true}
+                            placeholder='Select children'
                         />
                         {/* <select
                             value={studentId}
@@ -427,7 +425,7 @@ const NewParent = () => {
                         </select> */}
                     </div>
 
-                    { studentId && (
+                    {/* { studentId && (
                         <button 
                             type="button"
                             onClick={handleAddingChild}
@@ -435,7 +433,7 @@ const NewParent = () => {
                         >
                             Add as child
                         </button>
-                    ) }
+                    ) } */}
                 </section>
 
                 {/* Grid for child */}
