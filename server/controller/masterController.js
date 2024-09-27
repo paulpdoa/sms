@@ -914,7 +914,13 @@ module.exports.add_subject = async(req,res) => {
             return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
         } 
 
-        await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
+        // Loop through the array of grade level id's because of a subject name and a subject code can be same with different grade levels
+        for(const gradeLevel of gradeLevelId) {
+            console.log('Creating subjects', gradeLevel)    ;
+            await Subject.create({ subjectName, subjectCode, gradeLevelId: gradeLevel, inputter, recordStatus: 'Live', sessionId });
+        }
+
+        // await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
         res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
     } catch(err) {
         console.log(err);

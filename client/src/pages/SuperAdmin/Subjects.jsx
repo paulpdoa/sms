@@ -7,12 +7,13 @@ import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 import { useSnackbar } from 'notistack';
+import Dropdown from 'react-dropdown-select';
 
 const Subjects = () => {
 
     const [subjectName,setSubjectName] = useState('');
     const [subjectCode,setSubjectCode] = useState('');
-    const [gradeLevelId,setGradeLevelId] = useState('');
+    const [gradeLevelId,setGradeLevelId] = useState([]);
     const [errors,setErrors] = useState({ subjectName: '', subjectCode: '', gradeLevelId: '' });
 
     const { records: subjects,isLoading } = useFetch(`${baseUrl()}/subjects`);
@@ -27,7 +28,7 @@ const Subjects = () => {
 
         if(!subjectName) return showError('subjectName','Subject name cannot be empty','Subject name is a required field',setErrors)
         if(!subjectCode) return showError('subjectCode','Subject code cannot be empty', 'Subject code is a required field', setErrors)
-        if(!gradeLevelId) return showError('gradeLevelId', 'Grade level cannot be empty', 'Grade level is a required field', setErrors);
+        if(gradeLevelId.length < 1) return showError('gradeLevelId', 'Grade level cannot be empty', 'Grade level is a required field', setErrors);
 
         try {   
             const data = await axios.post(`${baseUrl()}/subject`,{subjectName,subjectCode,gradeLevelId,sessionId: session, inputter:currentUserId});
@@ -58,7 +59,6 @@ const Subjects = () => {
     }
 
     const updateSubject = async (id, updatedData) => {
-        console.log(updatedData);
 
         try {   
             const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,inputter: currentUserId,sessionId:session });
@@ -143,13 +143,26 @@ const Subjects = () => {
 
             <div className="flex flex-col mt-1">
                 <label className="text-sm" htmlFor="grade level">Grade Level</label>
-                <select className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setGradeLevelId(e.target.value)}>
+                <Dropdown
+                    className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} 
+                    options={gradeLevels}
+                    onChange={(selectedItems) => {
+                        const ids = selectedItems.map(item => item._id);  // Extract only the IDs
+                        setGradeLevelId(ids);
+                    }}
+                    values={gradeLevels?.filter(gradeLevel => gradeLevelId.includes(gradeLevel._id))}
+                    labelField='gradeLevel'
+                    valueField="_id"
+                    multi={true}
+                    placeholder="Select Grade levels"
+                />
+                {/* <select className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setGradeLevelId(e.target.value)}>
                     <option hidden>Choose grade level</option>
                     { gradeLevels?.map(gl => (
                         <option key={gl._id} value={gl._id}>{gl.gradeLevel}</option>
                     )) }
                     <option value="">N/A</option>
-                </select>
+                </select> */}
                 { errors.gradeLevelId && <span className="text-red-500 text-xs">{errors.gradeLevelId}</span> }
             </div>
         </div>
