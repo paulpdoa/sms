@@ -916,7 +916,7 @@ module.exports.add_subject = async(req,res) => {
 
         // Loop through the array of grade level id's because of a subject name and a subject code can be same with different grade levels
         for(const gradeLevel of gradeLevelId) {
-            console.log('Creating subjects', gradeLevel)    ;
+            console.log('Creating subjects', gradeLevel);
             await Subject.create({ subjectName, subjectCode, gradeLevelId: gradeLevel, inputter, recordStatus: 'Live', sessionId });
         }
 

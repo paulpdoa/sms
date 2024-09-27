@@ -387,7 +387,7 @@ const NewParent = () => {
                 </section>
 
                 <section>
-                    <h2 className="text-gray-700 font-bold text-xl">Parent Of:</h2>
+                    <h2 className="text-gray-700 font-bold text-xl">Children:</h2>
                     <div className="flex flex-col mt-4">
                         <label className="text-sm" htmlFor="student">Student Name</label>
                         <select
