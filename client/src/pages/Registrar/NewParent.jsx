@@ -6,6 +6,7 @@ import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
 import ViewChildModal from '../../components/parent/ViewChildModal';
+import Dropdown from 'react-dropdown-select';
 
 const NewParent = () => {
     // Fetch records for religions, genders, students, and nationalities
@@ -18,6 +19,12 @@ const NewParent = () => {
     const { enqueueSnackbar } = useSnackbar();
 
     const navigate = useNavigate();
+
+    // To be used in dropdown
+    const studentOptions = students?.map(student => ({
+        ...student,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}` // Combine the name fields
+    })).sort((a,b) => a.lastName.localeCompare(b.lastName)) || [];
 
     // Define state variables for form fields
     const [motherName, setMotherName] = useState('');
@@ -48,6 +55,8 @@ const NewParent = () => {
     // For storage of child added
     const [addedChildren,setAddedChildren] = useState([]);
     const [viewChildModal,setViewChildModal] = useState(false);
+
+    console.log(addedChildren)
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -390,7 +399,20 @@ const NewParent = () => {
                     <h2 className="text-gray-700 font-bold text-xl">Children:</h2>
                     <div className="flex flex-col mt-4">
                         <label className="text-sm" htmlFor="student">Student Name</label>
-                        <select
+                        <Dropdown
+                             onChange={(selectedItems) => {
+                                const ids = selectedItems.map(item => item._id);  // Extract only the IDs
+                                setAddedChildren(selectedItems);  // Store the array of IDs
+                            }} 
+                            options={studentOptions}
+                            labelField="fullName"
+                            valueField='_id'
+                            multi={true}
+                            searchable={true}
+                            searchBy='fullName'
+                            selectAll={true}
+                        />
+                        {/* <select
                             value={studentId}
                             className="outline-none p-2 rounded-md border border-gray-300"
                             id="student"
@@ -402,7 +424,7 @@ const NewParent = () => {
                                     {student.firstName} {student.middleName} {student.lastName}
                                 </option>
                             ))}
-                        </select>
+                        </select> */}
                     </div>
 
                     { studentId && (
@@ -415,6 +437,11 @@ const NewParent = () => {
                         </button>
                     ) }
                 </section>
+
+                {/* Grid for child */}
+                <div>
+
+                </div>
 
                 <section>
                     <h2 className="text-gray-700 font-bold text-xl">User Information:</h2>
@@ -478,13 +505,13 @@ const NewParent = () => {
                 </button>
             </form>
 
-            { viewChildModal && (
+            {/* { viewChildModal && (
                 <ViewChildModal
                     setAddedChildren={setAddedChildren}
                     addedChildren={addedChildren}
                     onClose={setViewChildModal}
                 />
-            ) }
+            ) } */}
         </main>
     )
 }
