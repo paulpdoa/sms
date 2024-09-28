@@ -874,7 +874,7 @@ module.exports.get_live_subjects = async(req,res) => {
     const { session } = req.query;
 
     try {  
-        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Live' }).populate('gradeLevelId inputter sessionId');
+        const subjects = await Subject.find({ sessionId: session, recordStatus: 'Live' }).populate('gradeLevelId inputter sessionId strandId');
         res.status(200).json(subjects);
     } catch(err) {
         console.log(err);
@@ -896,37 +896,109 @@ module.exports.get_deleted_subjects = async (req,res) => {
     }
 }
 
-module.exports.add_subject = async(req,res) => {
-    const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
+// module.exports.add_subject = async(req,res) => {
+//     const { subjectName,subjectCode,gradeLevelId,sessionId, inputter,strandId } = req.body;
 
-    if(subjectName === '' || subjectCode === '') {
+//     if(subjectName === '' || subjectCode === '') {
+//         return res.status(400).json({ mssg: `Subject name or subject code cannot be blank` });
+//     }
+
+//     try {
+
+//         const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
+//         if(subjectNameExist) {
+//             return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
+//         }
+
+//         const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
+//         if(subjectCodeExist) {
+//             return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
+//         } 
+
+//         // Loop through the array of grade level id's because of a subject name and a subject code can be same with different grade levels
+//         for(const gradeLevel of gradeLevelId) {
+//             console.log('Creating subjects', gradeLevel);
+
+//             if(strandId.length > 0) {
+//                 for(const strand of strandId) {
+//                     const currentStrand = await Strand.findById(strand);
+
+//                     await Subject.create({ subjectName, subjectCode: `${subjectCode}-${currentStrand.strand}`, gradeLevelId: gradeLevel, inputter, recordStatus: 'Live', sessionId, strandId: strand });
+//                 }
+//             } else {
+//                 await Subject.create({ subjectName, subjectCode, gradeLevelId: gradeLevel, inputter, recordStatus: 'Live', sessionId });
+//             }
+//         }
+
+//         // await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
+//         res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).json({mssg:'An error occurred while adding subject record'});
+//     }
+// }
+
+module.exports.add_subject = async (req, res) => {
+    const { subjectName, subjectCode, gradeLevelId, sessionId, inputter, strandId } = req.body;
+
+    if (subjectName === '' || subjectCode === '') {
         return res.status(400).json({ mssg: `Subject name or subject code cannot be blank` });
     }
 
     try {
+        // Check if the subjectName already exists for the same session and is "Live"
         const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
-        if(subjectNameExist) {
+        if (subjectNameExist) {
             return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
         }
 
+        // Check if the subjectCode already exists for the same session and is "Live"
         const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
-        if(subjectCodeExist) {
+        if (subjectCodeExist) {
             return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
-        } 
-
-        // Loop through the array of grade level id's because of a subject name and a subject code can be same with different grade levels
-        for(const gradeLevel of gradeLevelId) {
-            console.log('Creating subjects', gradeLevel);
-            await Subject.create({ subjectName, subjectCode, gradeLevelId: gradeLevel, inputter, recordStatus: 'Live', sessionId });
         }
 
-        // await Subject.create({ subjectName,subjectCode, gradeLevelId,sessionId,inputter,recordStatus});
+        // Loop through the array of grade level IDs since a subject name and code can be the same across different grade levels
+        for (const gradeLevel of gradeLevelId) {
+            console.log('Creating subject for grade level:', gradeLevel);
+
+            // Check if the grade level is 11 or 12 to allow adding strand information
+            const currentGradeLevel = await GradeLevel.findById(gradeLevel); // Assuming you have a GradeLevel model
+            if (currentGradeLevel.gradeLevel.includes(12) || currentGradeLevel.gradeLevel.includes(11)) {
+                // Grade 11 or 12: process strandId if provided
+                console.log(currentGradeLevel.gradeLevel);
+                for (const strand of strandId) {
+                    const currentStrand = await Strand.findById(strand);
+                    await Subject.create({
+                        subjectName,
+                        subjectCode: `${subjectCode}-${currentStrand.strand}`, // Append strand name to subject code
+                        gradeLevelId: gradeLevel,
+                        inputter,
+                        recordStatus: 'Live',
+                        sessionId,
+                        strandId: strand
+                    });
+                }
+            } else {
+                // Create subject without strand
+                await Subject.create({
+                    subjectName,
+                    subjectCode,
+                    gradeLevelId: gradeLevel,
+                    inputter,
+                    recordStatus: 'Live',
+                    sessionId
+                });
+            }
+        }
+
         res.status(200).json({ mssg: `${subjectName} has been added to subjects successfully` });
-    } catch(err) {
+    } catch (err) {
         console.log(err);
-        res.status(500).json({mssg:'An error occurred while adding subject record'});
+        res.status(500).json({ mssg: 'An error occurred while adding subject record' });
     }
-}
+};
+
 
 module.exports.get_live_subject_detail = async (req,res) => {
     
@@ -942,39 +1014,103 @@ module.exports.get_live_subject_detail = async (req,res) => {
     }
 }
 
-module.exports.edit_live_subject = async(req,res) => {
+// module.exports.edit_live_subject = async(req,res) => {
 
+//     const { id } = req.params;
+//     const { subjectName,subjectCode,gradeLevelId,sessionId, inputter,strandId } = req.body;
+//     try {
+
+//         const existingSubject = await Subject.findOne({ _id: id, recordStatus: 'Live', sessionId });
+//         if(!existingSubject) {
+//             return res.status(404).json({ mssg: 'Subject is not existing' });
+//         }
+
+//         if(subjectName !== existingSubject.subjectName) {
+//             const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
+//             if(subjectNameExist) {
+//                 return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
+//             }
+//         }
+
+//         if(subjectCode !== existingSubject.subjectCode) {
+//             const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
+//             if(subjectCodeExist) {
+//                 return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
+//             } 
+//         }
+
+//         await Subject.findByIdAndUpdate(id,{ subjectName,subjectCode,gradeLevelId,sessionId,inputter, strandId });
+//         res.status(200).json({ mssg: `${subjectName} has been updated successfully`});
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).json({ mssg: 'An error occurred while updating subject information'});
+//     }
+// }
+module.exports.edit_live_subject = async (req, res) => {
     const { id } = req.params;
-    const { subjectName,subjectCode,gradeLevelId,sessionId, inputter } = req.body;
-    console.log(req.body)
-    try {
+    const { subjectName, subjectCode, gradeLevelId, sessionId, inputter, strandId } = req.body;
 
+    try {
+        // Check if the subject exists
         const existingSubject = await Subject.findOne({ _id: id, recordStatus: 'Live', sessionId });
-        if(!existingSubject) {
+        if (!existingSubject) {
             return res.status(404).json({ mssg: 'Subject is not existing' });
         }
 
-        if(subjectName !== existingSubject.subjectName) {
+        // Check if the subject name is being updated, and if it's already taken by another subject
+        if (subjectName !== existingSubject.subjectName) {
             const subjectNameExist = await Subject.findOne({ subjectName, recordStatus: 'Live', sessionId });
-            if(subjectNameExist) {
+            if (subjectNameExist) {
                 return res.status(400).json({ mssg: `${subjectName} is already existing, please choose another subject name` });
             }
         }
 
-        if(subjectCode !== existingSubject.subjectCode) {
+        // Check if the subject code is being updated, and if it's already taken by another subject
+        if (subjectCode !== existingSubject.subjectCode) {
             const subjectCodeExist = await Subject.findOne({ subjectCode, recordStatus: 'Live', sessionId });
-            if(subjectCodeExist) {
+            if (subjectCodeExist) {
                 return res.status(400).json({ mssg: `${subjectCode} is already existing, please choose another subject code` });
-            } 
+            }
         }
 
-        await Subject.findByIdAndUpdate(id,{ subjectName,subjectCode,gradeLevelId,sessionId,inputter });
-        res.status(200).json({ mssg: `${subjectName} has been updated successfully`});
-    } catch(err) {
+        // Fetch the current grade level
+        const currentGradeLevel = await GradeLevel.findById(gradeLevelId); // Assuming you have a GradeLevel model
+        console.log(req.body);
+
+        let updatedSubjectCode = subjectCode;
+
+        // If the grade level is 11 or 12, append the strand to the subject code
+        if (currentGradeLevel.gradeLevel.includes(11) || currentGradeLevel.gradeLevel.includes(12)) {
+            if(strandId) {
+                const currentStrand = await Strand.findById(strandId);
+                updatedSubjectCode = `${subjectCode}-${currentStrand.strand}`; // Append strand name to subject code
+            } else {
+                return res.status(400).json({ mssg: `Strand is required for Grade 11 and 12.` });
+            }
+        } else {
+            // Grade level is below 11, ensure no strand is attached
+            if (strandId) {
+                return res.status(400).json({ mssg: `Strand is only allowed for Grade 11 and 12.` });
+            }
+        }
+
+        // Update the subject with the modified subject code (with or without strand)
+        await Subject.findByIdAndUpdate(id, {
+            subjectName,
+            subjectCode: updatedSubjectCode,
+            gradeLevelId,
+            sessionId,
+            inputter,
+            strandId
+        });
+
+        res.status(200).json({ mssg: `${subjectName} has been updated successfully` });
+    } catch (err) {
         console.log(err);
-        res.status(500).json({ mssg: 'An error occurred while updating subject information'});
+        res.status(500).json({ mssg: 'An error occurred while updating subject information' });
     }
-}
+};
+
 
 module.exports.delete_live_subject = async(req,res) => {
     const { id } = req.params;

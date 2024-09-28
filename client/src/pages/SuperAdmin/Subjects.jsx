@@ -14,14 +14,22 @@ const Subjects = () => {
     const [subjectName,setSubjectName] = useState('');
     const [subjectCode,setSubjectCode] = useState('');
     const [gradeLevelId,setGradeLevelId] = useState([]);
-    const [errors,setErrors] = useState({ subjectName: '', subjectCode: '', gradeLevelId: '' });
+    const [strandId,setStrandId] = useState([]);
+    const [errors,setErrors] = useState({ subjectName: '', subjectCode: '', gradeLevelId: '', strandId: '' });
 
     const { records: subjects,isLoading } = useFetch(`${baseUrl()}/subjects`);
     const { records: gradeLevels } = useFetch(`${baseUrl()}/grade-levels`);
-    // const { records: strands } = useFetch(`${baseUrl()}/strands`);
+    const { records: strands } = useFetch(`${baseUrl()}/strands`);
     const { enqueueSnackbar } = useSnackbar();
     
     const { session,currentUserId,setShowForm,searchQuery,showForm,role,showError } = useContext(MainContext);
+
+    // Check if selected grade level includes Grade 11 or 12
+    const isGrade11or12 = gradeLevelId.some(id => {
+        const grade = gradeLevels?.find(level => level._id === id)?.gradeLevel;
+
+        if(grade.includes(11) || grade.includes(12)) return true
+    });
 
     const addSubject = async (e) => {
         e.preventDefault();
@@ -29,9 +37,22 @@ const Subjects = () => {
         if(!subjectName) return showError('subjectName','Subject name cannot be empty','Subject name is a required field',setErrors)
         if(!subjectCode) return showError('subjectCode','Subject code cannot be empty', 'Subject code is a required field', setErrors)
         if(gradeLevelId.length < 1) return showError('gradeLevelId', 'Grade level cannot be empty', 'Grade level is a required field', setErrors);
+        if(isGrade11or12 && (strandId.length < 1)) return showError('strandId', 'Strand cannot be empty', 'Strand is a required field with 11 or 12 grade levels', setErrors);
+
+        const subjectInfo = {
+            subjectName,
+            subjectCode,
+            gradeLevelId,
+            sessionId: session,
+            inputter: currentUserId
+        }
+
+        if(isGrade11or12) {
+            subjectInfo.strandId = strandId
+        }
 
         try {   
-            const data = await axios.post(`${baseUrl()}/subject`,{subjectName,subjectCode,gradeLevelId,sessionId: session, inputter:currentUserId});
+            const data = await axios.post(`${baseUrl()}/subject`,subjectInfo);
             enqueueSnackbar(data.data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
@@ -59,9 +80,9 @@ const Subjects = () => {
     }
 
     const updateSubject = async (id, updatedData) => {
-
+        console.log(updatedData);
         try {   
-            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,inputter: currentUserId,sessionId:session });
+            const newData = await axios.patch(`${baseUrl()}/subject/${id}`,{ subjectName: updatedData.subjectName,subjectCode: updatedData.subjectCode, gradeLevelId: updatedData.gradeLevelId,inputter: currentUserId,sessionId:session, strandId: updatedData.strand });
             enqueueSnackbar(newData.data.mssg, { 
                 variant: 'success',
                 anchorOrigin: {
@@ -122,8 +143,10 @@ const Subjects = () => {
         { accessorKey: 'subjectName', header: 'Subject', editable: true },
         { accessorKey: 'subjectCode', header: 'Subject Code', editable: true },
         { accessorKey: 'gradeLevel', header: 'Grade Level', editable: true, selectOptions: gradeLevels?.map(gl => ({ value: gl._id, label: gl.gradeLevel })) },
-        // { accessorKey: 'strand', header: 'Strand', editable: true, selectOptions: strands?.map(strand => ({ value: strand._id, label: strand.strand })) }
+        { accessorKey: 'strand', header: 'Strand', editable: true, selectOptions: strands?.map(strand => ({ value: strand._id, label: strand.strand })) }
     ]
+
+   
 
     const form = () => (
         <>
@@ -159,23 +182,43 @@ const Subjects = () => {
                     searchBy='gradeLevel'
                     selectAll={true}
                 />
-                {/* <select className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} onChange={(e) => setGradeLevelId(e.target.value)}>
-                    <option hidden>Choose grade level</option>
-                    { gradeLevels?.map(gl => (
-                        <option key={gl._id} value={gl._id}>{gl.gradeLevel}</option>
-                    )) }
-                    <option value="">N/A</option>
-                </select> */}
                 { errors.gradeLevelId && <span className="text-red-500 text-xs">{errors.gradeLevelId}</span> }
             </div>
+
+            { isGrade11or12 && (
+                <div className="flex flex-col mt-1">
+                    <label className="text-sm" htmlFor="strand">Strand</label>
+                    <Dropdown
+                        className={`outline-none p-1 rounded-md border ${errors.gradeLevelId ? 'border-red-500' : 'border-gray-300'}`} 
+                        options={strands}
+                        onChange={(selectedItems) => {
+                            const ids = selectedItems.map(item => item._id);  // Extract only the IDs
+                            setStrandId(ids);
+                        }}
+                        values={strands?.filter(strand => strandId.includes(strand._id))}
+                        labelField='strand'
+                        valueField="_id"
+                        multi={true}
+                        placeholder="Select strand"
+                        searchable={true}
+                        searchBy='strand'
+                        selectAll={true}
+                    />
+                    { errors.strandId && <span className="text-red-500 text-xs">{errors.strandId}</span> }
+                </div>
+            )} 
         </div>
         </>
     )
 
+
+
     const recordsWithoutInputter = subjects?.map(subject => ({
         ...subject,
-        gradeLevel: subject?.gradeLevelId?.gradeLevel
-    }))
+        gradeLevel: subject?.gradeLevelId?.gradeLevel,
+        strand: subject?.strandId?.strand
+    }));
+    console.log(recordsWithoutInputter)
 
     return (
         <main className="p-2 relative">

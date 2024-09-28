@@ -369,7 +369,7 @@ const initialMenus = [
                 icon: <MdOutlineWorkHistory />,
                 link: '/finance/payment-history'
             }
-        ].sort((a, b) => a.name.localeCompare(b.name))
+        ]
     }
 ];
 

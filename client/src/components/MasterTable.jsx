@@ -41,6 +41,16 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
         }
     }, [editId, data]);
 
+
+    // By chatgpt testing
+    // const handleEditClick = (record) => {
+    //     // Prevent resetting on page change
+    //     if (!editId) {
+    //         setEditId(record._id);
+    //     }
+    //     onOpenPopup && onOpenPopup(true);
+    // };
+
     const handleEditClick = (record) => {
         navigate(`${location.pathname}?page=${currentPage}`);
         onOpenPopup && onOpenPopup(true)
@@ -226,7 +236,7 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                     value={editValues[column.accessorKey] || ''}
                                                                     onChange={(e) => handleInputChange(e, column)}
                                                                     className="outline-none p-1 rounded-md border border-gray-300 w-fit text-black"
-                                                                >
+                                                                >   
                                                                     <option value={record._id || ''} disabled hidden>
                                                                         { 
                                                                             column.header === 'Adviser' ? record.adviser.name : 
@@ -237,16 +247,11 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                                                             column.header
                                                                         }
                                                                     </option>
+                                                                    
                                                                     {column.selectOptions.map((option,key) => (
-                                                                        <option key={key} value={option.value}>{
-                                                                            // column.header === 'Adviser' ? record.adviser.name : 
-                                                                            // column.header === 'Grade Level' ? record.gradeLevel.gradeLevel : 
-                                                                            // column.header === 'Department' ? record.department.department : 
-                                                                            // column.header === 'Fee Category' ? record.feeCateg.feeCateg : 
-                                                                            // column.header === 'Nationality Code' ? record.nationalityCodeId : 
-                                                                            // option.label
-                                                                            option.label
-                                                                        }</option>
+                                                                        <>
+                                                                        <option key={key} value={option.value}>{option.label}</option>
+                                                                        </>
                                                                     ))}
                                                                 </select>
 
@@ -361,21 +366,6 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                                 </button>
                             ) }
                         </div>
-                        {/* <AnimatePresence mode="wait">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <motion.button
-                                    key={page}
-                                    onClick={() => paginate(page)}
-                                    initial={{ opacity: 0, x: page > currentPage ? 50 : -50 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: page > currentPage ? -50 : 50 }}
-                                    transition={{ duration: 0.3 }}
-                                    className={`text-sm ${page === currentPage ? 'text-white bg-blue-500 px-3 py-1 rounded-md' : 'text-blue-500 hover:text-blue-700'}`}
-                                >
-                                    {page}
-                                </motion.button>
-                            ))}
-                        </AnimatePresence> */}
                         <button
                             onClick={() => paginate(currentPage + 1)}
                             disabled={currentPage === totalPages}
@@ -386,50 +376,6 @@ const MasterTable = ({ columns, data, searchQuery, onUpdate, onDelete, goToEdit,
                     </div>
                 </div>
             )}
-            
-            {/* <div className="pagination mt-4 flex justify-center items-center">
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 rounded-md focus:outline-none text-sm hover:underline text-blue-500 disabled:cursor-not-allowed"
-                >
-                    Previous
-                </button>
-                <ul className="flex mx-4">
-                    {currentPage > 1 && (
-                        <li className="mx-1">
-                            <button
-                                onClick={() => paginate(currentPage - 1)}
-                                className="px-3 py-1 focus:outline-none text-blue-500 rounded-md text-sm"                            >
-                                {currentPage - 1}
-                            </button>
-                        </li>
-                    )}
-                    <li className="mx-1">
-                        <button
-                            className="px-3 py-1 focus:outline-none hover:bg-gray-200 text-sm text-blue-500 bg-white border border-gray-400 rounded-md"
-                        >
-                            {currentPage}
-                        </button>
-                    </li>
-                    {currentPage < totalPages && (
-                        <li className="mx-1">
-                            <button
-                                onClick={() => paginate(currentPage + 1)}
-                                className="px-3 py-1 focus:outline-none text-blue-500 rounded-md text-sm"                            >
-                                {currentPage + 1}
-                            </button>
-                        </li>
-                    )}
-                </ul>
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages || totalPages < 1}
-                    className="px-3 py-1 rounded-md focus:outline-none text-sm hover:underline text-blue-500 disabled:cursor-not-allowed"
-                >
-                    Next
-                </button>
-            </div> */}
             { isForDelete && <ConfirmationPopup
                 message={'Are you sure you want to delete this record? Deleting this record will remove it from the list'}
                 onClose={() => setIsForDelete(false)}
