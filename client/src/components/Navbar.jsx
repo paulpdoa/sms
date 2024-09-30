@@ -7,7 +7,6 @@ import { CiLogout } from "react-icons/ci";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainContext } from "../helpers/MainContext";
 import { useSnackbar } from 'notistack';
-import TabActions from "./TabActions";
 import Searchbar from "./Searchbar";
 
 const Navbar = () => {

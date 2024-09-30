@@ -627,12 +627,14 @@ module.exports.add_discount = async (req, res) => {
         if(discountTypeExist) {
             return res.status(400).json({ mssg: `${discountType} is already existing, please choose another discount type` });
         }
-
+        
 
         if(gradeLevelId === '') {
             await Discount.create({ sessionId, discountType, discountPercent, discountCode, inputter,recordStatus: 'Live' });
         } else {
-            await Discount.create({ sessionId, gradeLevelId, discountType, discountPercent, amount, discountCode, inputter,recordStatus: 'Live' });
+            for(const glId of gradeLevelId) {
+                await Discount.create({ sessionId, gradeLevelId: glId, discountType, discountPercent, amount, discountCode, inputter,recordStatus: 'Live' });
+            }
         }
         res.status(200).json({ mssg: `${discountType} discount has been added to the record` });
     } catch (err) {
@@ -681,10 +683,26 @@ module.exports.edit_discount = async (req, res) => {
             }
         }
 
+        // Compare the existing discountPercent with the new one
+        let updatedDiscountPercent = existingDiscount.discountPercent; // Start with existing value
+
+        if (discountPercent !== undefined && discountPercent !== (existingDiscount.discountPercent * 100)) {
+            // If discountPercent has been updated, recalculate it
+            updatedDiscountPercent = discountPercent / 100;
+        }
+
         // If validation passed, proceed with the update
         const updatedDiscount = await Discount.findByIdAndUpdate(
             id,
-            { sessionId, gradeLevelId, discountType, discountPercent, amount, discountCategory, inputter },
+            { 
+                sessionId, 
+                gradeLevelId, 
+                discountType, 
+                discountPercent: updatedDiscountPercent, // Store percentage as a fraction
+                amount, 
+                discountCategory, 
+                inputter 
+            },
             { new: true } // Return the updated document
         );
 
@@ -694,6 +712,7 @@ module.exports.edit_discount = async (req, res) => {
         res.status(500).json({ mssg: 'An error occurred while updating discount record' });
     }
 };
+
 
 
 // For Student Discount

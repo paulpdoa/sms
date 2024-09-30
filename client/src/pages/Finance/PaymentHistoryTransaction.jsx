@@ -44,8 +44,8 @@ const PaymentHistoryTransaction = () => {
     }
 
     return (
-        <main className="bg-gray-100 min-h-screen flex flex-col items-center">
-            <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center">
+        <main className="bg-gray-50 min-h-screen flex flex-col items-center p-6">
+            <header className="w-full bg-white shadow-md py-6 px-8 flex justify-between items-center rounded-lg mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Welcome, {records?.financeName}!</h1>
             </header>
 

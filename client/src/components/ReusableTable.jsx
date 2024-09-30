@@ -1,164 +1,178 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
+import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/react-table';
+import { useState, useContext } from 'react';
+import { MainContext } from '../helpers/MainContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useFetch } from '../hooks/useFetch';
+import ConfirmationPopup from './ConfirmationPopup';
 
-const ReusableTable = ({ columns, records, path, deleteRecord, itemsPerPage = 10, searchQuery, viewRecord,disableAction }) => {
-    const navigate = useNavigate();
-    const goToEdit = (id) => navigate(`${path}/${id}`);
+const ReusableTable = ({ data, columns }) => {
+    const { searchQuery, setSearchQuery } = useContext(MainContext);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+    const [sorting, setSorting] = useState([]);
+    const [pageSize, setPageSize] = useState(10);
+    const [pageIndex,setPageIndex] = useState(0);
 
-    // Function to handle sorting
-    const handleSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+            sorting: sorting,
+            globalFilter: searchQuery,
+            pagination: {
+                pageSize: pageSize,
+                pageIndex: pageIndex
+            },
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setSearchQuery,
+    });
 
-    // Helper function to access nested properties and format dates
-    const getNestedValue = (obj, path) => {
-        const value = path.split('.').reduce((acc, part) => acc && acc[part], obj);
-        return formatDate(value);
-    };
-
-    // Helper function to format dates
-    const formatDate = (date) => {
-        if (moment(date, 'YYYY-MM-DD', true).isValid()) {
-            return moment(date).format('MMM D, YYYY');
-        }
-        return date;
-    };
-
-    // Filter records based on search query
-    const filteredRecords = records.filter(record =>
-        columns.some(column => {
-            const value = getNestedValue(record, column.accessorKey);
-            return value ? value.toString().toLowerCase().includes(searchQuery.toLowerCase()) : false;
-        })
-    );
-
-    // Apply sorting to records
-    let sortedRecords = [...filteredRecords];
-    if (sortConfig.key) {
-        sortedRecords.sort((a, b) => {
-            const aValue = getNestedValue(a, sortConfig.key);
-            const bValue = getNestedValue(b, sortConfig.key);
-            if (aValue < bValue) {
-                return sortConfig.direction === 'asc' ? -1 : 1;
-            }
-            if (aValue > bValue) {
-                return sortConfig.direction === 'asc' ? 1 : -1;
-            }
-            return 0;
-        });
-    }
-
-    // Pagination logic
-    const totalPages = Math.ceil(sortedRecords.length / itemsPerPage);
-    const paginatedRecords = sortedRecords.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-    // Function to handle page change
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+    const currentPage = table.getState().pagination.pageIndex + 1;
 
     return (
         <>
-            <div className="relative col-span-2 overflow-x-auto sm:rounded-lg h-fit">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            {columns?.map((column, key) => (
-                                <th
-                                    key={key}
-                                    scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                                    onClick={() => handleSort(column.accessorKey)}
-                                >
-                                    <div className="flex items-center">
-                                        {column.header}
-                                        {sortConfig.key === column.accessorKey ? (
-                                            sortConfig.direction === 'asc' ? (
-                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
-                                                </svg>
-                                            ) : (
-                                                <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                                </svg>
-                                            )
-                                        ) : (
-                                            <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
-                                            </svg>
-                                        )}
-                                    </div>
-                                </th>
+            {/* Page Size Selector */}
+            <div className="flex items-center gap-2 p-2">
+                <span className="text-gray-500 text-sm">Display</span>
+                <input
+                    className="outline-blue-200 w-[4.5em] rounded-md p-1 text-sm border border-gray-300"
+                    value={pageSize}
+                    onChange={(e) => {
+                        const newSize = Number(e.target.value);
+                        setPageSize(newSize);
+                        setPageIndex(0); // Reset to first page when page size changes
+                        table.setPageSize(newSize); // Ensure the table state also updates
+                    }}
+                    type="number"
+                    min={1} // Prevent negative or zero page size
+                />
+                <span className="text-gray-500 text-sm">result/s</span>
+            </div>
+            
+            <table className="w-full text-sm text-left text-gray-500 shadow-md">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-100 border border-gray-200">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <tr key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                                <>
+                                    <th
+                                        key={header.id}
+                                        onClick={header.column.getToggleSortingHandler()} // Fix: Direct call to sorting handler
+                                        className="py-3 px-6 cursor-pointer"
+                                    >
+                                        <div className="flex items-center">
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                            <span className="ml-2">
+                                                {/* Sorting indicator */}
+                                                {header.column.getIsSorted() === 'asc' ? (
+                                                    <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                                    </svg>
+                                                ) : header.column.getIsSorted() === 'desc' ? (
+                                                    <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="ml-1 w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                                                    </svg>
+                                                )}
+                                            </span>
+                                        </div>
+                                    </th>
+
+                                    <th className="px-6 py-3">Actions</th>
+                                </>
                             ))}
-                            { !disableAction && <th scope="col" className="px-6 py-3">Action</th>  }
                         </tr>
-                    </thead>
-                    <tbody className="bg-gray-700 divide-y divide-gray-600">
-                        {paginatedRecords?.map((record) => (
+                    ))}
+                </thead>
+                <AnimatePresence mode="wait">
+                    <motion.tbody
+                        key={currentPage} // use currentPage as key to trigger re-render on page change
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {table.getRowModel().rows.map((row) => (
                             <tr
-                                key={record._id}
-                                className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                                key={row.id}
+                                className="bg-white border-b hover:bg-gray-200 transition-colors duration-150"
                             >
-                                {columns?.map((column, key) => (
-                                    <td className="px-6 py-4" key={key}>
-                                        {typeof column.cell === 'function' ? column.cell(getNestedValue(record, column.accessorKey)) : getNestedValue(record, column.accessorKey) ?? 'Not Assigned'}
+                                {row.getVisibleCells().map((cell) => (
+                                    <>
+                                    <td key={cell.id} className="px-6 py-3">
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>
+
+                                    <td className="px-6 py-3 whitespace-nowrap">
+                                        <>
+                                            <button className="bg-customSubmit text-white px-4 py-2 rounded-md mr-2">Save</button>
+                                            <button className="bg-customCancel text-white px-4 py-2 rounded-md mr-2">Cancel</button>
+                                        </>
+                                    </td>
+                                    </>
                                 ))}
-                                { !disableAction && (
-                                    <td className="px-6 py-4 flex gap-2 items-center">
-                                        {viewRecord ?
-                                            <button
-                                                onClick={() => viewRecord(record)}
-                                                className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                            >
-                                                View
-                                            </button>
-                                            :
-                                            <button
-                                                onClick={() => goToEdit(record._id)}
-                                                className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                            >
-                                                Edit
-                                            </button>
-                                        }  
-                                        {deleteRecord &&
-                                            <button
-                                                onClick={() => deleteRecord(record._id)}
-                                                className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                                            >
-                                                Delete
-                                            </button>}
-                                    </td>
-                                ) }
                             </tr>
                         ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="flex justify-center items-center p-4 space-x-4 text-sm">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 rounded-lg border ${currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
-                >
-                    Previous
-                </button>
-                <span className="font-medium">Page {currentPage} of {totalPages}</span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages || records.length < 1}
-                    className={`px-4 py-2 rounded-lg border ${(currentPage === totalPages || records.length < 1) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
-                >
-                    Next
-                </button>
+                    </motion.tbody>
+                </AnimatePresence>
+            </table>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between p-3">
+                <div className="flex gap-2">
+                    <button
+                        className="px-4 py-2 text-xs font-medium text-white bg-blue-500 rounded disabled:opacity-50"
+                        onClick={() => {
+                            setPageIndex(0);
+                            table.setPageIndex(0)
+                        }}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        First
+                    </button>
+                    <button
+                        className="px-4 py-2 text-xs font-medium text-white bg-blue-500 rounded disabled:opacity-50"
+                        onClick={() => {
+                            const previousPage = table.getState().pagination.pageIndex - 1;
+                            setPageIndex(previousPage);
+                            table.previousPage();
+                        }}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        className="px-4 py-2 text-xs font-medium text-white bg-blue-500 rounded disabled:opacity-50"
+                        onClick={() => {
+                            const nextPage = table.getState().pagination.pageIndex + 1;
+                            setPageIndex(nextPage);
+                            table.nextPage();
+                        }}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Next
+                    </button>
+                    <button
+                        className="px-4 py-2 text-xs font-medium text-white bg-blue-500 rounded disabled:opacity-50"
+                        onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Last
+                    </button>
+                </div>
+
+                {/* Display current page and total pages */}
+                <div className="text-xs font-medium text-gray-700">
+                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                </div>
             </div>
         </>
     );

@@ -7,6 +7,7 @@ import { MainContext } from "../helpers/MainContext";
 import TabActions from '../components/TabActions';
 import MasterDataForm from "../components/MasterDataForm";
 import { useSnackbar } from 'notistack';
+import Dropdown from 'react-dropdown-select';
 
 const Discount = () => {
 
@@ -24,12 +25,14 @@ const Discount = () => {
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [amount, setAmount] = useState(null);
     const [discountCode, setDiscountCode] = useState('');
-    const [gradeLevel, setGradeLevel] = useState('');
+    const [gradeLevel, setGradeLevel] = useState([]);
+
+    console.log(gradeLevel);
 
     const categories = [
-        { _id: 1, discountCode: 'GA' },
-        { _id: 2, discountCode: 'PT' },
-        { _id: 3, discountCode: 'SA' }
+        { _id: 'GA', discountCode: 'GA' },
+        { _id: 'PT', discountCode: 'PT' },
+        { _id: 'SA', discountCode: 'SA' }
     ];
 
     const columns = [
@@ -59,10 +62,6 @@ const Discount = () => {
             header: 'Grade Level',
             editable: true,
             selectOptions: gradeLevels?.map(gl => ({ value: gl._id, label: gl.gradeLevel }))
-        },
-        {
-            accessorKey: 'session.session',
-            header: 'Session'
         }
     ];
 
@@ -190,7 +189,7 @@ const Discount = () => {
         } 
 
         
-        if (discountType === '') {
+        if (!discountType) {
             setErrors(prev => ({ ...prev, discountType: 'Discount type cannot be empty' }));
             enqueueSnackbar("Discount type is not provided", { 
                 variant: 'error',
@@ -199,12 +198,15 @@ const Discount = () => {
                     horizontal: 'center',
                 },
                 autoHideDuration: 3000,
-                preventDuplicate: true
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ discountType: '' });
+                }
             });
             return;
         }
 
-        if (discountCode === '') {
+        if (!discountCode) {
             setErrors(prev => ({ ...prev, discountCode: 'Discount code cannot be empty' }));
 
             enqueueSnackbar("Discount code is not provided", { 
@@ -214,7 +216,10 @@ const Discount = () => {
                     horizontal: 'center',
                 },
                 autoHideDuration: 3000,
-                preventDuplicate: true
+                preventDuplicate: true,
+                onClose: () => {
+                    setErrors({ discountCode: '' });
+                }
             });
             return;
         }
@@ -244,10 +249,6 @@ const Discount = () => {
             });
             return;
         }
-        
-        setTimeout(() => {
-            setErrors({ discountType: '', discountCode: '' })
-        },3000)
 
         try {
             const newDiscount = await axios.post(`${baseUrl()}/discount`, discountInfo);
@@ -283,10 +284,10 @@ const Discount = () => {
             gradeLevel: record?.gradeLevelId?.gradeLevel ?? 'Not Assigned',
             _id: record?.gradeLevelId?._id
         },
-        session: {
-            session: record?.sessionId?.startYear,
-            _id: record?.sessionId?._id
-        },
+        // session: {
+        //     session: record?.sessionId?.startYear,
+        //     _id: record?.sessionId?._id
+        // },
         amount: record.amount ?? 0
     }));
 
@@ -299,8 +300,24 @@ const Discount = () => {
                 {renderInput('discountType', discountType, 'Discount Type', setDiscountType, 'text', {}, '', errors)}
                 {renderInput('discountPercentage', discountPercentage, 'Discount Percentage', setDiscountPercentage, 'number', { step: "0.000001" }, '', errors)}
                 {renderInput('amount', amount, 'Discount Amount', setAmount, 'number', { step: "0.000001" }, '', errors)}
-                {renderSelect('discountCode', 'Discount Category', setDiscountCode, categories, 'Leave this empty if n/a', false, errors)}
-                {renderSelect('gradeLevel', 'Grade Level', setGradeLevel, gradeLevels, 'Leave this empty if n/a', false, errors)}
+                {renderSelect('discountCode', 'Discount Category', setDiscountCode, categories, 'Select discount code   ', false, errors)}
+                {/* {renderSelect('gradeLevel', 'Grade Level', setGradeLevel, gradeLevels, 'Select grade level', false, errors)} */}
+                
+                <div className="flex flex-col mt-2">
+                    <label className="text-sm" htmlFor='gradelevel'>Grade Level</label>
+                    <Dropdown
+                        onChange={(selectedItems) => {
+                            const ids = selectedItems.map(item => item._id);
+                            setGradeLevel(ids);
+                        }}
+                        options={gradeLevels}
+                        valueField="_id"
+                        labelField="gradeLevel"
+                        multi={true}
+                        placeholder="Select grade level"
+                    />
+                    {/* {errors[label] && <span className="text-xs text-red-500">{errors[label]}</span>} */}
+                </div>
             </div>
         </>
     );
@@ -359,7 +376,7 @@ const renderSelect = (label, description, onChange, options, placeholder, requir
                     {option.discountCode || option.gradeLevel}
                 </option>
             ))}
-            { (label !== 'discountType' || label !== 'discountCode') && <option value="">N/A</option> }
+            {/* { (label !== 'discountType' || label !== 'discountCode') && <option value="">N/A</option> } */}
         </select>
         {errors[label] && <span className="text-xs text-red-500">{errors[label]}</span>}
     </div>

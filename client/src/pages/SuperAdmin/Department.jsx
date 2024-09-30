@@ -7,6 +7,7 @@ import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
 import MasterDataForm from "../../components/MasterDataForm";
 import { useSnackbar } from 'notistack';
+import ReusableTable from "../../components/ReusableTable";
 
 const Department = () => {
 
@@ -22,7 +23,6 @@ const Department = () => {
         {
             accessorKey: 'department',
             header: 'Department',
-            editable: true
         }
     ]
 
@@ -162,6 +162,10 @@ const Department = () => {
                         onDelete={deleteDepartment}
                         isLoading={isLoading}
                     />
+                    {/* <ReusableTable 
+                        columns={columns}
+                        data={recordsWithInputter || []}
+                    /> */}
                 </div>    
             </div> 
         </main>
