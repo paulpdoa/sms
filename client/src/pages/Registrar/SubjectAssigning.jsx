@@ -54,7 +54,7 @@ const SubjectAssigning = () => {
     })).sort((a,b) => a.lastName.localeCompare(b.lastName));
 
     const formatTime = (time) => {
-        const [hours, minutes] = time.split(':');
+        const [hours, minutes] = time?.split(':');
         const date = new Date();
         date.setHours(hours, minutes);
         return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -63,17 +63,17 @@ const SubjectAssigning = () => {
     const studentSubjectData = studentSubjects?.filter(subj => subj.studentId?._id === studentRecord?._id)?.map(subj => ({
         ...subj,
         subject: `${subj.subjectId.subjectName} ${subj.subjectId.subjectCode}`,
-        teacher: `${subj.teacherSubjectId.teacherId.firstName} ${subj.teacherSubjectId.teacherId.middleName} ${subj.teacherSubjectId.teacherId.lastName}`,
-        room: subj.teacherSubjectId.roomNumberId.roomNumber,
-        startTime: subj.teacherSubjectId.startTime,
-        time: `${formatTime(subj.teacherSubjectId.startTime)} - ${formatTime(subj.teacherSubjectId.endTime)}`,
-        days: subj.teacherSubjectId.daySchedule?.map(dy => dy + ' ')
+        teacher: subj.teacherSubjectId ? `${subj?.teacherSubjectId?.teacherId?.firstName} ${subj?.teacherSubjectId?.teacherId?.middleName} ${subj?.teacherSubjectId?.teacherId?.lastName}` : 'No teacher assigned',
+        room: subj.teacherSubjectId ? subj?.teacherSubjectId?.roomNumberId?.roomNumber : 'No room yet',
+        startTime: subj.teacherSubjectId ? subj?.teacherSubjectId?.startTime : 'No schedule yet',
+        time: subj.teacherSubjectId ? `${formatTime(subj?.teacherSubjectId?.startTime)} - ${formatTime(subj?.teacherSubjectId?.endTime)}` : 'No schedule yet',
+        days: subj.teacherSubjectId ? subj?.teacherSubjectId?.daySchedule?.map(dy => dy + ' ') : 'No scheduled days yet'
     })).sort((a, b) => {
         // Compare by start time
-        const timeA = a.startTime;
-        const timeB = b.startTime;
+        const timeA = a?.startTime;
+        const timeB = b?.startTime;
     
-        return timeA.localeCompare(timeB); // Sort by start time
+        return timeA?.localeCompare(timeB); // Sort by start time
     });
 
     // Subject assigning function

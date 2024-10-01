@@ -27,8 +27,6 @@ const Discount = () => {
     const [discountCode, setDiscountCode] = useState('');
     const [gradeLevel, setGradeLevel] = useState([]);
 
-    console.log(gradeLevel);
-
     const categories = [
         { _id: 'GA', discountCode: 'GA' },
         { _id: 'PT', discountCode: 'PT' },

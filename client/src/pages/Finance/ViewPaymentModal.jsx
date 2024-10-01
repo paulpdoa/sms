@@ -19,7 +19,6 @@ const ViewPaymentModal = ({ paymentRecords,setViewPayment,searchQuery,totalPayme
         description: payment.manageFeeId?.feeDescription?.description || payment?.description || payment?.feeDescription?.description || (payment?.paymentScheduleId && `Tuition Fee ${payment.paymentScheduleId.dateSchedule}`) || payment?.textBookId?.bookTitle || 'No Description',
         amount: numberFormatter(payment.amount || payment.manageFeeId?.amount || payment?.payEveryAmount || payment?.textBookId?.bookAmount || 0)
     }));
-    console.log(paymentRecordData);
 
     const removePaymentRecord = (id) => {
         const miscCode = id?.manageFeeId?.feeDescription?.feeCateg?.code === 'MSC';
@@ -54,7 +53,7 @@ const ViewPaymentModal = ({ paymentRecords,setViewPayment,searchQuery,totalPayme
 
     return (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-md w-[50%] relative p-6 overflow-y-auto h-[80%] min-h-fit">
+            <div className="bg-white rounded-md w-[50%] relative p-6 overflow-y-auto h-[80%]">
                 <div className="border-b border-gray-300 py-2 flex items-center justify-between">
                     <div>
                         <h2 className="font-bold text-gray-700 text-2xl">Payments Selected</h2>

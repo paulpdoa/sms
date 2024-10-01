@@ -18,12 +18,11 @@ const Assessment = () => {
     const [currentPage, setCurrentPage] = useState('Total Fees');
     const [currStudRec, setCurrStudRec] = useState(undefined);
     const [enableView, setEnableView] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
-    const { session, currentUserId, role,snackbarKey } = useContext(MainContext);
+    const { session, currentUserId, role,snackbarKey,searchQuery } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone ? true : false;
 

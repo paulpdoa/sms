@@ -5,9 +5,9 @@ import MasterTable from "../../MasterTable";
 import { useContext } from 'react';
 import { MainContext } from "../../../helpers/MainContext";
 
-const StudentReqTable = ({ searchQuery }) => {
+const StudentReqTable = () => {
 
-    const { setCurrStudRec: setViewRecord } = useContext(MainContext);
+    const { setCurrStudRec: setViewRecord,searchQuery } = useContext(MainContext);
 
     // This student will display all students that are not admitted yet
 

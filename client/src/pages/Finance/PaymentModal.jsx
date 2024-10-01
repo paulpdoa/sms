@@ -286,7 +286,7 @@ const PaymentModal = ({
 
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%] min-h-fit">
+        <div className="bg-white rounded-md w-[80%] relative p-6 overflow-y-auto h-[90%]">
           <div className="border-b border-gray-300 py-2 flex items-center justify-between">
             <div className="flex flex-col">
                 <div className="flex gap-2 items-center">
@@ -424,20 +424,16 @@ const PaymentModal = ({
                                 </button>
                             ) }
                         </div>
-
-                        { paymentRecords.length > 0 && (
-                            <button
-                                className="bg-customSubmit hover:bg-green-600 text-white px-6 py-2 rounded-md text-sm"
-                                onClick={postPayment}
-                            >
-                                Pay Now
-                            </button>
-                        ) }
                     </div>
-                    
-                    
                 ) }
-                
+                { paymentRecords.length > 0 && (
+                    <button
+                        className="bg-customSubmit hover:bg-green-600 text-white px-6 py-2 rounded-md text-sm w-fit"
+                        onClick={postPayment}
+                    >
+                        Pay Now
+                    </button>
+                ) }
                 {/* Animation when fee is added */}
                 { animationTriggered && (
                     <div className="fee-animation">

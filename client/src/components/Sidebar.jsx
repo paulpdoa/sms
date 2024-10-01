@@ -92,7 +92,7 @@ const initialMenus = [
                             { name: 'Assessment', link: '/master/assessment' },
                             { name: 'Sectioning', link: '/master/sectioning' },
                             { name: 'Subject Assigning', link: '/master/subject-assigning' }
-                        ].sort((a, b) => a.name.localeCompare(b.name))
+                        ]
                     }
                 ].sort((a, b) => a.name.localeCompare(b.name))
             },
@@ -261,7 +261,7 @@ const initialMenus = [
                             { name: 'Assessment', link: '/registrar/assessment' },
                             { name: 'Sectioning', link: '/registrar/sectioning' },
                             { name: 'Subject Assigning', link: '/registrar/subject-assigning' }
-                        ].sort((a, b) => a.name.localeCompare(b.name))
+                        ]
                     }
                 ].sort((a, b) => a.name.localeCompare(b.name))
             }

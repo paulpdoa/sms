@@ -7,14 +7,14 @@ import MasterTable from "../../components/MasterTable";
 import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
 import MasterDataForm from '../../components/MasterDataForm';
-
+import { useSnackbar } from 'notistack';
 const TeacherSubject = () => {
 
     const { records: teachersSubject } = useFetch(`${baseUrl()}/teachers-subject`);
     const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role,genericPath } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
     const isYearDone = schoolYear.isYearDone;
-
+    const { enqueueSnackbar } = useSnackbar();
     const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
     const { records: teachers } = useFetch(`${baseUrl()}/teachers`);

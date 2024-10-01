@@ -4,7 +4,7 @@ import { MainContext } from '../../helpers/MainContext';
 
 const PaymentHistoryModal= ({ currentStudent,setShowHistoryPayment,paymentTransactions }) => {
 
-    const { searchQuery } = useContext(MainContext);
+    const { searchQuery,numberFormatter } = useContext(MainContext);
 
     const paymentHistoryData = paymentTransactions?.map(paymentHistory => ({
         ...paymentHistory,
@@ -20,7 +20,8 @@ const PaymentHistoryModal= ({ currentStudent,setShowHistoryPayment,paymentTransa
             year: 'numeric',
             month: 'long',
             day: 'numeric' 
-        }) + ' - Tuition Fee' || ''
+        }) + ' - Tuition Fee' || '',
+        amountPaid: numberFormatter(paymentHistory.amountPaid)
 
     }));
     const paymentColumns = [

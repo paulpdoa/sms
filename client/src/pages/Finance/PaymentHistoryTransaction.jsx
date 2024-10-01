@@ -8,7 +8,7 @@ import PaymentHistoryModal from "./PaymentHistoryModal";
 
 const PaymentHistoryTransaction = () => {
 
-    const { currentUserId,searchQuery } = useContext(MainContext);
+    const { currentUserId,searchQuery,numberFormatter } = useContext(MainContext);
 
     const { records } = useFetch(`${baseUrl()}/finance-payment-history/${currentUserId}`);
 
