@@ -4,26 +4,20 @@ import { MainContext } from '../../helpers/MainContext';
 
 const PaymentHistoryModal= ({ currentStudent,setShowHistoryPayment,paymentTransactions }) => {
 
-    const { searchQuery,numberFormatter } = useContext(MainContext);
+    const { searchQuery,numberFormatter,dateFormatter } = useContext(MainContext);
 
     const paymentHistoryData = paymentTransactions?.map(paymentHistory => ({
         ...paymentHistory,
-        paymentDate: new Date(paymentHistory.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        }),
+        paymentDate: dateFormatter(paymentHistory.createdAt),
         description: 
         paymentHistory.studentPaymentId?.manageFeeId?.feeDescription?.feeCateg?.category || 
         paymentHistory.studentPaymentId?.textBookId?.bookTitle ||
-        new Date(paymentHistory?.studentPaymentId?.paymentScheduleId?.dateSchedule).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        }) + ' - Tuition Fee' || '',
+        dateFormatter(paymentHistory?.studentPaymentId?.paymentScheduleId?.dateSchedule) + ' - Tuition Fee',
         amountPaid: numberFormatter(paymentHistory.amountPaid)
-
     }));
+
+    console.log(paymentTransactions)
+
     const paymentColumns = [
         { accessorKey: 'description', header: 'Description' },
         { accessorKey: 'referenceCode', header: 'Reference Code' },

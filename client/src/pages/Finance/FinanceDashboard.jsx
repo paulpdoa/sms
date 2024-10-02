@@ -3,12 +3,30 @@ import { baseUrl } from "../../baseUrl";
 import { useContext } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import { FaDollarSign, FaUsers, FaListAlt, FaClock, FaMoneyBillWave } from 'react-icons/fa';
+import MasterTable from "../../components/MasterTable";
 
 const FinanceDashboard = () => {
 
-    const { currentUserId } = useContext(MainContext);
+    const { currentUserId,searchQuery,dateFormatter } = useContext(MainContext);
 
     const { records } = useFetch(`${baseUrl()}/finance-dashboard/${currentUserId}`);
+
+    // For payment transactions
+    const paymentTransactionColumn = [
+        { accessorKey: 'description', header: 'Description' },
+        { accessorKey: 'referenceCode', header: 'Reference Code' },
+        { accessorKey: 'amountPaid', header: 'Amount Paid' },
+        { accessorKey: 'paymentDate', header: 'Payment Date' }
+    ]
+
+    const paymentTransactionData = records?.paymentTransactions?.map(payment => ({
+        ...payment,
+        paymentDate: dateFormatter(payment.createdAt),
+        description: 
+        payment.studentPaymentId?.manageFeeId?.feeDescription?.feeCateg?.category || 
+        payment.studentPaymentId?.textBookId?.bookTitle ||
+        dateFormatter(payment?.studentPaymentId?.paymentScheduleId?.dateSchedule) + ' - Tuition Fee',
+    }));
 
     return (
         <main className="bg-gray-50 min-h-screen flex flex-col items-center p-6">
@@ -43,26 +61,13 @@ const FinanceDashboard = () => {
                         <h2 className="text-xl font-semibold">Recent Transactions</h2>
                         <FaMoneyBillWave className="text-blue-500 text-2xl" />
                     </div>
-                    <table className="min-w-full bg-white border">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="px-4 py-2 border-b text-left text-gray-700">Date</th>
-                                <th className="px-4 py-2 border-b text-left text-gray-700">Student</th>
-                                <th className="px-4 py-2 border-b text-left text-gray-700">Amount</th>
-                                <th className="px-4 py-2 border-b text-left text-gray-700">Payment Method</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {records?.recentTransactions?.map(transaction => (
-                                <tr key={transaction.id} className="hover:bg-gray-50 transition">
-                                    <td className="px-4 py-2 border-b">{new Date(transaction.date).toLocaleDateString()}</td>
-                                    <td className="px-4 py-2 border-b">{transaction.studentName}</td>
-                                    <td className="px-4 py-2 border-b">${transaction.amount}</td>
-                                    <td className="px-4 py-2 border-b">{transaction.paymentMethod}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <MasterTable 
+                        searchQuery={searchQuery}
+                        data={paymentTransactionData || []}
+                        columns={paymentTransactionColumn}
+                        disableAction={true}
+                        disableCountList={true}
+                    />
                 </section>
 
                 {/* Outstanding Payments */}

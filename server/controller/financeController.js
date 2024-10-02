@@ -24,15 +24,12 @@ module.exports.get_finance_dashboard = async (req,res) => {
         }
         financeName = `${finance.firstName} ${finance.middleName} ${finance.lastName}`;
 
-        const paymentTransactions = await PaymentTransaction.find({ sessionId: session, recordStatus: 'Live' })
+        const paymentTransactions = await PaymentTransaction.find({ sessionId: session, recordStatus: 'Live' }).sort({ createdAt: -1 })
         if(!paymentTransactions) {
             return res.status(404).json({ mssg: 'Payment transactions is not existing' });
         }
 
-        console.log(paymentTransactions);
-
-
-        res.status(200).json({ financeName });
+        res.status(200).json({ financeName,paymentTransactions });
     } catch(err) {
         console.log(err);
         res.status(500).json({ mssg: 'An error occurred while fetching finance dashboard details' });
