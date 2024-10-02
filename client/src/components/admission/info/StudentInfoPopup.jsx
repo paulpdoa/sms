@@ -5,7 +5,7 @@ import axios from 'axios';
 import { MainContext } from '../../../helpers/MainContext';
 import { academicStatus as academicStatuses } from '../../../data/academicStatus.json';
 import { genders } from '../../../data/genders.json';
-
+import { useSnackbar } from 'notistack';
 
 const StudentInfoPopup = ({ id, closeModal }) => {
 
@@ -27,7 +27,8 @@ const StudentInfoPopup = ({ id, closeModal }) => {
     const [completedClearance, setCompletedClearance] = useState(id?.academicId?.completedClearance);
     const [isRegistered,setIsRegistered] = useState(id?.academicId?.isRegistered);
     const [academicStatus,setAcademicStatus] = useState(id?.academicId?.academicStatus);
-
+    
+    const { enqueueSnackbar } = useSnackbar();
 
     // const { records: genders } = useFetch(`${baseUrl()}/genders`);
     const { records: nationalities } = useFetch(`${baseUrl()}/nationalities`);
