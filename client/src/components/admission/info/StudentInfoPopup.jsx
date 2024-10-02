@@ -76,9 +76,9 @@ const StudentInfoPopup = ({ id, closeModal }) => {
                 },
                 autoHideDuration: 2000,
                 preventDuplicate: true,
-                onClose: () => {
-                    window.location.reload();
-                }
+                // onClose: () => {
+                //     window.location.reload();
+                // }
             });
         } catch(err) {
             console.log(err);
