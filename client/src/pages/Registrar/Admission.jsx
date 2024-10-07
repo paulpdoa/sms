@@ -18,11 +18,15 @@ const Admission = () => {
     const [enableView, setEnableView] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const { currStudRec, setCurrStudRec, currentUserId } = useContext(MainContext);
+    const { currStudRec,setCurrStudRec,currentUserId } = useContext(MainContext);
+
 
     const enableViewStudentRecord = (record) => {
         setCurrStudRec(record);
-        setEnableView(true);
+        
+        if(record) {
+            setEnableView(true);
+        } 
     };
 
     return (
@@ -45,7 +49,7 @@ const Admission = () => {
             </div> */}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
-                <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
+                <StudentReqTable setViewRecord={enableViewStudentRecord} />
                 {/* <div className="rounded-md h-fit">
                     {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
@@ -53,7 +57,7 @@ const Admission = () => {
                     {currentPage === 'Sibling' && <StudentSiblingTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                 </div> */}
 
-                {currStudRec?._id && (
+                { enableView && (
                     // The overlay with black background and opacity
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-40">
                         {/* The modal */}
@@ -88,17 +92,15 @@ const Admission = () => {
                                 ))}
                             </div>
 
-                            {currStudRec?._id ? (
-                                <>
-                                    {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} setEnableView={setEnableView} />}
-                                    {currentPage === 'Parents' && <StudentParent id={currStudRec._id} setEnableView={setEnableView} />}
-                                    {currentPage === 'Information' && <StudentInfo id={currStudRec._id} setEnableView={setEnableView} />}
-                                    {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} setEnableView={setEnableView} />}
-                                    {currentPage === 'Sibling' && <StudentSibling id={currStudRec} setEnableView={setEnableView} />}
-                                </>
-                            ) : (
-                                <p className="text-sm text-red-500">Please select a student from the list to view details.</p>
-                            )}
+                           
+                             {/* Show tables here below */}
+                            {currentPage === 'Requirements' && <SubmittedReq id={currStudRec._id} setEnableView={setEnableView} />}
+                            {currentPage === 'Parents' && <StudentParent id={currStudRec._id} setEnableView={setEnableView} />}
+                            {/* {currentPage === 'Information' && <StudentInfo id={currStudRec._id} setEnableView={setEnableView} />}
+                            {currentPage === 'Academic' && <StudentAcademic id={currStudRec._id} setEnableView={setEnableView} />} */}
+                            {currentPage === 'Sibling' && <StudentSibling id={currStudRec} setEnableView={setEnableView} />}
+                             
+                           
                         </div>
                     </div>
                 )}

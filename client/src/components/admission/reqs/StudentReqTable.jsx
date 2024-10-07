@@ -5,9 +5,9 @@ import MasterTable from "../../MasterTable";
 import { useContext } from 'react';
 import { MainContext } from "../../../helpers/MainContext";
 
-const StudentReqTable = () => {
+const StudentReqTable = ({ setViewRecord }) => {
 
-    const { setCurrStudRec: setViewRecord,searchQuery } = useContext(MainContext);
+    const { searchQuery } = useContext(MainContext);
 
     // This student will display all students that are not admitted yet
 
@@ -41,7 +41,12 @@ const StudentReqTable = () => {
     })).sort((a, b) => a.lastName.localeCompare(b.lastName));
 
     return (
-        <MasterTable columns={columns} data={formattedStudents || []} viewRecord={setViewRecord} searchQuery={searchQuery} /> 
+        <MasterTable 
+            columns={columns} 
+            data={formattedStudents || []} 
+            viewRecord={setViewRecord} 
+            searchQuery={searchQuery} 
+        /> 
     )
 }
 

@@ -10,7 +10,7 @@ const SubmittedReq = ({ setEnableView }) => {
     const { session: schoolYear,currStudRec,setCurrStudRec } = useContext(MainContext);
     const { enqueueSnackbar } = useSnackbar();
 
-    const id = currStudRec._id;
+    const id = currStudRec?._id;
     const { records: admission } = useFetch(`${baseUrl()}/admission/${id}`);
     const { records: sy } = useFetch(`${baseUrl()}/school-year/${schoolYear}`);
     const isYearDone = sy.isYearDone;
