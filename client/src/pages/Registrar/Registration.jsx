@@ -20,30 +20,8 @@ const Registration = () => {
 
     return (
         <main className="p-4 relative">
-            {/* <div className="flex justify"> */}
-                <TabActions title='Registration' noView={true} />
-
-                {/* <div className="flex flex-wrap gap-2 mb-4 mt-4">
-                    { buttonPages.map((page) => (
-                        <button
-                            key={page}
-                            className={`text-sm font-semibold px-3 py-1 rounded-lg ${currentPage === page ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
-                            onClick={() => {
-                                setCurrentPage(page);
-                                setEnableView(false);
-                            }}
-                        >
-                            {page}
-                        </button>
-                    )) }
-                </div> */}
-            {/* </div> */}
-            
-
+            <TabActions title='Registration' noView={true} />
             { currentPage === 'Registration' && <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} /> }
-            {/* { currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} /> } */}
-
-            
         </main>
     );
 }

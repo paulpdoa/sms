@@ -25,10 +25,6 @@ const Admission = () => {
         setEnableView(true);
     };
 
-    const handleSearch = (query) => {
-        setSearchQuery(query);
-    };
-
     return (
         <main className="p-4 relative overflow-hidden">
             <TabActions title="Admission" noView={true} />
