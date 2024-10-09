@@ -1,16 +1,13 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import SubmittedReq from '../../components/admission/reqs/SubmittedReq';
 import StudentParent from '../../components/admission/parent/StudentParent';
-import StudentInfo from '../../components/admission/info/StudentInfo';
-import StudentAcademic from '../../components/admission/acad/StudentAcademic';
 import StudentReqTable from '../../components/admission/reqs/StudentReqTable';
-import StudentInfoTable from '../../components/admission/info/StudentInfoTable';
-import StudentAcadTable from '../../components/admission/acad/StudentAcadTable';
-import StudentParentTable from '../../components/admission/parent/StudentParentTable';
 import StudentSibling from '../../components/admission/sibling/StudentSibling';
-import StudentSiblingTable from '../../components/admission/sibling/StudentSiblingTable';
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from '../../components/TabActions';
+import Filter from '../../components/Filter';
+import { baseUrl } from '../../baseUrl';
+import { useFetch } from '../../hooks/useFetch';
 
 const Admission = () => {
     const admissionPages = ['Requirements', 'Parents', 'Sibling'];
@@ -19,6 +16,39 @@ const Admission = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const { currStudRec,setCurrStudRec,currentUserId } = useContext(MainContext);
+
+    // This student will display all students that are not admitted yet
+    const [filter,setFilter] = useState('');
+
+    const columns = [
+        { accessorKey: 'fullName', header: 'Full Name' },
+        // { accessorKey: 'studentNo', header: 'Student No.' },
+        // { accessorKey: 'registered', header: 'Registered' },
+        { accessorKey: 'admitted', header: 'Admitted' },
+        // { accessorKey: 'dateRegistered', header: 'Date Registered' },
+        // { accessorKey: 'status', header: 'Status' },
+        // { accessorKey: 'gradeLevel', header: 'Grade Level' },
+        // { accessorKey: 'strand', header: 'Strand' },
+        { accessorKey: 'nationality', header: 'Nationality' },
+    ];
+
+    const { records: students } = useFetch(`${baseUrl()}/students`);
+
+    const formattedStudents = students?.filter(student => {
+        const filterStatus = filter === 'Admitted';
+        if(student?.academicId?.isAdmitted === filterStatus) {
+            return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && student?.academicId?.isAdmitted
+        } 
+        return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && !student?.academicId?.isAdmitted
+    }).map(student => ({
+        ...student,
+        fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
+        // studentNo: student.studentNo || 'Not assigned',
+        registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
+        admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
+        nationality: student.nationality?.nationality || 'Not assigned',
+        // status: student.status    
+    })).sort((a, b) => a.lastName.localeCompare(b.lastName));
 
 
     const enableViewStudentRecord = (record) => {
@@ -31,7 +61,10 @@ const Admission = () => {
 
     return (
         <main className="p-4 relative overflow-hidden">
-            <TabActions title="Admission" noView={true} />
+            <div className="flex items-center gap-2">
+                <TabActions title="Admission" noView={true} />
+                <Filter options={['Admitted','Not Admitted']} title="option" onChange={setFilter} />
+            </div>
             
             {/* <div className="flex flex-wrap gap-2 mb-4">
                 {admissionPages.map((page) => (
@@ -48,8 +81,8 @@ const Admission = () => {
                 ))}
             </div> */}
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
-                <StudentReqTable setViewRecord={enableViewStudentRecord} />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+                <StudentReqTable setViewRecord={enableViewStudentRecord} formattedStudents={formattedStudents || []} columns={columns} />
                 {/* <div className="rounded-md h-fit">
                     {currentPage === 'Requirements' && <StudentReqTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}
                     {currentPage === 'Academic' && <StudentAcadTable setViewRecord={enableViewStudentRecord} searchQuery={searchQuery} />}

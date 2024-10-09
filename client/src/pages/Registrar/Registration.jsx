@@ -1,15 +1,14 @@
 import StudentInfoTable from "../../components/admission/info/StudentInfoTable";
-import StudentAcadTable from "../../components/admission/acad/StudentAcadTable";
-import StudentInfo from "../../components/admission/info/StudentInfo";
 import { useContext,useState } from 'react';
 import { MainContext } from '../../helpers/MainContext';
 import TabActions from "../../components/TabActions";
-import StudentAcademic from "../../components/admission/acad/StudentAcademic";
+import Filter from "../../components/Filter";
 
 const Registration = () => {
     const { searchQuery, currStudRec, setCurrStudRec } = useContext(MainContext);
     const buttonPages = ['Registration', 'Academic'];
     const [currentPage, setCurrentPage] = useState('Registration');
+    const [filter,setFilter] = useState('');
 
     const [enableView,setEnableView] = useState(false);
 
@@ -20,8 +19,11 @@ const Registration = () => {
 
     return (
         <main className="p-4 relative">
-            <TabActions title='Registration' noView={true} />
-            { currentPage === 'Registration' && <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} /> }
+            <div className="flex items-center gap-2">
+                <TabActions title='Registration' noView={true} />
+                <Filter options={['Registered','Not Registered']} title="option" onChange={setFilter} />
+            </div>
+            { currentPage === 'Registration' && <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} filter={filter} /> }
         </main>
     );
 }

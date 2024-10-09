@@ -9,11 +9,11 @@ import { RiCloseLargeFill } from "react-icons/ri";
 import StudentAcademic from '../acad/StudentAcademic';
 import StudentRegistration from './StudentRegistration';
 
-const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
+const StudentInfoTable = ({ setViewRecord, searchQuery,filter }) => {
 
     const columns = [
         { accessorKey: 'fullName', header: 'Full Name' },
-        // { accessorKey: 'status', header: 'Status' },
+        { accessorKey: 'isRegistered', header: 'Registered' },
         { accessorKey: 'isAdmitted', header: 'Admitted' },
         { accessorKey: 'dateAdmitted', header: 'Date Admitted' },
         { accessorKey: 'gradeLevel', header: 'Grade Level' },
@@ -21,9 +21,12 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         { accessorKey: 'nationality', header: 'Nationality' },
     ];
 
+    console.log(filter)
+
+
     const buttonPages = ['Information','Academic','Assistance','Registration'];
     const [currentPage,setCurrentPage] = useState('Information');   
-    const { setCurrStudRec,currStudRec } = useContext(MainContext);
+    const { setCurrStudRec,currStudRec,dateFormatter } = useContext(MainContext);
 
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const [updatePopup, setUpdatePopup] = useState(false);
@@ -46,7 +49,13 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         </div>
     );
 
-    const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted).map(student => ({
+    const formattedStudents = students?.filter(student => {
+        const filterStatus = filter === 'Admitted';
+        if(student?.academicId?.isAdmitted === filterStatus) {
+            return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && student?.academicId?.isAdmitted
+        } 
+        return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && !student?.academicId?.isAdmitted
+    }).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
@@ -54,20 +63,16 @@ const StudentInfoTable = ({ setViewRecord, searchQuery }) => {
         nationality: student.nationality?.nationality || 'Not assigned',
         status: student.status,
         isAdmitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        dateAdmitted: new Date(student?.academicId?.dateAdmitted).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        })
+        isRegistered: student?.academicId?.isRegistered ? 'Yes' : 'No',
+        dateAdmitted: dateFormatter(student?.academicId?.dateAdmitted)
     })).sort((a, b) => a.lastName.localeCompare(b.lastName));
     
-
     return (
         <div className="relative">
             {/* <AdmissionTable columns={columns} data={formattedStudents} actions={actions} searchQuery={searchQuery} /> */}
             <MasterTable 
                 columns={columns} 
-                data={formattedStudents} 
+                data={formattedStudents || []} 
                 searchQuery={searchQuery} 
                 viewRecord={setViewRecord} 
                 actions={actions} 
