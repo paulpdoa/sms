@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { MainContext } from "../../helpers/MainContext";
 import MasterDataForm from "../../components/MasterDataForm";
 import { useSnackbar } from 'notistack';
+import Filter from '../../components/Filter';
 
 const Sectioning = () => {
     const columns = [
@@ -22,7 +23,7 @@ const Sectioning = () => {
     ];
 
     const navigate = useNavigate();
-    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role } = useContext(MainContext);
+    const { searchQuery, showForm, currentUserId, setShowForm, session: currentSession, role,dateFormatter } = useContext(MainContext);
     const { records: students } = useFetch(`${baseUrl()}/students`);
     const { records: sections } = useFetch(`${baseUrl()}/sections`);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${currentSession}`);
@@ -31,6 +32,9 @@ const Sectioning = () => {
     const [adviser, setAdviser] = useState('');
     const [studentRecord, setStudentRecord] = useState(null);
     const withStrands = [11, 12];
+
+    const [filter,setFilter] = useState('');
+
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -45,7 +49,20 @@ const Sectioning = () => {
         setSectionId(e.target.value);
     }
 
-    const studentLists = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId.isEnrolled).map(student => ({
+    const studentLists = students?.filter(student => {
+
+        const section = student?.academicId?.sectionId;
+
+        if(filter === 'With Section') {
+            return section
+        }
+
+        if(filter === 'Without Section') {
+            return !section
+        }
+
+        return student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId.isEnrolled
+    }).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         gradeLevel: student?.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
@@ -123,8 +140,11 @@ const Sectioning = () => {
 
     return (
         <main className="p-2 relative">
-            <TabActions title="Sectionings" noView={true} />
-            <div className={`gap-2 mt-5`}>
+            <div className="flex items-center">
+                <TabActions title="Sectionings" noView={true} />
+                <Filter title="option" options={['With Section', 'Without Section']} onChange={setFilter} />
+            </div>
+            <div className={`gap-2`}>
                 {showForm &&
                     (
                         studentRecord ?

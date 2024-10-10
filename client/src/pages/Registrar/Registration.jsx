@@ -21,7 +21,7 @@ const Registration = () => {
         <main className="p-4 relative">
             <div className="flex items-center gap-2">
                 <TabActions title='Registration' noView={true} />
-                <Filter options={['Registered','Not Registered']} title="option" onChange={setFilter} />
+                <Filter options={['Registered','Not Registered','Both']} title="option" onChange={setFilter} />
             </div>
             { currentPage === 'Registration' && <StudentInfoTable searchQuery={searchQuery} setViewRecord={enableViewStudentRecord} filter={filter} /> }
         </main>

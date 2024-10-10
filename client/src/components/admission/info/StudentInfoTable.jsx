@@ -50,11 +50,27 @@ const StudentInfoTable = ({ setViewRecord, searchQuery,filter }) => {
     );
 
     const formattedStudents = students?.filter(student => {
-        const filterStatus = filter === 'Admitted';
-        if(student?.academicId?.isAdmitted === filterStatus) {
-            return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && student?.academicId?.isAdmitted
-        } 
-        return student?.academicId?.academicStatus?.toLowerCase() !== 'graduated' && !student?.academicId?.isAdmitted
+        const isAdmitted = student?.academicId?.isAdmitted;
+        const isRegistered = student?.academicId?.isRegistered;
+    
+        // Handle 'Not Registered' filter
+        if (filter === 'Not Registered') {
+            return !isRegistered; // Return students who are not registered
+        }
+    
+        // Handle 'Registered' filter
+        if (filter === 'Registered') {
+            return isRegistered; // Return students who are registered
+        }
+    
+        // Handle 'Admitted' filter
+        if (filter === 'Admitted') {
+            return isAdmitted && !isRegistered; // Return students who are admitted but not registered
+        }
+    
+        // Default case: return all students if no filter matches
+        return student?.academicId?.isAdmitted;
+        
     }).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,

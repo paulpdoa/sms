@@ -10,6 +10,7 @@ import { useFetch } from '../../hooks/useFetch';
 import { MainContext } from '../../helpers/MainContext';
 import { useSnackbar } from 'notistack';
 import TabActions from '../../components/TabActions';
+import Filter from '../../components/Filter';
 
 const Assessment = () => {
 
@@ -20,9 +21,11 @@ const Assessment = () => {
     const [enableView, setEnableView] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [filter,setFilter] = useState('');
+
     const { enqueueSnackbar,closeSnackbar } = useSnackbar();
 
-    const { session, currentUserId, role,snackbarKey,searchQuery } = useContext(MainContext);
+    const { session, currentUserId, role,snackbarKey,searchQuery,dateFormatter } = useContext(MainContext);
     const { records: schoolYear } = useFetch(`${baseUrl()}/school-year/${session}`);
     const isYearDone = schoolYear.isYearDone ? true : false;
 
@@ -123,17 +126,26 @@ const Assessment = () => {
         }
     };
 
-    const formattedStudents = students?.filter(student => student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId?.gradeLevelId).map(student => ({
+    const formattedStudents = students?.filter(student => {
+
+        const isAssessed = student?.academicId?.isAssessed;
+
+        if(filter === 'Assessed') {
+            return isAssessed
+        }
+
+        if(filter === 'Not Assessed') {
+            return !isAssessed
+        }
+
+        return student?.academicId?.isAdmitted && student?.academicId?.isRegistered && student?.academicId?.gradeLevelId
+    }).map(student => ({
         ...student,
         fullName: `${student.lastName}, ${student.firstName} ${student.middleName}`,
         studentNo: student.studentNo || 'Not assigned',
         registered: student?.academicId?.isRegistered ? 'Yes' : 'No',
         admitted: student?.academicId?.isAdmitted ? 'Yes' : 'No',
-        dateRegistered: student.academicId?.dateRegistered ? new Date(student.academicId?.dateRegistered).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric' 
-        }) : 'Not Registered',
+        dateRegistered: student.academicId?.dateRegistered ? dateFormatter(student.academicId?.dateRegistered) : 'Not Registered',
         gradeLevel: student.academicId?.gradeLevelId?.gradeLevel || 'Not Assigned',
         strand: student.academicId?.strandId?.strand || 'Not assigned',
         nationality: student.nationality?.nationality || 'Not assigned',
@@ -144,16 +156,20 @@ const Assessment = () => {
 
     return (
         <main className="p-4 relative overflow-hidden">
-            <div className="flex mx-4 my-2 items-center">
+            <div className="flex items-center">
                 <TabActions title="Assessment" noView={true} />
                 <div className="flex items-center gap-2 mx-9">
                     <button disabled={isYearDone} onClick={deleteGeneratedFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customCancel hover:bg-red-600 text-white p-2 rounded-md min-w-fit`}>Delete Fees</button>
                     <button disabled={isYearDone} onClick={generateFees} className={`${isYearDone ? 'cursor-not-allowed' : 'cursor-pointer'} items-end text-sm bg-customView hover:bg-customHighlight text-white p-2 rounded-md min-w-fit`}>{isLoading ? 'Loading' : 'Generate Fees'}</button>
                 </div>
             </div>
+            
+            <div className="flex justify-end">
+                <Filter options={['Assessed','Not Assessed', 'Clear']} title="option" onChange={setFilter} />
+            </div>
 
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1 mt-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
                 <div className="rounded-md h-fit">
                     <MasterTable columns={columns} data={formattedStudents} viewRecord={enableViewStudentRecord} searchQuery={searchQuery} />
                 </div>
